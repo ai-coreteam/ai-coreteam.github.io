@@ -5067,14 +5067,44 @@
       </p>
 
       <form id="create-program-form" onsubmit="handleCreateProgramSubmit(event)">
+        <!-- P8: NGÀNH HÀNG / PHÂN KHÚC (TỰ ĐỘNG GỢI Ý MÃ ĐỢT BÁN KHÔNG TRÙNG LẶP) -->
+        <div style="margin-bottom:12px;">
+          <label class="form-label" for="prog-segment" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Ngành hàng / Phân khúc sản phẩm *</span>
+            <span style="font-size:11px; color:#A50034; font-weight:600;">(Hệ thống tự động sinh Mã đợt bán chuẩn hóa)</span>
+          </label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select class="form-control" id="prog-segment" required onchange="handleProgSegmentChange(this.value)" style="font-weight:600; color:#262626; background:#FFF;">
+              <option value="Kitchen" selected>Kitchen · Bếp / Lò vi sóng / Máy rửa bát</option>
+              <option value="REF">REF · Tủ lạnh (Refrigerator / InstaView)</option>
+              <option value="WM">WM · Máy giặt / Tháp giặt sấy (Washing Machine / WashTower)</option>
+              <option value="TV">TV · Tivi OLED / QNED / UHD</option>
+              <option value="AV">AV · Loa thanh Soundbar / Dàn âm thanh</option>
+              <option value="MS">MS · Màn hình máy tính (Monitor Series)</option>
+              <option value="ES">ES · Thiết bị điện tử gia dụng (Electronic Systems)</option>
+              <option value="RAC">RAC · Điều hòa không khí dân dụng</option>
+              <option value="AP">AP · Máy lọc không khí Purifier</option>
+              <option value="PC">PC · Laptop LG Gram / Thiết bị tin học</option>
+              <option value="Display">Display · Màn hình chuyên dụng / Quảng cáo</option>
+              <option value="Other">Other segment · Phân khúc khác</option>
+            </select>
+            <button type="button" class="btn-quick-date" onclick="regenerateProgramId()" style="white-space:nowrap; padding:6px 12px;" title="Tự động tính toán lại Mã đợt bán theo Quý và Ngành hàng">
+              🔄 Sinh mã
+            </button>
+          </div>
+        </div>
+
         <div style="display:grid; grid-template-columns: 1fr 2fr; gap:12px; margin-bottom:12px;">
           <div class="form-group">
-            <label class="form-label" for="prog-id">Mã đợt bán *</label>
-            <input type="text" class="form-control" id="prog-id" required placeholder="VD: IS2026Q4-HA" style="text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">
+            <label class="form-label" for="prog-id" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Mã đợt bán *</span>
+              <span id="prog-id-status" style="font-size:10.5px; font-weight:700; color:#1E8449;">✓ Mã đề xuất</span>
+            </label>
+            <input type="text" class="form-control" id="prog-id" required placeholder="Hệ thống tự sinh..." oninput="validateProgramIdInput(this.value)" style="text-transform:uppercase; font-weight:700; letter-spacing:0.5px; background:#FBF9F5;">
           </div>
           <div class="form-group">
             <label class="form-label" for="prog-name">Tên chương trình hiển thị *</label>
-            <input type="text" class="form-control" id="prog-name" required placeholder="VD: Đợt Bán Hàng Q4/2026 – Ngành Gia Dụng">
+            <input type="text" class="form-control" id="prog-name" required placeholder="VD: Đợt Bán Hàng Q4/2026 – Ngành Kitchen">
           </div>
         </div>
 
@@ -5428,6 +5458,12 @@
   </div>
 
   <script>
+    // P8: Global catalog state hoisted to prevent TDZ runtime errors
+    var unifiedCatalogViewMode = 'cards'; // 'cards' | 'table'
+    var unifiedCatalogKho = '';           // '' = all
+    var unifiedCatalogSearch = '';        // query string
+    var currentProducts = [];
+
     // Global HTML Escape helper
     function esc(t) {
       return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -6106,7 +6142,10 @@
     let pmRegistrations = [];
     let programs = [];        // cached list of programs
     let activeProgram = 'IS2026Q3-HA'; // currently selected program ID
-    let currentProducts = [];
+    unifiedCatalogViewMode = 'cards'; // 'cards' | 'table'
+    unifiedCatalogKho = '';           // '' = all
+    unifiedCatalogSearch = '';        // query string
+
 
     function quickLogin(id, pw) {
       const idEl = document.getElementById('login-id');
@@ -6930,20 +6969,109 @@
       endInput.value = formatLocal(end);
     }
 
+    // P8: SMART PROGRAM CODE GENERATOR & UNIQUENESS ENGINE
+    function generateAutoProgramId(segment) {
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const quarter = Math.ceil(month / 3);
+      const seg = (segment || 'OTHER').toUpperCase();
+
+      const allProgs = (typeof programs !== 'undefined' && programs.length) ? programs : (typeof DEMO_PROGRAMS !== 'undefined' ? DEMO_PROGRAMS : []);
+      const prefix = `IS-${year}Q${quarter}-${seg}`;
+      const prefixNoHyphen = `IS${year}Q${quarter}-${seg}`;
+
+      let maxSeq = 0;
+      allProgs.forEach(p => {
+        const id = String(p.id || '').toUpperCase();
+        if (id.startsWith(prefix) || id.startsWith(prefixNoHyphen)) {
+          const match = id.match(/-(\d+)$/);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxSeq) maxSeq = num;
+          } else {
+            if (maxSeq === 0) maxSeq = 1;
+          }
+        }
+      });
+
+      const nextSeq = String(maxSeq + 1).padStart(2, '0');
+      return `${prefix}-${nextSeq}`;
+    }
+    window.generateAutoProgramId = generateAutoProgramId;
+
+    function handleProgSegmentChange(seg) {
+      if (!seg) return;
+      const autoId = generateAutoProgramId(seg);
+      const idEl = document.getElementById('prog-id');
+      if (idEl) {
+        idEl.value = autoId;
+        validateProgramIdInput(autoId);
+      }
+      const nameEl = document.getElementById('prog-name');
+      if (nameEl && (!nameEl.value || nameEl.value.includes('Đợt Bán Hàng'))) {
+        const d = new Date();
+        const year = d.getFullYear();
+        const quarter = Math.ceil((d.getMonth() + 1) / 3);
+        const segNames = {
+          Kitchen: 'Nhà Bếp (MWO/Dishwasher)',
+          REF: 'Tủ Lạnh (InstaView/Door-in-Door)',
+          WM: 'Máy Giặt & WashTower',
+          TV: 'Tivi OLED & QNED',
+          AV: 'Loa Thanh Soundbar & Dàn Âm Thanh',
+          MS: 'Màn Hình Máy Tính',
+          ES: 'Thiết Bị Điện Tử Gia Dụng',
+          RAC: 'Điều Hòa Không Khí Dân Dụng',
+          AP: 'Máy Lọc Không Khí Purifier',
+          PC: 'Laptop LG Gram',
+          Display: 'Màn Hình Hiển Thị Chuyên Dụng',
+          Other: 'Phân Khúc Đặc Biệt'
+        };
+        nameEl.value = `Đợt Bán Hàng Nội Bộ Q${quarter}/${year} – Ngành ${segNames[seg] || seg}`;
+      }
+    }
+    window.handleProgSegmentChange = handleProgSegmentChange;
+
+    function regenerateProgramId() {
+      const segEl = document.getElementById('prog-segment');
+      const seg = segEl ? segEl.value : 'Kitchen';
+      handleProgSegmentChange(seg);
+    }
+    window.regenerateProgramId = regenerateProgramId;
+
+    function validateProgramIdInput(idVal) {
+      const statusEl = document.getElementById('prog-id-status');
+      const submitBtn = document.getElementById('btn-submit-create-prog');
+      const id = String(idVal || '').trim().toUpperCase();
+      if (!id) {
+        if (statusEl) statusEl.textContent = '';
+        return;
+      }
+      const allProgs = (typeof programs !== 'undefined' && programs.length) ? programs : (typeof DEMO_PROGRAMS !== 'undefined' ? DEMO_PROGRAMS : []);
+      const duplicate = allProgs.some(p => String(p.id || '').toUpperCase() === id);
+      if (duplicate) {
+        if (statusEl) {
+          statusEl.style.color = '#EA1917';
+          statusEl.textContent = '❌ Đã tồn tại mã này!';
+        }
+        if (submitBtn) submitBtn.disabled = true;
+      } else {
+        if (statusEl) {
+          statusEl.style.color = '#1E8449';
+          statusEl.textContent = '✓ Mã hợp lệ';
+        }
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }
+    window.validateProgramIdInput = validateProgramIdInput;
+
     function showCreateProgramModal() {
       const modal = document.getElementById('create-program-modal');
       if (!modal) return;
 
-      const now = new Date();
-      const q = Math.floor(now.getMonth() / 3) + 1;
-      const progIdInput = document.getElementById('prog-id');
-      const progNameInput = document.getElementById('prog-name');
-      if (progIdInput) {
-        progIdInput.value = `IS${now.getFullYear()}Q${q}-HA`;
-      }
-      if (progNameInput) {
-        progNameInput.value = `Đợt Bán Hàng Nội Bộ Q${q}/${now.getFullYear()} – Gia Dụng HA`;
-      }
+      const segSelect = document.getElementById('prog-segment');
+      if (segSelect) segSelect.value = 'Kitchen';
+      handleProgSegmentChange('Kitchen');
 
       setQuickDateRange('7days');
       clearProgImportedFile();
@@ -7027,15 +7155,27 @@
           }
 
           const headers = json[headerRowIdx].map(c => String(c).trim());
-          const findColIdx = (keywords) => headers.findIndex(h => keywords.some(k => h.toLowerCase().includes(k.toLowerCase())));
+          const findColIdx = (keywords) => headers.findIndex(h => {
+            const hClean = h.toLowerCase().replace(/[\r\n\t]/g, ' ').trim();
+            return keywords.some(k => {
+              const kClean = k.toLowerCase().trim();
+              return hClean === kClean || hClean.startsWith(kClean) || hClean.includes(kClean);
+            });
+          });
 
+          // P8: Enhanced Column Mapping (Supports both Standard 7-col template & Warehouse Inspection template)
+          // Exact matching for highlighted columns: A(No), B(CAT), E(W/H), F(Model), G(Serial), H(NOTE), Y(Grade), AA(MRP), AB(D/C), AC(Selling price)
           const modelIdx = findColIdx(['model', 'mã model', 'tên model', 'tên sp', 'tên sản phẩm']);
-          const khoIdx = findColIdx(['kho', 'wh', 'warehouse']);
-          const slotIdx = findColIdx(['slot', 'mã slot', 'slot id', 'stt', 'no']);
-          const priceIdx = findColIdx(['giá bán', 'giá nội bộ', 'internal price', 'price', 'giá']);
-          const rrpIdx = findColIdx(['giá niêm yết', 'rrp', 'retail', 'giá hãng']);
-          const catIdx = findColIdx(['ngành hàng', 'loại (grade)', 'loại', 'grade', 'category']);
-          const descIdx = findColIdx(['mô tả', 'description', 'chi tiết', 'tên sp']);
+          const khoIdx = findColIdx(['w/h', 'wh', 'kho', 'warehouse']);
+          const slotIdx = findColIdx(['slot id', 'mã slot', 'slot']);
+          const noIdx = findColIdx(['no', 'stt', 'số tt']);
+          const catIdx = findColIdx(['product/cat', 'ngành hàng', 'category', 'phân loại', 'cat']);
+          const serialIdx = findColIdx(['serial', 'số serial', 's/n', 'imei']);
+          const noteIdx = findColIdx(['note', 'ghi chú', 'tình trạng', 'mô tả', 'description', 'defect']);
+          const gradeIdx = findColIdx(['grade', 'loại (grade)', 'loại', 'hạng']);
+
+          const priceIdx = findColIdx(['selling price', 'giá bán', 'giá nội bộ', 'internal price', 'price', 'giá']);
+          const rrpIdx = findColIdx(['mrp', 'giá niêm yết', 'rrp', 'retail', 'giá hãng']);
 
           if (modelIdx === -1 && slotIdx === -1) {
             callback(new Error('Không tìm thấy cột "Model" hoặc "Slot ID" trong bảng tính.'), null);
@@ -7046,23 +7186,40 @@
           for (let i = headerRowIdx + 1; i < json.length; i++) {
             const row = json[i];
             if (!row || row.length === 0) continue;
-            const modelVal = modelIdx !== -1 ? String(row[modelIdx] || '').trim() : '';
-            if (!modelVal) continue;
 
-            let slotVal = slotIdx !== -1 ? String(row[slotIdx] || '').trim() : '';
-            if (!slotVal) {
+            const modelVal = modelIdx !== -1 ? String(row[modelIdx] || '').trim() : '';
+            // Skip subheaders, notes, or rows without a valid model
+            if (!modelVal || modelVal.toLowerCase() === 'model' || modelVal.toLowerCase() === 'none') continue;
+
+            const khoVal = khoIdx !== -1 ? String(row[khoIdx] || 'AYC').trim().toUpperCase() : 'AYC';
+            const catVal = catIdx !== -1 && row[catIdx] ? String(row[catIdx]).trim() : 'Thiết bị LG';
+            const serialVal = serialIdx !== -1 && row[serialIdx] ? String(row[serialIdx]).trim() : '';
+            const noteVal = noteIdx !== -1 && row[noteIdx] ? String(row[noteIdx]).trim() : '';
+            const gradeVal = gradeIdx !== -1 && row[gradeIdx] ? String(row[gradeIdx]).trim() : '';
+
+            // Slot ID generation: prioritize explicit Slot ID > sequential No > index
+            let slotVal = '';
+            if (slotIdx !== -1 && row[slotIdx]) {
+              slotVal = String(row[slotIdx]).trim();
+            } else if (noIdx !== -1 && row[noIdx] && !isNaN(row[noIdx])) {
+              slotVal = `#${String(row[noIdx]).padStart(3, '0')}`;
+            } else {
               slotVal = `#${String(products.length + 1).padStart(3, '0')}`;
             }
 
-            const khoVal = khoIdx !== -1 ? String(row[khoIdx] || 'AYC').trim() : 'AYC';
             let rawPrice = priceIdx !== -1 ? row[priceIdx] : 0;
             if (typeof rawPrice === 'string') rawPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, '')) || 0;
 
-            let rawRrp = rrpIdx !== -1 ? row[rrpIdx] : (rawPrice * 1.4);
-            if (typeof rawRrp === 'string') rawRrp = parseFloat(rawRrp.replace(/[^0-9.]/g, '')) || (rawPrice * 1.4);
+            let rawRrp = rrpIdx !== -1 ? row[rrpIdx] : 0;
+            if (typeof rawRrp === 'string') rawRrp = parseFloat(rawRrp.replace(/[^0-9.]/g, '')) || 0;
+            if (!rawRrp && rawPrice) rawRrp = Math.round(rawPrice * 1.4);
 
-            const catVal = catIdx !== -1 ? String(row[catIdx] || '').trim() : 'Thiết bị LG';
-            const descVal = descIdx !== -1 && row[descIdx] ? String(row[descIdx]).trim() : `${modelVal} - ${catVal}`;
+            // Rich description composed from yellow-highlighted fields
+            const descParts = [];
+            if (gradeVal) descParts.push(`Loại ${gradeVal}`);
+            if (serialVal) descParts.push(`Serial: ${serialVal}`);
+            if (noteVal) descParts.push(noteVal);
+            const descVal = descParts.length > 0 ? descParts.join(' · ') : `${modelVal} - ${catVal}`;
 
             products.push({
               uniqueCode: slotVal,
@@ -7070,6 +7227,9 @@
               model: modelVal,
               kho: khoVal,
               category: catVal || 'Thiết bị LG',
+              serial: serialVal,
+              grade: gradeVal,
+              note: noteVal,
               description: descVal,
               internalPrice: rawPrice || 0,
               rrp: rawRrp || 0,
@@ -8080,9 +8240,6 @@
 
     // ===== P2: Product Display (Unified Single Catalog) =====
 
-    let unifiedCatalogViewMode = 'cards'; // 'cards' | 'table'
-    let unifiedCatalogKho = '';           // '' = all
-    let unifiedCatalogSearch = '';        // query string
 
     function setUnifiedViewMode(mode) {
       unifiedCatalogViewMode = mode;
@@ -10686,35 +10843,92 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     }
     async function refreshTaken(force) {
       if (!SHEET_API_URL || takenBusy) return;
-      if (!force && Date.now() - takenLoadedAt < 10000) return;
+      if (!force && Date.now() - takenLoadedAt < 5000) return;
       takenBusy = true;
       try {
         const r = await fetch(SHEET_API_URL + '?action=taken&t=' + Date.now());
         const j = await r.json();
         if (j && j.ok && Array.isArray(j.taken)) {
           takenSet.clear(); j.taken.forEach(x => takenSet.add(x));
-          takenLoadedAt = Date.now(); applyTaken(false);
+          takenLoadedAt = Date.now();
+          applyTaken(false);
+          // P8: Real-time dynamic sync to Unified Single Catalog
+          if (typeof syncProductRegistrationStatus === 'function') {
+            syncProductRegistrationStatus(activeProgram, currentProducts);
+          }
+          if (typeof renderProductTable === 'function' && currentProducts && currentProducts.length) {
+            renderProductTable(currentProducts);
+          }
+          if (typeof updateKhoCounts === 'function') updateKhoCounts();
         }
       } catch (e) { /* mạng lỗi: giữ danh sách cũ, lần sau thử lại */ }
       finally { takenBusy = false; }
     }
     ['reg-model', 'reg-slot-id'].forEach(id => {
       const el = document.getElementById(id);
-      el.addEventListener('mousedown', () => refreshTaken(false));
-      el.addEventListener('focus', () => refreshTaken(false));
+      if (el) {
+        el.addEventListener('mousedown', () => refreshTaken(false));
+        el.addEventListener('focus', () => refreshTaken(false));
+      }
     });
-    // Chỉ cập nhật khi trang đang mở ở Tab 2 hoặc Tab 4, 60–75 giây/lần (giảm tải máy chủ khi 200 người cùng vào)
+
+    // P8: Kiểm tra tab active
     function takenTabActive() {
       const a = document.querySelector('.tab-content.active');
       return !!a && (a.id === 'tab2' || a.id === 'tab4');
     }
     document.addEventListener('visibilitychange', () => { if (!document.hidden && takenTabActive()) refreshTaken(false); });
+
+    // P8: Adaptive Background Polling (6–8 giây khi xem Kho để chống tranh chấp slot)
     (function pollTaken() {
-      setTimeout(() => { if (!document.hidden && takenTabActive()) refreshTaken(true); pollTaken(); },
-        60000 + Math.floor(Math.random() * 15000));
+      const interval = takenTabActive() ? (6000 + Math.floor(Math.random() * 2000)) : (45000 + Math.floor(Math.random() * 15000));
+      setTimeout(() => {
+        if (!document.hidden && takenTabActive()) refreshTaken(true);
+        pollTaken();
+      }, interval);
     })();
-    // Hiện ngay link "Đặt hàng" cho mọi slot, không chờ máy chủ. Máy chủ trả về thì slot đã có người sẽ đổi thành "Đã hết".
-    // (Nếu 2 người cùng chọn 1 slot, máy chủ vẫn chặn người đến sau khi bấm Gửi đăng ký.)
+
+    // P8: Cross-tab Synchronizer (Đồng bộ đa tab/cửa sổ tức thì < 50ms)
+    try {
+      const syncChannel = new BroadcastChannel('lge_internal_sales_sync');
+      syncChannel.onmessage = function(ev) {
+        if (ev.data && ev.data.action === 'slot_registered') {
+          if (ev.data.slotId) takenSet.add(ev.data.slotId);
+          if (typeof syncProductRegistrationStatus === 'function') {
+            syncProductRegistrationStatus(activeProgram, currentProducts);
+          }
+          if (typeof renderProductTable === 'function' && currentProducts && currentProducts.length) {
+            renderProductTable(currentProducts);
+          }
+          if (typeof updateKhoCounts === 'function') updateKhoCounts();
+        }
+      };
+      window.broadcastSlotRegistered = function(slotId) {
+        try { syncChannel.postMessage({ action: 'slot_registered', slotId: slotId, t: Date.now() }); } catch (e) {}
+      };
+    } catch (e) {
+      window.broadcastSlotRegistered = function() {};
+    }
+
+    // Lắng nghe sự kiện storage cho đa tab chế độ Demo Offline
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'lg_demo_registrations') {
+        try {
+          const parsed = JSON.parse(e.newValue || '[]');
+          if (Array.isArray(parsed)) {
+            parsed.forEach(r => { if (r.slotId) takenSet.add(r.slotId); });
+            if (typeof syncProductRegistrationStatus === 'function') {
+              syncProductRegistrationStatus(activeProgram, currentProducts);
+            }
+            if (typeof renderProductTable === 'function' && currentProducts && currentProducts.length) {
+              renderProductTable(currentProducts);
+            }
+            if (typeof updateKhoCounts === 'function') updateKhoCounts();
+          }
+        } catch (err) {}
+      }
+    });
+
     applyTaken(true);
     // Gọi khi mở trang: vừa lấy danh sách slot, vừa "đánh thức" máy chủ. Lỗi mạng/máy chủ chậm thì tự thử lại (tối đa 5 lần).
     (function firstLoadTaken(n) {
@@ -10836,6 +11050,9 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (!res.ok && !res.offline) {
         alert('CHƯA GỬI ĐƯỢC ĐĂNG KÝ.\n\n' + (res.message || 'Lỗi không xác định.') + '\n\nVui lòng thử lại hoặc báo PM phụ trách.');
         return;
+      }
+      if (typeof window.broadcastSlotRegistered === 'function') {
+        window.broadcastSlotRegistered(slotId);
       }
       if (res.timestamp) timestampStr = res.timestamp;
       const openAtD = payOpenAt(timestampStr) || new Date(Date.now() + PAY_OPEN_DELAY_HOURS * 3600000);

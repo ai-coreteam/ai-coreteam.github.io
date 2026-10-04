@@ -40,14 +40,20 @@ Mục tiêu: nhân viên bấm Gửi ở Tab 2 (đăng ký) và Tab 3 (khai nộ
 
 ## Thiết lập Bộ quét Tự động Giải phóng Slot 24h (Time-driven Trigger)
 Để hệ thống tự động kiểm tra và giải phóng các slot giữ chỗ quá hạn 24 giờ cũng như gửi email cảnh báo trước 2 giờ:
-1. Trong giao diện Google Apps Script, bấm vào biểu tượng **Kích hoạt (Triggers - Biểu tượng đồng hồ ở thanh menu trái)**.
-2. Bấm nút **+ Thêm trình kích hoạt (+ Add Trigger)** ở góc dưới bên phải:
-   - Chọn hàm muốn chạy: `runExpirationWatchdog`.
-   - Chọn bản triển khai: `Head`.
-   - Chọn nguồn sự kiện: **Theo thời gian (Time-driven)**.
-   - Chọn loại trình kích hoạt: **Bộ đếm thời gian theo giờ (Hour timer)**.
-   - Chọn khoảng thời gian: **Mỗi giờ (Every hour)**.
-3. Bấm **Lưu**. Kể từ thời điểm này, Apps Script sẽ tự động chạy ngầm mỗi 60 phút để giải phóng các slot quá hạn và gửi email cảnh báo.
+
+- **Cách 1 (1-Click Tự Động Khuyến Nghị):**
+  - Tại ô chọn hàm trên thanh công cụ Apps Script, chọn hàm: 👉 **`setupWatchdogTrigger`** và bấm **Chạy (Run)**.
+  - Script sẽ tự động xóa các trigger trùng lặp cũ và khởi tạo trigger chạy ngầm hàm `runExpirationWatchdog` mỗi 1 giờ.
+
+- **Cách 2 (Cài đặt thủ công qua giao diện Triggers):**
+  1. Trong giao diện Google Apps Script, bấm vào biểu tượng **Kích hoạt (Triggers - Biểu tượng đồng hồ ở thanh menu trái)**.
+  2. Bấm nút **+ Thêm trình kích hoạt (+ Add Trigger)** ở góc dưới bên phải:
+     - Chọn hàm muốn chạy: `runExpirationWatchdog`.
+     - Chọn bản triển khai: `Head`.
+     - Chọn nguồn sự kiện: **Theo thời gian (Time-driven)**.
+     - Chọn loại trình kích hoạt: **Bộ đếm thời gian theo giờ (Hour timer)**.
+     - Chọn khoảng thời gian: **Mỗi giờ (Every hour)**.
+  3. Bấm **Lưu**. Kể từ thời điểm này, Apps Script sẽ tự động chạy ngầm mỗi 60 phút để giải phóng các slot quá hạn và gửi email cảnh báo.
 
 ## Cấu hình Bật/Tắt Gửi Email Tự động (AutoEmail)
 - Mặc định, hệ thống chạy ở chế độ mô phỏng an toàn: ghi nhận lịch sử vào sheet `AutoEmail` với trạng thái `[SIMULATED]`.

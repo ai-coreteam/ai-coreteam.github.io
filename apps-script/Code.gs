@@ -1010,7 +1010,8 @@ function pm_allow_payment_(d) {
     if (curStatus === STATUS_WAIT_GATE || curStatus === 'Đã đăng ký - Chờ mở thanh toán' || curStatus === 'Mới đăng ký') {
       data[r][C.STATUS - 1] = STATUS_NEW; // 'Chờ nộp tiền'
       var oldNote = String(data[r][C.NOTE - 1]).trim();
-      data[r][C.NOTE - 1] = (oldNote ? oldNote + ' | ' : '') + 'PM ' + pmName + ' mở cổng thanh toán lúc ' + nowStr;
+      var gateOpenIso = new Date().toISOString();
+      data[r][C.NOTE - 1] = (oldNote ? oldNote + ' | ' : '') + 'GATE_OPEN:' + gateOpenIso + ' (PM ' + pmName + ' mở cổng thanh toán lúc ' + nowStr + ')';
 
       var empCode = String(data[r][C.EMP_CODE - 1]).trim();
       var empName = String(data[r][C.EMP_NAME - 1]).trim();
@@ -1091,16 +1092,30 @@ function check_expired_slots_(d) {
 
     var rawTs = data[r][0];
     var regDate = rawTs instanceof Date ? rawTs : new Date(rawTs);
-    if (isNaN(regDate.getTime())) continue;
+    var curNote = String(data[r][C.NOTE - 1]).trim();
 
-    var diffMs = now - regDate.getTime();
+    // SPRINT P8: Bắt buộc đếm 24h từ thời điểm PM mở cổng thanh toán (GATE_OPEN) thay vì lúc đăng ký ban đầu
+    var gateMatch = curNote.match(/GATE_OPEN:([^\s|\)]+)/);
+    var baseDate = regDate;
+    if (gateMatch && gateMatch[1]) {
+      var parsedGate = new Date(gateMatch[1]);
+      if (!isNaN(parsedGate.getTime())) baseDate = parsedGate;
+    } else {
+      var vnMatch = curNote.match(/mở cổng thanh toán lúc (\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
+      if (vnMatch) {
+        var parsedVn = new Date(vnMatch[3] + '-' + vnMatch[2] + '-' + vnMatch[1] + 'T' + vnMatch[4] + ':' + vnMatch[5] + ':' + vnMatch[6]);
+        if (!isNaN(parsedVn.getTime())) baseDate = parsedVn;
+      }
+    }
+    if (isNaN(baseDate.getTime())) continue;
+
+    var diffMs = now - baseDate.getTime();
     var curSlot = String(data[r][C.SLOT - 1]).trim();
     var empCode = String(data[r][C.EMP_CODE - 1]).trim();
     var empName = String(data[r][C.EMP_NAME - 1]).trim();
     var empEmail = findUserEmail_(empCode);
     var pProg = String(data[r][C.CAMPAIGN - 1]).trim();
     var model = String(data[r][C.MODEL - 1]).trim();
-    var curNote = String(data[r][C.NOTE - 1]).trim();
 
     if (diffMs >= TWENTY_FOUR_HOURS_MS) {
       // 1. Release expired slot (>24h)
@@ -1177,6 +1192,22 @@ function runExpirationWatchdog() {
   var res = check_expired_slots_({});
   Logger.log(JSON.stringify(res));
   return res;
+}
+
+/** Tự động cài đặt Time-Driven Trigger chạy mỗi 1 giờ cho Watchdog 24h (1-Click Setup) */
+function setupWatchdogTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'runExpirationWatchdog') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  ScriptApp.newTrigger('runExpirationWatchdog')
+    .timeBased()
+    .everyHours(1)
+    .create();
+  Logger.log('Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog 24h!');
+  return { ok: true, message: 'Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog 24h!' };
 }
 
 /* ---------- P0: Xác thực (auth) ---------- */
@@ -1693,6 +1724,7 @@ function setupNewDatabase() {
     configSheet.appendRow(['BANK_ACC', '0991000012525', 'Số tài khoản công ty']);
     configSheet.appendRow(['BANK_HOLDER', 'CONG TY TNHH LG ELECTRONICS VIET NAM HAI PHONG', 'Tên chủ tài khoản']);
     configSheet.appendRow(['SYS_STATUS', 'OPEN', 'Trạng thái toàn hệ thống']);
+    configSheet.appendRow(['ENABLE_AUTO_EMAIL', 'true', 'Bật/tắt gửi email tự động qua MailApp (true / false)']);
   }
   
   // 4. Sheet: ActivityLog
@@ -1708,31 +1740,31 @@ function setupNewDatabase() {
     usersSheet.appendRow(['VH55432', 'test123', 'Lê Hoàng Anh (Demo)', 'HE Sales Division', '0933445566', 'hoanganh@lge.com', 'USER', 'Active']);
   }
   
-  // 6. Sheet: Programs
+  // 6. Sheet: Programs (Chuẩn 10 cột khớp 100% PROG_COL)
   var progSheet = ss.getSheetByName(SHEET_PROGRAMS) || ss.insertSheet(SHEET_PROGRAMS);
-  formatHeader(progSheet, ['ProgramID', 'Name', 'StartDate', 'EndDate', 'Status', 'BannerText', 'CreatedAt']);
+  formatHeader(progSheet, ['ProgramID', 'Name', 'PM_ID', 'PM_Name', 'Status', 'StartDate', 'EndDate', 'Description', 'MaxPerEmployee', 'CreatedAt']);
   if (progSheet.getLastRow() <= 1) {
-    progSheet.appendRow(['IS2026Q3-HA', 'CTBHNB HA Q3/2026', '2026-09-01', '2026-10-31', 'Open', 'Ưu đãi nội bộ Thiết bị gia dụng cao cấp', new Date()]);
-    progSheet.appendRow(['IS2026Q3-HE', 'CTBHNB HE Q3/2026', '2026-09-01', '2026-10-31', 'Open', 'Ưu đãi nội bộ Tivi OLED & Dàn âm thanh', new Date()]);
-    progSheet.appendRow(['IS2026Q4-BS', 'CTBHNB B2B/BS Q4/2026', '2026-10-01', '2026-11-30', 'Open', 'Ưu đãi Màn hình gram & Thiết bị văn phòng', new Date()]);
+    var nowIso = new Date().toISOString();
+    progSheet.appendRow(['IS2026Q3-HA', 'CTBHNB HA Q3/2026', 'VH12345', 'Nguyễn Thị Quỳnh Như', 'Open', '2026-09-01 08:00', '2026-10-31 18:00', 'Ưu đãi nội bộ Thiết bị gia dụng cao cấp', 1, nowIso]);
+    progSheet.appendRow(['IS2026Q3-HE', 'CTBHNB HE Q3/2026', 'VH12345', 'Nguyễn Thị Quỳnh Như', 'Open', '2026-09-01 08:00', '2026-10-31 18:00', 'Ưu đãi nội bộ Tivi OLED & Dàn âm thanh', 2, nowIso]);
+    progSheet.appendRow(['IS2026Q4-BS', 'CTBHNB B2B/BS Q4/2026', 'VH12345', 'Nguyễn Thị Quỳnh Như', 'Draft', '2026-10-01 08:00', '2026-11-30 18:00', 'Ưu đãi Màn hình gram & Thiết bị văn phòng', 1, nowIso]);
   }
   
-  // 7. Sheet: Products
+  // 7. Sheet: Products (Chuẩn 12 cột khớp 100% PROD_COL)
   var prodSheet = ss.getSheetByName(SHEET_PRODUCTS) || ss.insertSheet(SHEET_PRODUCTS);
-  formatHeader(prodSheet, ['UniqueCode', 'ProgramID', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Kho', 'Status']);
+  formatHeader(prodSheet, ['ProgramID', 'UniqueCode', 'Kho', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Qty', 'Status', 'EmpCode', 'Timestamp']);
   if (prodSheet.getLastRow() <= 1) {
-    prodSheet.appendRow(['HE-001', 'IS2026Q3-HE', 'Tivi OLED', 'OLED65G3PSA', 'Smart Tivi OLED evo 4K 65 inch Gallery Edition', 68900000, 38900000, 'AYA', 'Available']);
-    prodSheet.appendRow(['HA-001', 'IS2026Q3-HA', 'Máy giặt sấy', 'WT1410NHEG', 'Tháp giặt sấy thông minh LG WashTower', 32900000, 18900000, 'AYB', 'Available']);
-    prodSheet.appendRow(['BS-001', 'IS2026Q4-BS', 'Màn hình', '34WP65C', 'Màn hình UltraWide cong 34 inch QHD 160Hz', 12500000, 7200000, 'AYA', 'Available']);
+    var nowIso = new Date().toISOString();
+    prodSheet.appendRow(['IS2026Q3-HE', 'HE-001', 'AYA', 'Tivi OLED', 'OLED65G3PSA', 'Smart Tivi OLED evo 4K 65 inch Gallery Edition', 68900000, 38900000, 1, 'Available', '', nowIso]);
+    prodSheet.appendRow(['IS2026Q3-HA', 'HA-001', 'AYB', 'Máy giặt sấy', 'WT1410NHEG', 'Tháp giặt sấy thông minh LG WashTower', 32900000, 18900000, 1, 'Available', '', nowIso]);
+    prodSheet.appendRow(['IS2026Q4-BS', 'BS-001', 'AYA', 'Màn hình', '34WP65C', 'Màn hình UltraWide cong 34 inch QHD 160Hz', 12500000, 7200000, 1, 'Available', '', nowIso]);
   }
   
-  // 8. Sheet: AutoEmail
+  // 8. Sheet: AutoEmail (Nhật ký gửi email tự động)
   var emailSheet = ss.getSheetByName(SHEET_AUTO_EMAIL) || ss.insertSheet(SHEET_AUTO_EMAIL);
-  formatHeader(emailSheet, ['TemplateKey', 'Subject', 'BodyHtml', 'Active']);
+  formatHeader(emailSheet, ['EmpName', 'EmpCode', 'Email', 'Type', 'Timestamp']);
   if (emailSheet.getLastRow() <= 1) {
-    emailSheet.appendRow(['REGISTRATION_CONFIRM', '[LGEVH] Xác nhận đăng ký giữ chỗ #{{SLOT}}', '<p>Chào {{NAME}}, đơn đăng ký {{MODEL}} (#{{SLOT}}) đã được ghi nhận.</p>', 'TRUE']);
-    emailSheet.appendRow(['PAYMENT_GATE_OPENED', '[LGEVH] Cổng thanh toán đã mở cho đơn #{{SLOT}}', '<p>Chào {{NAME}}, vui lòng nộp tiền trước {{DEADLINE}}.</p>', 'TRUE']);
-    emailSheet.appendRow(['PAYMENT_APPROVED', '[LGEVH] Đơn hàng #{{SLOT}} đã xác nhận thanh toán', '<p>Chào {{NAME}}, đơn hàng của bạn đã được PM duyệt đối soát.</p>', 'TRUE']);
+    emailSheet.appendRow(['Trần Văn Nam', 'VH88921', 'vannam@lge.com', 'REGISTRATION_CONFIRM [SYSTEM_INIT]', new Date().toISOString()]);
   }
   
   // Dọn dẹp Sheet1 rỗng mặc định

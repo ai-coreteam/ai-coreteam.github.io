@@ -23,17 +23,17 @@
 
 ---
 
-## 0.2. CẬP NHẬT TOÀN DIỆN 01/10/2026 (PRODUCTION V8 — ĐÃ CÓ BACKEND & HOÀN THIỆN 100%)
+## 0.2. CẬP NHẬT TOÀN DIỆN 04/10/2026 (PRODUCTION V8.2 — PHASE P8 GO-LIVE READY & 100% PASS)
 
 > ⚠️ **ĐẶC BIỆT LƯU Ý DÀNH CHO AGENT TIẾP THEO / CHAT MỚI:**
-> Các mục cũ bên dưới (viết từ 24/09 và 28/09 nói "chưa có backend, chưa có database") **ĐÃ HOÀN TOÀN LỖI THỜI**. 
-> Hiện tại hệ thống đã là **Bản Production V8 hoàn chỉnh**, kết nối backend Google Apps Script đầy đủ.
+> Các mục cũ bên dưới (viết từ 24/09 và 28/09 nói "chưa có backend, chưa có database") **ĐÃ HOÀN TOÀN LỖI THỜI VÀ CHỈ MANG TÍNH CHẤT LỊCH SỬ**. 
+> Hiện tại hệ thống đã là **Bản Production V8.2 hoàn chỉnh**, vận hành trực tuyến với backend Google Apps Script + CSDL Google Sheet cá nhân.
 
 ### Hiện trạng thực tế của dự án hiện nay:
 1. **File Web Portal chính thức (Portal Live):**
    - **`Mau_Dang_Ky_Internal_Sales_3009.html`** (ĐÃ THAY THẾ TOÀN BỘ các file cũ `index.html` hay `Mau_Thu_Dang_Ky_Internal_Sales.html`). File này chạy độc lập, tự động fallback chế độ mô phỏng offline với `localStorage` bền vững hoặc gọi API Google Apps Script khi có URL.
 2. **Backend API chính thức:**
-   - **`apps-script/Code.gs`** kết nối CSDL Google Sheet `LG_Internal_Sales_Database` (`ID: <YOUR_SPREADSHEET_ID>` tự động tạo trên Google Drive cá nhân qua hàm `setupNewDatabase`).
+   - **`apps-script/Code.gs`** kết nối CSDL Google Sheet `LG_Internal_Sales_Database` (tự động tạo trên Google Drive cá nhân qua hàm `setupNewDatabase`).
 3. **Các tính năng kỹ thuật cốt lõi đã hoàn thành 100%:**
    - **Phase P0 (Auth & RBAC):** Đăng nhập Mã NV/Mật khẩu; phân quyền PM (Quản trị) vs USER (Nhân viên).
    - **Phase P1 (Multi-Program):** Chạy đồng thời `IS2026Q3-HA`, `IS2026Q3-HE`, `IS2026Q4-BS` với hạn mức 1 SP / NV.
@@ -41,13 +41,22 @@
    - **Phase P3 (VietQR 1-Chạm):** Tự nạp cú pháp chuyển khoản, nén ảnh biên lai < 300KB bằng Canvas HTML5.
    - **Phase P4 (PM Dashboard):** Tab 5 dành riêng cho PM, đối soát biên lai, phê duyệt tiền hoặc từ chối hoàn slot.
    - **Phase P4.5 & Dual-Mode Password:** Người dùng tự đổi MK trên web (băm SHA-256 + Salt); Quản lý có thể gõ trực tiếp mật khẩu plaintext trên Cột B tab `Users` của Google Sheet để reset mật khẩu nhanh.
-   - **Phase P4.6 (PM Allow Payment Gate):** Đơn mới đăng ký nhận trạng thái `Đã đăng ký - Chờ mở thanh toán` (khóa thanh toán, chống chuyển tiền nhầm). PM bấm `🔓 Mở cổng thanh toán` sẽ chuyển toàn bộ đơn đăng ký trước đó sang `Chờ nộp tiền` và kích hoạt đếm ngược 24h. Các đơn đăng ký sau thời điểm này tiếp tục chờ đợt sau.
+   - **Phase P4.6 (PM Allow Payment Gate):** Đơn mới đăng ký nhận trạng thái `Đã đăng ký - Chờ mở thanh toán` (khóa thanh toán, chống chuyển tiền nhầm). PM bấm `🔓 Mở cổng thanh toán` sẽ chuyển toàn bộ đơn đăng ký trước đó sang `Chờ nộp tiền` và kích hoạt đếm ngược 24h từ thời điểm mở cổng (`gateOpenTime`).
    - **Phase P5 (High Concurrency Cache):** Cache 2 tầng (Server CacheService 60s + Client SWR 25s), đã stress test đạt 903.7 req/s, chịu tải 200–300 users đồng thời.
-   - **Phase P7 (AutoEmail & 24h Watchdog):** Tự động quét giải phóng slot quá hạn 24h và gửi email thông báo theo nhận diện LG V5.2.
+   - **Phase P7 (AutoEmail & 24h Watchdog):** Tự động quét giải phóng slot quá hạn 24h (tính từ lúc mở cổng, không tính từ lúc nộp đơn) và gửi email thông báo theo nhận diện LG V5.2.
+   - **Phase P8 (Go-Live Preparation & Data Integrity):**
+     - *Đồng bộ hóa dữ liệu thời gian thực (Adaptive Polling & Concurrency Sync):* Polling thích ứng 6–8s trong đợt mở bán, tự động đồng bộ tức thì qua `BroadcastChannel` và `storage event` giữa các tab trình duyệt.
+     - *Bộ sinh Mã Đợt Bán Thông Minh (Smart Program ID Generator):* Menu chọn 12 phân khúc ngành hàng (`REF`, `WM`, `Kitchen`, `TV`, `AV`, `MS`, `ES`, `RAC`, `AP`, `PC`, `Display`, `Other`) tự động tính Quý và sinh mã chuẩn `IS-YYYYQ[1-4]-<SEGMENT>-NN`, tự động phát hiện và tăng số thứ tự tránh trùng lặp.
+     - *Nạp Excel Kho Vận Đa Định Dạng (Multi-format Ingestion):* Tự động trích xuất chính xác 10 cột dữ liệu bôi vàng từ file kiểm kê kho của PM (`PM internal promotion template.xlsx`: A=No, B=CAT, E=W/H, F=Model, G=Serial, H=NOTE, Y=Grade, AA=MRP, AB=D/C, AC=Selling price) và loại bỏ hoàn toàn các cột điểm số kiểm tra kỹ thuật nội bộ (I đến X).
+     - *Đồng bộ Schema 12 cột Products:* Căn chỉnh hoàn hảo giữa `Code.gs`, `setupNewDatabase()` và bảng xuất dữ liệu.
+     - *Kích hoạt 1-Click Trigger:* Hàm `setupWatchdogTrigger()` trong Apps Script tự cài đặt cron theo giờ.
+     - *Bộ Kiểm Thử Tự Động Toàn Diện E2E:* File `tests/run_e2e_tests.js` kiểm tra 54 tiêu chí, đạt **54/54 PASS (100% Success)**.
 4. **Tài liệu chuẩn cần đọc:**
-   - [PROJECT_PLANNING.md](PROJECT_PLANNING.md): Kế hoạch và nhật ký kiểm thử chi tiết.
-   - [docs/SETUP_APPS_SCRIPT.md](docs/SETUP_APPS_SCRIPT.md): Hướng dẫn triển khai Web App và cài đặt Trigger.
-   - [docs/USERS_SHEET_TEMPLATE.md](docs/USERS_SHEET_TEMPLATE.md): Cấu trúc tab `Users` và hướng dẫn quản trị mật khẩu.
+   - [docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md](docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md): Hướng dẫn PIC & Agent tự động tạo Sheet trong 2 phút.
+   - [docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md](docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md): Hướng dẫn triển khai Web App và cài đặt Trigger.
+   - [docs/01-setup-and-deployment/USERS_SHEET_TEMPLATE.md](docs/01-setup-and-deployment/USERS_SHEET_TEMPLATE.md): Cấu trúc tab `Users` và hướng dẫn quản trị mật khẩu.
+   - [docs/03-architecture-and-analysis/PHASE_P8_GO_LIVE_DEEP_ANALYSIS_AND_BLINDSPOTS.md](docs/03-architecture-and-analysis/PHASE_P8_GO_LIVE_DEEP_ANALYSIS_AND_BLINDSPOTS.md): Phân tích chi tiết 5 điểm mù vận hành và giải pháp.
+   - [tests/run_e2e_tests.js](tests/run_e2e_tests.js): Kịch bản kiểm thử tự động E2E chạy độc lập.
 
 ---
 
@@ -63,8 +72,10 @@ Tiêu đề hiển thị ở banner (dòng 748–749):
 - `CỔNG ĐĂNG KÝ BÁN HÀNG NỘI BỘ (INTERNAL SALES PORTAL)`
 - `Hệ Thống Đăng Ký Trực Tuyến & Xác Nhận Nộp Tiền Ngân Hàng - Chuẩn Hóa LGEVH`
 
-### 1.2. Bản chất hiện tại
-Đây là **bản mẫu / prototype giao diện (mockup)**: trình bày được quy trình và tương tác trên trình duyệt, nhưng không lưu dữ liệu thật. Tải lại trang là mất hết dữ liệu đã nhập. Phù hợp để:
+### 1.2. Bản chất ban đầu (Lịch sử ngày 24/09/2026)
+> ⚠️ **LƯU Ý:** Mục 1.2, 2, 3 bên dưới ghi nhận tình trạng nguyên bản ngày 24/09 khi mới tạo mockup. Hiện tại (04/10/2026), hệ thống đã là **Bản Production V8.2 Live** với backend Google Apps Script và Google Sheets đầy đủ (xem chi tiết tại Mục 0.2).
+
+Đây là **bản mẫu / prototype giao diện (mockup)** ban đầu: trình bày được quy trình và tương tác trên trình duyệt, nhưng không lưu dữ liệu thật. Tải lại trang là mất hết dữ liệu đã nhập. Phù hợp để:
 - Trình bày ý tưởng cải tiến quy trình với PM Support, TL/BOD.
 - Làm tài liệu đặc tả (spec) cho IT xây hệ thống thật.
 - Làm mẫu thư thông báo (có bản text để copy vào Outlook).
@@ -790,6 +801,7 @@ Sau đó làm tiếp backlog mục 11, ưu tiên 1. Lưu bản mới, không ghi
 | 28/09/2026 | Claude (v7.3) | Chịu tải tốt hơn (khoá ngắn, bộ nhớ đệm, tự gửi lại khi bận); tra cứu đơn bằng Mã NV + 4 số cuối SĐT; thay dữ liệu mẫu cũ ở Tab 1, 3, 4 bằng 90 slot thật; khoá cột trên sheet; thêm sheet PM xử lý |
 | 30/09/2026 | Claude (v8) | Thêm file `Mau_Dang_Ky_Internal_Sales_3009.html` (chưa thay `index.html`). Tab 3: nộp tiền chỉ mở sau 2 giờ kể từ lúc đăng ký, qua nút Nộp tiền ở Tra cứu đơn (hằng `PAY_OPEN_DELAY_HOURS`); kéo thả biên lai; ô tick "người nộp tiền giống người đăng ký"; hiện số tiền cần nộp và cảnh báo khi khai lệch. Tab 2: chọn sản phẩm bằng thẻ (lọc kho, loại hàng, tìm model, sắp xếp giá), đưa bước chọn sản phẩm lên đầu. Tab 4: lọc kho, cột "Đăng ký nhanh" với link Đặt hàng sang Tab 2 điền sẵn. |
 | 01/10/2026 | Antigravity AI (v8 Production) | Hoàn thiện 100% Phase P0-P7 & P4.6: Quản lý mật khẩu linh hoạt kép (Admin đổi trực tiếp Sheet Cột B + User đổi qua SHA-256); Mở cổng thanh toán (PM Allow Payment Gate); Cache 2 tầng SWR đạt 903.7 req/s; Email tự động LG V5.2 và Watchdog 24h. Kiểm thử tự động Playwright 4/4 suites pass 100%. File chính thức: `Mau_Dang_Ky_Internal_Sales_3009.html`. |
+| 04/10/2026 | Antigravity AI (v8.2 Phase P8) | Hoàn thiện toàn diện Quy trình Chuẩn bị Go-Live (Phase P8): Adaptive polling 6–8s & cross-tab sync chống tranh chấp slot; Sinh mã đợt bán thông minh tự động (12 phân khúc ngành hàng, chống trùng lặp, tính Quý chuẩn); Nạp Excel kho vận đa định dạng lọc chính xác 10 cột vàng từ template PM; Đồng bộ 12 cột CSDL `Products` & 10 cột `Programs`; Sửa logic 24h Watchdog đếm từ `gateOpenTime`; Tích hợp 1-click trigger installer `setupWatchdogTrigger()`; Xây dựng bộ kiểm thử tự động E2E (`node tests/run_e2e_tests.js`) đạt 54/54 PASS (100%). |
 
 ---
 

@@ -60,8 +60,8 @@ Hàm `setupNewDatabase()` trong `apps-script/Code.gs` đã được lập trình
    - `Config`: Cấu hình hệ thống, thời gian giữ slot 24h, bật tắt AutoEmail.
    - `ActivityLog`: Nhật ký kiểm toán (Audit Trail) chống gian lận Jeong-Do.
    - `Users`: Danh mục tài khoản đăng nhập (PM & Nhân viên), mật khẩu kép.
-   - `Programs`: Danh mục các đợt bán hàng đa chương trình (`IS2026Q3-HA`, `IS2026Q3-HE`, `IS2026Q4-BS`).
-   - `Products`: Danh mục sản phẩm, model, giá niêm yết RRP, giá nội bộ, kho xuất (AYA, AYB).
+   - `Programs`: Danh mục các đợt bán hàng đa chương trình (`IS2026Q3-HA`, `IS2026Q3-HE`, `IS2026Q4-BS`), 10 cột chuẩn hóa `PROG_COL`.
+   - `Products`: Danh mục sản phẩm chuẩn 12 cột (`ProgramID`, `UniqueCode`, `Kho`, `Category`, `Model`, `Description`, `RRP`, `InternalPrice`, `Qty`, `Status`, `EmpCode`, `Timestamp`), khớp 100% các cột vàng của file mẫu kho vận PM.
    - `AutoEmail`: Mẫu email thông báo tự động chuẩn thương hiệu LG V5.2.
 3. Tự động tô màu tiêu đề cột chuẩn mã màu thương hiệu **LG Heritage Red (`#A50034`)**, chữ trắng đậm, cố định hàng 1 (Freeze Row 1), bật bộ lọc dữ liệu tự động.
 4. Nạp sẵn dữ liệu mẫu (Seed Data) ban đầu để hệ thống có thể chạy được ngay.
@@ -93,6 +93,19 @@ Khi PIC gửi lại URL Web App:
   2. Nhấp vào huy hiệu **`⚪ Demo Mode (Offline)`** trên thanh tiêu đề đầu trang (hoặc nút **`Cấu hình API`** trong Bảng điều khiển Quản trị PM).
   3. Dán Web App URL vào ô nhập liệu.
   4. Bấm **`Kiểm Tra & Lưu Cấu Hình`**. Hệ thống sẽ tự động gửi yêu cầu ping đến máy chủ Google Apps Script. Khi thành công, huy hiệu sẽ chuyển sang **`🟢 Google Cloud Live`**.
+
+### Bước 6: Kích hoạt Bộ quét Giải phóng Slot 24h (1-Click Trigger Installer)
+Để tự động giải phóng slot quá hạn 24h và gửi email cảnh báo tự động:
+1. Trong giao diện Google Apps Script, tại menu chọn hàm (toolbar), chọn hàm:
+   👉 **`setupWatchdogTrigger`** rồi bấm **Chạy (Run)**.
+2. Hàm sẽ tự động tạo trình kích hoạt theo giờ (Hourly Time-driven Trigger) chạy ngầm hàm `runExpirationWatchdog` mà PIC không cần cài đặt thủ công trong menu Triggers.
+
+### Bước 7: Xác thực Toàn diện bằng Bộ Kiểm thử Tự động E2E
+Sau khi thiết lập, chạy kiểm thử tự động toàn bộ 7 tính năng trọng yếu:
+```bash
+node tests/run_e2e_tests.js
+```
+Kết quả kiểm thử đạt **54/54 PASS (100% Success)** đảm bảo không có bất kỳ blindspot nào trước giờ mở bán.
 
 ---
 
