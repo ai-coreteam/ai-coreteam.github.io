@@ -26,6 +26,7 @@ desktop.ini
 
 # Scratch and runtime test directories
 scratch/
+archive/
 test-reports/
 *.log
 

@@ -28,6 +28,9 @@ docs/
 | Tài liệu | Mô tả chi tiết | Đối tượng |
 |---|---|---|
 | **[`PM_AND_USER_OPERATIONAL_GUIDE.md`](02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md)** | **[CẨM NANG TOÀN DIỆN]** Sơ đồ chu trình bán hàng trực quan (Mermaid), hướng dẫn từng bước cho **Nhân viên** (xem catalog, đặt suất, chuyển khoản, khai báo chứng từ) và cho **Quản trị viên PM** (tạo đợt bán, nạp Excel mẫu, hẹn giờ tự động, mở cổng, soi ảnh Lightbox, duyệt hàng loạt, kết sổ). | Tất cả nhân viên & PM LGEVH |
+| **[`ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md`](02-user-and-pm-guide/ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md)** | **[KẾ HOẠCH LUỒNG HƯỚNG DẪN SPOTLIGHT TOUR]** Đặc tả chi tiết 2 luồng hướng dẫn tự động phân quyền (Nhân viên 4 bước, PM 5 bước), kiến trúc Spotlight không mờ nét quang học, hợp đồng dữ liệu localStorage và quy trình tích hợp an toàn. | Lãnh đạo duyệt, PM, Devs |
+| **[`PROPOSAL_PM_FLOW_OPTIMIZATION.md`](02-user-and-pm-guide/PROPOSAL_PM_FLOW_OPTIMIZATION.md)** | **[ĐỀ XUẤT TỐI ƯU HÓA FLOW PM & TRIỆT TIÊU TRÙNG LẶP UX]** Báo cáo nhập vai PM Quỳnh Như (non-tech), xác thực 2 nhận định cốt lõi của người dùng, phân tích blindspot bỏ quên 'Mở cổng thanh toán', thiết kế lại 5 Bước Vàng và giải pháp ẩn hiện nút Kết Sổ thông minh. | Lãnh đạo duyệt, PM Quản trị, Devs |
+| **[`PROPOSAL_USER_FLOW_OPTIMIZATION.md`](02-user-and-pm-guide/PROPOSAL_USER_FLOW_OPTIMIZATION.md)** | **[ĐỀ XUẤT TỐI ƯU HÓA FLOW NHÂN VIÊN MUA HÀNG & ROLEPLAY ANH TUẤN]** Báo cáo nhập vai nhân viên mới, xác thực 3 nhận định của người dùng, phân tích blindspot bỏ quên thanh chọn chương trình và hoang mang mẫu nộp tiền bị khóa, thiết kế 4 Bước Vàng trực quan 1-chạm. | Lãnh đạo duyệt, Nhân viên, Devs |
 
 ---
 
@@ -35,6 +38,7 @@ docs/
 
 | Tài liệu | Mô tả nội dung chuyên sâu |
 |---|---|
+| **[`SINGLE_SOURCE_OF_TRUTH_DATA_ARCHITECTURE.md`](03-architecture-and-analysis/SINGLE_SOURCE_OF_TRUTH_DATA_ARCHITECTURE.md)** | **[KIẾN TRÚC ĐỒNG BỘ DỮ LIỆU TẬP TRUNG (SSOT)]** Động cơ đồng bộ thời gian thực `syncProductRegistrationStatus`, cơ chế đảm bảo khớp 100% số liệu giữa 4 màn hình (PM Tab 1 & 2, User Tab 2 & 4) và chuẩn hóa tự động cho các chương trình mới tạo. |
 | **[`GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md`](03-architecture-and-analysis/GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md)** | Báo cáo kiểm định an toàn thông tin, bảo mật mã token chống gian lận giữ chỗ, cam kết đạo đức kinh doanh Jeong-Do. |
 | **[`LG_BRAND_ARTISTIC_GAP_ANALYSIS.md`](03-architecture-and-analysis/LG_BRAND_ARTISTIC_GAP_ANALYSIS.md)** | Phân tích tuân thủ hướng dẫn nhận diện thương hiệu LG Electronics Brand Guidelines V5.2 (Màu sắc, Font chữ LG EI, Khoảng thở lưới). |
 | **[`LG_BRAND_ARTISTIC_IMPROVEMENT_PLAN_PROPOSAL.md`](03-architecture-and-analysis/LG_BRAND_ARTISTIC_IMPROVEMENT_PLAN_PROPOSAL.md)** | Kế hoạch cải tiến thẩm mỹ và đồ họa UI/UX theo tiêu chuẩn trang chủ LG.com toàn cầu. |

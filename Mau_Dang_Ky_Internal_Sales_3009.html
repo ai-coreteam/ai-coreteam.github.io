@@ -2681,6 +2681,370 @@
         padding: 16px 12px 24px 12px !important;
       }
     }
+
+    /* ==========================================================================
+       SPOTLIGHT TOUR ENGINE STYLES (LG BRAND ADAPTIVE ONBOARDING TOUR)
+       ========================================================================== */
+    .lg-tour-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--lg-t-fast, 0.2s) var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1)), visibility var(--lg-t-fast, 0.2s) var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+    }
+    .lg-tour-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* THE HOLE CUTOUT SPOTLIGHT (FIXED COORDINATES TO VIEWPORT) */
+    .lg-tour-hole {
+      position: fixed;
+      border-radius: var(--radius-md, 8px);
+      box-shadow: 0 0 0 3px var(--lg-heritage, #A50034), 0 0 0 9999px rgba(18, 18, 18, 0.75);
+      transition: top 0.22s cubic-bezier(0.2, 0, 0, 1), left 0.22s cubic-bezier(0.2, 0, 0, 1), width 0.22s cubic-bezier(0.2, 0, 0, 1), height 0.22s cubic-bezier(0.2, 0, 0, 1);
+      pointer-events: none;
+      animation: lgSpotlightPulse 2.4s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1)) infinite;
+    }
+    [data-theme="dark"] .lg-tour-hole {
+      box-shadow: 0 0 0 3px var(--lg-red, #EA1917), 0 0 0 9999px rgba(10, 10, 10, 0.82);
+    }
+    @keyframes lgSpotlightPulse {
+      0%, 100% { box-shadow: 0 0 0 3.5px rgba(165, 0, 52, 0.8), 0 0 0 9999px rgba(18, 18, 18, 0.75); }
+      50% { box-shadow: 0 0 0 8px rgba(234, 25, 23, 0.3), 0 0 0 9999px rgba(18, 18, 18, 0.75); }
+    }
+    [data-theme="dark"] @keyframes lgSpotlightPulse {
+      0%, 100% { box-shadow: 0 0 0 3.5px rgba(253, 49, 46, 0.85), 0 0 0 9999px rgba(10, 10, 10, 0.82); }
+      50% { box-shadow: 0 0 0 8px rgba(253, 49, 46, 0.35), 0 0 0 9999px rgba(10, 10, 10, 0.82); }
+    }
+
+    /* DYNAMIC SCROLL PADDING DURING ACTIVE TOUR */
+    body.lg-tour-active .main-wrap {
+      padding-bottom: 450px !important;
+      transition: padding-bottom 0.3s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+    }
+
+    /* FLOATING TOUR TOOLTIP CARD (INTERNAL SALES & LG BRAND STANDARD) */
+    .lg-tour-card {
+      position: fixed;
+      background: var(--lg-card-bg, #FFFFFF);
+      color: var(--lg-text, #262626);
+      border: 1px solid var(--lg-border, #CBC8C2);
+      border-top: 4px solid var(--lg-heritage, #A50034);
+      border-radius: var(--radius-lg, 12px);
+      padding: 15px 18px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12);
+      max-width: 400px;
+      width: calc(100vw - 32px);
+      z-index: 10002;
+      transition: top 0.22s cubic-bezier(0.2, 0, 0, 1), left 0.22s cubic-bezier(0.2, 0, 0, 1), transform 0.2s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+      animation: lgTourCardPop 0.22s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+    }
+    [data-theme="dark"] .lg-tour-card {
+      border-top-color: var(--lg-red, #EA1917);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    @keyframes lgTourCardPop {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* CARETS / ARROWS CONNECTING CARD TO SPOTLIGHT */
+    .lg-tour-card::before {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--lg-card-bg, #FFFFFF);
+      transform: rotate(45deg);
+      display: none;
+      z-index: 1;
+    }
+    .lg-tour-card.arrow-top::before {
+      display: block;
+      top: -8px;
+      left: var(--arrow-left, 36px);
+      border-top: 3.5px solid var(--lg-heritage, #A50034);
+      border-left: 3.5px solid var(--lg-heritage, #A50034);
+    }
+    [data-theme="dark"] .lg-tour-card.arrow-top::before {
+      border-top-color: var(--lg-red, #EA1917);
+      border-left-color: var(--lg-red, #EA1917);
+    }
+    .lg-tour-card.arrow-bottom::before {
+      display: block;
+      bottom: -8px;
+      left: var(--arrow-left, 36px);
+      border-bottom: 1px solid var(--lg-border, #CBC8C2);
+      border-right: 1px solid var(--lg-border, #CBC8C2);
+    }
+
+    .tour-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--lg-border, #CBC8C2);
+    }
+    .tour-brand-lead {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tour-lg-motion-logo {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      display: inline-block;
+      vertical-align: middle;
+      border-radius: 50%;
+    }
+    .tour-step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--lg-panel-2, #EDE8DF);
+      color: var(--lg-heritage, #A50034);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill, 999px);
+      border: 1px solid var(--lg-border, #CBC8C2);
+    }
+    .tour-step-badge.pm-role {
+      background: rgba(165, 0, 52, 0.08);
+      color: var(--lg-heritage, #A50034);
+      border-color: rgba(165, 0, 52, 0.2);
+    }
+    .tour-btn-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--lg-panel-2, #EDE8DF);
+      border: 1px solid var(--lg-border, #CBC8C2);
+      color: var(--lg-muted, #716F6A);
+      font-size: 16px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+    }
+    .tour-btn-close:hover {
+      background: var(--lg-border-strong, #CBC8C2);
+      color: var(--lg-ink, #000000);
+    }
+
+    /* TOUR FEATURE ROW WITH MOTION ICON */
+    .tour-feature-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .tour-motion-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--lg-panel, #F6F3EB);
+      border: 1px solid var(--lg-border, #CBC8C2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+    .tour-motion-icon {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .tour-title-wrap {
+      flex: 1;
+    }
+    .tour-card-kicker {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--lg-heritage, #A50034);
+      margin-bottom: 2px;
+    }
+    .tour-card-title {
+      font-family: var(--font-heading, "LG EI Headline", "LG Smart", sans-serif);
+      font-size: 15.5px;
+      font-weight: 600;
+      color: var(--lg-ink, #000000);
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .tour-card-body {
+      font-family: var(--font-main, "LG EI Text", "LG Smart", sans-serif);
+      font-size: 12.5px;
+      color: var(--lg-text, #262626);
+      line-height: 1.48;
+      margin-bottom: 8px;
+    }
+
+    /* LG SEC-CARD TIP BOX */
+    .tour-card-tip {
+      background: var(--lg-panel, #F6F3EB);
+      border: 1px solid var(--lg-border, #CBC8C2);
+      border-left: 3px solid var(--lg-heritage, #A50034);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      color: var(--lg-text, #262626);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      line-height: 1.45;
+    }
+    .tour-card-tip .tip-icon {
+      color: var(--lg-warn, #D97706);
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    /* FOOTER & BUTTONS */
+    .tour-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid var(--lg-border, #CBC8C2);
+      padding-top: 10px;
+    }
+    .tour-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tour-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--lg-border-strong, #CBC8C2);
+      cursor: pointer;
+      transition: all 0.25s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+    }
+    .tour-dot:hover {
+      background: var(--lg-muted, #716F6A);
+    }
+    .tour-dot.active {
+      width: 22px;
+      border-radius: var(--radius-pill, 999px);
+      background: var(--lg-heritage, #A50034);
+    }
+
+    .tour-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-tour-skip {
+      background: transparent;
+      border: none;
+      color: var(--lg-muted, #716F6A);
+      font-family: var(--font-main, "LG EI Text", "LG Smart", sans-serif);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm, 6px);
+      transition: color 0.15s;
+    }
+    .btn-tour-skip:hover {
+      color: var(--lg-ink, #000000);
+      text-decoration: underline;
+    }
+
+    .btn-tour-back {
+      background: var(--lg-card-bg, #FFFFFF);
+      color: var(--lg-ink, #000000);
+      border: 1.5px solid var(--lg-ink, #000000);
+      font-family: var(--font-main, "LG EI Text", "LG Smart", sans-serif);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill, 999px);
+      cursor: pointer;
+      transition: background 0.15s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1)), color 0.15s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-tour-back:hover {
+      background: var(--lg-ink, #000000);
+      color: var(--lg-card-bg, #FFFFFF);
+    }
+
+    .btn-tour-next {
+      background: var(--lg-heritage, #A50034);
+      color: #FFFFFF;
+      border: 1.5px solid var(--lg-heritage, #A50034);
+      font-family: var(--font-main, "LG EI Text", "LG Smart", sans-serif);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 20px;
+      border-radius: var(--radius-pill, 999px);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(165, 0, 52, 0.24);
+      transition: all 0.2s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+    }
+    .btn-tour-next:hover {
+      background: var(--lg-red, #EA1917);
+      border-color: var(--lg-red, #EA1917);
+      box-shadow: 0 6px 18px rgba(234, 25, 23, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* REPLAY TOUR BUTTON IN HEADER (HIGH-CONTRAST LG BRAND ADAPTIVE) */
+    .btn-tour-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(165, 0, 52, 0.08);
+      border: 1.5px solid var(--lg-heritage, #A50034);
+      color: var(--lg-heritage, #A50034);
+      font-family: var(--font-main, "LG EI Text", "LG Smart", sans-serif);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill, 999px);
+      cursor: pointer;
+      transition: all 0.2s var(--lg-ease, cubic-bezier(0.25, 0.1, 0.25, 1));
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .btn-tour-header:hover {
+      background: var(--lg-heritage, #A50034);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(165, 0, 52, 0.28);
+    }
+    [data-theme="dark"] .btn-tour-header {
+      background: rgba(253, 49, 46, 0.16);
+      border-color: var(--lg-red, #EA1917);
+      color: #FFFFFF;
+    }
+    [data-theme="dark"] .btn-tour-header:hover {
+      background: var(--lg-red, #EA1917);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(253, 49, 46, 0.4);
+    }
   </style>
   <!-- P0: SheetJS for Client-Side Excel Import (.xlsx) -->
   <script src="data/xlsx.mini.min.js"></script>
@@ -2755,6 +3119,11 @@
         </div>
       </div>
       <div class="header-actions">
+        <!-- ONBOARDING TOUR RELAUNCH BUTTON (LG BRAND ADAPTIVE) -->
+        <button type="button" class="btn-tour-header" id="btn-header-tour" onclick="startCurrentRoleTour()" title="Xem lại tour hướng dẫn sử dụng nhanh">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><path d="M9 21h6"></path></svg>
+          <span>Hướng dẫn nhanh</span>
+        </button>
         <button type="button" class="api-status-badge api-offline" id="top-api-badge" onclick="openApiConfigModal()" style="cursor:pointer; font-size:11px; padding:4px 10px; border-radius:12px; background:#F0ECE4; color:#716F6A; font-weight:600; border:1px solid #CBC8C2; display:inline-flex; align-items:center; gap:5px;" title="Cấu hình Google Sheet API / Chế độ Demo">
           <span style="width:7px; height:7px; border-radius:50%; background:#716F6A; display:inline-block;"></span>
           <span>Demo Mode (Offline)</span>
@@ -3147,7 +3516,7 @@
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div>
           <h2 style="font-size:17px; color:var(--lg-red); font-family:var(--font-heading); margin-bottom:4px;">Đăng Ký Mua Hàng Trực Tuyến Trên Hệ Thống (Direct Registration Form)</h2>
-          <p style="color:var(--lg-gray-muted); font-size:12.5px;">Nhân viên điền trực tiếp thông tin vào biểu mẫu bên dưới. Chọn sản phẩm dạng thẻ hoặc tra cứu nhanh bảng danh sách chi tiết.</p>
+          <p style="color:var(--lg-gray-muted); font-size:12.5px;">Chọn sản phẩm trực tuyến theo đợt bán hàng để giữ chỗ nhanh (thời hạn thanh toán 24h theo quy chế FCFS). Mỗi nhân viên được đăng ký 01 sản phẩm / đợt.</p>
         </div>
         <button type="button" class="btn-bank-tab" onclick="openFullLetterModal()" style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; font-size:12px; background:#FFFFFF; border:1px solid #D1CEC7; border-radius:6px; cursor:pointer;">
           <svg class="lg-icon lg-icon-red" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Xem Thể Lệ & Quy Định Mở Bán
@@ -3201,7 +3570,7 @@
         </div>
       </div>
 
-      <form id="system-reg-form" onsubmit="handleFormSubmit(event)" style="background:var(--lg-card-bg); border:1.5px solid var(--lg-border); border-radius:14px; padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
+      <form id="system-reg-form" onsubmit="handleFormSubmit(event)" style="display:none; background:var(--lg-card-bg); border:1.5px solid var(--lg-border); border-radius:14px; padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
         <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--lg-border); margin-bottom:16px;">
           <span style="font-weight:600; font-size:15px; color:var(--lg-ink);">THÔNG TIN ĐĂNG KÝ</span>
           <span style="font-size:12px; background:var(--lg-panel); color:var(--lg-ok); font-weight:700; padding:3px 10px; border-radius:12px; border:1px solid var(--lg-border);">Cổng Đăng Ký Đang Mở Live</span>
@@ -3965,97 +4334,8 @@
               <th>Đăng ký nhanh</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td><span class="badge-ordinal">#001</span></td><td>AYC</td><td>27LX6TDGA.ATV</td><td>604KCGWKN047</td><td>A</td><td class="cond">thùng xấu</td><td class="num">33,900,000 đ</td><td class="num">85%</td><td class="num"><strong>5,085,000 đ</strong></td><td class="slot-state" data-slot="#001">—</td></tr>
-            <tr><td><span class="badge-ordinal">#002</span></td><td>AYC</td><td>43UA8450PSA.ATV</td><td>506INHZ0H361</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, ko remot</td><td class="num">10,690,000 đ</td><td class="num">75%</td><td class="num"><strong>2,672,500 đ</strong></td><td class="slot-state" data-slot="#002">—</td></tr>
-            <tr><td><span class="badge-ordinal">#003</span></td><td>AYC</td><td>43UQ7050PSA.ATVQ</td><td>503BEYG0R354</td><td>B</td><td class="cond">thùng xấu, sp trầy xước,thiếu ốc chân</td><td class="num">10,690,000 đ</td><td class="num">75%</td><td class="num"><strong>2,672,500 đ</strong></td><td class="slot-state" data-slot="#003">—</td></tr>
-            <tr><td><span class="badge-ordinal">#004</span></td><td>AYC</td><td>55QNED86ASA.ATV</td><td>505INBS6V189</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc chân đế</td><td class="num">23,400,000 đ</td><td class="num">75%</td><td class="num"><strong>5,850,000 đ</strong></td><td class="slot-state" data-slot="#004">—</td></tr>
-            <tr><td><span class="badge-ordinal">#005</span></td><td>AYC</td><td>55QNED86BSA.ATV</td><td>605INLV49960</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc chân đế</td><td class="num">23,900,000 đ</td><td class="num">75%</td><td class="num"><strong>5,975,000 đ</strong></td><td class="slot-state" data-slot="#005">—</td></tr>
-            <tr><td><span class="badge-ordinal">#006</span></td><td>AYC</td><td>55UA8450PSA.ATV</td><td>505INDP5L298</td><td>B</td><td class="cond">Sai Thùng,  sp trầy xước, thiếu ốc chân đế</td><td class="num">15,590,000 đ</td><td class="num">75%</td><td class="num"><strong>3,897,500 đ</strong></td><td class="slot-state" data-slot="#006">—</td></tr>
-            <tr><td><span class="badge-ordinal">#007</span></td><td>AYC</td><td>65QNED80BSA.ATV</td><td>604INPT2W928</td><td>B</td><td class="cond">Sai Thùng,  sp trầy xước, thiếu ốc chân đế</td><td class="num">25,400,000 đ</td><td class="num">75%</td><td class="num"><strong>6,350,000 đ</strong></td><td class="slot-state" data-slot="#007">—</td></tr>
-            <tr><td><span class="badge-ordinal">#008</span></td><td>AYC</td><td>65QNED86ASA.ATV</td><td>510INAR7E096</td><td>B</td><td class="cond">thùng xấu rách, thiếu mút chân đế, sp trầy xước, thiếu ốc chân đế</td><td class="num">29,290,000 đ</td><td class="num">75%</td><td class="num"><strong>7,322,500 đ</strong></td><td class="slot-state" data-slot="#008">—</td></tr>
-            <tr><td><span class="badge-ordinal">#009</span></td><td>AYC</td><td>65QNED86BSA.ATV</td><td>604INGQ77215</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc chân đế</td><td class="num">29,900,000 đ</td><td class="num">75%</td><td class="num"><strong>7,475,000 đ</strong></td><td class="slot-state" data-slot="#009">—</td></tr>
-            <tr><td><span class="badge-ordinal">#010</span></td><td>AYC</td><td>75QNED82ASA.AGADLHX</td><td>412KCPYL4928</td><td>B</td><td class="cond">thùng xấu rách nát, sp trầy xước, thiếu ốc chân đế</td><td class="num">39,900,000 đ</td><td class="num">75%</td><td class="num"><strong>9,975,000 đ</strong></td><td class="slot-state" data-slot="#010">—</td></tr>
-            <tr><td><span class="badge-ordinal">#011</span></td><td>AYC</td><td>75QNED86BSA.ATV</td><td>604INUB2F134</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc chân đế</td><td class="num">41,900,000 đ</td><td class="num">75%</td><td class="num"><strong>10,475,000 đ</strong></td><td class="slot-state" data-slot="#011">—</td></tr>
-            <tr><td><span class="badge-ordinal">#012</span></td><td>AYC</td><td>75QNED9MASA.AGAFLHX</td><td>501KCXML3882</td><td>B</td><td class="cond">Thùng xấu rách,sp trầy xước, thiếu remot, thiếu ốc chân đế</td><td class="num">49,900,000 đ</td><td class="num">75%</td><td class="num"><strong>12,475,000 đ</strong></td><td class="slot-state" data-slot="#012">—</td></tr>
-            <tr><td><span class="badge-ordinal">#013</span></td><td>AYC</td><td>OLED65G5PSA.ATV</td><td>504INNG1A551</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc khung treo</td><td class="num">70,490,000 đ</td><td class="num">75%</td><td class="num"><strong>17,622,500 đ</strong></td><td class="slot-state" data-slot="#013">—</td></tr>
-            <tr><td><span class="badge-ordinal">#014</span></td><td>AYC</td><td>OLED77C44LA.AEUQLHX</td><td>402KCHEKC281</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc chân đế</td><td class="num">55,900,000 đ</td><td class="num">75%</td><td class="num"><strong>13,975,000 đ</strong></td><td class="slot-state" data-slot="#014">—</td></tr>
-            <tr><td><span class="badge-ordinal">#015</span></td><td>AYC</td><td>OLED77C54LA.AEUQLHX</td><td>501KCUKKK798</td><td>B</td><td class="cond">Thùng xấu rách,sp trầy xước, thiếu remot, thiếu chân đế</td><td class="num">59,900,000 đ</td><td class="num">75%</td><td class="num"><strong>14,975,000 đ</strong></td><td class="slot-state" data-slot="#015">—</td></tr>
-            <tr><td><span class="badge-ordinal">#016</span></td><td>AYC</td><td>OLED83B5PSA.AGAQLHX</td><td>502KCSFKC414</td><td>B</td><td class="cond">thùng xấu, sp trầy xước, thiếu ốc chân đế</td><td class="num">65,900,000 đ</td><td class="num">75%</td><td class="num"><strong>16,475,000 đ</strong></td><td class="slot-state" data-slot="#016">—</td></tr>
-            <tr><td><span class="badge-ordinal">#017</span></td><td>AYC</td><td>OLED83M4PUA.AUSYLHX</td><td>403KCRNK1966</td><td>B</td><td class="cond">Thùng xấu rách,sp trầy xước, thiếu ốc khung treo</td><td class="num">69,900,000 đ</td><td class="num">75%</td><td class="num"><strong>17,475,000 đ</strong></td><td class="slot-state" data-slot="#017">—</td></tr>
-            <tr><td><span class="badge-ordinal">#018</span></td><td>AYC</td><td>OLED97M5PSA.AAU</td><td>504KCZPKH037</td><td>B</td><td class="cond">Thùng xấu rách,sp trầy xước, thiếu remot , thiếu ốc khung treo</td><td class="num">100,000,000 đ</td><td class="num">75%</td><td class="num"><strong>25,000,000 đ</strong></td><td class="slot-state" data-slot="#018">—</td></tr>
-            <tr><td><span class="badge-ordinal">#019</span></td><td>AYC</td><td>OLED77C6PJA.AJLQLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">35,900,000 đ</td><td class="num">50%</td><td class="num"><strong>17,950,000 đ</strong></td><td class="slot-state" data-slot="#019">—</td></tr>
-            <tr><td><span class="badge-ordinal">#020</span></td><td>AYC</td><td>OLED77B6PCA.ACNQLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">26,900,000 đ</td><td class="num">50%</td><td class="num"><strong>13,450,000 đ</strong></td><td class="slot-state" data-slot="#020">—</td></tr>
-            <tr><td><span class="badge-ordinal">#021</span></td><td>AYC</td><td>75QNED70BSA.AGAFLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">16,900,000 đ</td><td class="num">50%</td><td class="num"><strong>8,450,000 đ</strong></td><td class="slot-state" data-slot="#021">—</td></tr>
-            <tr><td><span class="badge-ordinal">#022</span></td><td>AYC</td><td>75QNED81B6A.AEUNLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">18,900,000 đ</td><td class="num">50%</td><td class="num"><strong>9,450,000 đ</strong></td><td class="slot-state" data-slot="#022">—</td></tr>
-            <tr><td><span class="badge-ordinal">#023</span></td><td>AYC</td><td>65NU850BPUA.AUSFLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">13,900,000 đ</td><td class="num">50%</td><td class="num"><strong>6,950,000 đ</strong></td><td class="slot-state" data-slot="#023">—</td></tr>
-            <tr><td><span class="badge-ordinal">#024</span></td><td>AYC</td><td>75MRGB86BSA.AGADLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">34,900,000 đ</td><td class="num">50%</td><td class="num"><strong>17,450,000 đ</strong></td><td class="slot-state" data-slot="#024">—</td></tr>
-            <tr><td><span class="badge-ordinal">#025</span></td><td>AYA</td><td>100QNED89AS.AGAFLHX</td><td>501KCQXKX396</td><td>B</td><td class="cond">trầy xước nhẹ ,hộp xấu</td><td class="num">89,900,000 đ</td><td class="num">75%</td><td class="num"><strong>22,475,000 đ</strong></td><td class="slot-state" data-slot="#025">—</td></tr>
-            <tr><td><span class="badge-ordinal">#026</span></td><td>AYA</td><td>27LX6TDGA.ATV</td><td>602KCEAKG180</td><td>B</td><td class="cond">trầy xước nhẹ , thiếu khiển,dây typeC. hộp xấu</td><td class="num">33,900,000 đ</td><td class="num">85%</td><td class="num"><strong>5,085,000 đ</strong></td><td class="slot-state" data-slot="#026">—</td></tr>
-            <tr><td><span class="badge-ordinal">#027</span></td><td>AYA</td><td>27LX6TDGA.ATV</td><td>602KCDGKG226</td><td>B</td><td class="cond">cũ xước,hộp xấu .thiếu dây typeC</td><td class="num">33,900,000 đ</td><td class="num">85%</td><td class="num"><strong>5,085,000 đ</strong></td><td class="slot-state" data-slot="#027">—</td></tr>
-            <tr><td><span class="badge-ordinal">#028</span></td><td>AYA</td><td>27LX6TDGA.ATV</td><td>602KCVUKG167</td><td>B</td><td class="cond">trầy xước nhẹ ,hộp xấu</td><td class="num">33,900,000 đ</td><td class="num">85%</td><td class="num"><strong>5,085,000 đ</strong></td><td class="slot-state" data-slot="#028">—</td></tr>
-            <tr><td><span class="badge-ordinal">#029</span></td><td>AYA</td><td>43LB6500PSB.AWZSLHX</td><td>604KCFTKB083</td><td>B</td><td class="cond">trầy xước nhẹ ,hộp xấu .khiển thường</td><td class="num">3,614,000 đ</td><td class="num">75%</td><td class="num"><strong>903,500 đ</strong></td><td class="slot-state" data-slot="#029">—</td></tr>
-            <tr><td><span class="badge-ordinal">#030</span></td><td>AYA</td><td>65UA8055PSA.ATV</td><td>602INYD2J866</td><td>A</td><td class="cond">trầy xước nhẹ ,hộp xấu</td><td class="num">19,490,000 đ</td><td class="num">75%</td><td class="num"><strong>4,872,500 đ</strong></td><td class="slot-state" data-slot="#030">—</td></tr>
-            <tr><td><span class="badge-ordinal">#031</span></td><td>AYA</td><td>75QNED86ASA.ATV</td><td>510INVM50727</td><td>B</td><td class="cond">trầy xước nhẹ , thiếu khiển. hộp xấu</td><td class="num">40,090,000 đ</td><td class="num">75%</td><td class="num"><strong>10,022,500 đ</strong></td><td class="slot-state" data-slot="#031">—</td></tr>
-            <tr><td><span class="badge-ordinal">#032</span></td><td>AYA</td><td>75QNED9MASA.AGAFLHX</td><td>501KCKJL3877</td><td>B</td><td class="cond">trầy xước nhẹ ,hộp xấu</td><td class="num">49,900,000 đ</td><td class="num">75%</td><td class="num"><strong>12,475,000 đ</strong></td><td class="slot-state" data-slot="#032">—</td></tr>
-            <tr><td><span class="badge-ordinal">#033</span></td><td>AYA</td><td>OLED48B5PSA.ATV</td><td>510INMF04155</td><td>B</td><td class="cond">sai thùng xốp,thiếu khiển.trầy xước nhẹ</td><td class="num">29,290,000 đ</td><td class="num">75%</td><td class="num"><strong>7,322,500 đ</strong></td><td class="slot-state" data-slot="#033">—</td></tr>
-            <tr><td><span class="badge-ordinal">#034</span></td><td>AYA</td><td>OLED65G5PSA.ATV</td><td>504INGQ1A543</td><td>B</td><td class="cond">sai giá treo.không khiển.hộp rách</td><td class="num">70,490,000 đ</td><td class="num">75%</td><td class="num"><strong>17,622,500 đ</strong></td><td class="slot-state" data-slot="#034">—</td></tr>
-            <tr><td><span class="badge-ordinal">#035</span></td><td>AYA</td><td>OLED77C44LA.AEUQLHX</td><td>402KCPYKC280</td><td>B</td><td class="cond">trầy xước nhẹ ,hộp xấu (không chuyển được coss VN)</td><td class="num">55,900,000 đ</td><td class="num">75%</td><td class="num"><strong>13,975,000 đ</strong></td><td class="slot-state" data-slot="#035">—</td></tr>
-            <tr><td><span class="badge-ordinal">#036</span></td><td>AYA</td><td>OLED77C54LA.AEUQLHX</td><td>501KCNLKK799</td><td>B</td><td class="cond">trầy xước nhẹ , thiếu khiển. hộp xấu (không chuyển được coss VN)</td><td class="num">59,900,000 đ</td><td class="num">75%</td><td class="num"><strong>14,975,000 đ</strong></td><td class="slot-state" data-slot="#036">—</td></tr>
-            <tr><td><span class="badge-ordinal">#037</span></td><td>AYA</td><td>OLED83B5PSA.AGAQLHX</td><td>502KCMRKC419</td><td>B</td><td class="cond">trầy xước nhẹ ,hộp xấu</td><td class="num">65,900,000 đ</td><td class="num">75%</td><td class="num"><strong>16,475,000 đ</strong></td><td class="slot-state" data-slot="#037">—</td></tr>
-            <tr><td><span class="badge-ordinal">#038</span></td><td>AYA</td><td>OLED83C5PSA.AWZQLHX</td><td>502KCFTKC451</td><td>B</td><td class="cond">trầy xước nhẹ , thiếu khiển hộp xấu (thieu nap chan)</td><td class="num">69,900,000 đ</td><td class="num">75%</td><td class="num"><strong>17,475,000 đ</strong></td><td class="slot-state" data-slot="#038">—</td></tr>
-            <tr><td><span class="badge-ordinal">#039</span></td><td>AYA</td><td>OLED77C6PJA.AJLQLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">35,900,000 đ</td><td class="num">50%</td><td class="num"><strong>17,950,000 đ</strong></td><td class="slot-state" data-slot="#039">—</td></tr>
-            <tr><td><span class="badge-ordinal">#040</span></td><td>AYA</td><td>75QNED70BSA.AGAFLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">16,900,000 đ</td><td class="num">50%</td><td class="num"><strong>8,450,000 đ</strong></td><td class="slot-state" data-slot="#040">—</td></tr>
-            <tr><td><span class="badge-ordinal">#041</span></td><td>AYA</td><td>65NU850BPUA.AUSFLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">13,900,000 đ</td><td class="num">50%</td><td class="num"><strong>6,950,000 đ</strong></td><td class="slot-state" data-slot="#041">—</td></tr>
-            <tr><td><span class="badge-ordinal">#042</span></td><td>AYA</td><td>75MRGB86BSA.AGADLHX</td><td>—</td><td>GoodSet</td><td class="cond">—</td><td class="num">34,900,000 đ</td><td class="num">50%</td><td class="num"><strong>17,450,000 đ</strong></td><td class="slot-state" data-slot="#042">—</td></tr>
-            <tr><td><span class="badge-ordinal">#043</span></td><td>AYA</td><td>OLED77G5PSA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">117,690,000 đ</td><td class="num">50%</td><td class="num"><strong>58,845,000 đ</strong></td><td class="slot-state" data-slot="#043">—</td></tr>
-            <tr><td><span class="badge-ordinal">#044</span></td><td>AYA</td><td>65QNED92ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">37,190,000 đ</td><td class="num">50%</td><td class="num"><strong>18,595,000 đ</strong></td><td class="slot-state" data-slot="#044">—</td></tr>
-            <tr><td><span class="badge-ordinal">#045</span></td><td>AYA</td><td>65QNED92ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">37,190,000 đ</td><td class="num">50%</td><td class="num"><strong>18,595,000 đ</strong></td><td class="slot-state" data-slot="#045">—</td></tr>
-            <tr><td><span class="badge-ordinal">#046</span></td><td>AYA</td><td>43QNED81ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">14,090,000 đ</td><td class="num">50%</td><td class="num"><strong>7,045,000 đ</strong></td><td class="slot-state" data-slot="#046">—</td></tr>
-            <tr><td><span class="badge-ordinal">#047</span></td><td>AYA</td><td>55QNED80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">18,990,000 đ</td><td class="num">50%</td><td class="num"><strong>9,495,000 đ</strong></td><td class="slot-state" data-slot="#047">—</td></tr>
-            <tr><td><span class="badge-ordinal">#048</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#048">—</td></tr>
-            <tr><td><span class="badge-ordinal">#049</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#049">—</td></tr>
-            <tr><td><span class="badge-ordinal">#050</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#050">—</td></tr>
-            <tr><td><span class="badge-ordinal">#051</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#051">—</td></tr>
-            <tr><td><span class="badge-ordinal">#052</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#052">—</td></tr>
-            <tr><td><span class="badge-ordinal">#053</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#053">—</td></tr>
-            <tr><td><span class="badge-ordinal">#054</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#054">—</td></tr>
-            <tr><td><span class="badge-ordinal">#055</span></td><td>AYA</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#055">—</td></tr>
-            <tr><td><span class="badge-ordinal">#056</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#056">—</td></tr>
-            <tr><td><span class="badge-ordinal">#057</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#057">—</td></tr>
-            <tr><td><span class="badge-ordinal">#058</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#058">—</td></tr>
-            <tr><td><span class="badge-ordinal">#059</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#059">—</td></tr>
-            <tr><td><span class="badge-ordinal">#060</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#060">—</td></tr>
-            <tr><td><span class="badge-ordinal">#061</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#061">—</td></tr>
-            <tr><td><span class="badge-ordinal">#062</span></td><td>AYA</td><td>55NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">17,490,000 đ</td><td class="num">50%</td><td class="num"><strong>8,745,000 đ</strong></td><td class="slot-state" data-slot="#062">—</td></tr>
-            <tr><td><span class="badge-ordinal">#063</span></td><td>AYA</td><td>65UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">18,490,000 đ</td><td class="num">50%</td><td class="num"><strong>9,245,000 đ</strong></td><td class="slot-state" data-slot="#063">—</td></tr>
-            <tr><td><span class="badge-ordinal">#064</span></td><td>AYA</td><td>65UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">18,490,000 đ</td><td class="num">50%</td><td class="num"><strong>9,245,000 đ</strong></td><td class="slot-state" data-slot="#064">—</td></tr>
-            <tr><td><span class="badge-ordinal">#065</span></td><td>AYA</td><td>50UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">12,590,000 đ</td><td class="num">50%</td><td class="num"><strong>6,295,000 đ</strong></td><td class="slot-state" data-slot="#065">—</td></tr>
-            <tr><td><span class="badge-ordinal">#066</span></td><td>AYA</td><td>50UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">12,590,000 đ</td><td class="num">50%</td><td class="num"><strong>6,295,000 đ</strong></td><td class="slot-state" data-slot="#066">—</td></tr>
-            <tr><td><span class="badge-ordinal">#067</span></td><td>AYA</td><td>43UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">9,690,000 đ</td><td class="num">50%</td><td class="num"><strong>4,845,000 đ</strong></td><td class="slot-state" data-slot="#067">—</td></tr>
-            <tr><td><span class="badge-ordinal">#068</span></td><td>AYA</td><td>43UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">9,690,000 đ</td><td class="num">50%</td><td class="num"><strong>4,845,000 đ</strong></td><td class="slot-state" data-slot="#068">—</td></tr>
-            <tr><td><span class="badge-ordinal">#069</span></td><td>AYC</td><td>75QNED80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">34,190,000 đ</td><td class="num">50%</td><td class="num"><strong>17,095,000 đ</strong></td><td class="slot-state" data-slot="#069">—</td></tr>
-            <tr><td><span class="badge-ordinal">#070</span></td><td>AYC</td><td>75QNED80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">34,190,000 đ</td><td class="num">50%</td><td class="num"><strong>17,095,000 đ</strong></td><td class="slot-state" data-slot="#070">—</td></tr>
-            <tr><td><span class="badge-ordinal">#071</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#071">—</td></tr>
-            <tr><td><span class="badge-ordinal">#072</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#072">—</td></tr>
-            <tr><td><span class="badge-ordinal">#073</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#073">—</td></tr>
-            <tr><td><span class="badge-ordinal">#074</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#074">—</td></tr>
-            <tr><td><span class="badge-ordinal">#075</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#075">—</td></tr>
-            <tr><td><span class="badge-ordinal">#076</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#076">—</td></tr>
-            <tr><td><span class="badge-ordinal">#077</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#077">—</td></tr>
-            <tr><td><span class="badge-ordinal">#078</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#078">—</td></tr>
-            <tr><td><span class="badge-ordinal">#079</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#079">—</td></tr>
-            <tr><td><span class="badge-ordinal">#080</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#080">—</td></tr>
-            <tr><td><span class="badge-ordinal">#081</span></td><td>AYC</td><td>75NANO80ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">30,790,000 đ</td><td class="num">50%</td><td class="num"><strong>15,395,000 đ</strong></td><td class="slot-state" data-slot="#081">—</td></tr>
-            <tr><td><span class="badge-ordinal">#082</span></td><td>AYB</td><td>50UA7350PSB.ATVQ</td><td>—</td><td>GoodSet</td><td class="cond">GoodSet</td><td class="num">12,590,000 đ</td><td class="num">50%</td><td class="num"><strong>6,295,000 đ</strong></td><td class="slot-state" data-slot="#082">—</td></tr>
-            <tr><td><span class="badge-ordinal">#083</span></td><td>AYC</td><td>65QNED70ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">22,900,000 đ</td><td class="num">50%</td><td class="num"><strong>11,450,000 đ</strong></td><td class="slot-state" data-slot="#083">—</td></tr>
-            <tr><td><span class="badge-ordinal">#084</span></td><td>AYC</td><td>65QNED70ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">22,900,000 đ</td><td class="num">50%</td><td class="num"><strong>11,450,000 đ</strong></td><td class="slot-state" data-slot="#084">—</td></tr>
-            <tr><td><span class="badge-ordinal">#085</span></td><td>AYC</td><td>65QNED70ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">22,900,000 đ</td><td class="num">50%</td><td class="num"><strong>11,450,000 đ</strong></td><td class="slot-state" data-slot="#085">—</td></tr>
-            <tr><td><span class="badge-ordinal">#086</span></td><td>AYC</td><td>65QNED70ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">22,900,000 đ</td><td class="num">50%</td><td class="num"><strong>11,450,000 đ</strong></td><td class="slot-state" data-slot="#086">—</td></tr>
-            <tr><td><span class="badge-ordinal">#087</span></td><td>AYC</td><td>43QNED70ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">13,090,000 đ</td><td class="num">50%</td><td class="num"><strong>6,545,000 đ</strong></td><td class="slot-state" data-slot="#087">—</td></tr>
-            <tr><td><span class="badge-ordinal">#088</span></td><td>AYC</td><td>43QNED70ASA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">13,090,000 đ</td><td class="num">50%</td><td class="num"><strong>6,545,000 đ</strong></td><td class="slot-state" data-slot="#088">—</td></tr>
-            <tr><td><span class="badge-ordinal">#089</span></td><td>AYC</td><td>65UA8450PSA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">19,490,000 đ</td><td class="num">50%</td><td class="num"><strong>9,745,000 đ</strong></td><td class="slot-state" data-slot="#089">—</td></tr>
-            <tr><td><span class="badge-ordinal">#090</span></td><td>AYC</td><td>55UA8450PSA.ATV</td><td>—</td><td>GoodSet</td><td class="cond">Box damage</td><td class="num">15,590,000 đ</td><td class="num">50%</td><td class="num"><strong>7,795,000 đ</strong></td><td class="slot-state" data-slot="#090">—</td></tr>
+          <tbody id="tab4-tbody">
+            <!-- Dynamically populated from active program via renderTab4ProductTable() -->
           </tbody>
         </table>
         </div>
@@ -4097,11 +4377,11 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
               Nạp Excel SP
             </button>
-            <button class="btn-pm-action btn-pm-export" onclick="exportRegistrationsCSV()">
+            <button class="btn-pm-action btn-pm-export" id="btn-pm-export-csv" onclick="exportRegistrationsCSV()">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Xuất Excel (CSV)
             </button>
-            <button class="btn-pm-action btn-pm-outline" onclick="triggerExpiredCheck()" title="Quét giải phóng các slot giữ chỗ quá hạn 24h và gửi cảnh báo">
+            <button class="btn-pm-action btn-pm-outline" id="btn-pm-expired-check" onclick="triggerExpiredCheck()" title="Quét giải phóng các slot giữ chỗ quá hạn 24h và gửi cảnh báo">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               Quét quá hạn 24h
             </button>
@@ -5305,6 +5585,7 @@
         const prod = currentProducts.find(p => p.uniqueCode === reg.slotId);
         if (prod) prod.status = 'Available';
         renderProductTable(currentProducts);
+        if (typeof renderTab4ProductTable === 'function') renderTab4ProductTable(currentProducts);
       }
 
       if (typeof DEMO_REGISTRATIONS !== 'undefined') {
@@ -5477,24 +5758,109 @@
 
     const DEMO_PRODUCTS = {
       'IS2026Q3-HA': [
-        { uniqueCode: 'HA-001', programId: 'IS2026Q3-HA', category: 'Tủ lạnh', model: 'GR-X257BG', description: 'Tủ lạnh InstaView Door-in-Door 635L', rrp: 42990000, internalPrice: 24900000, kho: 'AYA', status: 'Available' },
-        { uniqueCode: 'HA-002', programId: 'IS2026Q3-HA', category: 'Máy giặt', model: 'WT1410NHEG', description: 'Tháp giặt sấy WashTower 14kg giặt / 10kg sấy', rrp: 54990000, internalPrice: 32500000, kho: 'AYA', status: 'Available' },
-        { uniqueCode: 'HA-003', programId: 'IS2026Q3-HA', category: 'Máy sấy', model: 'DVH09B', description: 'Máy sấy HeatPump DUAL Inverter 9kg', rrp: 21990000, internalPrice: 12900000, kho: 'AYB', status: 'Available' },
-        { uniqueCode: 'HA-004', programId: 'IS2026Q3-HA', category: 'Điều hòa', model: 'V10APFUV', description: 'Điều hòa Inverter UVnano lọc khí 1HP', rrp: 13490000, internalPrice: 7800000, kho: 'AYC', status: 'Registered' }
+        { uniqueCode: 'HA-001', programId: 'IS2026Q3-HA', category: 'Tủ lạnh', model: 'GR-X257BG', description: 'Tủ lạnh InstaView Door-in-Door 635L', rrp: 42990000, internalPrice: 24900000, kho: 'AYA', status: 'Available', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'HA-002', programId: 'IS2026Q3-HA', category: 'Máy giặt', model: 'WT1410NHEG', description: 'Tháp giặt sấy WashTower 14kg giặt / 10kg sấy', rrp: 54990000, internalPrice: 32500000, kho: 'AYA', status: 'Available', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'HA-003', programId: 'IS2026Q3-HA', category: 'Máy sấy', model: 'DVH09B', description: 'Máy sấy HeatPump DUAL Inverter 9kg', rrp: 21990000, internalPrice: 12900000, kho: 'AYB', status: 'Available', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'HA-004', programId: 'IS2026Q3-HA', category: 'Điều hòa', model: 'V10APFUV', description: 'Điều hòa Inverter UVnano lọc khí 1HP', rrp: 13490000, internalPrice: 7800000, kho: 'AYC', status: 'Registered', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' }
       ],
       'IS2026Q3-HE': [
-        { uniqueCode: 'HE-001', programId: 'IS2026Q3-HE', category: 'Tivi OLED', model: 'OLED65G3PSA', description: 'Smart Tivi OLED evo 4K 65 inch Gallery Edition', rrp: 68900000, internalPrice: 38900000, kho: 'AYA', status: 'Registered' },
-        { uniqueCode: 'HE-002', programId: 'IS2026Q3-HE', category: 'Tivi QNED', model: '65QNED80SRA', description: 'Smart Tivi QNED 4K 65 inch 120Hz', rrp: 28900000, internalPrice: 16500000, kho: 'AYC', status: 'Registered' },
-        { uniqueCode: 'HE-003', programId: 'IS2026Q3-HE', category: 'Loa thanh', model: 'SC9S', description: 'Loa soundbar LG Sound Sync 400W 3.1.3 kênh', rrp: 14990000, internalPrice: 7900000, kho: 'AYB', status: 'Available' },
-        { uniqueCode: 'HE-004', programId: 'IS2026Q3-HE', category: 'Tivi OLED', model: 'OLED55C3PSA', description: 'Smart Tivi OLED 4K 55 inch Cinema 120Hz', rrp: 39900000, internalPrice: 22500000, kho: 'AYA', status: 'Available' },
-        { uniqueCode: 'HE-005', programId: 'IS2026Q3-HE', category: 'Loa không dây', model: 'XBOOM XL7S', description: 'Loa tiệc di động LG XBOOM 250W Pixel LED', rrp: 10990000, internalPrice: 5900000, kho: 'AYC', status: 'Available' }
+        {"uniqueCode": "#001", "programId": "IS2026Q3-HE", "category": "Tivi StandbyME", "model": "27LX6TDGA.ATV", "serial": "604KCGWKN047", "grade": "A", "cond": "thùng xấu", "description": "Tivi StandbyME LG 27LX6TDGA.ATV (Loại A · thùng xấu)", "rrp": 33900000, "internalPrice": 5085000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#002", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "43UA8450PSA.ATV", "serial": "506INHZ0H361", "grade": "B", "cond": "thùng xấu, sp trầy xước, ko remot", "description": "Tivi UHD 4K LG 43UA8450PSA.ATV (Loại B · thùng xấu, sp trầy xước, ko remot)", "rrp": 10690000, "internalPrice": 2672500, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#003", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "43UQ7050PSA.ATVQ", "serial": "503BEYG0R354", "grade": "B", "cond": "thùng xấu, sp trầy xước,thiếu ốc chân", "description": "Tivi UHD 4K LG 43UQ7050PSA.ATVQ (Loại B · thùng xấu, sp trầy xước,thiếu ốc chân)", "rrp": 10690000, "internalPrice": 2672500, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#004", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "55QNED86ASA.ATV", "serial": "505INBS6V189", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 55QNED86ASA.ATV (Loại B · thùng xấu, sp trầy xước, thiếu ốc chân đế)", "rrp": 23400000, "internalPrice": 5850000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#005", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "55QNED86BSA.ATV", "serial": "605INLV49960", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 55QNED86BSA.ATV (Loại B · thùng xấu, sp trầy xước, thiếu ốc chân đế)", "rrp": 23900000, "internalPrice": 5975000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#006", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "55UA8450PSA.ATV", "serial": "505INDP5L298", "grade": "B", "cond": "Sai Thùng,  sp trầy xước, thiếu ốc chân đế", "description": "Tivi UHD 4K LG 55UA8450PSA.ATV (Loại B · Sai Thùng,  sp trầy xước, thiếu ốc chân đế)", "rrp": 15590000, "internalPrice": 3897500, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#007", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED80BSA.ATV", "serial": "604INPT2W928", "grade": "B", "cond": "Sai Thùng,  sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 65QNED80BSA.ATV (Loại B · Sai Thùng,  sp trầy xước, thiếu ốc chân đế)", "rrp": 25400000, "internalPrice": 6350000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#008", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED86ASA.ATV", "serial": "510INAR7E096", "grade": "B", "cond": "thùng xấu rách, thiếu mút chân đế, sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 65QNED86ASA.ATV (Loại B · thùng xấu rách, thiếu mút chân đế, sp trầy xước, thiếu ốc chân đế)", "rrp": 29290000, "internalPrice": 7322500, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#009", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED86BSA.ATV", "serial": "604INGQ77215", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 65QNED86BSA.ATV (Loại B · thùng xấu, sp trầy xước, thiếu ốc chân đế)", "rrp": 29900000, "internalPrice": 7475000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#010", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED82ASA.AGADLHX", "serial": "412KCPYL4928", "grade": "B", "cond": "thùng xấu rách nát, sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 75QNED82ASA.AGADLHX (Loại B · thùng xấu rách nát, sp trầy xước, thiếu ốc chân đế)", "rrp": 39900000, "internalPrice": 9975000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#011", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED86BSA.ATV", "serial": "604INUB2F134", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc chân đế", "description": "Tivi QNED LG 75QNED86BSA.ATV (Loại B · thùng xấu, sp trầy xước, thiếu ốc chân đế)", "rrp": 41900000, "internalPrice": 10475000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#012", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED9MASA.AGAFLHX", "serial": "501KCXML3882", "grade": "B", "cond": "Thùng xấu rách,sp trầy xước, thiếu remot, thiếu ốc chân đế", "description": "Tivi QNED LG 75QNED9MASA.AGAFLHX (Loại B · Thùng xấu rách,sp trầy xước, thiếu remot, thiếu ốc chân đế)", "rrp": 49900000, "internalPrice": 12475000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#013", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED65G5PSA.ATV", "serial": "504INNG1A551", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc khung treo", "description": "Tivi OLED LG OLED65G5PSA.ATV (Loại B · thùng xấu, sp trầy xước, thiếu ốc khung treo)", "rrp": 70490000, "internalPrice": 17622500, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#014", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77C44LA.AEUQLHX", "serial": "402KCHEKC281", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc chân đế", "description": "Tivi OLED LG OLED77C44LA.AEUQLHX (Loại B · thùng xấu, sp trầy xước, thiếu ốc chân đế)", "rrp": 55900000, "internalPrice": 13975000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#015", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77C54LA.AEUQLHX", "serial": "501KCUKKK798", "grade": "B", "cond": "Thùng xấu rách,sp trầy xước, thiếu remot, thiếu chân đế", "description": "Tivi OLED LG OLED77C54LA.AEUQLHX (Loại B · Thùng xấu rách,sp trầy xước, thiếu remot, thiếu chân đế)", "rrp": 59900000, "internalPrice": 14975000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#016", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED83B5PSA.AGAQLHX", "serial": "502KCSFKC414", "grade": "B", "cond": "thùng xấu, sp trầy xước, thiếu ốc chân đế", "description": "Tivi OLED LG OLED83B5PSA.AGAQLHX (Loại B · thùng xấu, sp trầy xước, thiếu ốc chân đế)", "rrp": 65900000, "internalPrice": 16475000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#017", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED83M4PUA.AUSYLHX", "serial": "403KCRNK1966", "grade": "B", "cond": "Thùng xấu rách,sp trầy xước, thiếu ốc khung treo", "description": "Tivi OLED LG OLED83M4PUA.AUSYLHX (Loại B · Thùng xấu rách,sp trầy xước, thiếu ốc khung treo)", "rrp": 69900000, "internalPrice": 17475000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#018", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED97M5PSA.AAU", "serial": "504KCZPKH037", "grade": "B", "cond": "Thùng xấu rách,sp trầy xước, thiếu remot , thiếu ốc khung treo", "description": "Tivi OLED LG OLED97M5PSA.AAU (Loại B · Thùng xấu rách,sp trầy xước, thiếu remot , thiếu ốc khung treo)", "rrp": 100000000, "internalPrice": 25000000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#019", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77C6PJA.AJLQLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi OLED LG OLED77C6PJA.AJLQLHX (GoodSet)", "rrp": 35900000, "internalPrice": 17950000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#020", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77B6PCA.ACNQLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi OLED LG OLED77B6PCA.ACNQLHX (GoodSet)", "rrp": 26900000, "internalPrice": 13450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#021", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED70BSA.AGAFLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi QNED LG 75QNED70BSA.AGAFLHX (GoodSet)", "rrp": 16900000, "internalPrice": 8450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#022", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED81B6A.AEUNLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi QNED LG 75QNED81B6A.AEUNLHX (GoodSet)", "rrp": 18900000, "internalPrice": 9450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#023", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "65NU850BPUA.AUSFLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi UHD 4K LG 65NU850BPUA.AUSFLHX (GoodSet)", "rrp": 13900000, "internalPrice": 6950000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#024", "programId": "IS2026Q3-HE", "category": "Tivi & Loa", "model": "75MRGB86BSA.AGADLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi & Loa LG 75MRGB86BSA.AGADLHX (GoodSet)", "rrp": 34900000, "internalPrice": 17450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#025", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "100QNED89AS.AGAFLHX", "serial": "501KCQXKX396", "grade": "B", "cond": "trầy xước nhẹ ,hộp xấu", "description": "Tivi QNED LG 100QNED89AS.AGAFLHX (Loại B · trầy xước nhẹ ,hộp xấu)", "rrp": 89900000, "internalPrice": 22475000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#026", "programId": "IS2026Q3-HE", "category": "Tivi StandbyME", "model": "27LX6TDGA.ATV", "serial": "602KCEAKG180", "grade": "B", "cond": "trầy xước nhẹ , thiếu khiển,dây typeC. hộp xấu", "description": "Tivi StandbyME LG 27LX6TDGA.ATV (Loại B · trầy xước nhẹ , thiếu khiển,dây typeC. hộp xấu)", "rrp": 33900000, "internalPrice": 5085000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#027", "programId": "IS2026Q3-HE", "category": "Tivi StandbyME", "model": "27LX6TDGA.ATV", "serial": "602KCDGKG226", "grade": "B", "cond": "cũ xước,hộp xấu .thiếu dây typeC", "description": "Tivi StandbyME LG 27LX6TDGA.ATV (Loại B · cũ xước,hộp xấu .thiếu dây typeC)", "rrp": 33900000, "internalPrice": 5085000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#028", "programId": "IS2026Q3-HE", "category": "Tivi StandbyME", "model": "27LX6TDGA.ATV", "serial": "602KCVUKG167", "grade": "B", "cond": "trầy xước nhẹ ,hộp xấu", "description": "Tivi StandbyME LG 27LX6TDGA.ATV (Loại B · trầy xước nhẹ ,hộp xấu)", "rrp": 33900000, "internalPrice": 5085000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#029", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "43LB6500PSB.AWZSLHX", "serial": "604KCFTKB083", "grade": "B", "cond": "trầy xước nhẹ ,hộp xấu .khiển thường", "description": "Tivi UHD 4K LG 43LB6500PSB.AWZSLHX (Loại B · trầy xước nhẹ ,hộp xấu .khiển thường)", "rrp": 3614000, "internalPrice": 903500, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#030", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "65UA8055PSA.ATV", "serial": "602INYD2J866", "grade": "A", "cond": "trầy xước nhẹ ,hộp xấu", "description": "Tivi UHD 4K LG 65UA8055PSA.ATV (Loại A · trầy xước nhẹ ,hộp xấu)", "rrp": 19490000, "internalPrice": 4872500, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#031", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED86ASA.ATV", "serial": "510INVM50727", "grade": "B", "cond": "trầy xước nhẹ , thiếu khiển. hộp xấu", "description": "Tivi QNED LG 75QNED86ASA.ATV (Loại B · trầy xước nhẹ , thiếu khiển. hộp xấu)", "rrp": 40090000, "internalPrice": 10022500, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#032", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED9MASA.AGAFLHX", "serial": "501KCKJL3877", "grade": "B", "cond": "trầy xước nhẹ ,hộp xấu", "description": "Tivi QNED LG 75QNED9MASA.AGAFLHX (Loại B · trầy xước nhẹ ,hộp xấu)", "rrp": 49900000, "internalPrice": 12475000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#033", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED48B5PSA.ATV", "serial": "510INMF04155", "grade": "B", "cond": "sai thùng xốp,thiếu khiển.trầy xước nhẹ", "description": "Tivi OLED LG OLED48B5PSA.ATV (Loại B · sai thùng xốp,thiếu khiển.trầy xước nhẹ)", "rrp": 29290000, "internalPrice": 7322500, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#034", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED65G5PSA.ATV", "serial": "504INGQ1A543", "grade": "B", "cond": "sai giá treo.không khiển.hộp rách", "description": "Tivi OLED LG OLED65G5PSA.ATV (Loại B · sai giá treo.không khiển.hộp rách)", "rrp": 70490000, "internalPrice": 17622500, "kho": "AYA", "status": "Registered"},
+        {"uniqueCode": "#035", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77C44LA.AEUQLHX", "serial": "402KCPYKC280", "grade": "B", "cond": "trầy xước nhẹ ,hộp xấu (không chuyển được coss VN)", "description": "Tivi OLED LG OLED77C44LA.AEUQLHX (Loại B · trầy xước nhẹ ,hộp xấu (không chuyển được coss VN))", "rrp": 55900000, "internalPrice": 13975000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#036", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77C54LA.AEUQLHX", "serial": "501KCNLKK799", "grade": "B", "cond": "trầy xước nhẹ , thiếu khiển. hộp xấu (không chuyển được coss VN)", "description": "Tivi OLED LG OLED77C54LA.AEUQLHX (Loại B · trầy xước nhẹ , thiếu khiển. hộp xấu (không chuyển được coss VN))", "rrp": 59900000, "internalPrice": 14975000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#037", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED83B5PSA.AGAQLHX", "serial": "502KCMRKC419", "grade": "B", "cond": "trầy xước nhẹ ,hộp xấu", "description": "Tivi OLED LG OLED83B5PSA.AGAQLHX (Loại B · trầy xước nhẹ ,hộp xấu)", "rrp": 65900000, "internalPrice": 16475000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#038", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED83C5PSA.AWZQLHX", "serial": "502KCFTKC451", "grade": "B", "cond": "trầy xước nhẹ , thiếu khiển hộp xấu (thieu nap chan)", "description": "Tivi OLED LG OLED83C5PSA.AWZQLHX (Loại B · trầy xước nhẹ , thiếu khiển hộp xấu (thieu nap chan))", "rrp": 69900000, "internalPrice": 17475000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#039", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77C6PJA.AJLQLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi OLED LG OLED77C6PJA.AJLQLHX (GoodSet)", "rrp": 35900000, "internalPrice": 17950000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#040", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED70BSA.AGAFLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi QNED LG 75QNED70BSA.AGAFLHX (GoodSet)", "rrp": 16900000, "internalPrice": 8450000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#041", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "65NU850BPUA.AUSFLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi UHD 4K LG 65NU850BPUA.AUSFLHX (GoodSet)", "rrp": 13900000, "internalPrice": 6950000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#042", "programId": "IS2026Q3-HE", "category": "Tivi & Loa", "model": "75MRGB86BSA.AGADLHX", "serial": "—", "grade": "GoodSet", "cond": "—", "description": "Tivi & Loa LG 75MRGB86BSA.AGADLHX (GoodSet)", "rrp": 34900000, "internalPrice": 17450000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#043", "programId": "IS2026Q3-HE", "category": "Tivi OLED", "model": "OLED77G5PSA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi OLED LG OLED77G5PSA.ATV (GoodSet · GoodSet)", "rrp": 117690000, "internalPrice": 58845000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#044", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED92ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi QNED LG 65QNED92ASA.ATV (GoodSet · GoodSet)", "rrp": 37190000, "internalPrice": 18595000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#045", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED92ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 65QNED92ASA.ATV (GoodSet · Box damage)", "rrp": 37190000, "internalPrice": 18595000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#046", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "43QNED81ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 43QNED81ASA.ATV (GoodSet · Box damage)", "rrp": 14090000, "internalPrice": 7045000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#047", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "55QNED80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi QNED LG 55QNED80ASA.ATV (GoodSet · GoodSet)", "rrp": 18990000, "internalPrice": 9495000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#048", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#049", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#050", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#051", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#052", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#053", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#054", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#055", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#056", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#057", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#058", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#059", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#060", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#061", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#062", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "55NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 55NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 17490000, "internalPrice": 8745000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#063", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "65UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 65UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 18490000, "internalPrice": 9245000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#064", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "65UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 65UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 18490000, "internalPrice": 9245000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#065", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "50UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 50UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 12590000, "internalPrice": 6295000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#066", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "50UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 50UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 12590000, "internalPrice": 6295000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#067", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "43UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 43UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 9690000, "internalPrice": 4845000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#068", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "43UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 43UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 9690000, "internalPrice": 4845000, "kho": "AYA", "status": "Available"},
+        {"uniqueCode": "#069", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 75QNED80ASA.ATV (GoodSet · Box damage)", "rrp": 34190000, "internalPrice": 17095000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#070", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "75QNED80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 75QNED80ASA.ATV (GoodSet · Box damage)", "rrp": 34190000, "internalPrice": 17095000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#071", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#072", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#073", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#074", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#075", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#076", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#077", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#078", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#079", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#080", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · GoodSet)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#081", "programId": "IS2026Q3-HE", "category": "Tivi NanoCell", "model": "75NANO80ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi NanoCell LG 75NANO80ASA.ATV (GoodSet · Box damage)", "rrp": 30790000, "internalPrice": 15395000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#082", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "50UA7350PSB.ATVQ", "serial": "—", "grade": "GoodSet", "cond": "GoodSet", "description": "Tivi UHD 4K LG 50UA7350PSB.ATVQ (GoodSet · GoodSet)", "rrp": 12590000, "internalPrice": 6295000, "kho": "AYB", "status": "Available"},
+        {"uniqueCode": "#083", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED70ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 65QNED70ASA.ATV (GoodSet · Box damage)", "rrp": 22900000, "internalPrice": 11450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#084", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED70ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 65QNED70ASA.ATV (GoodSet · Box damage)", "rrp": 22900000, "internalPrice": 11450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#085", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED70ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 65QNED70ASA.ATV (GoodSet · Box damage)", "rrp": 22900000, "internalPrice": 11450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#086", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "65QNED70ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 65QNED70ASA.ATV (GoodSet · Box damage)", "rrp": 22900000, "internalPrice": 11450000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#087", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "43QNED70ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 43QNED70ASA.ATV (GoodSet · Box damage)", "rrp": 13090000, "internalPrice": 6545000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#088", "programId": "IS2026Q3-HE", "category": "Tivi QNED", "model": "43QNED70ASA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi QNED LG 43QNED70ASA.ATV (GoodSet · Box damage)", "rrp": 13090000, "internalPrice": 6545000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#089", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "65UA8450PSA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi UHD 4K LG 65UA8450PSA.ATV (GoodSet · Box damage)", "rrp": 19490000, "internalPrice": 9745000, "kho": "AYC", "status": "Available"},
+        {"uniqueCode": "#090", "programId": "IS2026Q3-HE", "category": "Tivi UHD 4K", "model": "55UA8450PSA.ATV", "serial": "—", "grade": "GoodSet", "cond": "Box damage", "description": "Tivi UHD 4K LG 55UA8450PSA.ATV (GoodSet · Box damage)", "rrp": 15590000, "internalPrice": 7795000, "kho": "AYC", "status": "Available"}
       ],
       'IS2026Q4-BS': [
-        { uniqueCode: 'BS-001', programId: 'IS2026Q4-BS', category: 'Màn hình', model: '34WP65C', description: 'Màn hình UltraWide cong 34 inch QHD 160Hz', rrp: 12500000, internalPrice: 7200000, kho: 'AYA', status: 'Registered' },
-        { uniqueCode: 'BS-002', programId: 'IS2026Q4-BS', category: 'Màn hình', model: '32UN880', description: 'Màn hình Ergo UltraFine 32 inch 4K IPS', rrp: 18900000, internalPrice: 11200000, kho: 'AYA', status: 'Available' },
-        { uniqueCode: 'BS-003', programId: 'IS2026Q4-BS', category: 'Màn hình di động', model: '16MQ70', description: 'Màn hình LG gram +view 16 inch IPS WQXGA Type-C', rrp: 8990000, internalPrice: 5100000, kho: 'AYB', status: 'Registered' },
-        { uniqueCode: 'BS-004', programId: 'IS2026Q4-BS', category: 'Bảng tương tác', model: '43ST43U', description: 'Màn hình tương tác cảm ứng One:Quick Flex 43 inch', rrp: 32000000, internalPrice: 19500000, kho: 'AYC', status: 'Registered' },
-        { uniqueCode: 'BS-005', programId: 'IS2026Q4-BS', category: 'Máy chiếu', model: 'BU50NST', description: 'Máy chiếu laser thông minh ProBeam 5000 ANSI 4K', rrp: 65000000, internalPrice: 38000000, kho: 'AYC', status: 'Available' }
+        { uniqueCode: 'BS-001', programId: 'IS2026Q4-BS', category: 'Màn hình', model: '34WP65C', description: 'Màn hình UltraWide cong 34 inch QHD 160Hz', rrp: 12500000, internalPrice: 7200000, kho: 'AYA', status: 'Registered', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'BS-002', programId: 'IS2026Q4-BS', category: 'Màn hình', model: '32UN880', description: 'Màn hình Ergo UltraFine 32 inch 4K IPS', rrp: 18900000, internalPrice: 11200000, kho: 'AYA', status: 'Available', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'BS-003', programId: 'IS2026Q4-BS', category: 'Màn hình di động', model: '16MQ70', description: 'Màn hình LG gram +view 16 inch IPS WQXGA Type-C', rrp: 8990000, internalPrice: 5100000, kho: 'AYB', status: 'Registered', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'BS-004', programId: 'IS2026Q4-BS', category: 'Bảng tương tác', model: '43ST43U', description: 'Màn hình tương tác cảm ứng One:Quick Flex 43 inch', rrp: 32000000, internalPrice: 19500000, kho: 'AYC', status: 'Registered', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' },
+        { uniqueCode: 'BS-005', programId: 'IS2026Q4-BS', category: 'Máy chiếu', model: 'BU50NST', description: 'Máy chiếu laser thông minh ProBeam 5000 ANSI 4K', rrp: 65000000, internalPrice: 38000000, kho: 'AYC', status: 'Available', serial: '—', grade: 'GoodSet', cond: 'Hàng mới 100% nguyên seal' }
       ]
     };
 
@@ -5606,12 +5972,12 @@
       {
         id: 'REG-2026-005',
         programId: 'IS2026Q3-HE',
-        slotId: 'HE-001',
+        slotId: '#034',
         kho: 'AYA',
         category: 'Tivi OLED',
-        model: 'OLED65G3PSA',
-        description: 'Smart Tivi OLED evo 4K 65 inch Gallery Edition',
-        internalPrice: 38900000,
+        model: 'OLED65G5PSA.ATV',
+        description: 'Tivi OLED LG OLED65G5PSA.ATV (Loại B · sai giá treo.không khiển.hộp rách)',
+        internalPrice: 17622500,
         empCode: 'VH88921',
         empName: 'Trần Văn Nam',
         division: 'Audit & Jeong-Do',
@@ -5621,7 +5987,7 @@
         status: 'Đã duyệt thanh toán',
         payerName: 'Trần Văn Nam',
         payerCode: 'VH88921',
-        amount: 38900000,
+        amount: 17622500,
         bankTxn: 'VCB-554433221',
         payTime: '2026-09-15 09:20:00',
         receiptUrl: 'bienlai_nam_tivi.pdf',
@@ -5714,7 +6080,19 @@
       if (savedRegs) {
         const parsed = JSON.parse(savedRegs);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          parsed.forEach(r => {
+            if (r.programId === 'IS2026Q3-HE' && (r.slotId === 'HE-001' || r.id === 'REG-2026-005')) {
+              r.slotId = '#034';
+              r.model = 'OLED65G5PSA.ATV';
+              r.category = 'Tivi OLED';
+              r.kho = 'AYA';
+              r.internalPrice = 17622500;
+              r.amount = 17622500;
+              r.description = 'Tivi OLED LG OLED65G5PSA.ATV (Loại B · sai giá treo.không khiển.hộp rách)';
+            }
+          });
           DEMO_REGISTRATIONS = parsed;
+          localStorage.setItem('lg_demo_registrations', JSON.stringify(DEMO_REGISTRATIONS));
         }
       }
     } catch (e) {}
@@ -5860,6 +6238,10 @@
       document.getElementById('login-overlay').classList.add('hidden');
       // P1: Load programs after login
       loadPrograms();
+      // Onboarding Tour check for first-time login
+      if (typeof checkAndAutoLaunchTour === 'function') {
+        setTimeout(() => checkAndAutoLaunchTour(user.role), 800);
+      }
     }
 
     async function handleLogin(e) {
@@ -6368,6 +6750,7 @@
       if (currentUser && currentUser.role === 'PM') {
         const createBtn = document.createElement('button');
         createBtn.className = 'program-tab program-tab-create';
+        createBtn.id = 'btn-create-program-tab';
         createBtn.innerHTML = '<svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tạo chương trình';
         createBtn.onclick = showCreateProgramModal;
         bar.appendChild(createBtn);
@@ -6416,7 +6799,13 @@
         controls.style.display = 'none';
         return;
       }
-      controls.style.display = 'flex';
+      // Smart Visibility: When PM is on tab-pm (main dashboard), hide top duplicate #pm-controls
+      const tabPm = document.getElementById('tab-pm');
+      if (tabPm && tabPm.classList.contains('active')) {
+        controls.style.display = 'none';
+      } else {
+        controls.style.display = 'flex';
+      }
       controls.innerHTML = '';
 
       if (prog.status === 'Draft') {
@@ -6837,9 +7226,23 @@
       // If products were provided, attach to DEMO_PRODUCTS & currentProducts
       if (importedProducts && importedProducts.length > 0) {
         if (typeof DEMO_PRODUCTS !== 'undefined') {
-          DEMO_PRODUCTS[programId] = importedProducts.map(p => ({ ...p, programId }));
+          DEMO_PRODUCTS[programId] = importedProducts.map((p, idx) => ({
+            ...p,
+            programId,
+            uniqueCode: p.uniqueCode || `#${String(idx + 1).padStart(3, '0')}`,
+            status: p.status || 'Available'
+          }));
         }
+        currentProducts = DEMO_PRODUCTS[programId];
         setSwrCache('products_' + programId, DEMO_PRODUCTS[programId]);
+      } else {
+        if (typeof DEMO_PRODUCTS !== 'undefined' && !DEMO_PRODUCTS[programId]) {
+          DEMO_PRODUCTS[programId] = [];
+        }
+        currentProducts = DEMO_PRODUCTS[programId] || [];
+      }
+      if (typeof syncProductRegistrationStatus === 'function') {
+        syncProductRegistrationStatus(programId, currentProducts);
       }
 
       // Re-render tabs and select new program
@@ -6953,14 +7356,22 @@
         return;
       }
       const targetProg = activeProgram;
-      const enriched = standaloneImportedProducts.map(p => ({ ...p, programId: targetProg }));
+      const enriched = standaloneImportedProducts.map((p, idx) => ({ 
+        ...p, 
+        programId: targetProg,
+        uniqueCode: p.uniqueCode || `#${String(idx + 1).padStart(3, '0')}`,
+        status: p.status || 'Available'
+      }));
       if (typeof DEMO_PRODUCTS !== 'undefined') {
         DEMO_PRODUCTS[targetProg] = enriched;
       }
       currentProducts = enriched;
       setSwrCache('products_' + targetProg, enriched);
+      syncProductRegistrationStatus(targetProg, currentProducts);
       renderProductTable(currentProducts);
+      if (typeof renderTab4ProductTable === 'function') renderTab4ProductTable(currentProducts);
       renderBriefTopDashboard(targetProg);
+      if (typeof calculatePMStats === 'function') calculatePMStats(targetProg);
 
       if (SHEET_API_URL && currentUser) {
         try {
@@ -6981,36 +7392,50 @@
     // ===== End P1 =====
 
     // ===== P1.5: Program Product & Regional Statistics Core =====
+    function syncProductRegistrationStatus(programId, productsList) {
+      const pid = programId || activeProgram;
+      const prods = (productsList && Array.isArray(productsList) && productsList.length)
+        ? productsList
+        : (currentProducts && currentProducts.length && currentProducts[0].programId === pid)
+          ? currentProducts
+          : (typeof DEMO_PRODUCTS !== 'undefined' && DEMO_PRODUCTS[pid])
+            ? DEMO_PRODUCTS[pid]
+            : [];
+      if (!prods || !prods.length) return prods;
+
+      const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
+        ? pmRegistrations
+        : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+
+      const activeRegs = allRegs.filter(r => 
+        (r.programId === pid || !r.programId) && 
+        r.status !== 'Từ chối' && 
+        r.status !== 'Hủy' && 
+        !String(r.status || '').startsWith('Đã hủy')
+      );
+
+      const takenSlots = new Set(activeRegs.map(r => r.slotId));
+      if (typeof takenSet !== 'undefined') {
+        activeRegs.forEach(r => { if (r.slotId) takenSet.add(r.slotId); });
+      }
+
+      prods.forEach(p => {
+        const code = p.uniqueCode || p.slotId;
+        if (takenSlots.has(code)) {
+          p.status = 'Registered';
+        } else {
+          p.status = 'Available';
+        }
+      });
+
+      return prods;
+    }
+    window.syncProductRegistrationStatus = syncProductRegistrationStatus;
+
     function getProgramProducts(programId) {
       const pid = programId || activeProgram;
-      if (pid === 'IS2026Q3-HA') {
-        const cat = (typeof getCatalog === 'function') ? getCatalog() : [];
-        if (cat && cat.length > 0) {
-          return cat.map(it => {
-            const isReg = !!takenSet && takenSet.has(it.slot);
-            let category = 'Gia dụng & Nghe nhìn';
-            if (it.model.includes('OLED') || it.model.includes('QNED') || it.model.includes('UA') || it.model.includes('UQ') || it.model.includes('LX')) category = 'Tivi & Màn hình';
-            else if (it.model.includes('GR-') || it.model.includes('B247') || it.model.includes('D635')) category = 'Tủ lạnh';
-            else if (it.model.includes('WT') || it.model.includes('FV') || it.model.includes('DVH')) category = 'Máy giặt & Sấy';
-            else if (it.model.includes('V10') || it.model.includes('V13') || it.model.includes('APF')) category = 'Điều hòa';
-
-            return {
-              uniqueCode: it.slot,
-              programId: 'IS2026Q3-HA',
-              category: category,
-              model: it.model,
-              description: `${it.grade === 'GoodSet' ? 'GoodSet' : 'Loại ' + it.grade} · ${it.cond}${it.serial && it.serial !== '—' ? ' (SN: ' + it.serial + ')' : ''}`,
-              rrp: it.mrp,
-              internalPrice: it.price,
-              off: it.off,
-              kho: it.kho,
-              status: isReg ? 'Registered' : 'Available',
-              grade: it.grade,
-              cond: it.cond,
-              serial: it.serial
-            };
-          });
-        }
+      if (currentProducts && currentProducts.length && currentProducts[0].programId === pid) {
+        return currentProducts;
       }
       return (DEMO_PRODUCTS[pid] || []).slice();
     }
@@ -7020,6 +7445,8 @@
       const prods = (currentProducts && currentProducts.length && currentProducts[0].programId === pid)
         ? currentProducts
         : getProgramProducts(pid);
+
+      syncProductRegistrationStatus(pid, prods);
 
       const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
         ? pmRegistrations
@@ -7043,7 +7470,10 @@
       warehouses.forEach(k => {
         const kProds = prods.filter(p => (p.kho || '').toUpperCase() === k);
         const kListed = kProds.length;
-        const kRegs = progRegs.filter(r => (r.kho || '').toUpperCase() === k);
+        const kRegs = progRegs.filter(r => {
+          if ((r.kho || '').toUpperCase() === k) return true;
+          return kProds.some(p => (p.uniqueCode || p.slotId) === r.slotId);
+        });
         const kRegistered = kRegs.length;
         const kPaid = kRegs.filter(r => r.status === 'Đã duyệt thanh toán' || r.status === 'Đã khai nộp - chờ đối soát').length;
         const kAvail = Math.max(0, kListed - kRegistered);
@@ -7648,17 +8078,40 @@
       }
     }
 
-    // ===== P2: Product Display =====
+    // ===== P2: Product Display (Unified Single Catalog) =====
+
+    let unifiedCatalogViewMode = 'cards'; // 'cards' | 'table'
+    let unifiedCatalogKho = '';           // '' = all
+    let unifiedCatalogSearch = '';        // query string
+
+    function setUnifiedViewMode(mode) {
+      unifiedCatalogViewMode = mode;
+      renderProductTable(currentProducts);
+    }
+
+    function setUnifiedCatalogKho(kho) {
+      unifiedCatalogKho = kho;
+      renderProductTable(currentProducts);
+    }
+
+    function handleUnifiedSearch(val) {
+      unifiedCatalogSearch = val;
+      renderProductTable(currentProducts);
+    }
 
     async function loadProducts(programId) {
       if (!currentUser) return;
+      unifiedCatalogKho = '';
+      unifiedCatalogSearch = '';
       let fetched = false;
 
       // 1. Check SWR Client Cache first (instant zero-delay rendering during peak traffic)
       const cached = getSwrCache('products_' + programId);
       if (cached && Array.isArray(cached) && cached.length > 0) {
         currentProducts = cached;
+        syncProductRegistrationStatus(programId, currentProducts);
         renderProductTable(cached);
+        renderTab4ProductTable(cached);
         renderBriefTopDashboard(programId);
         fetched = true;
       }
@@ -7679,7 +8132,9 @@
             if (data.ok && Array.isArray(data.products) && data.products.length > 0) {
               currentProducts = data.products;
               setSwrCache('products_' + programId, data.products);
+              syncProductRegistrationStatus(programId, currentProducts);
               renderProductTable(data.products);
+              renderTab4ProductTable(data.products);
               renderBriefTopDashboard(programId);
               fetched = true;
             }
@@ -7691,7 +8146,9 @@
 
       if (!fetched) {
         currentProducts = (DEMO_PRODUCTS[programId] || []).slice();
+        syncProductRegistrationStatus(programId, currentProducts);
         renderProductTable(currentProducts);
+        renderTab4ProductTable(currentProducts);
         renderBriefTopDashboard(programId);
       }
     }
@@ -7704,7 +8161,6 @@
       // Find or create product container
       let container = document.getElementById('product-container');
       if (!container) {
-        // Find a suitable place — inside tab2 or after grap-brief-dashboard
         const anchor = document.getElementById('tab2') || document.getElementById('grap-brief-dashboard');
         if (!anchor) return;
         container = document.createElement('div');
@@ -7714,111 +8170,325 @@
       }
 
       if (!products || products.length === 0) {
-        container.innerHTML = '<div style="padding:20px;text-align:center;color:#716F6A;">Chưa có sản phẩm nào trong chương trình này.</div>';
+        container.innerHTML = '<div style="padding:36px 20px;text-align:center;color:#716F6A;background:#FFFFFF;border:1px solid #E6E1D6;border-radius:12px;margin:12px 0;">Chưa có sản phẩm nào trong chương trình này.</div>';
         return;
       }
 
-      // Group by Kho
-      const byKho = {};
+      // Ensure product status is synchronized with registrations
+      syncProductRegistrationStatus(activeProgram, products);
+
+      // Compute statistics across all products of active program
+      const allKhoMap = {};
       products.forEach(p => {
-        if (!byKho[p.kho]) byKho[p.kho] = [];
-        byKho[p.kho].push(p);
+        const k = p.kho || 'Khác';
+        if (!allKhoMap[k]) allKhoMap[k] = { total: 0, avail: 0 };
+        allKhoMap[k].total++;
+        if (p.status === 'Available') allKhoMap[k].avail++;
+      });
+      const khoNames = Object.keys(allKhoMap).sort();
+      const totalAll = products.length;
+      const availAll = products.filter(p => p.status === 'Available').length;
+
+      // Filter products
+      const q = (unifiedCatalogSearch || '').trim().toLowerCase();
+      const filtered = products.filter(p => {
+        const matchKho = !unifiedCatalogKho || p.kho === unifiedCatalogKho;
+        const matchQ = !q ||
+          (p.model || '').toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q) ||
+          (p.category || '').toLowerCase().includes(q) ||
+          (p.uniqueCode || '').toLowerCase().includes(q);
+        return matchKho && matchQ;
       });
 
-      let html = '';
-      const khoNames = Object.keys(byKho).sort();
-      khoNames.forEach(kho => {
+      // Build Unified Toolbar HTML
+      let html = `
+      <div class="unified-catalog-toolbar" style="background:#F6F3EB; border:1px solid #E6E1D6; border-radius:14px; padding:14px 18px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+          <!-- Warehouse Filter Tabs -->
+          <div class="kho-filter-pills" style="display:inline-flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <span style="font-size:12px; font-weight:700; color:#4A4946; margin-right:4px;">Kho:</span>
+            <button type="button" onclick="setUnifiedCatalogKho('')" style="padding:5px 12px; border-radius:20px; font-size:12px; font-weight:${!unifiedCatalogKho ? '700' : '500'}; background:${!unifiedCatalogKho ? '#A50034' : '#FFF'}; color:${!unifiedCatalogKho ? '#FFF' : '#262626'}; border:1px solid ${!unifiedCatalogKho ? '#A50034' : '#D1CEC7'}; cursor:pointer; transition:all .15s;">
+              Tất cả kho <span style="font-size:11px; opacity:0.85;">(${availAll}/${totalAll})</span>
+            </button>
+      `;
+
+      khoNames.forEach(k => {
+        const isSel = unifiedCatalogKho === k;
+        const stat = allKhoMap[k];
+        html += `
+            <button type="button" onclick="setUnifiedCatalogKho('${esc(k)}')" style="padding:5px 12px; border-radius:20px; font-size:12px; font-weight:${isSel ? '700' : '500'}; background:${isSel ? '#A50034' : '#FFF'}; color:${isSel ? '#FFF' : '#262626'}; border:1px solid ${isSel ? '#A50034' : '#D1CEC7'}; cursor:pointer; transition:all .15s;">
+              Kho ${esc(k)} <span style="font-size:11px; opacity:0.85;">(${stat.avail}/${stat.total})</span>
+            </button>
+        `;
+      });
+
+      html += `
+          </div>
+
+          <!-- View Mode Toggle (Cards vs Table) -->
+          <div class="view-mode-toggle" style="display:inline-flex; border:1px solid #D1CEC7; border-radius:8px; overflow:hidden; background:#FFF;">
+            <button type="button" class="btn-view-mode ${unifiedCatalogViewMode === 'cards' ? 'active' : ''}" onclick="setUnifiedViewMode('cards')" style="display:inline-flex; align-items:center; gap:5px;">
+              <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:currentColor;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Dạng Thẻ
+            </button>
+            <button type="button" class="btn-view-mode ${unifiedCatalogViewMode === 'table' ? 'active' : ''}" onclick="setUnifiedViewMode('table')" style="display:inline-flex; align-items:center; gap:5px;">
+              <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:currentColor;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              Dạng Bảng
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Bar & Counter -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="position:relative; flex:1; min-width:240px; max-width:380px;">
+            <svg style="position:absolute; left:11px; top:50%; transform:translateY(-50%); width:15px; height:15px; stroke:#716F6A; fill:none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" placeholder="Tìm kiếm model, loại sản phẩm..." value="${esc(unifiedCatalogSearch)}" oninput="handleUnifiedSearch(this.value)" style="width:100%; padding:7px 12px 7px 34px; border:1px solid #D1CEC7; border-radius:6px; font-size:12.5px; font-family:inherit; background:#FFF; box-sizing:border-box;">
+          </div>
+          <div style="font-size:12px; color:#716F6A;">
+            Hiển thị <strong>${filtered.length}</strong> sản phẩm ${unifiedCatalogKho ? `(Kho ${esc(unifiedCatalogKho)})` : ''} · Còn khả dụng: <strong style="color:#0E6251;">${filtered.filter(p => p.status === 'Available').length}</strong>
+          </div>
+        </div>
+      </div>
+      `;
+
+      if (filtered.length === 0) {
+        html += `
+          <div style="padding:36px 20px; text-align:center; background:#FFF; border:1px solid #E6E1D6; border-radius:12px; color:#716F6A; margin:16px 0;">
+            <svg class="lg-icon" viewBox="0 0 24 24" style="width:36px; height:36px; stroke:#A50034; margin-bottom:8px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div style="font-size:14px; font-weight:600; color:#262626;">Không tìm thấy sản phẩm phù hợp</div>
+            <div style="font-size:12px; color:#716F6A; margin-top:4px;">Vui lòng thử chọn kho khác hoặc xóa bớt từ khóa tìm kiếm.</div>
+          </div>
+        `;
+        container.innerHTML = html;
+        return;
+      }
+
+      // Group filtered by Kho
+      const byKho = {};
+      filtered.forEach(p => {
+        const k = p.kho || 'Khác';
+        if (!byKho[k]) byKho[k] = [];
+        byKho[k].push(p);
+      });
+
+      const displayKhoNames = Object.keys(byKho).sort();
+      displayKhoNames.forEach(kho => {
         const items = byKho[kho];
         const available = items.filter(i => i.status === 'Available').length;
-        html += `<div class="kho-section">`;
+        html += `<div class="kho-section" style="margin: 0 0 20px 0;">`;
         html += `<div class="kho-header"><svg class="lg-icon lg-icon-red" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Kho ${esc(kho)} <span class="kho-count">${available}/${items.length} còn trống</span></div>`;
 
-        // SPRINT 4: Merchandising Product Cards Grid
-        html += `<div class="lg-product-grid">`;
-        items.forEach(p => {
-          const isAvail = p.status === 'Available';
-          const discountPct = (p.rrp && p.internalPrice && p.rrp > p.internalPrice)
-            ? Math.round((1 - p.internalPrice / p.rrp) * 100)
-            : 0;
+        if (unifiedCatalogViewMode === 'cards') {
+          // Cards Grid
+          html += `<div class="lg-product-grid">`;
+          items.forEach(p => {
+            const isAvail = p.status === 'Available';
+            const discountPct = (p.rrp && p.internalPrice && p.rrp > p.internalPrice)
+              ? Math.round((1 - p.internalPrice / p.rrp) * 100)
+              : 0;
 
-          // Category icon
-          let catIcon = '<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>';
-          const catUpper = (p.category || '').toUpperCase();
-          if (catUpper.includes('REF') || catUpper.includes('TỦ LẠNH')) {
-            catIcon = '<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="10" y1="2" x2="10" y2="22"/></svg>';
-          } else if (catUpper.includes('WM') || catUpper.includes('GIẶT')) {
-            catIcon = '<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><circle cx="12" cy="6" r="1"/></svg>';
-          } else if (catUpper.includes('AC') || catUpper.includes('LẠNH') || catUpper.includes('ĐIỀU HÒA')) {
-            catIcon = '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="8" rx="2"/><line x1="6" y1="16" x2="18" y2="16"/><line x1="8" y1="19" x2="16" y2="19"/></svg>';
-          } else if (catUpper.includes('IT') || catUpper.includes('GRAM') || catUpper.includes('MÀN HÌNH')) {
-            catIcon = '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
-          }
+            let catIcon = '<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>';
+            const catUpper = (p.category || '').toUpperCase();
+            if (catUpper.includes('REF') || catUpper.includes('TỦ LẠNH')) {
+              catIcon = '<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="10" y1="2" x2="10" y2="22"/></svg>';
+            } else if (catUpper.includes('WM') || catUpper.includes('GIẶT')) {
+              catIcon = '<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><circle cx="12" cy="6" r="1"/></svg>';
+            } else if (catUpper.includes('AC') || catUpper.includes('LẠNH') || catUpper.includes('ĐIỀU HÒA')) {
+              catIcon = '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="8" rx="2"/><line x1="6" y1="16" x2="18" y2="16"/><line x1="8" y1="19" x2="16" y2="19"/></svg>';
+            } else if (catUpper.includes('IT') || catUpper.includes('GRAM') || catUpper.includes('MÀN HÌNH')) {
+              catIcon = '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
+            }
 
-          html += `
-          <div class="lg-product-card" data-category="${esc(p.category || '')}">
-            <div>
-              <div class="lg-card-top-badges">
-                <span class="lg-tag-exclusive">ƯU ĐÃI NỘI BỘ</span>
-                <span class="lg-tag-stock ${isAvail ? 'avail' : 'taken'}">
-                  ${isAvail ? '● Còn slot' : '● Đã giữ chỗ'}
-                </span>
-              </div>
-              <div class="lg-card-visual">
-                ${catIcon}
-              </div>
-              <div class="lg-card-meta">Kho ${esc(p.kho)} · Slot: <strong>${esc(p.uniqueCode)}</strong></div>
-              <div class="lg-card-model">${esc(p.model)}</div>
-              <div class="lg-card-desc">${esc(p.description)}</div>
-            </div>
-            <div>
-              <div class="lg-price-box">
-                <div class="lg-rrp-row">
-                  <span>Giá niêm yết:</span>
-                  <span class="lg-rrp-value">${formatVND(p.rrp)}</span>
-                  ${discountPct > 0 ? `<span class="lg-discount-pill">-${discountPct}%</span>` : ''}
+            html += `
+            <div class="lg-product-card" data-category="${esc(p.category || '')}">
+              <div>
+                <div class="lg-card-top-badges">
+                  <span class="lg-tag-exclusive">ƯU ĐÃI NỘI BỘ</span>
+                  <span class="lg-tag-stock ${isAvail ? 'avail' : 'taken'}">
+                    ${isAvail ? '● Còn slot' : '● Đã giữ chỗ'}
+                  </span>
                 </div>
-                <div class="lg-internal-row">
-                  <span class="lg-internal-label">Giá Nhân Viên:</span>
-                  <span class="lg-internal-price">${formatVND(p.internalPrice)}</span>
+                <div class="lg-card-visual">
+                  ${catIcon}
                 </div>
+                <div class="lg-card-meta">Kho ${esc(p.kho)} · Slot: <strong>${esc(p.uniqueCode)}</strong></div>
+                <div class="lg-card-model">${esc(p.model)}</div>
+                <div class="lg-card-desc">${esc(p.description)}</div>
               </div>
               <div>
-                ${(isAvail && currentUser && currentUser.role !== 'PM') ?
-                  `<button type="button" class="lg-btn-buy" onclick="handleRegisterProduct('${esc(p.uniqueCode)}')">Đăng Ký Giữ Chỗ Ngay <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>` :
-                  (isAvail ? `<button type="button" class="lg-btn-buy" disabled style="background:#4A7B4A;">Còn khả dụng</button>` :
-                  `<button type="button" class="lg-btn-buy" disabled>Đã Có Người Giữ Chỗ</button>`)}
+                <div class="lg-price-box">
+                  <div class="lg-rrp-row">
+                    <span>Giá niêm yết:</span>
+                    <span class="lg-rrp-value">${formatVND(p.rrp)}</span>
+                    ${discountPct > 0 ? `<span class="lg-discount-pill">-${discountPct}%</span>` : ''}
+                  </div>
+                  <div class="lg-internal-row">
+                    <span class="lg-internal-label">Giá Nhân Viên:</span>
+                    <span class="lg-internal-price">${formatVND(p.internalPrice)}</span>
+                  </div>
+                </div>
+                <div>
+                  ${(isAvail && currentUser && currentUser.role !== 'PM') ?
+                    `<button type="button" class="lg-btn-buy" onclick="handleRegisterProduct('${esc(p.uniqueCode)}')">Đăng Ký Giữ Chỗ Ngay <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>` :
+                    (isAvail ? `<button type="button" class="lg-btn-buy" disabled style="background:#4A7B4A;">Còn khả dụng</button>` :
+                    `<button type="button" class="lg-btn-buy" disabled>Đã Có Người Giữ Chỗ</button>`)}
+                </div>
               </div>
-            </div>
-          </div>`;
-        });
-        html += `</div>`; // end lg-product-grid
-
-        // Keep Data Table for detailed audit / PM inspection
-        html += `<div style="margin-top:14px; overflow-x:auto;"><table class="product-table"><thead><tr>`;
-        html += `<th>Mã SP</th><th>Category</th><th>Model</th><th>Mô tả</th><th>Giá niêm yết</th><th>Giá nội bộ</th><th>Trạng thái</th><th>Thao tác</th>`;
-        html += `</tr></thead><tbody>`;
-        items.forEach(p => {
-          const statusClass = p.status === 'Available' ? 'status-available' : 'status-taken';
-          const statusText = p.status === 'Available' ? 'Còn trống' : (p.status === 'Registered' ? 'Đã đăng ký' : p.status);
-          html += `<tr class="${p.status !== 'Available' ? 'row-taken' : ''}">`;
-          html += `<td class="code-cell">${esc(p.uniqueCode)}</td>`;
-          html += `<td>${esc(p.category)}</td>`;
-          html += `<td><strong>${esc(p.model)}</strong></td>`;
-          html += `<td>${esc(p.description)}</td>`;
-          html += `<td class="price-cell">${formatVND(p.rrp)}</td>`;
-          html += `<td class="price-cell price-internal">${formatVND(p.internalPrice)}</td>`;
-          html += `<td><span class="${statusClass}">${statusText}</span></td>`;
-          html += `<td>`;
-          if (p.status === 'Available' && currentUser && currentUser.role !== 'PM') {
-            html += `<button class="btn-register" onclick="handleRegisterProduct('${esc(p.uniqueCode)}')">Đăng ký</button>`;
-          }
-          html += `</td></tr>`;
-        });
-        html += `</tbody></table></div></div>`;
+            </div>`;
+          });
+          html += `</div>`; // end lg-product-grid
+        } else {
+          // Table View
+          html += `<div style="overflow-x:auto;"><table class="product-table"><thead><tr>`;
+          html += `<th>Mã SP</th><th>Category</th><th>Model</th><th>Mô tả</th><th>Giá niêm yết</th><th>Giá nội bộ</th><th>Trạng thái</th><th style="text-align:center;">Thao tác</th>`;
+          html += `</tr></thead><tbody>`;
+          items.forEach(p => {
+            const statusClass = p.status === 'Available' ? 'status-available' : 'status-taken';
+            const statusText = p.status === 'Available' ? 'Còn trống' : (p.status === 'Registered' ? 'Đã đăng ký' : p.status);
+            html += `<tr class="${p.status !== 'Available' ? 'row-taken' : ''}">`;
+            html += `<td class="code-cell">${esc(p.uniqueCode)}</td>`;
+            html += `<td>${esc(p.category)}</td>`;
+            html += `<td><strong>${esc(p.model)}</strong></td>`;
+            html += `<td>${esc(p.description)}</td>`;
+            html += `<td class="price-cell">${formatVND(p.rrp)}</td>`;
+            html += `<td class="price-cell price-internal">${formatVND(p.internalPrice)}</td>`;
+            html += `<td><span class="${statusClass}">${statusText}</span></td>`;
+            html += `<td style="text-align:center;">`;
+            if (p.status === 'Available' && currentUser && currentUser.role !== 'PM') {
+              html += `<button class="btn-register" onclick="handleRegisterProduct('${esc(p.uniqueCode)}')">Đăng ký giữ chỗ</button>`;
+            } else if (p.status === 'Available') {
+              html += `<span style="font-size:11.5px; color:#4A7B4A; font-weight:600;">Khả dụng</span>`;
+            } else {
+              html += `<span style="font-size:11.5px; color:#A50034; font-weight:600;">Đã giữ chỗ</span>`;
+            }
+            html += `</td></tr>`;
+          });
+          html += `</tbody></table></div>`;
+        }
+        html += `</div>`; // end kho-section
       });
 
       container.innerHTML = html;
     }
+
+    // ===== Render Tab 4: Bảng Chi Tiết Sản Phẩm (Đồng bộ trực tiếp với activeProgram) =====
+    function renderTab4ProductTable(products) {
+      const prods = (products && Array.isArray(products)) ? products : (currentProducts || []);
+      const tbody = document.getElementById('tab4-tbody');
+      if (!tbody) return;
+
+      if (typeof syncProductRegistrationStatus === 'function') {
+        syncProductRegistrationStatus(activeProgram, prods);
+      }
+
+      // 1. Cập nhật tiêu đề chương trình tương ứng
+      const prog = (typeof programs !== 'undefined' && programs.length)
+        ? programs.find(p => p.id === activeProgram)
+        : (DEMO_PROGRAMS.find(p => p.id === activeProgram));
+      const progName = prog ? prog.name : activeProgram;
+      const heading = document.getElementById('tab4-heading');
+      if (heading) {
+        heading.textContent = `Bảng Chi Tiết Sản Phẩm — ${progName}`;
+      }
+      const summaryText = document.getElementById('tab4-summary-text');
+      if (summaryText) {
+        summaryText.innerHTML = `Bảng tra cứu thông số chi tiết, kho hàng (AYA · AYB · AYC), loại hàng và tình trạng đăng ký của toàn bộ <strong>${prods.length}</strong> sản phẩm niêm yết trong chương trình <strong>${progName}</strong>. Cột Đăng ký nhanh tự cập nhật theo thời gian thực.`;
+      }
+
+      // 2. Thống kê theo kho
+      const tot = { '': 0, 'AYA': 0, 'AYB': 0, 'AYC': 0 };
+      const free = { '': 0, 'AYA': 0, 'AYB': 0, 'AYC': 0 };
+      prods.forEach(p => {
+        const k = (p.kho || '').toUpperCase();
+        tot['']++;
+        tot[k] = (tot[k] || 0) + 1;
+        const isAvail = p.status === 'Available';
+        if (isAvail) {
+          free['']++;
+          free[k] = (free[k] || 0) + 1;
+        }
+        if (p.uniqueCode) {
+          SLOT_PRICE[p.uniqueCode] = p.internalPrice;
+        }
+      });
+
+      // 3. Cập nhật thẻ đếm kho ở Tab 4 (#list-kho-filter)
+      document.querySelectorAll('#list-kho-filter .kho-card').forEach(c => {
+        const k = c.dataset.kho;
+        const f = free[k] || 0;
+        const t = tot[k] || 0;
+        const countEl = c.querySelector('.k-count');
+        if (countEl) {
+          countEl.innerHTML = `Còn <b>${f}</b>/${t} slot`;
+        }
+        c.classList.toggle('is-empty', t === 0 || f === 0);
+      });
+
+      // 4. Render danh sách dòng sản phẩm
+      if (prods.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:24px; color:var(--lg-gray-muted);">Chưa có sản phẩm nào trong chương trình này.</td></tr>';
+        filterSlotList();
+        return;
+      }
+
+      let rowsHtml = '';
+      prods.forEach((p, idx) => {
+        const isFree = p.status === 'Available';
+        const discPct = (p.rrp && p.internalPrice) ? Math.round((1 - p.internalPrice / p.rrp) * 100) : 0;
+        const grade = p.grade || 'GoodSet';
+        const cond = p.cond || p.description || '—';
+        const serial = p.serial || '—';
+        const code = p.uniqueCode || `#${String(idx + 1).padStart(3, '0')}`;
+
+        rowsHtml += `
+          <tr class="${isFree ? 'slot-free' : 'is-taken'}" data-kho="${pkEsc(p.kho || '')}" ${isFree ? `tabindex="0" role="link" title="Bấm để đăng ký slot ${pkEsc(code)}"` : ''}>
+            <td><span class="badge-ordinal">${pkEsc(code)}</span></td>
+            <td>${pkEsc(p.kho || '—')}</td>
+            <td><strong>${pkEsc(p.model || '')}</strong></td>
+            <td>${pkEsc(serial)}</td>
+            <td>${pkEsc(grade)}</td>
+            <td class="cond">${pkEsc(cond)}</td>
+            <td class="num">${formatVND(p.rrp || 0)}</td>
+            <td class="num">${discPct}%</td>
+            <td class="num"><strong>${formatVND(p.internalPrice || 0)}</strong></td>
+            <td class="slot-state ${isFree ? 'is-free' : 'is-taken'}" data-slot="${pkEsc(code)}">
+              ${isFree 
+                ? `<button type="button" class="slot-link" onclick="handleRegisterProduct('${pkEsc(code)}'); event.stopPropagation();">Đặt hàng</button>`
+                : `<span style="color:#A50034; font-weight:600;">Đã đăng ký</span>`
+              }
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = rowsHtml;
+
+      // Click vào cả dòng để đăng ký nhanh (tiện ích FCFS cho nhân viên)
+      tbody.querySelectorAll('tr.slot-free').forEach(tr => {
+        tr.addEventListener('click', e => {
+          if (e.target.tagName !== 'BUTTON') {
+            const slotState = tr.querySelector('.slot-state');
+            if (slotState && slotState.dataset.slot) {
+              handleRegisterProduct(slotState.dataset.slot);
+            }
+          }
+        });
+        tr.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const slotState = tr.querySelector('.slot-state');
+            if (slotState && slotState.dataset.slot) {
+              handleRegisterProduct(slotState.dataset.slot);
+            }
+          }
+        });
+      });
+
+      // 5. Áp dụng bộ lọc kho hiện tại (nếu đang chọn 1 kho nhất định hoặc checkbox chỉ hiện slot trống)
+      filterSlotList();
+    }
+
 
     async function handleRegisterProduct(uniqueCode) {
       if (!currentUser || !activeProgram) return;
@@ -7932,6 +8602,7 @@
 
       showToast(`Đăng ký thành công sản phẩm ${prod.model} (${prod.uniqueCode})!\nTrạng thái: "Đã đăng ký - Chờ mở cổng thanh toán". Quản lý sẽ mở cổng nộp tiền sau.`, 'success', 5000);
       renderProductTable(currentProducts);
+      if (typeof renderTab4ProductTable === 'function') renderTab4ProductTable(currentProducts);
       renderBriefTopDashboard(activeProgram);
       if (typeof calculatePMStats === 'function') calculatePMStats(activeProgram);
 
@@ -8149,14 +8820,16 @@
         ? currentProducts
         : getProgramProducts(pid);
 
+      syncProductRegistrationStatus(pid, prods);
+
       const allRegs = pmRegistrations.length ? pmRegistrations : DEMO_REGISTRATIONS;
-      const takenSlotIds = new Set(allRegs.filter(r => (r.programId === pid || !r.programId) && r.status !== 'Từ chối' && r.status !== 'Hủy' && r.status !== 'Đã hủy bởi nhân viên' && r.status !== 'Đã hủy bởi PM').map(r => r.slotId));
+      const takenSlotIds = new Set(allRegs.filter(r => (r.programId === pid || !r.programId) && r.status !== 'Từ chối' && r.status !== 'Hủy' && !String(r.status || '').startsWith('Đã hủy')).map(r => r.slotId));
 
       const khoFilter = (document.getElementById('pm-filter-kho') ? document.getElementById('pm-filter-kho').value : '').trim().toUpperCase();
       const query = (document.getElementById('pm-search-query') ? document.getElementById('pm-search-query').value : '').trim().toLowerCase();
 
       const remainingProds = prods.filter(p => {
-        if (p.status === 'Registered' || takenSlotIds.has(p.uniqueCode)) return false;
+        if (p.status === 'Registered' || takenSlotIds.has(p.uniqueCode) || takenSlotIds.has(p.slotId)) return false;
         if (khoFilter && (p.kho || '').toUpperCase() !== khoFilter) return false;
         if (query) {
           const matchCode = (p.uniqueCode || '').toLowerCase().includes(query);
@@ -8618,6 +9291,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         const prod = currentProducts.find(p => p.uniqueCode === reg.slotId);
         if (prod) prod.status = 'Available';
         renderProductTable(currentProducts);
+        if (typeof renderTab4ProductTable === 'function') renderTab4ProductTable(currentProducts);
       }
 
       const isDemo = currentUser && DEMO_USERS.some(u => u.id === currentUser.id);
@@ -9408,7 +10082,33 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const targetContent = document.getElementById(tabId);
       if (targetContent) targetContent.classList.add('active');
       if (tabId === 'tab2' || tabId === 'tab4') refreshTaken(false); // mở tab thì cập nhật slot hết (tối đa 10 giây/lần)
-      if (tabId === 'tab2') restoreRegFormDraft();
+      if (tabId === 'tab2') {
+        restoreRegFormDraft();
+        if (typeof syncProductRegistrationStatus === 'function') {
+          syncProductRegistrationStatus(activeProgram, currentProducts);
+        }
+        if (typeof loadProducts === 'function' && (!currentProducts || currentProducts.length === 0)) {
+          loadProducts(activeProgram);
+        } else if (typeof renderProductTable === 'function') {
+          renderProductTable(currentProducts);
+        }
+        if (typeof updateKhoCounts === 'function') updateKhoCounts();
+      }
+      if (tabId === 'tab4') {
+        if (typeof syncProductRegistrationStatus === 'function') {
+          syncProductRegistrationStatus(activeProgram, currentProducts);
+        }
+        if (typeof renderTab4ProductTable === 'function') {
+          renderTab4ProductTable(currentProducts);
+        }
+        if (typeof updateKhoCounts === 'function') updateKhoCounts();
+      }
+
+      // Smart visibility for #pm-controls: hide on tab-pm to avoid duplicate "Kết sổ chương trình" button
+      const pmControls = document.getElementById('pm-controls');
+      if (pmControls && currentUser && currentUser.role === 'PM') {
+        pmControls.style.display = (tabId === 'tab-pm') ? 'none' : 'flex';
+      }
     }
 
     function goToPortal() {
@@ -9678,16 +10378,28 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     }
     // Số slot còn trống theo kho, hiện trên các ô lọc kho (Tab 2 + Tab 4)
     function updateKhoCounts() {
-      const tot = { '': 0 }, free = { '': 0 };
-      document.querySelectorAll('#reg-slot-id option[data-model]').forEach(o => {
-        const k = o.dataset.kho, f = o.dataset.taken !== '1';
-        tot[k] = (tot[k] || 0) + 1; tot['']++;
-        free[k] = (free[k] || 0) + (f ? 1 : 0); if (f) free['']++;
+      const prods = (currentProducts && currentProducts.length) ? currentProducts : (DEMO_PRODUCTS[activeProgram] || []);
+      if (typeof syncProductRegistrationStatus === 'function') {
+        syncProductRegistrationStatus(activeProgram, prods);
+      }
+      const tot = { '': 0 };
+      const free = { '': 0 };
+      prods.forEach(p => {
+        const k = (p.kho || '').toUpperCase().trim();
+        tot[''] = (tot[''] || 0) + 1;
+        tot[k] = (tot[k] || 0) + 1;
+        const isFree = p.status === 'Available';
+        if (isFree) {
+          free[''] = (free[''] || 0) + 1;
+          free[k] = (free[k] || 0) + 1;
+        }
       });
-      document.querySelectorAll('.kho-card').forEach(c => {
-        const k = c.dataset.kho, f = free[k] || 0, t = tot[k] || 0;
-        c.querySelector('.k-count').innerHTML = `Còn <b>${f}</b>/${t} slot`;
-        c.classList.toggle('is-empty', f === 0);
+      document.querySelectorAll('#list-kho-filter .kho-card, .kho-filter .kho-card').forEach(c => {
+        const k = (c.dataset.kho || '').toUpperCase().trim();
+        const f = free[k] || 0, t = tot[k] || 0;
+        const countEl = c.querySelector('.k-count');
+        if (countEl) countEl.innerHTML = `Còn <b>${f}</b>/${t} slot`;
+        c.classList.toggle('is-empty', t === 0 || f === 0);
       });
     }
     // Tab 4: lọc bảng theo kho + chỉ hiện slot còn đặt được
@@ -9697,11 +10409,14 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       let shown = 0;
       document.querySelectorAll('#tab4 .slot-table tbody tr').forEach(tr => {
         const td = tr.querySelector('.slot-state');
-        const hit = (!kho || tr.cells[1].textContent.trim() === kho) && (!onlyFree || !td || !td.classList.contains('is-taken'));
+        const trKho = tr.dataset.kho || (tr.cells[1] ? tr.cells[1].textContent.trim() : '');
+        const isFree = td && !td.classList.contains('is-taken');
+        const hit = (!kho || trKho === kho) && (!onlyFree || isFree);
         tr.style.display = hit ? '' : 'none';
         if (hit) shown++;
       });
-      document.getElementById('list-empty').style.display = shown ? 'none' : 'block';
+      const emptyEl = document.getElementById('list-empty');
+      if (emptyEl) emptyEl.style.display = shown ? 'none' : 'block';
     }
     // Chọn ở ô 5 hoặc ô 6 thì ô còn lại và Kho tự điền theo
     function syncRegPick(slotId) {
@@ -9746,21 +10461,31 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     function pkMoney(n) { return (n || 0).toLocaleString('en-US') + ' đ'; }
     function pkNum(t) { return parseInt(String(t).replace(/[^0-9]/g, ''), 10) || 0; }
     function getCatalog() {
-      if (PK_CATALOG) return PK_CATALOG;
-      PK_CATALOG = [];
-      document.querySelectorAll('#tab4 .slot-table tbody tr').forEach(tr => {
-        const c = tr.cells; if (c.length < 9) return;
-        const slot = (tr.querySelector('.badge-ordinal') || c[0]).textContent.trim();
-        PK_CATALOG.push({ slot, no: pkNum(slot), kho: c[1].textContent.trim(), model: c[2].textContent.trim(), serial: c[3].textContent.trim(),
-          grade: c[4].textContent.trim(), cond: c[5].textContent.trim().replace(/\s+/g, ' '), mrp: pkNum(c[6].textContent),
-          off: c[7].textContent.trim(), offN: pkNum(c[7].textContent), price: pkNum(c[8].textContent) });
+      const prods = (currentProducts && currentProducts.length) ? currentProducts : (DEMO_PRODUCTS[activeProgram] || []);
+      return prods.map((p, idx) => {
+        const disc = (p.rrp && p.internalPrice) ? Math.round((1 - p.internalPrice / p.rrp) * 100) : 0;
+        return {
+          slot: p.uniqueCode,
+          no: idx + 1,
+          kho: p.kho || '',
+          model: p.model || '',
+          serial: p.serial || '—',
+          grade: p.grade || 'GoodSet',
+          cond: p.cond || p.description || '',
+          mrp: p.rrp || 0,
+          off: disc + '%',
+          offN: disc,
+          price: p.internalPrice || 0
+        };
       });
-      return PK_CATALOG;
     }
     // ===== P2: View Mode Switching & 90-Slot Table View (GAP-DUP-01) =====
     var catalogViewMode = 'cards';
     function setCatalogViewMode(mode) {
       catalogViewMode = mode;
+      if (typeof setUnifiedViewMode === 'function') {
+        setUnifiedViewMode(mode);
+      }
       const cardsBtn = document.getElementById('btn-view-cards');
       const tableBtn = document.getElementById('btn-view-table');
       const gridEl = document.getElementById('pk-grid');
@@ -9776,7 +10501,6 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (gridEl) gridEl.style.display = 'grid';
         if (tableContainer) tableContainer.style.display = 'none';
       }
-      renderPicker();
     }
 
     function renderCatalogSlotTable(list) {
@@ -9830,11 +10554,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const regForm = document.getElementById('system-reg-form');
       if (currentUser && currentUser.role === 'PM') {
         if (govCard) govCard.style.display = 'block';
-        if (regForm) regForm.style.display = 'none';
       } else {
         if (govCard) govCard.style.display = 'none';
-        if (regForm) regForm.style.display = 'block';
       }
+      // Section B legacy form is permanently hidden in favor of Section A unified dynamic catalog
+      if (regForm) regForm.style.display = 'none';
       const kho = (document.querySelector('input[name="reg-kho"]:checked') || {}).value || '';
       const grade = (document.querySelector('input[name="pk-grade"]:checked') || {}).value || '';
       const q = (document.getElementById('pk-q').value || '').trim().toLowerCase().replace(/^#/, '');
@@ -9907,8 +10631,25 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     var takenSet = new Set(); // var: bộ chọn sản phẩm có thể gọi trước dòng này
     let takenLoadedAt = 0, takenBusy = false;
     function applyTaken(silent) {
+      if (typeof syncProductRegistrationStatus === 'function') {
+        syncProductRegistrationStatus(activeProgram);
+      }
+      if (!SHEET_API_URL) {
+        const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
+          ? pmRegistrations
+          : ((typeof DEMO_REGISTRATIONS !== 'undefined') ? DEMO_REGISTRATIONS : []);
+        const activeRegs = allRegs.filter(r => 
+          (r.programId === activeProgram || !r.programId) && 
+          r.status !== 'Từ chối' && 
+          r.status !== 'Hủy' && 
+          !String(r.status || '').startsWith('Đã hủy')
+        );
+        takenSet.clear();
+        activeRegs.forEach(r => { if (r.slotId) takenSet.add(r.slotId); });
+      }
+
       const slotSel = document.getElementById('reg-slot-id');
-      const cur = slotSel.value;
+      const cur = slotSel ? slotSel.value : '';
       const lost = !silent && cur && takenSet.has(cur);
       let total = 0;
       ['reg-model', 'reg-slot-id'].forEach(id => {
@@ -9921,13 +10662,19 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         });
       });
       document.querySelectorAll('#tab4 .slot-state').forEach(td => {
-        const t = takenSet.has(td.dataset.slot);
-        td.innerHTML = t ? 'Đã hết' : '<span class="slot-link">Đặt hàng</span>';
+        const slot = td.dataset.slot;
+        const t = takenSet.has(slot);
+        td.innerHTML = t 
+          ? '<span style="color:#A50034; font-weight:600;">Đã đăng ký</span>' 
+          : `<button type="button" class="slot-link" onclick="handleRegisterProduct('${pkEsc(slot)}'); event.stopPropagation();">Đặt hàng</button>`;
         td.className = 'slot-state ' + (t ? 'is-taken' : 'is-free');
         const tr = td.closest('tr');
-        tr.classList.toggle('slot-free', !t);
-        if (t) { tr.removeAttribute('tabindex'); tr.removeAttribute('title'); tr.removeAttribute('role'); }
-        else { tr.tabIndex = 0; tr.setAttribute('role', 'link'); tr.title = 'Bấm để đăng ký slot ' + td.dataset.slot; }
+        if (tr) {
+          tr.classList.toggle('slot-free', !t);
+          tr.classList.toggle('is-taken', t);
+          if (t) { tr.removeAttribute('tabindex'); tr.removeAttribute('title'); tr.removeAttribute('role'); }
+          else { tr.tabIndex = 0; tr.setAttribute('role', 'link'); tr.title = 'Bấm để đăng ký slot ' + slot; }
+        }
       });
       filterRegSlots();
       filterSlotList();
@@ -10528,5 +11275,436 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       <img id="lg-assistant-gif" src="assets/digital-logo-play/black/LGE_Electronics_Digital_Logo_Play_Transparent_Black_LookingAround.gif" alt="LG Digital Assistant">
     </div>
   </div>
+
+  <!-- ========================================================================
+       SPOTLIGHT TOUR ENGINE (ROLE-AWARE ONBOARDING FEATURE TOUR)
+       ======================================================================== -->
+  <div class="lg-tour-overlay" id="lg-tour-overlay" aria-hidden="true">
+    <div class="lg-tour-hole" id="lg-tour-hole"></div>
+    <div class="lg-tour-card" id="lg-tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-body">
+      <!-- HEADER WITH OFFICIAL LG DIGITAL LOGO PLAY & STEP BADGE -->
+      <div class="tour-card-header">
+        <div class="tour-brand-lead">
+          <img class="tour-lg-motion-logo" id="tour-brand-gif" src="assets/digital-logo-play/black/LGE_Electronics_Digital_Logo_Play_Transparent_Black_Wink.gif" alt="LG Brand Identity" width="24" height="24">
+          <span class="tour-step-badge" id="tour-badge">BƯỚC 1/4 · NHÂN VIÊN</span>
+        </div>
+        <button type="button" class="tour-btn-close" onclick="exitTour()" title="Đóng hướng dẫn (Phím Esc)" aria-label="Đóng hướng dẫn">×</button>
+      </div>
+
+      <!-- KICKER & TITLE WITH MOTION ICON -->
+      <div class="tour-feature-row">
+        <div class="tour-motion-icon-wrapper" id="tour-icon-box">
+          <img class="tour-motion-icon" id="tour-motion-icon" src="assets/images/quick-links-ani/ico_offer1_ani.gif" alt="Icon">
+        </div>
+        <div class="tour-title-wrap">
+          <div class="tour-card-kicker" id="tour-kicker">KHÁM PHÁ DANH MỤC</div>
+          <h3 class="tour-card-title" id="tour-title">Chọn Nhanh Ngành Hàng 1-Chạm</h3>
+        </div>
+      </div>
+
+      <!-- BODY COPY -->
+      <p class="tour-card-body" id="tour-body">Bấm vào các biểu tượng động (TV OLED, InstaView, WashTower...) để lọc ngay danh mục sản phẩm đang mở bán mà không cần gõ tìm kiếm.</p>
+
+      <!-- SIGNATURE LG SEC-CARD TIP BOX -->
+      <div class="tour-card-tip" id="tour-tip">
+        <span class="tip-icon" style="display: inline-flex; align-items: center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><path d="M9 21h6"></path></svg>
+        </span>
+        <span id="tour-tip-text">Xem nhanh giá gốc, giá nội bộ và số lượng suất còn lại theo thời gian thực.</span>
+      </div>
+
+      <!-- FOOTER ACTION BAR WITH INTERACTIVE DOTS & PILL BUTTONS -->
+      <div class="tour-card-footer">
+        <div class="tour-dots" id="tour-dots-box" title="Chọn bước"></div>
+        <div class="tour-actions-group">
+          <button type="button" class="btn-tour-skip" onclick="exitTour()">Bỏ qua</button>
+          <button type="button" class="btn-tour-back" id="btn-tour-back" onclick="prevTourStep()">Quay lại</button>
+          <button type="button" class="btn-tour-next" id="btn-tour-next" onclick="nextTourStep()">Tiếp →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================================
+       SPOTLIGHT TOUR ENGINE (LG BRAND ADAPTIVE & ZERO-BLAST-RADIUS)
+       ======================================================================== */
+    const ENABLE_ONBOARDING_TOUR = true;
+
+    const TOURS = {
+      // 1. TOUR DÀNH CHO NHÂN VIÊN MUA HÀNG — 4 BƯỚC VÀNG TỐI ƯU
+      employee: [
+        {
+          targetSelector: '#program-tab-bar, .program-tab-bar',
+          tabId: 'tab1',
+          badge: 'BƯỚC 1/4 · NHÂN VIÊN',
+          kicker: 'CỬA NGÕ MUA SẮM',
+          motionIcon: 'assets/images/quick-links-ani/ico_promotions_ani.gif',
+          title: 'Chọn Đợt Mở Bán Ưu Đãi Bạn Cần',
+          body: 'Bấm vào các thanh chương trình trên cùng (Gia dụng HA, Tivi & Loa HE, Thiết bị IT...) để xem đúng danh sách sản phẩm ưu đãi của đợt đó.',
+          tip: 'Mỗi chương trình có hạn mức và thời gian mở bán riêng, hãy chọn đúng đợt bạn có nhu cầu.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '.lg-product-card:first-child, .product-container .lg-product-card, #product-container',
+          tabId: 'tab2',
+          badge: 'BƯỚC 2/4 · NHÂN VIÊN',
+          kicker: 'KHÓA MÁY NHANH (FCFS)',
+          motionIcon: 'assets/images/quick-links-ani/cat_instaview_refrigerator.svg',
+          title: 'Bấm Giữ Chỗ Để Khóa Máy Riêng 24H',
+          body: 'Áp dụng nguyên tắc ai nhanh hơn được trước (FCFS). Khi chọn được máy ưng ý, bấm ngay "Đăng ký" để hệ thống khóa suất riêng cho bạn trong 24 giờ, không sợ người khác mua mất.',
+          tip: 'Bạn có thể kiểm tra tồn kho theo từng kho (Hải Phòng AYA, Hà Nội AYB, Hưng Yên AYC) ngay trên thẻ sản phẩm.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '#payment-upload-card',
+          tabId: 'tab3',
+          badge: 'BƯỚC 3/4 · NHÂN VIÊN',
+          kicker: 'CHUYỂN KHOẢN VCB PHÁP NHÂN',
+          motionIcon: 'assets/images/quick-links-ani/cat_vcb_security.svg',
+          title: 'Quét VietQR & Nộp Biên Lai Khi Cổng Mở',
+          body: 'Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với cú pháp [MãNV]_[MãSlot]. Lưu ý: Cổng nộp tiền mở sau 2 giờ để đối soát đơn; khi mở bạn chỉ cần tải ảnh chụp biên lai lên.',
+          tip: 'Có sẵn mã VietQR tự điền số tiền và cú pháp chuẩn, quét bằng app ngân hàng trong 5 giây siêu an toàn.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '#grap-card-context, .grap-card-dark',
+          tabId: 'tab1',
+          badge: 'BƯỚC 4/4 · HOÀN TẤT',
+          kicker: 'THEO DÕI ĐƠN 1-CHẠM',
+          motionIcon: 'assets/images/quick-links-ani/ico_membership_44.svg',
+          title: 'Theo Dõi & Hủy Đơn Ngay Tại Dashboard',
+          body: 'Bạn đã đăng nhập nên không cần gõ lại Mã NV hay SĐT. Mọi thông tin đơn hàng, tiến độ duyệt tiền và nút "Hủy Giữ Chỗ" (đổi máy khác) đều hiển thị tự động tại ô này!',
+          tip: 'Nếu cần xem lại hướng dẫn, bấm nút "Hướng dẫn nhanh" trên thanh Header bất cứ lúc nào!',
+          nextBtnText: 'Bắt đầu mua sắm →'
+        }
+      ],
+
+      // 2. TOUR DÀNH CHO QUẢN TRỊ VIÊN ĐỢT BÁN (PM) — 5 BƯỚC VÀNG VẬN HÀNH
+      pm: [
+        {
+          targetSelector: '#btn-create-program-tab, .program-tab-create, #program-tab-bar',
+          tabId: null,
+          badge: 'BƯỚC 1/5 · QUẢN TRỊ PM',
+          kicker: 'KHỞI TẠO ĐỢT BÁN',
+          motionIcon: 'assets/images/quick-links-ani/ico_epc.svg',
+          title: 'Tạo Đợt Bán & Nạp File Excel',
+          body: 'Bấm vào đây để tạo đợt bán mới. Tải file mẫu 7 cột, điền danh sách model và kéo thả vào để kích hoạt mở bán cho toàn công ty.',
+          tip: 'Hệ thống có sẵn nút chọn nhanh thời gian (+7 ngày, +14 ngày, cuối tháng) cực kỳ tiện lợi.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '#btn-allow-payment-header, .pm-header-actions',
+          tabId: 'tab-pm',
+          badge: 'BƯỚC 2/5 · QUẢN TRỊ PM',
+          kicker: 'QUẢN TRỊ THANH TOÁN',
+          motionIcon: 'assets/images/quick-links-ani/cat_vcb_security.svg',
+          title: 'Bật Cổng Nộp Tiền Chuyển Khoản',
+          body: 'Sau khi nhân viên đăng ký giữ chỗ máy thành công, bấm nút này để cho phép nhân viên quét mã VietQR nộp tiền ngay vào tài khoản LG.',
+          tip: 'Giúp nhân viên chủ động thanh toán sớm mà không phải chờ hết giờ khóa tạm thời.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '#btn-batch-approve-header, .pm-header-actions',
+          tabId: 'tab-pm',
+          badge: 'BƯỚC 3/5 · QUẢN TRỊ PM',
+          kicker: 'ĐỐI SOÁT & PHÊ DUYỆT',
+          motionIcon: 'assets/images/quick-links-ani/ico_lg-thinq_44.svg',
+          title: 'Soi Biên Lai 300% & Duyệt 1-Click',
+          body: 'Bấm vào ảnh biên lai để phóng to 300% soi rõ mã giao dịch ngân hàng. Sau đó bấm nút này để duyệt hàng trăm đơn trong 1 giây.',
+          tip: 'Hệ thống tự động gửi Email xác nhận thành công cho nhân viên ngay khi PM bấm duyệt.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '#btn-pm-expired-check, button[onclick*="triggerExpiredCheck"], .pm-header-actions',
+          tabId: 'tab-pm',
+          badge: 'BƯỚC 4/5 · QUẢN TRỊ PM',
+          kicker: 'KIỂM SOÁT TỒN KHO',
+          motionIcon: 'assets/images/quick-links-ani/ico_offer2_ani.gif',
+          title: 'Thu Hồi Suất Quá Hạn 24 Giờ',
+          body: 'Nhân viên giữ chỗ quá 24h không nộp tiền sẽ bị thu hồi suất. Bấm nút này để hủy đơn quá hạn và trả máy về kho cho người khác mua.',
+          tip: 'Có thể bấm nút "Hẹn Giờ (Timer)" bên cạnh nếu muốn hệ thống tự động quét mỗi ngày.',
+          nextBtnText: 'Tiếp →'
+        },
+        {
+          targetSelector: '#btn-pm-export-csv, .btn-pm-export, #pm-banner-controls',
+          tabId: 'tab-pm',
+          badge: 'BƯỚC 5/5 · HOÀN TẤT QUẢN TRỊ',
+          kicker: 'BÁO CÁO & QUYẾT TOÁN',
+          motionIcon: 'assets/images/quick-links-ani/ico_vertical3_44.svg',
+          title: 'Kết Sổ Chương Trình & Xuất Quyết Toán',
+          body: 'Khi hết đợt bán, bấm "Kết Sổ" để khóa cổng đăng ký. Sau đó bấm "Xuất Excel" để tải file đầy đủ 22 trường nộp Giám đốc Tài chính và Kế toán kho LGEVH.',
+          tip: 'Toàn bộ dữ liệu sau khi kết sổ sẽ được niêm phong chống sửa đổi trái phép.',
+          nextBtnText: 'Hoàn tất quản trị ✓'
+        }
+      ]
+    };
+
+    let currentTourRole = 'employee';
+    let currentTourStepIndex = 0;
+    let isTourActive = false;
+    let tourPositionRafId = null;
+
+    function getCurrentTourRole() {
+      if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'PM') {
+        return 'pm';
+      }
+      return 'employee';
+    }
+
+    function startCurrentRoleTour() {
+      if (!ENABLE_ONBOARDING_TOUR) return;
+      startTour(getCurrentTourRole());
+    }
+
+    function checkAndAutoLaunchTour(role) {
+      if (!ENABLE_ONBOARDING_TOUR) return;
+      const targetRole = role === 'PM' ? 'pm' : (role || getCurrentTourRole());
+      const storageKey = targetRole === 'pm' ? 'lg_tour_completed_pm' : 'lg_tour_completed_employee';
+      if (!localStorage.getItem(storageKey)) {
+        startTour(targetRole);
+      }
+    }
+
+    function startTour(role) {
+      if (!ENABLE_ONBOARDING_TOUR) return;
+      currentTourRole = (role === 'pm' || role === 'PM') ? 'pm' : 'employee';
+      currentTourStepIndex = 0;
+      isTourActive = true;
+
+      const overlay = document.getElementById('lg-tour-overlay');
+      if (!overlay) return;
+
+      document.body.classList.add('lg-tour-active');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+
+      renderTourStep();
+    }
+
+    function renderTourStep() {
+      if (!isTourActive) return;
+      const steps = TOURS[currentTourRole];
+      if (!steps || !steps[currentTourStepIndex]) return;
+
+      const step = steps[currentTourStepIndex];
+
+      // Auto switch Tab if specified
+      if (step.tabId && typeof switchTab === 'function') {
+        const activeTab = document.querySelector('.tab-content.active');
+        if (!activeTab || activeTab.id !== step.tabId) {
+          const tabBtn = document.getElementById(step.tabId + '-btn');
+          switchTab(step.tabId, tabBtn);
+        }
+      }
+
+      // Populate text & media
+      const badgeEl = document.getElementById('tour-badge');
+      if (badgeEl) {
+        badgeEl.textContent = step.badge;
+        if (currentTourRole === 'pm') {
+          badgeEl.classList.add('pm-role');
+        } else {
+          badgeEl.classList.remove('pm-role');
+        }
+      }
+
+      const kickerEl = document.getElementById('tour-kicker');
+      if (kickerEl) kickerEl.textContent = step.kicker;
+
+      const titleEl = document.getElementById('tour-title');
+      if (titleEl) titleEl.textContent = step.title;
+
+      const bodyEl = document.getElementById('tour-body');
+      if (bodyEl) bodyEl.textContent = step.body;
+
+      const tipTextEl = document.getElementById('tour-tip-text');
+      if (tipTextEl) tipTextEl.textContent = step.tip;
+
+      const iconEl = document.getElementById('tour-motion-icon');
+      if (iconEl && step.motionIcon) {
+        iconEl.src = step.motionIcon;
+      }
+
+      // Digital Logo Play adaptive color
+      const brandGif = document.getElementById('tour-brand-gif');
+      if (brandGif) {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        brandGif.src = isDark 
+          ? 'assets/digital-logo-play/white/LGE_Electronics_Digital_Logo_Play_Transparent_White_Wink.gif'
+          : 'assets/digital-logo-play/black/LGE_Electronics_Digital_Logo_Play_Transparent_Black_Wink.gif';
+      }
+
+      // Render Dots
+      const dotsBox = document.getElementById('tour-dots-box');
+      if (dotsBox) {
+        dotsBox.innerHTML = '';
+        steps.forEach((_, i) => {
+          const dot = document.createElement('span');
+          dot.className = 'tour-dot' + (i === currentTourStepIndex ? ' active' : '');
+          dot.title = `Bước ${i + 1}/${steps.length}`;
+          dot.onclick = () => {
+            currentTourStepIndex = i;
+            renderTourStep();
+          };
+          dotsBox.appendChild(dot);
+        });
+      }
+
+      // Configure back / next buttons
+      const backBtn = document.getElementById('btn-tour-back');
+      if (backBtn) {
+        backBtn.style.display = (currentTourStepIndex === 0) ? 'none' : 'inline-flex';
+      }
+
+      const nextBtn = document.getElementById('btn-tour-next');
+      if (nextBtn) {
+        nextBtn.textContent = step.nextBtnText;
+      }
+
+      // Smooth scroll target into comfortable viewport view
+      setTimeout(() => {
+        const targetEl = findTourTargetElement(step.targetSelector);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        updateTourPositions();
+        setTimeout(updateTourPositions, 280);
+        setTimeout(updateTourPositions, 550);
+      }, 120);
+    }
+
+    function findTourTargetElement(selectorString) {
+      if (!selectorString) return null;
+      const selectors = selectorString.split(',').map(s => s.trim());
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el && el.offsetParent !== null) {
+          return el;
+        }
+      }
+      return null;
+    }
+
+    function updateTourPositions() {
+      if (!isTourActive) return;
+      const steps = TOURS[currentTourRole];
+      if (!steps || !steps[currentTourStepIndex]) return;
+
+      const step = steps[currentTourStepIndex];
+      const targetEl = findTourTargetElement(step.targetSelector);
+      const hole = document.getElementById('lg-tour-hole');
+      const card = document.getElementById('lg-tour-card');
+
+      if (!targetEl || !hole || !card) {
+        if (hole) {
+          hole.style.top = '20px';
+          hole.style.left = '20px';
+          hole.style.width = '100px';
+          hole.style.height = '40px';
+        }
+        return;
+      }
+
+      const rect = targetEl.getBoundingClientRect();
+      const pad = 8;
+      const holeTop = Math.max(4, rect.top - pad);
+      const holeLeft = Math.max(4, rect.left - pad);
+      const holeWidth = Math.min(window.innerWidth - 8, rect.width + (pad * 2));
+      const holeHeight = rect.height + (pad * 2);
+
+      hole.style.top = `${holeTop}px`;
+      hole.style.left = `${holeLeft}px`;
+      hole.style.width = `${holeWidth}px`;
+      hole.style.height = `${holeHeight}px`;
+
+      const cardRect = card.getBoundingClientRect();
+      const cardHeight = cardRect.height || 260;
+      const cardWidth = Math.min(400, window.innerWidth - 32);
+
+      let cardTop;
+      let cardLeft;
+      const spaceBelow = window.innerHeight - (holeTop + holeHeight);
+      const spaceAbove = holeTop;
+      const spaceRight = window.innerWidth - (holeLeft + holeWidth);
+
+      card.classList.remove('arrow-top', 'arrow-bottom');
+
+      if (spaceBelow >= cardHeight + 20) {
+        cardTop = holeTop + holeHeight + 14;
+        card.classList.add('arrow-top');
+        cardLeft = Math.max(16, Math.min(holeLeft + 12, window.innerWidth - cardWidth - 16));
+      } else if (spaceAbove >= cardHeight + 20) {
+        cardTop = holeTop - cardHeight - 14;
+        card.classList.add('arrow-bottom');
+        cardLeft = Math.max(16, Math.min(holeLeft + 12, window.innerWidth - cardWidth - 16));
+      } else if (spaceRight >= cardWidth + 24) {
+        // Place to the right of tall elements to avoid obscuring card content
+        cardLeft = holeLeft + holeWidth + 18;
+        cardTop = Math.max(16, Math.min(holeTop + 10, window.innerHeight - cardHeight - 20));
+      } else {
+        cardTop = Math.max(16, window.innerHeight - cardHeight - 20);
+        cardLeft = Math.max(16, Math.min(holeLeft + 12, window.innerWidth - cardWidth - 16));
+      }
+
+      const arrowLeft = Math.max(16, Math.min(holeLeft + 36 - cardLeft, cardWidth - 32));
+      card.style.setProperty('--arrow-left', `${arrowLeft}px`);
+
+      card.style.top = `${cardTop}px`;
+      card.style.left = `${cardLeft}px`;
+      card.style.maxWidth = `${cardWidth}px`;
+    }
+
+    function nextTourStep() {
+      const steps = TOURS[currentTourRole];
+      if (currentTourStepIndex < steps.length - 1) {
+        currentTourStepIndex++;
+        renderTourStep();
+      } else {
+        finishTour();
+      }
+    }
+
+    function prevTourStep() {
+      if (currentTourStepIndex > 0) {
+        currentTourStepIndex--;
+        renderTourStep();
+      }
+    }
+
+    function exitTour() {
+      const overlay = document.getElementById('lg-tour-overlay');
+      if (overlay) {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      document.body.classList.remove('lg-tour-active');
+      isTourActive = false;
+      const storageKey = currentTourRole === 'pm' ? 'lg_tour_completed_pm' : 'lg_tour_completed_employee';
+      localStorage.setItem(storageKey, 'true');
+    }
+
+    function finishTour() {
+      exitTour();
+      if (typeof showToast === 'function') {
+        showToast('Chào mừng bạn đến với Cổng Bán Hàng Nội Bộ LG! Bấm "Hướng dẫn nhanh" bất kỳ lúc nào nếu cần hỗ trợ.', 'success', 5000);
+      }
+    }
+
+    // Keyboard navigation & responsive recalculation
+    document.addEventListener('keydown', (e) => {
+      if (!isTourActive) return;
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        nextTourStep();
+      } else if (e.key === 'ArrowLeft') {
+        prevTourStep();
+      } else if (e.key === 'Escape') {
+        exitTour();
+      }
+    });
+
+    window.addEventListener('resize', updateTourPositions, { passive: true });
+    window.addEventListener('scroll', updateTourPositions, { passive: true });
+  </script>
 </body>
 </html>
