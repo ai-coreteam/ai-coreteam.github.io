@@ -11496,17 +11496,33 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (ftMatch) res.txnId = ftMatch[1].toUpperCase();
       }
 
-      // 3. Detect Date Time
-      const dateMatch1 = clean.match(/(\d{1,2}:\d{2}(?::\d{2})?)\s+(?:Thứ\s+[^\s\d]+\s+)?(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i);
-      const dateMatch2 = clean.match(/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})(?:\s+(\d{1,2}:\d{2}(?::\d{2})?))?/i);
-      if (dateMatch1) {
-        const timePart = dateMatch1[1].length === 5 ? (dateMatch1[1] + ':00') : dateMatch1[1];
-        const datePart = dateMatch1[2].replace(/[\-\.]/g, '/');
+      // 3. Detect Date Time (Robust Bi-directional & Multi-line)
+      // Format 3A: Time before Date: '11:53 Thứ Năm 01/10/2026', '11:53 Thu Nam 01/10/2026', '11:53 01/10/2026'
+      const timeBeforeDate = clean.match(/(\d{1,2}:\d{2}(?::\d{2})?)[^\d\n\r]{1,35}(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i);
+      // Format 3B: Date before Time: '01/10/2026 11:53:00' or '01/10/2026 lúc 11:53'
+      const dateBeforeTime = clean.match(/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})[^\d\n\r]{1,35}(\d{1,2}:\d{2}(?::\d{2})?)/i);
+
+      if (timeBeforeDate) {
+        const timePart = timeBeforeDate[1].length === 5 ? (timeBeforeDate[1] + ':00') : timeBeforeDate[1];
+        const datePart = timeBeforeDate[2].replace(/[\-\.]/g, '/');
         res.date = `${datePart} ${timePart}`;
-      } else if (dateMatch2) {
-        const datePart = dateMatch2[1].replace(/[\-\.]/g, '/');
-        const timePart = dateMatch2[2] ? (dateMatch2[2].length === 5 ? (dateMatch2[2] + ':00') : dateMatch2[2]) : '00:00:00';
+      } else if (dateBeforeTime) {
+        const datePart = dateBeforeTime[1].replace(/[\-\.]/g, '/');
+        const timePart = dateBeforeTime[2].length === 5 ? (dateBeforeTime[2] + ':00') : dateBeforeTime[2];
         res.date = `${datePart} ${timePart}`;
+      } else {
+        // Format 3C: Fallback - find date and nearest time in receipt text
+        const dateMatch = clean.match(/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/);
+        if (dateMatch) {
+          const datePart = dateMatch[1].replace(/[\-\.]/g, '/');
+          const times = Array.from(clean.matchAll(/\b(\d{1,2}:\d{2}(?::\d{2})?)\b/g)).map(m => m[1]);
+          let timePart = '00:00:00';
+          if (times.length > 0) {
+            const picked = times.find(t => t !== '00:00') || times[0];
+            timePart = picked.length === 5 ? (picked + ':00') : picked;
+          }
+          res.date = `${datePart} ${timePart}`;
+        }
       }
 
       // 4. Detect Amount

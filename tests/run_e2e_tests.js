@@ -669,6 +669,12 @@ console.log('\n--- SUITE 13: Smart Zero-Cost Banking Receipt OCR & Parser ---');
   assert(parsedVCB.date === '01/10/2026 11:53:00', `VCB Date detected correctly (got: ${parsedVCB.date})`);
   assert(parsedVCB.amount === 500000, `VCB Amount detected correctly (got: ${parsedVCB.amount})`);
 
+  // Test Case A.2: Real English OCR outputs (unaccented 'Thu Nam' and 'Thu\' Nam')
+  const parsedUnaccented = parseReceiptText('11:53 Thu Nam 01/10/2026\nMa giao dich 16312412911');
+  assert(parsedUnaccented.date === '01/10/2026 11:53:00', `Unaccented Thu Nam extracts exact 11:53:00 (got: ${parsedUnaccented.date})`);
+  const parsedPunct = parseReceiptText("11:53 Thu' Nam 01/10/2026");
+  assert(parsedPunct.date === '01/10/2026 11:53:00', `Thu apostrophe Nam extracts exact 11:53:00 (got: ${parsedPunct.date})`);
+
   // Test Case B: Techcombank FT code sample
   const tcbSample = `
     Techcombank Mobile
