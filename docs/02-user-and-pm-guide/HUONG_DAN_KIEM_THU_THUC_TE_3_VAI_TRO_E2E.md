@@ -61,7 +61,14 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 ### Bước 1.1: Tạo CSDL Google Sheet 1-Click
 1. Mở trình duyệt web, truy cập: **[https://script.google.com](https://script.google.com)**.
 2. Nhấn nút **Dự án mới (New project)** ở góc trên bên trái.
-3. Mở tệp `apps-script/Code.gs` trong thư mục dự án này, copy toàn bộ nội dung và dán đè vào màn hình soạn thảo của Google.
+3. **Lấy nội dung mã nguồn Apps Script:**
+   - **Vị trí tệp:** Nằm tại thư mục `apps-script/` $\rightarrow$ tệp [`Code.gs`](file:///Users/macbook/Documents/antigravity/AI%20study/LG%20other/Internal%20sales%20platform/apps-script/Code.gs) (đường dẫn đầy đủ: `/Users/macbook/Documents/antigravity/AI study/LG other/Internal sales platform/apps-script/Code.gs`).
+   - **Cách 1 (Nhanh nhất):** Nhấp trực tiếp vào liên kết tệp này: 👉 **[apps-script/Code.gs](file:///Users/macbook/Documents/antigravity/AI%20study/LG%20other/Internal%20sales%20platform/apps-script/Code.gs)** để mở mã nguồn trong trình soạn thảo $\rightarrow$ Nhấn `Cmd + A` (chọn toàn bộ 1.798 dòng) $\rightarrow$ Nhấn `Cmd + C` để Copy.
+   - **Cách 2 (Sao chép 1-Click bằng Terminal):** Mở cửa sổ Terminal và gõ lệnh sau để hệ thống tự động nạp toàn bộ mã nguồn vào khay nhớ tạm (Clipboard) của máy:
+     ```bash
+     cat "apps-script/Code.gs" | pbcopy
+     ```
+   - Sau đó, quay lại cửa sổ trình duyệt `script.google.com`, xóa chữ `function myFunction() {...}` có sẵn và nhấn `Cmd + V` để dán đè toàn bộ vào.
 4. Nhấn **Lưu (Ctrl+S / Cmd+S)**.
 5. Trên thanh công cụ, tại ô chọn hàm (đang hiện `myFunction`), nhấp chọn:
    👉 **`setupNewDatabase`** $\rightarrow$ rồi nhấn nút **Chạy (Run ▶)**.
