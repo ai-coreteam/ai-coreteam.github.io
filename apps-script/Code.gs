@@ -69,6 +69,7 @@ function doPost(e) {
     if (data.action === 'programs') return json_(programs_(data));
     if (data.action === 'program_create') return json_(program_create_(data));
     if (data.action === 'program_update') return json_(program_update_(data));
+    if (data.action === 'program_delete') return json_(program_delete_(data));
     if (data.action === 'products') return json_(products_(data));
     if (data.action === 'product_upload' || data.action === 'products_bulk_import') return json_(product_upload_(data));
     if (data.action === 'register_product') return json_(register_product_(data));
@@ -421,11 +422,17 @@ function programs_(d) {
   for (var r = 0; r < n; r++) {
     var status = String(data[r][PROG_COL.STATUS - 1]).trim();
     var pmId = String(data[r][PROG_COL.PM_ID - 1]).trim().toUpperCase();
-    // Users only see Open programs; PM sees their own programs in any status
-    if (role === 'PM' && pmId === userId) {
-      // PM sees all their programs
-    } else if (status !== 'Open') {
-      continue;
+    // Multi-PM Isolation & Role-Based Access Control (RBAC):
+    if (role === 'PM') {
+      // SuperAdmin sees all; each PM sees ONLY their own programs
+      if (userId !== 'ADMIN' && pmId !== userId) {
+        continue;
+      }
+    } else {
+      // Normal employees (USER) see all Open programs across all PMs
+      if (status !== 'Open') {
+        continue;
+      }
     }
     result.push({
       id: String(data[r][0]).trim(),
@@ -517,6 +524,88 @@ function program_update_(d) {
     }
   }
   return { ok: false, message: 'Không tìm thấy chương trình ' + progId + '.' };
+}
+
+// PM deletes an empty / draft program (Jeong-Do compliant: 0 registrations only)
+function program_delete_(d) {
+  var authCheck = verifySessionToken_(d.token, 'PM');
+  if (!authCheck.valid) return { ok: false, message: authCheck.message };
+
+  var programId = str_(d.programId);
+  if (!programId) return { ok: false, message: 'Thiếu mã chương trình cần xóa.' };
+
+  var callerId = String(authCheck.payload.uid || '').toUpperCase();
+  var progSheet = book_().getSheetByName(SHEET_PROGRAMS);
+  if (!progSheet) return { ok: false, message: 'Sheet Programs không tồn tại.' };
+
+  var pn = progSheet.getLastRow() - 1;
+  if (pn <= 0) return { ok: false, message: 'Không tìm thấy chương trình.' };
+
+  var pData = progSheet.getRange(2, 1, pn, 3).getValues();
+  var targetRow = -1;
+  var ownerId = '';
+
+  for (var r = 0; r < pn; r++) {
+    if (String(pData[r][0]).trim().toUpperCase() === programId.toUpperCase()) {
+      targetRow = r + 2;
+      ownerId = String(pData[r][2]).trim().toUpperCase();
+      break;
+    }
+  }
+
+  if (targetRow === -1) return { ok: false, message: 'Không tìm thấy chương trình: ' + programId };
+
+  // Ownership check: Only the PM who created it or ADMIN can delete
+  if (callerId !== 'ADMIN' && ownerId !== callerId) {
+    return { ok: false, message: 'Bạn không có quyền xóa chương trình này vì thuộc sở hữu của PM khác (' + ownerId + ').' };
+  }
+
+  // Jeong-Do Audit Protection: Check if any registrations exist
+  var regSheet = book_().getSheetByName(SHEET_REG);
+  if (regSheet) {
+    var rn = regSheet.getLastRow() - 1;
+    if (rn > 0) {
+      var regCampaigns = regSheet.getRange(2, C.CAMPAIGN, rn, 1).getValues();
+      var orderCount = 0;
+      for (var ri = 0; ri < rn; ri++) {
+        if (String(regCampaigns[ri][0]).trim().toUpperCase() === programId.toUpperCase()) {
+          orderCount++;
+        }
+      }
+      if (orderCount > 0) {
+        return {
+          ok: false,
+          message: 'Không thể xóa đợt bán "' + programId + '" vì đã có ' + orderCount + ' đơn đăng ký. Theo quy chuẩn kiểm toán Jeong-Do của LG, bạn chỉ có thể chọn "Kết sổ chương trình" để bảo toàn lịch sử giao dịch.'
+        };
+      }
+    }
+  }
+
+  // Safe to delete: Delete from Programs sheet
+  progSheet.deleteRow(targetRow);
+
+  // Also clean up products in Products / Slots sheet
+  var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+  if (prodSheet) {
+    var prn = prodSheet.getLastRow() - 1;
+    if (prn > 0) {
+      for (var pi = prn; pi >= 1; pi--) {
+        var pProgId = String(prodSheet.getRange(pi + 1, PROD_COL.PROG).getValue()).trim().toUpperCase();
+        if (pProgId === programId.toUpperCase()) {
+          prodSheet.deleteRow(pi + 1);
+        }
+      }
+    }
+  }
+
+  // Invalidate caches
+  invalidateCache_('prog_PM_' + callerId);
+  invalidateCache_('prog_USER_all');
+  invalidateCache_('prog_PM_all');
+  invalidateCache_('prod_' + programId.toUpperCase());
+
+  try { log_('PROGRAM_DELETE', callerId, programId, d.userAgent, 'Xóa an toàn chương trình 0 đơn'); } catch (e) {}
+  return { ok: true, message: 'Đã xóa thành công chương trình ' + programId + '!' };
 }
 
 /* ---------- P2: Products ---------- */
@@ -746,11 +835,37 @@ function register_product_(d) {
 }
 
 /* ---------- P4: PM Dashboard & Payment Approval (Zero-Trust SEC-01 & Batch CONC-02) ---------- */
+function isProgramOwnedByPM_(programId, pmId) {
+  if (!programId || !pmId) return false;
+  if (String(pmId).toUpperCase() === 'ADMIN') return true;
+  var progSheet = book_().getSheetByName(SHEET_PROGRAMS);
+  if (!progSheet) return false;
+  var pn = progSheet.getLastRow() - 1;
+  if (pn <= 0) return false;
+  var pData = progSheet.getRange(2, 1, pn, 3).getValues();
+  for (var pi = 0; pi < pn; pi++) {
+    if (String(pData[pi][0]).trim().toUpperCase() === String(programId).trim().toUpperCase()) {
+      var owner = String(pData[pi][2]).trim().toUpperCase();
+      return owner === String(pmId).trim().toUpperCase();
+    }
+  }
+  return false;
+}
+
 function pm_dashboard_(d) {
   var authCheck = verifySessionToken_(d.token, 'PM');
   if (!authCheck.valid) return { ok: false, message: authCheck.message };
 
   var programId = str_(d.programId);
+  var callerId = String(authCheck.payload.uid || '').toUpperCase();
+
+  // Multi-PM Isolation Check: PM can only view dashboard of their own program
+  if (programId && callerId !== 'ADMIN') {
+    if (!isProgramOwnedByPM_(programId, callerId)) {
+      return { ok: false, message: 'Từ chối truy cập: Chương trình này thuộc quyền quản lý của PM khác.' };
+    }
+  }
+
   var regSheet = book_().getSheetByName(SHEET_REG);
   var out = [];
 
@@ -811,6 +926,10 @@ function pm_approve_payment_(d) {
     var curSlot = String(data[r][C.SLOT - 1]).trim();
     var curId = 'REG-' + (r + 1);
     if ((slotId && curSlot === slotId) || (regId && curId === regId)) {
+      var pId = String(data[r][C.CAMPAIGN - 1]).trim();
+      if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) {
+        return { ok: false, message: 'Từ chối: Bạn không có quyền phê duyệt đơn hàng thuộc chương trình của PM khác.' };
+      }
       var rowNum = r + 2;
       var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
       var nowStr = fmt_(new Date());
@@ -862,6 +981,7 @@ function pm_batch_approve_payment_(d) {
   for (var r = 0; r < n; r++) {
     var pId = String(data[r][C.CAMPAIGN - 1]).trim();
     if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
+    if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) continue;
 
     var curSlot = String(data[r][C.SLOT - 1]).trim();
     var curId = 'REG-' + (r + 1);
@@ -930,6 +1050,10 @@ function pm_reject_payment_(d) {
     var curSlot = String(data[r][C.SLOT - 1]).trim();
     var curId = 'REG-' + (r + 1);
     if ((slotId && curSlot === slotId) || (regId && curId === regId)) {
+      var pId = String(data[r][C.CAMPAIGN - 1]).trim();
+      if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) {
+        return { ok: false, message: 'Từ chối: Bạn không có quyền từ chối đơn hàng thuộc chương trình của PM khác.' };
+      }
       var rowNum = r + 2;
       targetSlot = curSlot;
       var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
@@ -1000,6 +1124,7 @@ function pm_allow_payment_(d) {
   for (var r = 0; r < n; r++) {
     var pId = String(data[r][C.CAMPAIGN - 1]).trim();
     if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
+    if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) continue;
 
     var curSlot = String(data[r][C.SLOT - 1]).trim();
     var curRegId = 'REG-' + (r + 1);

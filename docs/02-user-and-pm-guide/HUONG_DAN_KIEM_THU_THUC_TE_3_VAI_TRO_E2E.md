@@ -157,10 +157,17 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 3. Nếu hợp lệ: Bấm **`✓ Duyệt Thanh Toán`** $\rightarrow$ Đơn chuyển sang `Đã duyệt thanh toán` (chốt thành công).
 4. Nếu sai sót: Bấm **`✕ Từ Chối / Bổ Sung`** (nhập lý do: sai số tiền, mờ biên lai) $\rightarrow$ Slot được hoàn trả hoặc yêu cầu nộp lại.
 
-### Bước 2.5: Đóng Đợt & Xuất Danh Sách Giao Hàng
-1. Khi hết hạn đăng ký, PM đổi trạng thái chương trình sang **`Closed`**.
-2. Nhấn nút **`📥 Xuất Excel Bàn Giao Logistics`**:
-   - Hệ thống tải về file Excel tổng hợp các đơn đã duyệt thanh toán đầy đủ Mã NV, Tên, Số điện thoại, Địa chỉ giao hàng, Kho xuất (AYA/AYB/AYC), Model và Serial chính xác để kho xuất hàng.
+### Bước 2.5: Đóng Đợt, Xóa Đợt An Toàn & Xuất Danh Sách Giao Hàng
+1. **Phân quyền Độc lập Đa PM (Multi-PM Isolation):**
+   - Mỗi tài khoản PM chỉ nhìn thấy và quản trị **các chương trình do chính mình tạo ra**.
+   - Nếu là tài khoản PM mới tinh (chưa tạo chương trình nào), hệ thống sẽ hiển thị trạng thái ban đầu sạch sẽ cùng nút **`+ Tạo chương trình`** để khởi tạo đợt đầu tiên.
+   - Nhân viên mua hàng (USER) khi đăng nhập sẽ nhìn thấy **toàn bộ các chương trình đang Mở bán (`Open`)** từ tất cả các PM thuộc mọi ngành hàng.
+2. **Quy tắc Xóa Đợt Bán vs Kết Sổ (Tuân thủ Kiểm toán Jeong-Do):**
+   - **Xóa hoàn toàn (0 đơn):** Nếu đợt bán vừa tạo thử hoặc đang ở trạng thái Nháp/Mở nhưng **chưa có bất kỳ nhân viên nào đăng ký giữ chỗ (0 đơn)**, PM có thể bấm nút **`🗑️ Xóa đợt bán (0 đơn)`** để xóa sạch vĩnh viễn khỏi hệ thống và database Google Sheet.
+   - **Khóa xóa khi đã có giao dịch ( $\ge 1$ đơn):** Nếu đợt bán đã phát sinh đơn đăng ký hoặc giao dịch chuyển khoản, hệ thống sẽ **khóa chặt tính năng xóa** nhằm bảo toàn tính liêm chính kiểm toán thuế và đối soát dòng tiền Vietcombank. PM chỉ được phép bấm **`🔒 Kết sổ chương trình (Closed)`**.
+3. **Xuất Excel Bàn Giao Logistics:**
+   - Sau khi kết sổ, PM nhấn nút **`📥 Xuất Excel Bàn Giao Logistics`**:
+   - Hệ thống tải về file Excel tổng hợp các đơn đã duyệt thanh toán đầy đủ Mã NV, Tên, Số điện thoại, Địa chỉ giao hàng, Kho xuất (AYA/AYB/AYC), Model và Serial chính xác để điều phối kho xuất hàng.
 
 ---
 

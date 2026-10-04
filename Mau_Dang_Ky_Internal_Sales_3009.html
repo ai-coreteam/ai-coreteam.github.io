@@ -6716,7 +6716,7 @@
           clearTimeout(timer);
           if (res.ok) {
             const data = await res.json();
-            if (data.ok && Array.isArray(data.programs) && data.programs.length > 0) {
+            if (data.ok && Array.isArray(data.programs)) {
               programs = data.programs;
               setSwrCache('programs_' + currentUser.role + '_' + currentUser.id, data.programs);
               fetched = true;
@@ -6742,8 +6742,10 @@
         } catch (e) {}
 
         if (currentUser.role === 'PM') {
-          programs = DEMO_PROGRAMS.filter(p => p.pmId === currentUser.id || p.status === 'Open');
+          // Multi-PM Isolation: Each PM ONLY sees their own programs (SuperAdmin sees all)
+          programs = DEMO_PROGRAMS.filter(p => currentUser.id === 'ADMIN' || p.pmId === currentUser.id);
         } else {
+          // Normal users see ALL open programs across all PMs
           programs = DEMO_PROGRAMS.filter(p => p.status === 'Open');
         }
       }
@@ -6761,6 +6763,18 @@
         const firstOpen = programs.find(p => p.status === 'Open');
         if (firstOpen) selectProgram(firstOpen.id);
         else selectProgram(programs[0].id);
+      } else {
+        // 0 programs: reset activeProgram and render empty view safely
+        activeProgram = null;
+        renderBriefTopDashboard(null);
+        renderPMControls(null);
+        loadProducts(null);
+        if (currentUser && currentUser.role === 'PM') {
+          const tabPm = document.getElementById('tab-pm');
+          if (tabPm && tabPm.classList.contains('active')) {
+            renderPMDashboard();
+          }
+        }
       }
     }
 
@@ -6770,7 +6784,19 @@
       bar.innerHTML = '';
 
       if (programs.length === 0) {
-        bar.innerHTML = '<div style="padding:12px 20px;color:#716F6A;font-size:13px;">Chưa có chương trình nào đang mở.</div>';
+        if (currentUser && currentUser.role === 'PM') {
+          bar.innerHTML = '<div style="padding:10px 16px;color:#716F6A;font-size:13px;display:flex;align-items:center;gap:8px;">' +
+            '<svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#A50034;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+            '<span>Bạn chưa có chương trình nào do mình quản lý. Bấm <strong>"+ Tạo chương trình"</strong> bên phải để khởi tạo đợt bán đầu tiên.</span></div>';
+          const createBtn = document.createElement('button');
+          createBtn.className = 'program-tab program-tab-create';
+          createBtn.id = 'btn-create-program-tab';
+          createBtn.innerHTML = '<svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tạo chương trình';
+          createBtn.onclick = showCreateProgramModal;
+          bar.appendChild(createBtn);
+        } else {
+          bar.innerHTML = '<div style="padding:12px 20px;color:#716F6A;font-size:13px;">Chưa có chương trình bán hàng nội bộ nào đang mở.</div>';
+        }
         return;
       }
 
@@ -7798,17 +7824,29 @@
 
     function renderBriefTopDashboard(programId) {
       const pid = programId || activeProgram;
-      if (!pid) return;
+      const titleEl = document.getElementById('grap-program-title');
+      const pillEl = document.getElementById('grap-status-pill');
+      const subEl = document.getElementById('grap-program-subtitle');
+
+      if (!pid) {
+        if (titleEl) titleEl.textContent = 'Chưa có chương trình nào được chọn';
+        if (pillEl) {
+          pillEl.innerHTML = 'Chưa chọn';
+          pillEl.style.cssText = 'background:#F5F5F5; color:#716F6A; border:1px solid #E0E0E0;';
+        }
+        if (subEl) {
+          subEl.textContent = currentUser && currentUser.role === 'PM'
+            ? 'Bấm "+ Tạo chương trình" trên thanh tab để khởi tạo đợt bán đầu tiên của bạn.'
+            : 'Hiện tại chưa có đợt bán hàng nội bộ nào đang mở.';
+        }
+        return;
+      }
 
       const prog = (programs && programs.find(p => p.id === pid)) ||
                    (typeof DEMO_PROGRAMS !== 'undefined' && DEMO_PROGRAMS.find(p => p.id === pid));
       if (!prog) return;
 
       // Title & status pill
-      const titleEl = document.getElementById('grap-program-title');
-      const pillEl = document.getElementById('grap-status-pill');
-      const subEl = document.getElementById('grap-program-subtitle');
-
       if (titleEl) titleEl.textContent = `${prog.id} · ${prog.name}`;
       if (pillEl) {
         if (prog.status === 'Open') {
@@ -9196,17 +9234,31 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     function renderPMDashboard() {
       if (!currentUser || currentUser.role !== 'PM') return;
 
-      const allProgs = (typeof programs !== 'undefined' && Array.isArray(programs) && programs.length) ? programs : DEMO_PROGRAMS;
-      const pid = activeProgram || 'IS2026Q3-HA';
-      const prog = allProgs.find(p => p.id === pid) || allProgs[0];
-      const progName = prog ? prog.name : (pid || 'Chương trình Bán hàng');
-      const progStatus = prog ? prog.status : 'Open';
-
-      // Update banner title & status
+      const allProgs = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs : [];
       const bannerTitle = document.getElementById('pm-banner-title');
       const bannerStatus = document.getElementById('pm-banner-status');
       const bannerDesc = document.getElementById('pm-banner-desc');
       const bannerControls = document.getElementById('pm-banner-controls');
+
+      if (allProgs.length === 0 || !activeProgram) {
+        if (bannerTitle) bannerTitle.textContent = 'Bạn chưa có đợt bán nào';
+        if (bannerStatus) {
+          bannerStatus.className = 'pm-prog-status pm-status-draft';
+          bannerStatus.innerHTML = 'Chưa khởi tạo';
+        }
+        if (bannerDesc) bannerDesc.textContent = 'Nhấn nút "+ Tạo chương trình" trên thanh tab để nạp danh mục sản phẩm từ file Excel.';
+        if (bannerControls) {
+          bannerControls.innerHTML = '<button class="btn-pm-action btn-pm-primary" onclick="showCreateProgramModal()"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tạo chương trình ngay</button>';
+        }
+        const tbody = document.getElementById('pm-reg-tbody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px; color:var(--lg-gray-muted);">Chưa có chương trình nào. Vui lòng bấm "+ Tạo chương trình" để bắt đầu.</td></tr>';
+        return;
+      }
+
+      const pid = activeProgram;
+      const prog = allProgs.find(p => p.id === pid) || allProgs[0];
+      const progName = prog ? prog.name : (pid || 'Chương trình Bán hàng');
+      const progStatus = prog ? prog.status : 'Open';
 
       if (bannerTitle) bannerTitle.textContent = `${activeProgram} · ${progName}`;
       if (bannerStatus) {
@@ -9225,13 +9277,20 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         bannerDesc.textContent = `Hạn mức: ${prog ? prog.maxPerEmployee || 1 : 1} SP/NV · PM: ${prog ? prog.pmName || currentUser.name : currentUser.name}`;
       }
 
+      // Safe Delete Button (Only active when 0 registrations exist)
+      let deleteBtnHtml = '';
+      const orderCountForProg = pmRegistrations.filter(r => (r.programId || '').toUpperCase() === (activeProgram || '').toUpperCase()).length;
+      if (orderCountForProg === 0) {
+        deleteBtnHtml = `<button class="btn-pm-action btn-pm-outline" style="border-color:#D72638; color:#D72638; margin-left:8px;" onclick="deleteActiveProgram('${esc(activeProgram)}')" title="Đợt bán 0 đơn có thể xóa hoàn toàn"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Xóa đợt bán (0 đơn)</button>`;
+      }
+
       if (bannerControls) {
         if (progStatus === 'Open') {
-          bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-outline" style="border-color:#A50034; color:#A50034;" onclick="if(confirm('Bạn có chắc muốn kết sổ chương trình ${esc(activeProgram)}?')){ updateProgramStatus('${esc(activeProgram)}', 'Closed'); }"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Kết sổ chương trình</button>`;
+          bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-outline" style="border-color:#A50034; color:#A50034;" onclick="if(confirm('Bạn có chắc muốn kết sổ chương trình ${esc(activeProgram)}?')){ updateProgramStatus('${esc(activeProgram)}', 'Closed'); }"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Kết sổ chương trình</button>${deleteBtnHtml}`;
         } else if (progStatus === 'Draft') {
-          bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-primary" onclick="updateProgramStatus('${esc(activeProgram)}', 'Open')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polygon points="5 3 19 12 5 21 5 3"/></svg> Mở bán ngay</button>`;
+          bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-primary" onclick="updateProgramStatus('${esc(activeProgram)}', 'Open')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polygon points="5 3 19 12 5 21 5 3"/></svg> Mở bán ngay</button>${deleteBtnHtml}`;
         } else {
-          bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-outline" onclick="updateProgramStatus('${esc(activeProgram)}', 'Open')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Mở lại chương trình</button>`;
+          bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-outline" onclick="updateProgramStatus('${esc(activeProgram)}', 'Open')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Mở lại chương trình</button>${deleteBtnHtml}`;
         }
       }
 
@@ -9241,6 +9300,55 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         updatePMTimerStatusPill(activeProgram);
       }
     }
+
+    async function deleteActiveProgram(pid) {
+      if (!pid) return;
+      const allProgs = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs : [];
+      const prog = allProgs.find(p => p.id === pid);
+      const progName = prog ? prog.name : pid;
+      
+      const orderCount = (pmRegistrations || []).filter(r => (r.programId || '').toUpperCase() === pid.toUpperCase()).length;
+      if (orderCount > 0) {
+        alert(`KHÔNG THỂ XÓA ĐỢT BÁN (QUY CHUẨN JEONG-DO):\n\nĐợt bán "${progName}" (${pid}) đã có ${orderCount} đơn đăng ký!\n\nĐể bảo toàn tính minh bạch và lịch sử đối soát ngân hàng theo quy định của LG, bạn chỉ có thể chọn "Kết sổ chương trình".`);
+        return;
+      }
+
+      if (!confirm(`XÁC NHẬN XÓA ĐỢT BÁN (0 ĐƠN ĐĂNG KÝ):\n\nBạn có chắc chắn muốn xóa vĩnh viễn đợt bán:\n• Mã đợt: ${pid}\n• Tên đợt: ${progName}\n\nĐợt bán này chưa có đơn hàng nào. Thao tác này sẽ dọn sạch đợt bán và danh mục sản phẩm kèm theo.`)) {
+        return;
+      }
+
+      if (SHEET_API_URL && currentUser && currentUser.token) {
+        try {
+          showToast('Đang gửi lệnh xóa đợt bán lên máy chủ...', 'info', 2000);
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'program_delete', programId: pid, token: currentUser.token })
+          });
+          const data = await res.json();
+          if (!data.ok) {
+            alert('Không thể xóa: ' + data.message);
+            return;
+          }
+        } catch (err) {
+          console.warn('Lỗi gọi API program_delete, fallback local:', err);
+        }
+      }
+
+      // Remove from memory & local storage
+      programs = (programs || []).filter(p => p.id !== pid);
+      if (typeof DEMO_PROGRAMS !== 'undefined') {
+        const dIdx = DEMO_PROGRAMS.findIndex(p => p.id === pid);
+        if (dIdx !== -1) DEMO_PROGRAMS.splice(dIdx, 1);
+      }
+      try {
+        localStorage.setItem('lg_demo_programs', JSON.stringify(programs));
+      } catch (e) {}
+
+      showToast(`Đã xóa thành công đợt bán ${pid}!`, 'success', 4000);
+      loadPrograms();
+    }
+    window.deleteActiveProgram = deleteActiveProgram;
 
     function filterPMRegistrations() {
       if (pmCurrentViewMode === 'remaining') {

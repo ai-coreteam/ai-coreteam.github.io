@@ -385,6 +385,82 @@ console.log('\n--- SUITE 7: Cross-tab & Multi-client Concurrency Protocol ---');
 }
 
 // ----------------------------------------------------------------
+// SUITE 8: Multi-PM Scoping & Jeong-Do Audit Deletion Protection
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 8: Multi-PM Scoping & Jeong-Do Audit Deletion Protection ---');
+{
+  const mockPrograms = [
+    { id: 'IS2026Q3-HA', name: 'CTBHNB HA', pmId: 'VH12345', status: 'Open' },
+    { id: 'IS2026Q3-HE', name: 'CTBHNB HE', pmId: 'VH12345', status: 'Open' },
+    { id: 'IS2026Q4-BS', name: 'CTBHNB BS', pmId: 'VH12345', status: 'Draft' },
+    { id: 'IS2026Q3-RAC', name: 'CTBHNB RAC', pmId: 'VH88888', status: 'Open' }
+  ];
+
+  // Logic simulation of programs_ endpoint in Code.gs
+  function filterProgramsForUser(role, userId, programs) {
+    const rRole = (role || 'USER').toUpperCase();
+    const uId = (userId || '').toUpperCase();
+    return programs.filter(p => {
+      if (rRole === 'PM') {
+        if (uId === 'ADMIN') return true;
+        return p.pmId.toUpperCase() === uId;
+      } else {
+        return p.status === 'Open';
+      }
+    });
+  }
+
+  // 1. PM VH12345 sees only their own 3 programs
+  const pm1Progs = filterProgramsForUser('PM', 'VH12345', mockPrograms);
+  assert(pm1Progs.length === 3, 'PM VH12345 receives exactly their 3 programs');
+  assert(pm1Progs.every(p => p.pmId === 'VH12345'), 'All returned programs belong to PM VH12345');
+
+  // 2. New PM Nguyen Ngoc Bao (VH77777) sees 0 programs (empty state)
+  const pmNewProgs = filterProgramsForUser('PM', 'VH77777', mockPrograms);
+  assert(pmNewProgs.length === 0, 'New PM VH77777 sees 0 programs (clean slate, no leakage)');
+
+  // 3. Normal USER sees ALL open programs across all PMs
+  const userProgs = filterProgramsForUser('USER', 'VH99999', mockPrograms);
+  assert(userProgs.length === 3, 'Normal USER sees 3 Open programs from all PMs (HA, HE, RAC)');
+  assert(!userProgs.some(p => p.status === 'Draft'), 'USER cannot see Draft programs');
+
+  // 4. SuperAdmin sees all programs across all statuses
+  const adminProgs = filterProgramsForUser('PM', 'ADMIN', mockPrograms);
+  assert(adminProgs.length === 4, 'ADMIN oversees all 4 programs across all PMs');
+
+  // 5. Jeong-Do Audit Protection simulation
+  function canDeleteProgram(programId, callerPmId, registrations, programs) {
+    const prog = programs.find(p => p.id === programId);
+    if (!prog) return { ok: false, reason: 'NOT_FOUND' };
+    if (callerPmId !== 'ADMIN' && prog.pmId !== callerPmId) {
+      return { ok: false, reason: 'UNAUTHORIZED_CROSS_PM' };
+    }
+    const orderCount = registrations.filter(r => r.programId === programId).length;
+    if (orderCount > 0) {
+      return { ok: false, reason: 'JEONG_DO_AUDIT_LOCKED', orderCount };
+    }
+    return { ok: true };
+  }
+
+  const mockRegistrations = [
+    { id: 'REG-1', programId: 'IS2026Q3-HA', slotId: 'HA-001', status: 'Chờ nộp tiền' },
+    { id: 'REG-2', programId: 'IS2026Q3-HA', slotId: 'HA-002', status: 'Đã duyệt' }
+  ];
+
+  // Program with orders cannot be deleted (must use Closed)
+  const delWithOrders = canDeleteProgram('IS2026Q3-HA', 'VH12345', mockRegistrations, mockPrograms);
+  assert(!delWithOrders.ok && delWithOrders.reason === 'JEONG_DO_AUDIT_LOCKED', 'Program with orders is BLOCKED from deletion by Jeong-Do rule');
+
+  // Program with 0 orders can be deleted
+  const delZeroOrders = canDeleteProgram('IS2026Q4-BS', 'VH12345', mockRegistrations, mockPrograms);
+  assert(delZeroOrders.ok, 'Program with 0 orders is safely allowed to delete');
+
+  // PM cannot delete another PM's program
+  const delCrossPm = canDeleteProgram('IS2026Q3-RAC', 'VH12345', mockRegistrations, mockPrograms);
+  assert(!delCrossPm.ok && delCrossPm.reason === 'UNAUTHORIZED_CROSS_PM', 'Cross-PM deletion attempt is strictly blocked');
+}
+
+// ----------------------------------------------------------------
 // FINAL TEST RESULTS
 // ----------------------------------------------------------------
 console.log('\n================================================================');
