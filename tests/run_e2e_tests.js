@@ -729,6 +729,40 @@ console.log('\n--- SUITE 14: Payment Form UX & Redundant Input Elimination ---')
 }
 
 // ----------------------------------------------------------------
+// SUITE 15: User Authentication & Demo Account Synchronization
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 15: User Authentication & Demo Account Synchronization ---');
+
+const htmlPathSuite15 = path.join(__dirname, '../Mau_Dang_Ky_Internal_Sales_3009.html');
+const htmlContentSuite15 = fs.readFileSync(htmlPathSuite15, 'utf8');
+
+// 1. Verify DEMO_USERS in HTML contains VH11111 and VH99999
+const demoUsersMatch = htmlContentSuite15.match(/const DEMO_USERS = (\[[\s\S]*?\]);/);
+assert(demoUsersMatch !== null, 'DEMO_USERS array found in HTML');
+let parsedDemoUsers = [];
+try {
+  parsedDemoUsers = eval(demoUsersMatch[1]);
+} catch (e) {
+  parsedDemoUsers = [];
+}
+
+const vh11111 = parsedDemoUsers.find(u => u.id === 'VH11111');
+assert(vh11111 !== undefined, 'VH11111 exists in DEMO_USERS');
+assert(vh11111 && vh11111.password === 'test123', 'VH11111 has password test123');
+assert(vh11111 && vh11111.role === 'USER', 'VH11111 has role USER');
+assert(vh11111 && vh11111.name === 'Nguyen Ngoc Bao', 'VH11111 matches name Nguyen Ngoc Bao');
+
+const vh99999 = parsedDemoUsers.find(u => u.id === 'VH99999');
+assert(vh99999 !== undefined, 'VH99999 exists in DEMO_USERS');
+assert(vh99999 && vh99999.role === 'PM', 'VH99999 has role PM');
+
+// 2. Verify quick login button for VH11111 in HTML
+assert(htmlContentSuite15.includes("quickLogin('VH11111', 'test123')"), 'Quick demo login button for VH11111 exists in HTML');
+
+// 3. Verify Apps Script auth timeout increased to withstand cold starts
+assert(htmlContentSuite15.includes('setTimeout(() => controller.abort(), 12000)'), 'Apps Script login timeout increased to 12s');
+
+// ----------------------------------------------------------------
 // FINAL TEST RESULTS
 // ----------------------------------------------------------------
 console.log('\n================================================================');

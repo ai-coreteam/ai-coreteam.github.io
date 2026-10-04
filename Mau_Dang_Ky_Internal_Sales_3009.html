@@ -3125,6 +3125,10 @@
             <span><strong>VH88921</strong> · Trần Văn Nam</span>
             <span class="role-tag role-user">Nhân viên</span>
           </button>
+          <button type="button" class="btn-demo" onclick="quickLogin('VH11111', 'test123')">
+            <span><strong>VH11111</strong> · Nguyen Ngoc Bao</span>
+            <span class="role-tag role-user">Nhân viên</span>
+          </button>
         </div>
       </div>
 
@@ -5884,6 +5888,8 @@
     const DEMO_USERS = [
       { id: 'VH12345', password: 'test123', name: 'Nguyễn Thị Quỳnh Như', dept: 'HS PM Support', phone: '0912345678', email: 'quynhnhu@lge.com', role: 'PM', status: 'Active' },
       { id: 'VH88921', password: 'test123', name: 'Trần Văn Nam', dept: 'Audit & Jeong-Do', phone: '0987654321', email: 'vannam@lge.com', role: 'USER', status: 'Active' },
+      { id: 'VH11111', password: 'test123', name: 'Nguyen Ngoc Bao', dept: 'Channel development', phone: '0932382313', email: 'ngocbao.nguyen@lge.com', role: 'USER', status: 'Active' },
+      { id: 'VH99999', password: 'test123', name: 'Nguyen Ngoc Bao', dept: 'Channel development', phone: '0932382313', email: 'ngocbao.nguyen@lge.com', role: 'PM', status: 'Active' },
       { id: 'VH55432', password: 'test123', name: 'Lê Hoàng Anh', dept: 'HE Sales Division', phone: '0933445566', email: 'hoanganh@lge.com', role: 'USER', status: 'Active' },
       { id: 'VH33211', password: 'test123', name: 'Hoàng Minh Trí', dept: 'HA Production', phone: '0911223344', email: 'minhtri@lge.com', role: 'USER', status: 'Active' },
       { id: 'VH99120', password: 'test123', name: 'Đặng Thanh Hà', dept: 'Finance & Accounting', phone: '0955667788', email: 'thanhha@lge.com', role: 'USER', status: 'Active' },
@@ -6440,10 +6446,12 @@
       }
 
       // 1. Try Google Apps Script if SHEET_API_URL is configured (reads live Users sheet)
+      let serverError = false;
+      let serverErrorMsg = '';
       if (SHEET_API_URL) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 3000);
+          const timer = setTimeout(() => controller.abort(), 12000);
           const res = await fetch(SHEET_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -6470,6 +6478,10 @@
           }
         } catch (netErr) {
           console.warn('Apps Script unreachable, falling back to local demo accounts:', netErr);
+          serverError = true;
+          serverErrorMsg = (netErr && netErr.name === 'AbortError')
+            ? 'Kết nối máy chủ Google Sheet quá thời gian chờ (12s). Vui lòng thử lại.'
+            : 'Không thể kết nối đến máy chủ Google Sheet. Vui lòng kiểm tra kết nối mạng hoặc URL Web App.';
         }
       }
 
@@ -6506,7 +6518,13 @@
         return;
       }
 
-      errEl.textContent = 'Mã nhân viên hoặc mật khẩu không đúng.';
+      if (serverError && !demoMatch) {
+        errEl.textContent = serverErrorMsg;
+      } else if (!SHEET_API_URL) {
+        errEl.textContent = 'Mã nhân viên chưa có trong dữ liệu Demo cục bộ. Nếu bạn tạo tài khoản trên Google Sheet, vui lòng cấu hình "API Google Sheet" bên dưới để kết nối trực tuyến.';
+      } else {
+        errEl.textContent = 'Mã nhân viên hoặc mật khẩu không đúng.';
+      }
       errEl.classList.add('show');
       btn.disabled = false; btn.textContent = 'Đăng nhập';
     }
