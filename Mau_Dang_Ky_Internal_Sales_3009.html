@@ -4182,9 +4182,9 @@
 
         <div class="pay-lock" id="pay-lock">
           <div style="font-weight:700; font-size:14px; margin-bottom:6px; color:var(--lg-ink);">Mẫu nộp tiền đang khoá</div>
-          <div>Để hệ thống cập nhật đơn kịp, <strong>chức năng nộp tiền chỉ mở sau <span class="pay-delay-text">2 giờ</span> kể từ lúc đăng ký thành công</strong>.</div>
+          <div>Để đảm bảo kiểm duyệt công bằng và đối soát chính xác, chức năng nộp tiền sẽ mở khi <strong>PM duyệt mở cổng thanh toán</strong> (hoặc tự động sau <span class="pay-delay-text">2 giờ</span>).</div>
           <div style="margin-top:6px;">Cách mở: (1) Nhập <strong>Mã NV + 4 số cuối SĐT</strong> ở ô <strong>Tra cứu đơn của tôi</strong> phía trên → (2) Bấm nút <strong>Nộp tiền</strong> ở dòng đơn của bạn. Hệ thống tự điền Slot, Mã NV và số tiền cần nộp.</div>
-          <div style="margin-top:6px; color:var(--lg-text-2); font-size:12px;">Chưa đủ thời gian thì dòng đơn sẽ hiện giờ mở nộp tiền. Vui lòng <strong>chưa chuyển khoản</strong> trước giờ đó.</div>
+          <div style="margin-top:6px; color:var(--lg-text-2); font-size:12px;">Nếu PM chưa mở cổng thanh toán, dòng đơn sẽ hiện trạng thái tương ứng. Vui lòng <strong>chưa chuyển khoản</strong> trước khi cổng mở.</div>
         </div>
 
         <form id="payment-form" onsubmit="handlePaymentSubmit(event)" hidden>
@@ -9008,7 +9008,7 @@
       if (!isDemo && SHEET_API_URL) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 3000);
+          const timer = setTimeout(() => controller.abort(), 8000);
           const res = await fetch(SHEET_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -9021,6 +9021,9 @@
             if (data.ok && Array.isArray(data.registrations)) {
               pmRegistrations = data.registrations;
               renderPMDashboard();
+              if (forceRefresh) {
+                alert('Đã cập nhật lại số liệu bảng điều khiển PM thành công.');
+              }
               return;
             }
           }
@@ -10551,6 +10554,9 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           return;
         }
         renderPMDashboard();
+        if (typeof loadPMDashboardData === 'function') {
+          loadPMDashboardData();
+        }
       }
 
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -10677,10 +10683,21 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     }
 
     // ===== Thời gian mở nộp tiền =====
-    function parseVNTime(t) { // "30/09/2026 07:41:51"
-      const m = String(t || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})[ ,T]+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-      if (!m) return null;
-      return new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5], +(m[6] || 0));
+    function parseVNTime(t) {
+      if (!t) return null;
+      const s = String(t).trim();
+      // 1. Hỗ trợ ISO 8601 (ví dụ: "2026-10-04T10:59:30.326Z" hoặc "2026-10-04 10:59:30")
+      if (s.includes('-') || s.includes('T')) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) return d;
+      }
+      // 2. Định dạng tiếng Việt: "30/09/2026 07:41:51" hoặc "30/09/2026"
+      const m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})[ ,T]+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+      if (m) {
+        return new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5], +(m[6] || 0));
+      }
+      const fallback = new Date(s);
+      return !isNaN(fallback.getTime()) ? fallback : null;
     }
     function payOpenAt(t) { const d = parseVNTime(t); return d ? new Date(d.getTime() + PAY_OPEN_DELAY_HOURS * 3600000) : null; }
     const fmtHM = d => d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN');
@@ -10691,10 +10708,15 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       document.getElementById('pay-lock').hidden = false;
     }
     function openPayment(order, empCode, phoneLast4) {
-      const at = payOpenAt(order.time);
-      if (!at) { alert('Không đọc được thời gian đăng ký của đơn này. Vui lòng liên hệ PM phụ trách.'); return; }
-      if (Date.now() < at.getTime()) { alert(`Chưa đến giờ nộp tiền.\n\nSlot ${order.slot} mở nộp tiền lúc ${fmtHM(at)}.\nVui lòng chưa chuyển khoản trước giờ này.`); return; }
-      payCtx = { slot: order.slot, empCode, phoneLast4, time: order.time, name: order.name || '', price: SLOT_PRICE[order.slot] || 0 };
+      // Nếu PM đã mở cổng thanh toán (trạng thái 'Chờ nộp tiền' hoặc 'Mới đăng ký'), cho phép nộp tiền ngay lập tức
+      const isGateOpen = order.status === 'Chờ nộp tiền' || order.status === 'Mới đăng ký';
+      if (!isGateOpen) {
+        const at = payOpenAt(order.time);
+        if (!at) { alert('Không đọc được thời gian đăng ký của đơn này. Vui lòng liên hệ PM phụ trách.'); return; }
+        if (Date.now() < at.getTime()) { alert(`Chưa đến giờ nộp tiền.\n\nSlot ${order.slot} mở nộp tiền lúc ${fmtHM(at)} (hoặc khi PM mở cổng thanh toán).\nVui lòng chưa chuyển khoản trước giờ này.`); return; }
+      }
+      const finalPrice = Number(order.amount) || Number(order.price) || SLOT_PRICE[order.slot] || 0;
+      payCtx = { slot: order.slot, empCode, phoneLast4, time: order.time, status: order.status || '', name: order.name || '', price: finalPrice };
       const form = document.getElementById('payment-form');
       form.reset();
       clearReceipt();
@@ -11454,8 +11476,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       const fileName = uploadedFileName || 'Chưa đính kèm';
       if (!payCtx || payCtx.slot !== slotId) { alert('Vui lòng Tra cứu đơn và bấm Nộp tiền ở dòng đơn của bạn trước.'); lockPayment(); goToLookup(); return; }
-      const openAt = payOpenAt(payCtx.time);
-      if (!openAt || Date.now() < openAt.getTime()) { alert('Chưa đến giờ nộp tiền cho slot ' + slotId + (openAt ? ' (mở lúc ' + fmtHM(openAt) + ')' : '') + '.'); return; }
+      const isGateOpen = payCtx.status === 'Chờ nộp tiền' || payCtx.status === 'Mới đăng ký';
+      if (!isGateOpen) {
+        const openAt = payOpenAt(payCtx.time);
+        if (!openAt || Date.now() < openAt.getTime()) { alert('Chưa đến giờ nộp tiền cho slot ' + slotId + (openAt ? ' (mở lúc ' + fmtHM(openAt) + ')' : '') + ' hoặc PM chưa mở cổng thanh toán.'); return; }
+      }
       if (!uploadedFileBase64) { alert('Vui lòng đính kèm file biên lai (chọn file hoặc kéo thả vào khung ô 9).'); document.getElementById('receipt-drop').focus(); return; }
       const paidN = parseInt(amount.replace(/[^0-9]/g, ''), 10) || 0;
       if (payCtx.price && paidN !== payCtx.price &&
@@ -11551,14 +11576,24 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const blocked = s => /h[uủ]y|cancel|từ chối|tu choi|reject/i.test(String(s || ''));
       out.innerHTML = `<div style="overflow-x:auto;"><table class="custom-table"><thead><tr><th>Thời gian đăng ký</th><th>Slot</th><th>Kho</th><th>Model</th><th class="num" style="text-align:right;">Số tiền cần nộp</th><th>Trạng thái</th><th>Đã khai nộp tiền</th><th>Biên lai</th><th>Nộp tiền</th></tr></thead><tbody>` +
         lastLookup.orders.map((o, i) => {
-          const price = SLOT_PRICE[o.slot];
+          const price = Number(o.amount) || Number(o.price) || SLOT_PRICE[o.slot] || 0;
           const at = payOpenAt(o.time);
           let act;
-          if (o.paid) act = '<span style="color:var(--lg-ok); font-weight:600;">Đã khai</span>';
-          else if (blocked(o.status)) act = '<span style="color:var(--lg-gray-muted);">Không áp dụng</span>';
-          else if (!at) act = '<span class="pay-wait">Liên hệ PM</span>';
-          else if (Date.now() < at.getTime()) act = `<span class="pay-wait">Mở lúc ${fmtHM(at)}</span>`;
-          else act = `<button type="button" class="btn-pay-open" onclick="openPaymentFromLookup(${i})">Nộp tiền</button>`;
+          if (o.paid) {
+            act = '<span style="color:var(--lg-ok); font-weight:600;">Đã khai</span>';
+          } else if (blocked(o.status)) {
+            act = '<span style="color:var(--lg-gray-muted);">Không áp dụng</span>';
+          } else if (o.status === 'Chờ nộp tiền' || o.status === 'Mới đăng ký') {
+            act = `<button type="button" class="btn-pay-open" onclick="openPaymentFromLookup(${i})">Nộp tiền</button>`;
+          } else if (o.status === 'Đã đăng ký - Chờ mở thanh toán') {
+            act = '<span class="pay-wait" style="color:var(--lg-heritage); font-weight:600;">Chờ PM mở cổng TT</span>';
+          } else if (!at) {
+            act = '<span class="pay-wait">Liên hệ PM</span>';
+          } else if (Date.now() < at.getTime()) {
+            act = `<span class="pay-wait">Mở lúc ${fmtHM(at)}</span>`;
+          } else {
+            act = `<button type="button" class="btn-pay-open" onclick="openPaymentFromLookup(${i})">Nộp tiền</button>`;
+          }
           return `<tr><td>${esc(o.time)}</td><td><span class="badge-ordinal">${esc(o.slot)}</span></td><td>${esc(o.kho)}</td><td>${esc(o.model)}</td><td style="text-align:right; white-space:nowrap;"><strong>${price ? fmtVND(price) : '—'}</strong></td><td><strong>${esc(o.status)}</strong></td><td>${o.paid ? 'Đã khai' : 'Chưa khai'}</td><td>${o.receipt ? 'Đã tải lên' : 'Chưa có'}</td><td>${act}</td></tr>`;
         }).join('') +
         `</tbody></table></div>`;

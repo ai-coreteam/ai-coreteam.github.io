@@ -812,6 +812,7 @@ function register_product_(d) {
       regRow[9] = str_(d.address);             // Address
       regRow[10] = 'Đồng ý';                    // Agree
       regRow[11] = STATUS_WAIT_GATE;           // Status: 'Đã đăng ký - Chờ mở thanh toán'
+      regRow[C.AMOUNT - 1] = Number(prodDataTarget[PROD_COL.PRICE - 1]) || 0; // Amount
       regSheet.getRange(regSheet.getLastRow() + 1, 1, 1, 22).setValues([regRow]);
     }
 
@@ -879,6 +880,20 @@ function pm_dashboard_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   var out = [];
 
+  // Lookup product prices to guarantee accurate revenue and price metrics
+  var prodPrices = {};
+  try {
+    var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+    if (prodSheet && prodSheet.getLastRow() > 1) {
+      var pData = prodSheet.getRange(2, 1, prodSheet.getLastRow() - 1, PROD_COL.PRICE).getValues();
+      for (var pi = 0; pi < pData.length; pi++) {
+        var sCode = String(pData[pi][PROD_COL.CODE - 1]).trim();
+        var sPrice = Number(pData[pi][PROD_COL.PRICE - 1]) || 0;
+        if (sCode && sPrice > 0) prodPrices[sCode] = sPrice;
+      }
+    }
+  } catch (eProd) {}
+
   if (regSheet) {
     var n = regSheet.getLastRow() - 1;
     if (n > 0) {
@@ -886,6 +901,9 @@ function pm_dashboard_(d) {
       for (var r = 0; r < n; r++) {
         var pId = String(v[r][C.CAMPAIGN - 1]).trim();
         if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
+
+        var curSlot = str_(v[r][C.SLOT - 1]);
+        var curAmt = Number(v[r][C.AMOUNT - 1]) || prodPrices[curSlot] || 0;
 
         out.push({
           id: 'REG-' + (r + 1),
@@ -895,13 +913,14 @@ function pm_dashboard_(d) {
           empName: str_(v[r][C.EMP_NAME - 1]),
           kho: str_(v[r][C.KHO - 1]),
           model: str_(v[r][C.MODEL - 1]),
-          slotId: str_(v[r][C.SLOT - 1]),
+          slotId: curSlot,
           phone: str_(v[r][C.PHONE - 1]),
           address: str_(v[r][C.ADDRESS - 1]),
           status: str_(v[r][C.STATUS - 1]) || 'Chờ nộp tiền',
           payerName: str_(v[r][C.PAYER_NAME - 1]),
           payerCode: str_(v[r][C.PAYER_CODE - 1]),
-          amount: Number(v[r][C.AMOUNT - 1]) || 0,
+          amount: curAmt,
+          internalPrice: curAmt,
           bankTxn: str_(v[r][C.BANK_TXN - 1]),
           payTime: str_(v[r][C.PAY_TIME - 1]),
           receipt: str_(v[r][C.RECEIPT - 1]),
@@ -1640,13 +1659,30 @@ function lookup_(d) {
   var n = reg.getLastRow() - 1;
   var v = n > 0 ? reg.getRange(2, 1, n, C.RECEIPT).getValues() : [];
   var out = [];
+
+  var prodPrices = {};
+  try {
+    var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+    if (prodSheet && prodSheet.getLastRow() > 1) {
+      var pData = prodSheet.getRange(2, 1, prodSheet.getLastRow() - 1, PROD_COL.PRICE).getValues();
+      for (var pi = 0; pi < pData.length; pi++) {
+        var sCode = String(pData[pi][PROD_COL.CODE - 1]).trim();
+        var sPrice = Number(pData[pi][PROD_COL.PRICE - 1]) || 0;
+        if (sCode && sPrice > 0) prodPrices[sCode] = sPrice;
+      }
+    }
+  } catch (eProd) {}
+
   for (var r = 0; r < v.length; r++) {
     if (String(v[r][C.EMP_CODE - 1]).toUpperCase() !== empCode) continue;
     var phone = String(v[r][C.PHONE - 1]).replace(/\D/g, '');
     if (phone.slice(-4) !== last4) continue;
+    var curSlot = str_(v[r][C.SLOT - 1]);
+    var curAmt = Number(v[r][C.AMOUNT - 1]) || prodPrices[curSlot] || 0;
     out.push({
       time: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0]),
-      slot: str_(v[r][C.SLOT - 1]), kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
+      slot: curSlot, kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
+      amount: curAmt, price: curAmt,
       status: str_(v[r][C.STATUS - 1]) || 'Chưa có trạng thái',
       paid: !!str_(v[r][C.BANK_TXN - 1]), receipt: !!str_(v[r][C.RECEIPT - 1])
     });

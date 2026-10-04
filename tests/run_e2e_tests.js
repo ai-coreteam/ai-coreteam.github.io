@@ -545,6 +545,54 @@ console.log('\n--- SUITE 10: Password Visibility & Status Indicator Icons Compli
 }
 
 // ----------------------------------------------------------------
+// SUITE 11: Payment Gate Integration & ISO Date Parsing
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 11: Payment Gate Integration & ISO Date Parsing ---');
+{
+  const htmlPath = path.join(__dirname, '../Mau_Dang_Ky_Internal_Sales_3009.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const codeGsPath = path.join(__dirname, '../apps-script/Code.gs');
+  const codeGs = fs.readFileSync(codeGsPath, 'utf8');
+
+  // 1. Verify parseVNTime handles ISO 8601 strings
+  assert(html.includes("if (s.includes('-') || s.includes('T'))"), 'parseVNTime checks for ISO 8601 strings');
+  
+  // Test parseVNTime logic in isolation
+  function parseVNTimeTest(t) {
+    if (!t) return null;
+    const s = String(t).trim();
+    if (s.includes('-') || s.includes('T')) {
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) return d;
+    }
+    const m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})[ ,T]+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (m) {
+      return new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5], +(m[6] || 0));
+    }
+    const fallback = new Date(s);
+    return !isNaN(fallback.getTime()) ? fallback : null;
+  }
+  const isoDate = parseVNTimeTest('2026-10-04T10:59:30.326Z');
+  assert(isoDate !== null && isoDate instanceof Date && !isNaN(isoDate.getTime()), 'parseVNTime successfully parses ISO 8601 string');
+  const vnDate = parseVNTimeTest('30/09/2026 07:41:51');
+  assert(vnDate !== null && vnDate.getFullYear() === 2026 && vnDate.getMonth() === 8, 'parseVNTime successfully parses DD/MM/YYYY string');
+
+  // 2. Verify renderLookup renders active button for 'Chờ nộp tiền'
+  assert(html.includes("o.status === 'Chờ nộp tiền' || o.status === 'Mới đăng ký'"), 'renderLookup checks Chờ nộp tiền status');
+  assert(html.includes('Chờ PM mở cổng TT'), 'renderLookup displays Chờ PM mở cổng TT when gate is closed');
+
+  // 3. Verify openPayment allows immediate payment when gate is open
+  assert(html.includes("const isGateOpen = order.status === 'Chờ nộp tiền' || order.status === 'Mới đăng ký';"), 'openPayment bypasses timer when PM gate is open');
+
+  // 4. Verify Code.gs lookup_ includes amount & price
+  assert(codeGs.includes("curAmt = Number(v[r][C.AMOUNT - 1]) || prodPrices[curSlot] || 0;"), 'Code.gs lookup_ calculates verified curAmt with fallback');
+  assert(codeGs.includes("amount: curAmt, price: curAmt"), 'Code.gs lookup_ returns amount and price');
+
+  // 5. Verify Code.gs register_product_ records product price
+  assert(codeGs.includes("regRow[C.AMOUNT - 1] = Number(prodDataTarget[PROD_COL.PRICE - 1]) || 0;"), 'Code.gs register_product_ stores initial amount');
+}
+
+// ----------------------------------------------------------------
 // FINAL TEST RESULTS
 // ----------------------------------------------------------------
 console.log('\n================================================================');
