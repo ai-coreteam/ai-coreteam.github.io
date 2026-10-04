@@ -18,7 +18,7 @@
 // - Nếu gắn script này trực tiếp vào Sheet (Container-bound): có thể để trống, script tự nhận Sheet hiện tại.
 // - Nếu là standalone script: Hãy chạy hàm setupNewDatabase() bên dưới để tự tạo Sheet trên Drive của bạn,
 //   sau đó dán ID được tạo vào biến bên dưới:
-var SPREADSHEET_ID = ''; // <- Dán SPREADSHEET_ID của bạn vào đây (hoặc chạy hàm setupNewDatabase())
+var SPREADSHEET_ID = '15LzI6KYp2liuCeGmTcm5IaSXN6UapWfihk4EOVQFu8A'; // <- Google Sheet ID của bạn
 
 var SHEET_REG = 'Registrations';
 var SHEET_SLOTS = 'Slots';
@@ -474,12 +474,13 @@ function program_create_(d) {
 
   var pmId = authCheck.payload.uid || str_(d.userId);
   var pmName = authCheck.payload.name || str_(d.userName);
+  var initStatus = str_(d.status) || 'Open';
   var row = [
     str_(d.programId),
     str_(d.programName),
     pmId,
     pmName,
-    'Draft',
+    initStatus,
     str_(d.startDate),
     str_(d.endDate),
     str_(d.description) || '',
@@ -488,8 +489,8 @@ function program_create_(d) {
   ];
   sheet.appendRow(row);
   invalidateCache_('prog_all');
-  try { log_('PROGRAM_CREATE', pmId, pmName, '', 'program=' + d.programId); } catch (e2) {}
-  return { ok: true, message: 'Đã tạo chương trình ' + d.programId + ' (Draft).' };
+  try { log_('PROGRAM_CREATE', pmId, pmName, '', 'program=' + d.programId + ' status=' + initStatus); } catch (e2) {}
+  return { ok: true, message: 'Đã tạo chương trình ' + d.programId + ' (' + initStatus + ').' };
 }
 
 // PM updates program status (Draft→Open, Open→Closed)
@@ -509,6 +510,10 @@ function program_update_(d) {
   var data = sheet.getRange(2, 1, n, 5).getValues();
   for (var r = 0; r < n; r++) {
     if (String(data[r][0]).trim().toUpperCase() === progId.toUpperCase()) {
+      var pmOwnerId = String(data[r][PROG_COL.PM_ID - 1]).trim().toUpperCase();
+      if (authCheck.payload.uid !== 'ADMIN' && pmOwnerId !== authCheck.payload.uid) {
+        return { ok: false, message: 'Từ chối thẩm quyền: Bạn không có quyền kết sổ hoặc cập nhật trạng thái chương trình của PM khác (' + pmOwnerId + ').' };
+      }
       var currentStatus = String(data[r][4]).trim();
       // Validate transition: Draft→Open, Open→Closed
       if (newStatus === 'Open' && currentStatus !== 'Draft') {
@@ -655,6 +660,9 @@ function product_upload_(d) {
   if (!authCheck.valid) return { ok: false, message: authCheck.message };
   var programId = str_(d.programId);
   if (!programId) return { ok: false, message: 'Thiếu programId.' };
+  if (!isProgramOwnedByPM_(programId, authCheck.payload.uid)) {
+    return { ok: false, message: 'Từ chối thẩm quyền: Bạn không có quyền nạp sản phẩm vào chương trình của PM khác.' };
+  }
   var items = d.items || d.products; // array of {kho, category, model, description, rrp, internalPrice, qty}
   if (!items || !items.length) return { ok: false, message: 'Danh sách sản phẩm trống.' };
 

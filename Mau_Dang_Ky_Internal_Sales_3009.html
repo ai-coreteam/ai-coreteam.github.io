@@ -5539,6 +5539,10 @@
 
     // ===== P1: PM Batch Payment Approval (GAP-OPS-02) =====
     function pmBatchApprovePayments() {
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách đợt bán này (' + activeProgram + ')! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền duyệt đơn.');
+        return;
+      }
       const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
         ? pmRegistrations
         : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
@@ -6141,7 +6145,7 @@
 
     let pmRegistrations = [];
     let programs = [];        // cached list of programs
-    let activeProgram = 'IS2026Q3-HA'; // currently selected program ID
+    let activeProgram = '';   // dynamically assigned on login / loadPrograms
     unifiedCatalogViewMode = 'cards'; // 'cards' | 'table'
     unifiedCatalogKho = '';           // '' = all
     unifiedCatalogSearch = '';        // query string
@@ -6717,8 +6721,20 @@
           if (res.ok) {
             const data = await res.json();
             if (data.ok && Array.isArray(data.programs)) {
-              programs = data.programs;
-              setSwrCache('programs_' + currentUser.role + '_' + currentUser.id, data.programs);
+              let pList = data.programs;
+              if (currentUser.role === 'PM' && currentUser.id !== 'ADMIN') {
+                const cUid = String(currentUser.id || '').trim().toUpperCase();
+                const cUName = String(currentUser.name || '').trim().toLowerCase();
+                pList = pList.filter(p => {
+                  const pOwner = String(p.pmId || '').trim().toUpperCase();
+                  const pOwnerName = String(p.pmName || '').trim().toLowerCase();
+                  return pOwner === cUid || (pOwnerName && pOwnerName === cUName);
+                });
+              } else if (currentUser.role !== 'PM' && currentUser.id !== 'ADMIN') {
+                pList = pList.filter(p => p.status === 'Open');
+              }
+              programs = pList;
+              setSwrCache('programs_' + currentUser.role + '_' + currentUser.id, programs);
               fetched = true;
             }
           }
@@ -6735,7 +6751,13 @@
             if (Array.isArray(parsed) && parsed.length > 0) {
               parsed.forEach(sp => {
                 const dp = DEMO_PROGRAMS.find(x => x.id === sp.id);
-                if (dp) dp.status = sp.status;
+                if (dp) {
+                  dp.status = sp.status;
+                  dp.pmId = sp.pmId || dp.pmId;
+                  dp.pmName = sp.pmName || dp.pmName;
+                } else {
+                  DEMO_PROGRAMS.unshift(sp);
+                }
               });
             }
           }
@@ -6743,7 +6765,14 @@
 
         if (currentUser.role === 'PM') {
           // Multi-PM Isolation: Each PM ONLY sees their own programs (SuperAdmin sees all)
-          programs = DEMO_PROGRAMS.filter(p => currentUser.id === 'ADMIN' || p.pmId === currentUser.id);
+          const cUid = String(currentUser.id || '').trim().toUpperCase();
+          const cUName = String(currentUser.name || '').trim().toLowerCase();
+          programs = DEMO_PROGRAMS.filter(p => {
+            if (currentUser.id === 'ADMIN') return true;
+            const pOwner = String(p.pmId || '').trim().toUpperCase();
+            const pOwnerName = String(p.pmName || '').trim().toLowerCase();
+            return pOwner === cUid || (pOwnerName && pOwnerName === cUName);
+          });
         } else {
           // Normal users see ALL open programs across all PMs
           programs = DEMO_PROGRAMS.filter(p => p.status === 'Open');
@@ -6897,8 +6926,36 @@
     async function updateProgramStatus(programId, newStatus) {
       if (!currentUser) return;
       const pid = programId || activeProgram || 'IS2026Q3-HA';
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách chương trình này (' + pid + ')! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền kết sổ hoặc cập nhật trạng thái.');
+        return;
+      }
       const normStatus = (String(newStatus).toLowerCase() === 'open') ? 'Open' :
                          (String(newStatus).toLowerCase() === 'closed') ? 'Closed' : 'Draft';
+
+      if (SHEET_API_URL) {
+        try {
+          const controller = new AbortController();
+          const timerId = setTimeout(() => controller.abort(), 4000);
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'program_update', programId: pid, newStatus: normStatus,
+              role: currentUser.role, userId: currentUser.id, userName: currentUser.name
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timerId);
+          const data = await res.json();
+          if (data && !data.ok) {
+            alert('Lỗi cập nhật máy chủ: ' + (data.message || 'Không thể thay đổi trạng thái'));
+            return;
+          }
+          console.log('Program status synced to sheet:', data ? data.message : '');
+        } catch (err) {
+          console.warn('Sync to sheet failed, running in local mode:', err);
+        }
+      }
 
       let targetProg = null;
       if (typeof DEMO_PROGRAMS !== 'undefined') {
@@ -6920,28 +6977,6 @@
       try {
         localStorage.setItem('lg_demo_programs', JSON.stringify(DEMO_PROGRAMS));
       } catch (e) {}
-
-      if (SHEET_API_URL) {
-        try {
-          const controller = new AbortController();
-          const timerId = setTimeout(() => controller.abort(), 3500);
-          const res = await fetch(SHEET_API_URL, {
-            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-              action: 'program_update', programId: pid, newStatus: normStatus,
-              role: currentUser.role, userId: currentUser.id, userName: currentUser.name
-            }),
-            signal: controller.signal
-          });
-          clearTimeout(timerId);
-          const data = await res.json();
-          if (data && data.ok) {
-            console.log('Program status synced to sheet:', data.message);
-          }
-        } catch (err) {
-          console.warn('Sync to sheet failed, running in local mode:', err);
-        }
-      }
 
       // Crucial: Re-render tabs immediately so yellow signal dot turns green (lg-status-dot-active)!
       if (typeof renderProgramTabs === 'function') renderProgramTabs();
@@ -7392,7 +7427,8 @@
         description: description || '',
         maxPerEmployee: maxPerEmployee || 1,
         status: 'Open',
-        pmId: currentUser.id
+        pmId: currentUser.id,
+        pmName: currentUser.name || currentUser.id
       };
 
       // Add to programs array locally immediately
@@ -7408,6 +7444,9 @@
         if (dIdx !== -1) DEMO_PROGRAMS[dIdx] = newProg;
         else DEMO_PROGRAMS.unshift(newProg);
       }
+      try {
+        localStorage.setItem('lg_demo_programs', JSON.stringify(programs));
+      } catch (e) {}
 
       // If products were provided, attach to DEMO_PRODUCTS & currentProducts
       if (importedProducts && importedProducts.length > 0) {
@@ -7438,35 +7477,61 @@
       // Sync with Google Sheets backend if connected
       if (SHEET_API_URL) {
         try {
-          fetch(SHEET_API_URL, {
+          showToast('Đang đồng bộ chương trình lên Google Sheet...', 'info', 2000);
+          const controller = new AbortController();
+          const timerId = setTimeout(() => controller.abort(), 8000);
+          const res = await fetch(SHEET_API_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
               action: 'program_create', programId, programName, startDate, endDate, description, maxPerEmployee,
-              token: currentUser.token, role: currentUser.role, userId: currentUser.id, userName: currentUser.name
-            })
-          }).catch(err => console.warn('Backend program_create sync warning:', err));
+              status: 'Open', token: currentUser.token, role: currentUser.role, userId: currentUser.id, userName: currentUser.name
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timerId);
+          const data = await res.json();
+          if (!data || !data.ok) {
+            alert('CẢNH BÁO LƯU GOOGLE SHEET:\nMáy chủ Google Apps Script trả về lỗi: ' + (data ? data.message : 'Không xác định') + '\n\nChương trình hiện chỉ đang tạm lưu trên trình duyệt của bạn.');
+            return;
+          }
 
           if (importedProducts && importedProducts.length > 0) {
-            fetch(SHEET_API_URL, {
+            const pController = new AbortController();
+            const pTimer = setTimeout(() => pController.abort(), 10000);
+            const resProd = await fetch(SHEET_API_URL, {
               method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
               body: JSON.stringify({
                 action: 'products_bulk_import', programId, products: importedProducts,
                 token: currentUser.token, role: currentUser.role, userId: currentUser.id
-              })
-            }).catch(err => console.warn('Backend products_bulk_import sync warning:', err));
+              }),
+              signal: pController.signal
+            });
+            clearTimeout(pTimer);
+            const dataProd = await resProd.json();
+            if (!dataProd || !dataProd.ok) {
+              console.warn('Lỗi đồng bộ danh mục sản phẩm lên Google Sheet:', dataProd);
+            }
           }
+          alert(`✅ ĐÃ KHỞI TẠO VÀ ĐỒNG BỘ THÀNH CÔNG VÀO GOOGLE SHEET!\n\n• Mã đợt: ${programId}\n• Tên đợt: ${programName}\n• Sản phẩm: ${importedProducts ? importedProducts.length : 0} model đã nạp\n• PM Quản trị: ${currentUser.name}\n• Trạng thái: Đang Mở Bán\n\nDữ liệu đã được ghi trực tiếp vào Google Sheet ("Programs" và "Products").`);
+          return;
         } catch (err) {
-          console.warn('Backend connection error:', err);
+          console.warn('Backend sync failed:', err);
+          alert('CẢNH BÁO KẾT NỐI MÁY CHỦ:\nKhông thể gửi dữ liệu lên Google Sheet (' + err.message + ').\nChương trình hiện chỉ đang tạm lưu trên trình duyệt của bạn.');
+          return;
         }
+      } else {
+        alert(`⚠️ THÔNG BÁO CHẾ ĐỘ NGOẠI TUYẾN (DEMO MODE):\n\nBạn chưa kết nối đường link Google Apps Script Web App.\nChương trình "${programName}" (${programId}) đã được tạo và hiển thị trên giao diện, nhưng CHƯA ĐƯỢC GHI vào Google Sheet.\n\n👉 Để dữ liệu ghi vào Google Sheet thật, vui lòng nhấn nút "Cấu hình API" ở góc trên bên phải thanh công cụ PM và dán link Web App URL.`);
       }
-
-      alert(`ĐÃ KHỞI TẠO THÀNH CÔNG ĐỢT BÁN HÀNG!\n\n• Mã đợt: ${programId}\n• Tên đợt: ${programName}\n• Sản phẩm: ${importedProducts ? importedProducts.length : 0} model đã nạp\n• Trạng thái: Đang Mở Bán\n\nChương trình đã sẵn sàng cho toàn thể nhân viên LG!`);
     }
 
     // Standalone Excel Import Modal (Tab 5 button)
     function openImportExcelModal() {
       const modal = document.getElementById('import-excel-modal');
       if (!modal) return;
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không thể nạp sản phẩm vào chương trình của PM khác (' + activeProgram + ')! Chỉ PM tạo chương trình mới có quyền nạp sản phẩm.');
+        return;
+      }
       const prog = (programs && programs.length) ? programs.find(p => p.id === activeProgram) : null;
       const progNameEl = document.getElementById('import-modal-prog-name');
       if (progNameEl) progNameEl.textContent = prog ? `${prog.name} (${prog.id})` : activeProgram;
@@ -9199,9 +9264,13 @@
       const allRegs = pmRegistrations.length ? pmRegistrations : DEMO_REGISTRATIONS;
       const reg = allRegs.find(r => r.id === regId);
       if (!reg) return;
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(reg.programId || activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách đợt bán này! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền hủy slot.');
+        return;
+      }
 
       const ok = confirm(`XÁC NHẬN HỦY GIỮ CHỖ (PM OVERRIDE)?
-
+ 
 Nhân viên: ${reg.empName} (${reg.empCode})
 Sản phẩm: ${reg.model} (${reg.slotId})
 Kho: ${reg.kho}
@@ -9231,6 +9300,24 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     }
     window.pmCancelUnpaidSlot = pmCancelUnpaidSlot;
 
+    function isCurrentPMAssigned(progId) {
+      if (!currentUser) return false;
+      if (currentUser.id === 'ADMIN' || currentUser.role === 'ADMIN') return true;
+      if (!progId) return true;
+      const allP = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs : [];
+      let p = allP.find(x => x.id === progId);
+      if (!p && typeof DEMO_PROGRAMS !== 'undefined') {
+        p = DEMO_PROGRAMS.find(x => x.id === progId);
+      }
+      if (!p) return true;
+      const pOwnerId = String(p.pmId || '').trim().toUpperCase();
+      const cUserId = String(currentUser.id || '').trim().toUpperCase();
+      const pOwnerName = String(p.pmName || '').trim().toLowerCase();
+      const cUserName = String(currentUser.name || '').trim().toLowerCase();
+      return pOwnerId === cUserId || (pOwnerName && pOwnerName === cUserName);
+    }
+    window.isCurrentPMAssigned = isCurrentPMAssigned;
+
     function renderPMDashboard() {
       if (!currentUser || currentUser.role !== 'PM') return;
 
@@ -9259,16 +9346,24 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const prog = allProgs.find(p => p.id === pid) || allProgs[0];
       const progName = prog ? prog.name : (pid || 'Chương trình Bán hàng');
       const progStatus = prog ? prog.status : 'Open';
+      const isOwner = isCurrentPMAssigned(pid);
 
       if (bannerTitle) bannerTitle.textContent = `${activeProgram} · ${progName}`;
       if (bannerStatus) {
-        if (progStatus === 'Open') {
+        if (!isOwner) {
+          bannerStatus.className = 'pm-prog-status';
+          bannerStatus.style.cssText = 'background:#FFF3CD; color:#856404; border:1px solid #FFEEBA; font-weight:600; padding:4px 10px; border-radius:12px; display:inline-flex; align-items:center; gap:6px;';
+          bannerStatus.innerHTML = `<svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#856404;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Chỉ xem · Thuộc PM ${esc(prog ? (prog.pmName || prog.pmId) : 'khác')}`;
+        } else if (progStatus === 'Open') {
+          bannerStatus.style.cssText = '';
           bannerStatus.className = 'pm-prog-status pm-status-open';
           bannerStatus.innerHTML = '<span class="lg-status-dot lg-status-dot-active"></span>Đang Mở Bán';
         } else if (progStatus === 'Draft') {
+          bannerStatus.style.cssText = '';
           bannerStatus.className = 'pm-prog-status pm-status-draft';
           bannerStatus.innerHTML = 'Bản Nháp';
         } else {
+          bannerStatus.style.cssText = '';
           bannerStatus.className = 'pm-prog-status pm-status-closed';
           bannerStatus.innerHTML = 'Đã Kết Sổ';
         }
@@ -9277,21 +9372,43 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         bannerDesc.textContent = `Hạn mức: ${prog ? prog.maxPerEmployee || 1 : 1} SP/NV · PM: ${prog ? prog.pmName || currentUser.name : currentUser.name}`;
       }
 
-      // Safe Delete Button (Only active when 0 registrations exist)
+      // Safe Delete Button (Only active when 0 registrations exist and user is Owner)
       let deleteBtnHtml = '';
       const orderCountForProg = pmRegistrations.filter(r => (r.programId || '').toUpperCase() === (activeProgram || '').toUpperCase()).length;
-      if (orderCountForProg === 0) {
+      if (isOwner && orderCountForProg === 0) {
         deleteBtnHtml = `<button class="btn-pm-action btn-pm-outline" style="border-color:#D72638; color:#D72638; margin-left:8px;" onclick="deleteActiveProgram('${esc(activeProgram)}')" title="Đợt bán 0 đơn có thể xóa hoàn toàn"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Xóa đợt bán (0 đơn)</button>`;
       }
 
       if (bannerControls) {
-        if (progStatus === 'Open') {
+        if (!isOwner) {
+          bannerControls.innerHTML = `<span style="font-size:12px; color:#716F6A; font-style:italic; padding:6px 12px; background:#F8F9FA; border-radius:6px; border:1px solid #E5E5E5;">🔒 Quyền hạn bị giới hạn: Chỉ PM chủ quản mới có thể kết sổ hoặc xóa đợt bán này</span>`;
+        } else if (progStatus === 'Open') {
           bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-outline" style="border-color:#A50034; color:#A50034;" onclick="if(confirm('Bạn có chắc muốn kết sổ chương trình ${esc(activeProgram)}?')){ updateProgramStatus('${esc(activeProgram)}', 'Closed'); }"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Kết sổ chương trình</button>${deleteBtnHtml}`;
         } else if (progStatus === 'Draft') {
           bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-primary" onclick="updateProgramStatus('${esc(activeProgram)}', 'Open')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polygon points="5 3 19 12 5 21 5 3"/></svg> Mở bán ngay</button>${deleteBtnHtml}`;
         } else {
           bannerControls.innerHTML = `<button class="btn-pm-action btn-pm-outline" onclick="updateProgramStatus('${esc(activeProgram)}', 'Open')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Mở lại chương trình</button>${deleteBtnHtml}`;
         }
+      }
+
+      // Update header action buttons state based on ownership
+      const btnAllow = document.getElementById('btn-allow-payment-header');
+      const btnBatch = document.getElementById('btn-batch-approve-header');
+      const btnTimer = document.getElementById('btn-timer-settings-header');
+      if (btnAllow) {
+        btnAllow.disabled = !isOwner;
+        btnAllow.style.opacity = isOwner ? '1' : '0.5';
+        btnAllow.title = isOwner ? 'Mở cổng thanh toán cho các đơn đăng ký trước thời điểm này' : 'Chỉ PM chủ quản mới có quyền mở cổng thanh toán';
+      }
+      if (btnBatch) {
+        btnBatch.disabled = !isOwner;
+        btnBatch.style.opacity = isOwner ? '1' : '0.5';
+        btnBatch.title = isOwner ? 'Duyệt tất cả đơn hàng đã nộp tiền' : 'Chỉ PM chủ quản mới có quyền duyệt đơn';
+      }
+      if (btnTimer) {
+        btnTimer.disabled = !isOwner;
+        btnTimer.style.opacity = isOwner ? '1' : '0.5';
+        btnTimer.title = isOwner ? 'Cài đặt hẹn giờ tự động mở chương trình, kết sổ' : 'Chỉ PM chủ quản mới có quyền cài đặt hẹn giờ';
       }
 
       calculatePMStats(activeProgram);
@@ -9303,6 +9420,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     async function deleteActiveProgram(pid) {
       if (!pid) return;
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không thể xóa chương trình này vì thuộc sở hữu của PM khác (' + pid + ')!');
+        return;
+      }
       const allProgs = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs : [];
       const prog = allProgs.find(p => p.id === pid);
       const progName = prog ? prog.name : pid;
@@ -9433,7 +9554,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
         // Actions
         let actionCol = '';
-        if (r.status === 'Đã khai nộp - chờ đối soát') {
+        const isProgOwner = (typeof isCurrentPMAssigned === 'function') ? isCurrentPMAssigned(r.programId || activeProgram) : true;
+        if (!isProgOwner) {
+          actionCol = `<span style="font-size:11.5px;color:#716F6A;font-style:italic;">Chỉ xem</span>`;
+        } else if (r.status === 'Đã khai nộp - chờ đối soát') {
           actionCol = `
             <div style="display:flex;gap:6px;justify-content:center;">
               <button type="button" class="btn-table-action btn-approve" onclick="pmApprovePayment('${esc(r.id)}')"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polyline points="20 6 9 17 4 12"/></svg> Duyệt</button>
@@ -9499,6 +9623,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const allRegs = pmRegistrations.length ? pmRegistrations : DEMO_REGISTRATIONS;
       const reg = allRegs.find(r => r.id === regId);
       if (!reg) return;
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(reg.programId || activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách đợt bán này! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền duyệt đơn.');
+        return;
+      }
 
       const msg = `Xác nhận phê duyệt thanh toán cho đơn của nhân viên:\n\n` +
         `${reg.empName} (${reg.empCode})\n` +
@@ -9540,6 +9668,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const allRegs = pmRegistrations.length ? pmRegistrations : DEMO_REGISTRATIONS;
       const reg = allRegs.find(r => r.id === regId);
       if (!reg) return;
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(reg.programId || activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách đợt bán này! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền từ chối đơn.');
+        return;
+      }
 
       const reason = prompt(`Nhập lý do từ chối đơn ${reg.slotId} (${reg.empName}):\n(Ví dụ: Sai số tiền chuyển khoản, trùng đơn, nhân viên yêu cầu hủy)`, 'Sai thông tin chứng từ chuyển khoản');
       if (reason === null) return;
@@ -9586,6 +9718,9 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     async function pmAllowPaymentBatchDirect(isAuto = false) {
       if (!currentUser || currentUser.role !== 'PM') return { ok: false, count: 0 };
       const pid = activeProgram || 'IS2026Q3-HA';
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid)) {
+        return { ok: false, count: 0, message: 'Từ chối thẩm quyền: Bạn không phải là PM phụ trách chương trình này (' + pid + ').' };
+      }
       const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length) ? pmRegistrations : DEMO_REGISTRATIONS;
       const targetRegs = allRegs.filter(r => (r.programId === pid || !r.programId) && (r.status === 'Đã đăng ký - Chờ mở thanh toán' || r.status === 'Mới đăng ký'));
 
@@ -9647,6 +9782,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         alert('Chức năng này chỉ dành cho Quản lý (PM).');
         return;
       }
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách chương trình này (' + activeProgram + ')! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền mở cổng thanh toán.');
+        return;
+      }
       const allRegs = pmRegistrations.length ? pmRegistrations : DEMO_REGISTRATIONS;
       const targetRegs = allRegs.filter(r => (r.programId === activeProgram || !r.programId) && (r.status === 'Đã đăng ký - Chờ mở thanh toán' || r.status === 'Mới đăng ký'));
 
@@ -9677,6 +9816,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const allRegs = pmRegistrations.length ? pmRegistrations : DEMO_REGISTRATIONS;
       const reg = allRegs.find(r => r.id === regId || r.slotId === regId);
       if (!reg) return;
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(reg.programId || activeProgram)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách đợt bán này! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền mở cổng thanh toán.');
+        return;
+      }
 
       const confirmMsg = `XÁC NHẬN MỞ CỔNG THANH TOÁN CHO ĐƠN LẺ\n\n` +
         `• Mã Slot: ${reg.slotId}\n` +
@@ -9990,6 +10133,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         return;
       }
       const pid = activeProgram || 'IS2026Q3-HA';
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không thể thay đổi cài đặt hẹn giờ cho chương trình của PM khác (' + pid + ')!');
+        return;
+      }
       const timers = getProgramTimers(pid);
 
       const pTitle = document.getElementById('timer-active-program-text');
@@ -10090,6 +10237,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     function saveTimerSettingsFromModal() {
       const pid = activeProgram || 'IS2026Q3-HA';
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không thể lưu cài đặt hẹn giờ cho chương trình của PM khác (' + pid + ')!');
+        return;
+      }
       const current = getProgramTimers(pid);
 
       const openEn = document.getElementById('timer-open-enabled');
@@ -10221,6 +10372,10 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     async function executeTimerActionNow(action) {
       if (!currentUser || currentUser.role !== 'PM') return;
       const pid = activeProgram || 'IS2026Q3-HA';
+      if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid)) {
+        alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách chương trình này (' + pid + ')! Chỉ PM tạo chương trình hoặc Quản trị viên mới có thẩm quyền thực hiện.');
+        return;
+      }
 
       if (action === 'open') {
         if (!confirm(`XÁC NHẬN MỞ BÁN THỦ CÔNG:\n\nBạn có muốn chuyển chương trình ${pid} sang trạng thái "Đang Mở Bán" ngay lập tức?`)) return;

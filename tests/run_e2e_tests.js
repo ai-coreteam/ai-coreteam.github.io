@@ -461,6 +461,56 @@ console.log('\n--- SUITE 8: Multi-PM Scoping & Jeong-Do Audit Deletion Protectio
 }
 
 // ----------------------------------------------------------------
+// SUITE 9: Frontend Multi-PM Authorization & Program Sync Safety
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 9: Frontend Multi-PM Authorization & Program Sync Safety ---');
+{
+  const htmlPath = path.join(__dirname, '..', 'Mau_Dang_Ky_Internal_Sales_3009.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+
+  // 1. Verify isCurrentPMAssigned helper exists and is attached to window
+  assert(html.includes('function isCurrentPMAssigned(progId)'), 'isCurrentPMAssigned helper is defined');
+  assert(html.includes('window.isCurrentPMAssigned = isCurrentPMAssigned;'), 'isCurrentPMAssigned is exported to window');
+
+  // 2. Simulate isCurrentPMAssigned behavior
+  function testPMAssigned(progId, currentUser, progs) {
+    if (!currentUser) return false;
+    if (currentUser.id === 'ADMIN' || currentUser.role === 'ADMIN') return true;
+    if (!progId) return true;
+    const p = progs.find(x => x.id === progId);
+    if (!p) return true;
+    const pOwnerId = String(p.pmId || '').trim().toUpperCase();
+    const cUserId = String(currentUser.id || '').trim().toUpperCase();
+    const pOwnerName = String(p.pmName || '').trim().toLowerCase();
+    const cUserName = String(currentUser.name || '').trim().toLowerCase();
+    return pOwnerId === cUserId || (pOwnerName && pOwnerName === cUserName);
+  }
+
+  const progs = [
+    { id: 'IS2026Q3-HA', name: 'CTBHNB HA', pmId: 'VH12345', pmName: 'Quynh Nhu' },
+    { id: 'IS-2026Q4-OTHER-01', name: 'CTBHNB Other', pmId: 'VH99999', pmName: 'Nguyen Ngoc Bao' }
+  ];
+
+  const baoUser = { id: 'VH99999', name: 'Nguyen Ngoc Bao', role: 'PM' };
+  const nhuUser = { id: 'VH12345', name: 'Quynh Nhu', role: 'PM' };
+  const adminUser = { id: 'ADMIN', name: 'Super Admin', role: 'ADMIN' };
+
+  assert(!testPMAssigned('IS2026Q3-HA', baoUser, progs), 'PM Bao is BLOCKED from Quynh Nhu program IS2026Q3-HA');
+  assert(testPMAssigned('IS-2026Q4-OTHER-01', baoUser, progs), 'PM Bao is ALLOWED on their own program IS-2026Q4-OTHER-01');
+  assert(!testPMAssigned('IS-2026Q4-OTHER-01', nhuUser, progs), 'PM Nhu is BLOCKED from PM Bao program');
+  assert(testPMAssigned('IS2026Q3-HA', adminUser, progs), 'ADMIN is ALLOWED across all programs');
+
+  // 3. Verify function-level guards in Mau_Dang_Ky_Internal_Sales_3009.html
+  assert(html.includes("if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(pid))"), 'updateProgramStatus guards against cross-PM edits');
+  assert(html.includes("if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(reg.programId || activeProgram))"), 'pmApprovePayment guards against cross-PM approvals');
+  assert(html.includes("Chỉ xem · Thuộc PM"), 'Read-only pill renders for other PMs in banner');
+
+  // 4. Verify createProgram checks for offline/API connection
+  assert(html.includes("THÔNG BÁO CHẾ ĐỘ NGOẠI TUYẾN (DEMO MODE)"), 'createProgram warns when running offline without Web App URL');
+  assert(html.includes("ĐÃ KHỞI TẠO VÀ ĐỒNG BỘ THÀNH CÔNG VÀO GOOGLE SHEET"), 'createProgram confirms sync to Google Sheet when online');
+}
+
+// ----------------------------------------------------------------
 // FINAL TEST RESULTS
 // ----------------------------------------------------------------
 console.log('\n================================================================');
