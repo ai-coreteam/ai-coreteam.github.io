@@ -11932,9 +11932,20 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           if (res && res.ok && Array.isArray(res.orders)) {
             orders = res.orders;
           } else if (res && !res.ok && res.message && !res.offline) {
-            if (form) setBusy(form, false);
-            out.innerHTML = `<span style="color:var(--lg-heritage); font-weight:600;">${esc(res.message)}</span>`;
-            return;
+            // Check if there are local demo/cached registrations before failing
+            let hasLocal = false;
+            try {
+              const stored = localStorage.getItem('lg_demo_registrations');
+              const pool = stored ? JSON.parse(stored) : ((typeof DEMO_REGISTRATIONS !== 'undefined') ? DEMO_REGISTRATIONS : []);
+              hasLocal = Array.isArray(pool) && pool.some(r => String(r.empCode || r.payerCode || '').toUpperCase() === empCode.toUpperCase());
+            } catch (eCheck) {}
+
+            if (!hasLocal) {
+              if (form) setBusy(form, false);
+              out.innerHTML = `<span style="color:var(--lg-heritage); font-weight:600;">${esc(res.message)}</span>`;
+              return;
+            }
+            console.warn('Backend returned error (' + res.message + '), falling back to local demo registrations for ' + empCode);
           }
         } catch (eNet) {
           console.warn('Network lookup error, falling back to local storage:', eNet);

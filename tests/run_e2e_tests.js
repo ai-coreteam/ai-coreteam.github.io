@@ -603,7 +603,8 @@ console.log('\n--- SUITE 12: Authenticated Tab 3 Lookup & Dynamic Time Filtering
   const codeGs = fs.readFileSync(codeGsPath, 'utf8');
 
   // 1. Verify Code.gs bypasses phone last 4 digits for authenticated users
-  assert(codeGs.includes("var isAuthenticated = auth && auth.ok && (auth.payload.uid === empCode || auth.payload.role === 'ADMIN' || auth.payload.role === 'PM');"), 'Code.gs validates authenticated session for lookup');
+  assert(codeGs.includes("var isAuthenticated = !!(auth && auth.valid && (String(auth.payload.uid).toUpperCase() === empCode || auth.payload.role === 'ADMIN' || auth.payload.role === 'PM'));"), 'Code.gs validates authenticated session for lookup');
+  assert(codeGs.includes("function verifyToken_(tokenStr, requiredRole)"), 'Code.gs has verifyToken_ alias for backward compatibility');
   assert(codeGs.includes("if (!isAuthenticated && (!empCode || last4.length !== 4))"), 'Code.gs only requires 4-digit phone for unauthenticated guests');
   assert(codeGs.includes("if (!isAuthenticated) {\n      var phone = String(v[r][C.PHONE - 1]).replace(/\\D/g, '');"), 'Code.gs skips phone matching when authenticated');
   assert(codeGs.includes("empName: empName,\n      name: empName,"), 'Code.gs returns employee name to prevent blank form');
