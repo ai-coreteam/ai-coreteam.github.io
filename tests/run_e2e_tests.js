@@ -593,6 +593,135 @@ console.log('\n--- SUITE 11: Payment Gate Integration & ISO Date Parsing ---');
 }
 
 // ----------------------------------------------------------------
+// SUITE 12: Authenticated Tab 3 Lookup & Dynamic Time Filtering
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 12: Authenticated Tab 3 Lookup & Dynamic Time Filtering ---');
+{
+  const htmlPath = path.join(__dirname, '../Mau_Dang_Ky_Internal_Sales_3009.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const codeGsPath = path.join(__dirname, '../apps-script/Code.gs');
+  const codeGs = fs.readFileSync(codeGsPath, 'utf8');
+
+  // 1. Verify Code.gs bypasses phone last 4 digits for authenticated users
+  assert(codeGs.includes("var isAuthenticated = auth && auth.ok && (auth.payload.uid === empCode || auth.payload.role === 'ADMIN' || auth.payload.role === 'PM');"), 'Code.gs validates authenticated session for lookup');
+  assert(codeGs.includes("if (!isAuthenticated && (!empCode || last4.length !== 4))"), 'Code.gs only requires 4-digit phone for unauthenticated guests');
+  assert(codeGs.includes("if (!isAuthenticated) {\n      var phone = String(v[r][C.PHONE - 1]).replace(/\\D/g, '');"), 'Code.gs skips phone matching when authenticated');
+  assert(codeGs.includes("empName: empName,\n      name: empName,"), 'Code.gs returns employee name to prevent blank form');
+
+  // 2. Verify Tab 3 HTML contains Authenticated View and Time Filter
+  assert(html.includes('id="lookup-auth-fields"'), 'HTML has #lookup-auth-fields container');
+  assert(html.includes('id="lookup-guest-fields"'), 'HTML has #lookup-guest-fields container');
+  assert(html.includes('id="lookup-time-filter"'), 'HTML has #lookup-time-filter select');
+  assert(html.includes('value="1year" selected>1 năm gần nhất (Mặc định)</option>'), '1-year default history option exists');
+  assert(html.includes('value="6months">6 tháng gần đây</option>'), '6-month history option exists');
+  assert(html.includes('value="30days">30 ngày gần đây</option>'), '30-day history option exists');
+  assert(html.includes('value="custom">Tự chọn mốc ngày...</option>'), 'Custom date range option exists');
+
+  // 3. Verify syncTab3AuthView function is wired
+  assert(html.includes('function syncTab3AuthView()'), 'syncTab3AuthView function is defined');
+  assert(html.includes('function handleTimeFilterChange()'), 'handleTimeFilterChange function is defined');
+  assert(html.includes("if (typeof syncTab3AuthView === 'function') syncTab3AuthView();"), 'switchTab tab3 triggers syncTab3AuthView');
+}
+
+// ----------------------------------------------------------------
+// SUITE 13: Smart Zero-Cost Banking Receipt OCR & Parser
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 13: Smart Zero-Cost Banking Receipt OCR & Parser ---');
+{
+  const htmlPath = path.join(__dirname, '../Mau_Dang_Ky_Internal_Sales_3009.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+
+  // 1. Verify client-side zero-cost libraries
+  assert(fs.existsSync(path.join(__dirname, '../data/tesseract.min.js')), 'data/tesseract.min.js exists locally');
+  assert(fs.existsSync(path.join(__dirname, '../data/worker.min.js')), 'data/worker.min.js exists locally');
+  assert(html.includes('<script src="data/tesseract.min.js"></script>'), 'HTML loads local tesseract.min.js');
+  assert(html.includes('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'), 'HTML includes CDN fallback for Tesseract');
+
+  // 2. Extract and test parseReceiptText function
+  const parseReceiptMatch = html.match(/function parseReceiptText\(raw\) \{([\s\S]*?)\n    \}/);
+  assert(parseReceiptMatch !== null, 'parseReceiptText function extracted from HTML');
+
+  const parseReceiptText = new Function('raw', parseReceiptMatch[1]);
+
+  // Test Case A: User's real Vietcombank Digibank receipt OCR text
+  const userReceiptText = `
+    B Digibank
+    Giao dịch thành công!
+    500,000 VND
+    11:53 Thứ Năm 01/10/2026
+    Tài khoản nhận 9688996413823776
+    Tên người nhận VU VIET LINH
+    Ngân hàng nhận MSB
+    Ngân hàng Hàng Hải
+    Nội dung ck
+    Mã tham chiếu 6274BFTVGL1XBMT3
+    Phí chuyển tiền Miễn phí
+    Hình thức chuyển Chuyển tiền nhanh
+    napas 247
+    Mã giao dịch 16312412911
+    Quay lại (6s)
+  `;
+
+  const parsedVCB = parseReceiptText(userReceiptText);
+  assert(parsedVCB.bank === 'Vietcombank', `VCB Bank detected correctly (got: ${parsedVCB.bank})`);
+  assert(parsedVCB.txnId === '16312412911', `VCB Txn ID detected correctly (got: ${parsedVCB.txnId})`);
+  assert(parsedVCB.date === '01/10/2026 11:53:00', `VCB Date detected correctly (got: ${parsedVCB.date})`);
+  assert(parsedVCB.amount === 500000, `VCB Amount detected correctly (got: ${parsedVCB.amount})`);
+
+  // Test Case B: Techcombank FT code sample
+  const tcbSample = `
+    Techcombank Mobile
+    Chuyển tiền thành công
+    Số tiền: 12,500,000 VND
+    Thời gian: 02/10/2026 14:20:00
+    Mã giao dịch: FT26100499887711
+  `;
+  const parsedTCB = parseReceiptText(tcbSample);
+  assert(parsedTCB.bank === 'Techcombank', 'TCB Bank detected correctly');
+  assert(parsedTCB.txnId === 'FT26100499887711', 'TCB FT code detected');
+  assert(parsedTCB.amount === 12500000, 'TCB Amount parsed correctly');
+
+  // Test Case C: MB Bank sample
+  const mbSample = `
+    MBBank
+    Giao dịch thành công
+    Mã GD: MB99112233
+    Số tiền: 3,250,000 đ
+    Thời gian GD: 03/10/2026 09:15:30
+  `;
+  const parsedMB = parseReceiptText(mbSample);
+  assert(parsedMB.bank === 'MB Bank', 'MB Bank detected');
+  assert(parsedMB.txnId === 'MB99112233', 'MB Txn ID detected');
+
+  // 3. Verify autoScanReceiptOCR is hooked to image upload
+  assert(html.includes('autoScanReceiptOCR(e.target.result);'), 'autoScanReceiptOCR called on image upload reader');
+  assert(html.includes('id="ocr-status-banner"'), '#ocr-status-banner element exists in HTML');
+  assert(html.includes('highlightAutoFilled('), 'highlightAutoFilled feedback function exists');
+}
+
+// ----------------------------------------------------------------
+// SUITE 14: Payment Form UX & Redundant Input Elimination
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 14: Payment Form UX & Redundant Input Elimination ---');
+{
+  const htmlPath = path.join(__dirname, '../Mau_Dang_Ky_Internal_Sales_3009.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+
+  // 1. Verify Slot Display is readonly and clean
+  assert(html.includes('id="pay-slot-display" placeholder="Mã Slot ID được điền tự động" readonly'), 'pay-slot-display is a clean readonly input');
+  assert(html.includes('type="hidden" id="pay-slot-select" name="pay-slot-select" required'), 'pay-slot-select is maintained as hidden input for form contract');
+
+  // 2. Verify Employee Name (Field 3) is readonly and pre-filled
+  assert(html.includes('id="pay-emp-name" placeholder="Họ và tên nhân viên đăng ký" required readonly'), 'pay-emp-name is readonly to prevent redundant re-typing');
+  assert(html.includes("const empNameVal = order.empName || order.name || (currentUser && (currentUser.name || currentUser.empName)) || '';"), 'openPayment resolves empName from order or session');
+  assert(html.includes('empNameInput.value = empNameVal;'), 'openPayment pre-fills pay-emp-name');
+  assert(html.includes('syncSamePayer();'), 'openPayment synchronizes payer name and code');
+
+  // 3. Verify openPaymentFromLookup forwards name
+  assert(html.includes("let name = o.name || o.empName || (currentUser && currentUser.name) || '';"), 'openPaymentFromLookup supplies full name to openPayment');
+}
+
+// ----------------------------------------------------------------
 // FINAL TEST RESULTS
 // ----------------------------------------------------------------
 console.log('\n================================================================');

@@ -3075,6 +3075,13 @@
   </script>
   <!-- P1: heic2any for iPhone HEIC to JPEG Transcoding (GAP-TECH-02) -->
   <script src="data/heic2any.min.js"></script>
+  <!-- Smart Zero-Cost OCR for Banking Receipts -->
+  <script src="data/tesseract.min.js"></script>
+  <script>
+    if (typeof Tesseract === 'undefined') {
+      document.write('<scr' + 'ipt src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"><\/scr' + 'ipt>');
+    }
+  </script>
 </head>
 <body>
   <!-- P1: LG Floating Toast Container -->
@@ -4151,20 +4158,55 @@
         </div>
       </div>
 
-      <!-- TRA CỨU ĐƠN CỦA TÔI -->
+      <!-- TRA CỨU / LỊCH SỬ ĐƠN HÀNG CỦA TÔI -->
       <div class="sec-card" id="lookup-card" style="margin-bottom:20px;">
-        <div class="sec-title">TRA CỨU ĐƠN CỦA TÔI</div>
-        <p style="font-size:12.5px; color:var(--lg-text-2); margin-bottom:10px;">Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn và <strong>số tiền cần nộp</strong>. Nút <strong>Nộp tiền</strong> mở sau <strong class="pay-delay-text">2 giờ</strong> kể từ lúc đăng ký thành công.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+          <div class="sec-title" id="lookup-title" style="margin:0;">TRA CỨU ĐƠN CỦA TÔI</div>
+          <div id="lookup-user-badge" style="display:none; font-size:12px; background:var(--lg-red-light); color:var(--lg-red); border:1px solid var(--lg-red-border); padding:4px 10px; border-radius:999px; font-weight:600;"></div>
+        </div>
+        <p id="lookup-desc" style="font-size:12.5px; color:var(--lg-text-2); margin-bottom:12px;">Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn và <strong>số tiền cần nộp</strong>. Nút <strong>Nộp tiền</strong> mở sau <strong class="pay-delay-text">2 giờ</strong> kể từ lúc đăng ký thành công (hoặc khi PM mở cổng thanh toán).</p>
+
+        <!-- Form cho Khách / Chưa đăng nhập -->
         <form id="lookup-form" onsubmit="handleLookup(event)" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
-          <div class="form-group" style="margin:0; min-width:160px;">
-            <label class="form-label" for="lookup-emp">Mã NV</label>
-            <input type="text" class="form-control" id="lookup-emp" placeholder="Ví dụ: VH12345" required>
+          <div id="lookup-guest-fields" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+            <div class="form-group" style="margin:0; min-width:160px;">
+              <label class="form-label" for="lookup-emp">Mã NV</label>
+              <input type="text" class="form-control" id="lookup-emp" placeholder="Ví dụ: VH12345" required>
+            </div>
+            <div class="form-group" style="margin:0; width:150px;">
+              <label class="form-label" for="lookup-phone">4 số cuối SĐT</label>
+              <input type="text" class="form-control" id="lookup-phone" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Ví dụ: 5678" required>
+            </div>
           </div>
-          <div class="form-group" style="margin:0; width:150px;">
-            <label class="form-label" for="lookup-phone">4 số cuối SĐT</label>
-            <input type="text" class="form-control" id="lookup-phone" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Ví dụ: 5678" required>
+
+          <!-- Bộ lọc thời gian cho User đã đăng nhập -->
+          <div id="lookup-auth-fields" style="display:none; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+            <div class="form-group" style="margin:0; min-width:210px;">
+              <label class="form-label" for="lookup-time-filter">Khoảng thời gian tra cứu</label>
+              <select class="form-control" id="lookup-time-filter" onchange="handleTimeFilterChange()" style="font-weight:600;">
+                <option value="1year" selected>1 năm gần nhất (Mặc định)</option>
+                <option value="6months">6 tháng gần đây</option>
+                <option value="30days">30 ngày gần đây</option>
+                <option value="all">Toàn bộ lịch sử</option>
+                <option value="custom">Tự chọn mốc ngày...</option>
+              </select>
+            </div>
+            <div id="lookup-custom-dates" style="display:none; gap:8px; align-items:flex-end;">
+              <div class="form-group" style="margin:0;">
+                <label class="form-label" for="lookup-date-from">Từ ngày</label>
+                <input type="date" class="form-control" id="lookup-date-from" style="padding:6px 10px;">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label" for="lookup-date-to">Đến ngày</label>
+                <input type="date" class="form-control" id="lookup-date-to" style="padding:6px 10px;">
+              </div>
+            </div>
           </div>
-          <button type="submit" class="btn-action">Tra cứu</button>
+
+          <button type="submit" class="btn-action" id="btn-lookup-submit" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:currentColor;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span id="btn-lookup-label">Tra cứu</span>
+          </button>
         </form>
         <div id="lookup-result" style="margin-top:12px; font-size:13px;"></div>
       </div>
@@ -4190,25 +4232,25 @@
         <form id="payment-form" onsubmit="handlePaymentSubmit(event)" hidden>
           <div id="pay-unlocked-info" style="font-size:12.5px; margin-bottom:12px; padding:10px 12px; background:var(--lg-card-bg); border:1px solid var(--lg-border); border-radius:8px;"></div>
           <div class="form-grid">
-            <!-- Order Slot Selection -->
+            <!-- Order Slot Display & Hidden Sync Field -->
             <div class="form-group">
-              <label class="form-label" for="pay-slot-select">1. Chọn Mã Slot ID Đã Đăng Ký <span class="req">*</span></label>
-              <select class="form-control" id="pay-slot-select" onchange="autoFillPaymentOrderInfo()" required disabled>
-                <option value="">-- Chọn Mã Slot ID Của Bạn --</option>
-                <!-- Danh sách 90 slot được nạp tự động từ ô Slot ở Tab 2 -->
-              </select>
+              <label class="form-label" for="pay-slot-display">1. Mã Slot ID Đã Đăng Ký <span class="req">*</span></label>
+              <div style="position:relative;">
+                <input type="text" class="form-control" id="pay-slot-display" placeholder="Mã Slot ID được điền tự động" readonly style="background:var(--lg-panel); font-weight:700; color:var(--lg-ink);">
+                <input type="hidden" id="pay-slot-select" name="pay-slot-select" required>
+              </div>
             </div>
 
             <!-- EMP Code -->
             <div class="form-group">
               <label class="form-label" for="pay-emp-code">2. Mã NV Đăng Ký <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-emp-code" placeholder="Ví dụ: VH12345" required readonly oninput="syncSamePayer()">
+              <input type="text" class="form-control" id="pay-emp-code" placeholder="Ví dụ: VH12345" required readonly style="background:var(--lg-panel); font-weight:600; color:var(--lg-ink);" oninput="syncSamePayer()">
             </div>
 
             <!-- EMP Name -->
             <div class="form-group">
               <label class="form-label" for="pay-emp-name">3. Họ & Tên NV Đăng Ký <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-emp-name" placeholder="Ví dụ: Nguyễn Thị Quỳnh Như" required oninput="syncSamePayer()">
+              <input type="text" class="form-control" id="pay-emp-name" placeholder="Họ và tên nhân viên đăng ký" required readonly style="background:var(--lg-panel); font-weight:600; color:var(--lg-ink);" oninput="syncSamePayer()">
             </div>
 
             <!-- NGƯỜI NỘP TIỀN GIỐNG NGƯỜI ĐĂNG KÝ -->
@@ -4263,6 +4305,7 @@
                 <input type="file" id="file-input-receipt" accept="image/*,application/pdf" style="display:none;" onchange="handleFileSelected(event)">
                 <img id="file-preview-img" class="preview-thumbnail" alt="Xem trước biên lai">
                 <div id="file-name-display" style="margin-top:8px; font-weight:600; color:var(--lg-ink); font-size:12px;"></div>
+                <div id="ocr-status-banner" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; font-size:12.5px; align-items:center; gap:8px;"></div>
               </div>
             </div>
           </div>
@@ -6312,6 +6355,7 @@
       // Auto-fill lookup
       const lookupEmp = document.getElementById('lookup-emp');
       if (lookupEmp) { lookupEmp.value = user.id; lookupEmp.readOnly = true; }
+      if (typeof syncTab3AuthView === 'function') syncTab3AuthView();
       // Auto-fill payment
       const payEmpCode = document.getElementById('pay-emp-code');
       if (payEmpCode) { payEmpCode.value = user.id; }
@@ -10585,6 +10629,12 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         }
         if (typeof updateKhoCounts === 'function') updateKhoCounts();
       }
+      if (tabId === 'tab3') {
+        if (typeof syncTab3AuthView === 'function') syncTab3AuthView();
+        if (currentUser && currentUser.id && (!lastLookup || !lastLookup.orders || !lastLookup.orders.length)) {
+          if (typeof handleLookup === 'function') handleLookup();
+        }
+      }
       if (tabId === 'tab4') {
         if (typeof syncProductRegistrationStatus === 'function') {
           syncProductRegistrationStatus(activeProgram, currentProducts);
@@ -10716,24 +10766,54 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (Date.now() < at.getTime()) { alert(`Chưa đến giờ nộp tiền.\n\nSlot ${order.slot} mở nộp tiền lúc ${fmtHM(at)} (hoặc khi PM mở cổng thanh toán).\nVui lòng chưa chuyển khoản trước giờ này.`); return; }
       }
       const finalPrice = Number(order.amount) || Number(order.price) || SLOT_PRICE[order.slot] || 0;
-      payCtx = { slot: order.slot, empCode, phoneLast4, time: order.time, status: order.status || '', name: order.name || '', price: finalPrice };
+      const empNameVal = order.empName || order.name || (currentUser && (currentUser.name || currentUser.empName)) || '';
+      payCtx = { slot: order.slot, empCode, phoneLast4, time: order.time, status: order.status || '', name: empNameVal, price: finalPrice };
       const form = document.getElementById('payment-form');
       form.reset();
       clearReceipt();
-      document.getElementById('pay-slot-select').value = order.slot;
+
+      // Field 1: Slot display & hidden select sync
+      const slotSelect = document.getElementById('pay-slot-select');
+      if (slotSelect) slotSelect.value = order.slot;
+      const slotDisplay = document.getElementById('pay-slot-display');
+      if (slotDisplay) {
+        slotDisplay.value = `${order.slot} · Kho ${order.kho || ''} · ${order.model || ''}`;
+      }
+
+      // Field 2: EMP Code (Read-only)
       document.getElementById('pay-emp-code').value = empCode;
-      if (order.name) document.getElementById('pay-emp-name').value = order.name;
+
+      // Field 3: EMP Name (Read-only)
+      const empNameInput = document.getElementById('pay-emp-name');
+      if (empNameInput) {
+        empNameInput.value = empNameVal;
+        empNameInput.readOnly = true;
+      }
+
       document.getElementById('pay-same').checked = true;
       document.getElementById('pay-payer-name').dataset.wasSame = '1';
       syncSamePayer();
+
+      // Field 6: Pre-fill amount
+      if (finalPrice) {
+        document.getElementById('pay-amount').value = fmtVND(finalPrice).replace(' đ', '');
+      }
       checkAmount();
+
       document.getElementById('pay-unlocked-info').innerHTML =
         `Đang khai nộp tiền cho <strong>Slot ${order.slot}</strong> · Kho ${order.kho || ''} · ${order.model || ''}` +
         (payCtx.price ? ` · Số tiền cần nộp: <strong style="color:var(--lg-red);">${fmtVND(payCtx.price)}</strong>` : '');
       document.getElementById('pay-lock').hidden = true;
       form.hidden = false;
       document.getElementById('payment-upload-card').scrollIntoView({ behavior: 'smooth' });
-      setTimeout(() => { const n = document.getElementById('pay-emp-name'); (n.value ? document.getElementById('pay-amount') : n).focus({ preventScroll: true }); }, 450);
+      setTimeout(() => {
+        const amt = document.getElementById('pay-amount');
+        if (amt && !amt.value) amt.focus({ preventScroll: true });
+        else {
+          const drop = document.getElementById('receipt-drop');
+          if (drop) drop.focus({ preventScroll: true });
+        }
+      }, 450);
     }
 
     // Theme Toggle Logic
@@ -11125,13 +11205,15 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     // Nạp 90 slot vào ô chọn slot ở Tab 3 (Slot · Kho · Model · Loại · Giá; không hiện tên người)
     (function fillPaySlots() {
       const pay = document.getElementById('pay-slot-select');
-      document.querySelectorAll('#reg-slot-id option[data-model]').forEach(o => {
-        const opt = document.createElement('option');
-        opt.value = o.value;
-        const prod = document.querySelector(`#reg-model option[value="${o.value}"]`);
-        opt.textContent = prod ? '#' + prod.textContent : o.textContent;
-        pay.appendChild(opt);
-      });
+      if (pay && pay.tagName === 'SELECT') {
+        document.querySelectorAll('#reg-slot-id option[data-model]').forEach(o => {
+          const opt = document.createElement('option');
+          opt.value = o.value;
+          const prod = document.querySelector(`#reg-model option[value="${o.value}"]`);
+          opt.textContent = prod ? '#' + prod.textContent : o.textContent;
+          pay.appendChild(opt);
+        });
+      }
     })();
 
     // ===== Slot đã hết: lấy danh sách từ máy chủ (chỉ mã slot, không kèm tên) =====
@@ -11290,9 +11372,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     // File Selection Handler (chọn file hoặc kéo thả)
     function clearReceipt() {
       uploadedFileBase64 = null; uploadedFileName = '';
-      document.getElementById('file-input-receipt').value = '';
-      document.getElementById('file-name-display').innerText = '';
-      document.getElementById('file-preview-img').style.display = 'none';
+      const fin = document.getElementById('file-input-receipt'); if (fin) fin.value = '';
+      const fnd = document.getElementById('file-name-display'); if (fnd) fnd.innerText = '';
+      const fpi = document.getElementById('file-preview-img'); if (fpi) fpi.style.display = 'none';
+      const ocrb = document.getElementById('ocr-status-banner');
+      if (ocrb) { ocrb.style.display = 'none'; ocrb.innerHTML = ''; }
     }
     function handleFileSelected(event) {
       const file = event.target.files[0];
@@ -11342,12 +11426,198 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           const img = document.getElementById('file-preview-img');
           img.src = e.target.result;
           img.style.display = 'inline-block';
+          // Trigger zero-cost client-side OCR
+          autoScanReceiptOCR(e.target.result);
         };
         reader.readAsDataURL(file);
       } else {
         uploadedFileBase64 = null;
         document.getElementById('file-preview-img').style.display = 'none';
       }
+    }
+
+    // ===== Smart Zero-Cost Receipt Parser (Vietnamese Banking Standards) =====
+    function parseReceiptText(raw) {
+      if (!raw) return {};
+      const clean = raw.replace(/\r/g, '\n');
+      const lines = clean.split('\n').map(l => l.trim()).filter(Boolean);
+      const res = { bank: '', txnId: '', date: '', amount: null };
+
+      // 1. Detect Bank
+      const bankKeywords = [
+        { name: 'Vietcombank', regex: /vietcombank|vcb\s*digibank|b\s*digibank|digibank|ngân hàng ngoại thương/i },
+        { name: 'Techcombank', regex: /techcombank|tcb|ngân hàng kỹ thương/i },
+        { name: 'MB Bank', regex: /mbbank|mb\s*bank|quân\s*đội|military\s*bank/i },
+        { name: 'VietinBank', regex: /vietinbank|vietin|ipay|công thương/i },
+        { name: 'BIDV', regex: /bidv|smartbanking|đầu tư và phát triển/i },
+        { name: 'VPBank', regex: /vpbank|vp\s*bank|vpbank\s*neo|việt nam thịnh vượng/i },
+        { name: 'ACB', regex: /acb|acb\s*one|á\s*châu/i },
+        { name: 'TPBank', regex: /tpbank|tp\s*bank|tiên\s*phong/i },
+        { name: 'MSB', regex: /msb|hàng\s*hải|maritime\s*bank/i },
+        { name: 'Sacombank', regex: /sacombank|sài gòn thương tín/i },
+        { name: 'HDBank', regex: /hdbank|phát triển tp\.?hcm/i },
+        { name: 'OCB', regex: /ocb|phương đông/i },
+        { name: 'SHB', regex: /shb|sài gòn hà nội/i },
+        { name: 'VIB', regex: /vib|quốc tế/i },
+        { name: 'Agribank', regex: /agribank|nông nghiệp/i },
+        { name: 'MoMo', regex: /momo/i },
+        { name: 'ZaloPay', regex: /zalopay/i }
+      ];
+      for (const b of bankKeywords) {
+        if (b.regex.test(clean)) { res.bank = b.name; break; }
+      }
+
+      // 2. Detect Transaction Code (Ưu tiên Mã giao dịch, sau đó Mã tham chiếu / FT)
+      const mGiaoDich = clean.match(/(?:m[aã]\s*giao\s*d[iị]ch|m[aã]\s*gd)\s*[:\-–]?\s*([A-Za-z0-9]{6,26})/i);
+      if (mGiaoDich && mGiaoDich[1]) {
+        res.txnId = mGiaoDich[1].trim();
+      } else {
+        const txnExplicitRegex = /(?:m[aã]\s*giao\s*d[iị]ch|m[aã]\s*gd|m[aã]\s*tham\s*chi[eế]u|s[oố]\s*tham\s*chi[eế]u|m[aã]\s*tra\s*c[uứ]u|trace(?:\s*no)?)\s*[:\-–]?\s*([A-Za-z0-9]{6,26})/i;
+        const mExplicit = clean.match(txnExplicitRegex);
+        if (mExplicit && mExplicit[1]) {
+          res.txnId = mExplicit[1].trim();
+        } else {
+          for (let i = 0; i < lines.length; i++) {
+            if (/(?:m[aã]\s*giao\s*d[iị]ch|m[aã]\s*tham\s*chi[eế]u|m[aã]\s*gd)/i.test(lines[i])) {
+              const inlineM = lines[i].match(/([A-Za-z0-9]{8,26})/g);
+              if (inlineM && inlineM.length) {
+                res.txnId = inlineM[inlineM.length - 1];
+                break;
+              } else if (i + 1 < lines.length) {
+                const nextM = lines[i + 1].match(/^[A-Za-z0-9]{6,26}$/);
+                if (nextM) { res.txnId = nextM[0]; break; }
+              }
+            }
+          }
+        }
+      }
+      if (!res.txnId) {
+        const ftMatch = clean.match(/\b(FT\d{10,18})\b/i);
+        if (ftMatch) res.txnId = ftMatch[1].toUpperCase();
+      }
+
+      // 3. Detect Date Time
+      const dateMatch1 = clean.match(/(\d{1,2}:\d{2}(?::\d{2})?)\s+(?:Thứ\s+[^\s\d]+\s+)?(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i);
+      const dateMatch2 = clean.match(/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})(?:\s+(\d{1,2}:\d{2}(?::\d{2})?))?/i);
+      if (dateMatch1) {
+        const timePart = dateMatch1[1].length === 5 ? (dateMatch1[1] + ':00') : dateMatch1[1];
+        const datePart = dateMatch1[2].replace(/[\-\.]/g, '/');
+        res.date = `${datePart} ${timePart}`;
+      } else if (dateMatch2) {
+        const datePart = dateMatch2[1].replace(/[\-\.]/g, '/');
+        const timePart = dateMatch2[2] ? (dateMatch2[2].length === 5 ? (dateMatch2[2] + ':00') : dateMatch2[2]) : '00:00:00';
+        res.date = `${datePart} ${timePart}`;
+      }
+
+      // 4. Detect Amount
+      const amtMatch = clean.match(/([1-9]\d{0,2}(?:[.,]\d{3}){1,3})\s*(?:VND|VNĐ|đ|Đ|\b)/i);
+      if (amtMatch && amtMatch[1]) {
+        const numStr = amtMatch[1].replace(/[.,]/g, '');
+        const n = parseInt(numStr, 10);
+        if (n >= 10000 && n <= 500000000) res.amount = n;
+      }
+
+      return res;
+    }
+
+    // Auto OCR Scanner (100% Free Client-Side)
+    async function autoScanReceiptOCR(dataUrl) {
+      const banner = document.getElementById('ocr-status-banner');
+      if (!banner) return;
+      banner.style.display = 'flex';
+      banner.style.background = 'var(--lg-red-light)';
+      banner.style.border = '1px solid var(--lg-red-border)';
+      banner.style.color = 'var(--lg-ink)';
+      banner.innerHTML = `
+        <svg class="lg-icon lg-spin" style="width:16px;height:16px;stroke:var(--lg-red);flex-shrink:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"/></svg>
+        <span>Đang tự động quét thông tin biên lai chuyển khoản (hoàn toàn miễn phí)…</span>
+      `;
+
+      try {
+        if (typeof Tesseract === 'undefined') {
+          banner.style.background = '#FFFBE6';
+          banner.style.borderColor = '#FFE58F';
+          banner.style.color = '#D48806';
+          banner.innerHTML = `<span>Thư viện OCR chưa tải kịp. Bạn vui lòng tự điền ô 7 và 8.</span>`;
+          setTimeout(() => { if (banner) banner.style.display = 'none'; }, 4000);
+          return;
+        }
+
+        const res = await Tesseract.recognize(dataUrl, 'eng', {
+          logger: p => {
+            if (p && p.status === 'recognizing text' && typeof p.progress === 'number') {
+              const pct = Math.round(p.progress * 100);
+              const txt = banner.querySelector('span');
+              if (txt) txt.textContent = `Đang phân tích dữ liệu biên lai (${pct}%)…`;
+            }
+          }
+        });
+
+        const text = (res && res.data && res.data.text) ? res.data.text : '';
+        const parsed = parseReceiptText(text);
+
+        let filledFields = [];
+        const txnInput = document.getElementById('pay-txn-id');
+        const dateInput = document.getElementById('pay-date');
+        const amountInput = document.getElementById('pay-amount');
+
+        // Điền Ngân hàng & Mã GD (Mục 7)
+        if (parsed.bank || parsed.txnId) {
+          const bankPart = parsed.bank || 'Ngân hàng';
+          const txnPart = parsed.txnId || '';
+          const fullTxn = txnPart ? `${bankPart} - ${txnPart}` : bankPart;
+          if (txnInput) {
+            txnInput.value = fullTxn;
+            highlightAutoFilled(txnInput);
+            filledFields.push('Mục 7: ' + fullTxn);
+          }
+        }
+
+        // Điền Ngày giờ (Mục 8)
+        if (parsed.date && dateInput) {
+          dateInput.value = parsed.date;
+          highlightAutoFilled(dateInput);
+          filledFields.push('Mục 8: ' + parsed.date);
+        }
+
+        // Điền/Cập nhật Số tiền (Mục 6) nếu nhận diện được và ô chưa có
+        if (parsed.amount && amountInput && (!amountInput.value || amountInput.value === '0')) {
+          amountInput.value = fmtVND(parsed.amount).replace(' đ', '');
+          highlightAutoFilled(amountInput);
+          checkAmount();
+          filledFields.push('Mục 6: ' + fmtVND(parsed.amount));
+        }
+
+        if (filledFields.length > 0) {
+          banner.style.background = 'rgba(46,125,50,0.08)';
+          banner.style.borderColor = 'rgba(46,125,50,0.3)';
+          banner.style.color = '#1b5e20';
+          banner.innerHTML = `
+            <svg class="lg-icon" style="width:16px;height:16px;stroke:#2e7d32;flex-shrink:0;" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            <div><strong>Tự động điền thành công từ biên lai:</strong> ${filledFields.join(', ')}. <span style="font-size:11.5px;color:var(--lg-gray-muted);">(Vui lòng đối chiếu với ảnh chụp)</span></div>
+          `;
+        } else {
+          banner.style.background = '#F5F5F5';
+          banner.style.borderColor = '#E0E0E0';
+          banner.style.color = '#616161';
+          banner.innerHTML = `<span>Đã tải ảnh biên lai. Không nhận diện được rõ mã giao dịch, vui lòng điền tay mục 7 và 8.</span>`;
+          setTimeout(() => { if (banner) banner.style.display = 'none'; }, 4500);
+        }
+      } catch (err) {
+        console.warn('OCR processing error:', err);
+        banner.style.display = 'none';
+      }
+    }
+
+    function highlightAutoFilled(el) {
+      if (!el) return;
+      el.style.transition = 'all 0.3s ease';
+      el.style.boxShadow = '0 0 0 3px rgba(46,125,50,0.3)';
+      el.style.borderColor = '#2e7d32';
+      setTimeout(() => {
+        el.style.boxShadow = '';
+        el.style.borderColor = '';
+      }, 2500);
     }
 
     // Auto fill payment form from slot selection
@@ -11551,31 +11821,245 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       }
     }
 
-    // Tra cứu đơn của tôi (Tab 3)
-    async function handleLookup(event) {
-      event.preventDefault();
-      const form = event.target;
-      const out = document.getElementById('lookup-result');
-      const empCode = document.getElementById('lookup-emp').value.trim();
-      const phoneLast4 = document.getElementById('lookup-phone').value.trim();
-      const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      if (!SHEET_API_URL) { out.innerHTML = 'Bản mẫu chưa kết nối Google Sheet nên chưa tra cứu được.'; return; }
-      setBusy(form, true); out.innerHTML = 'Đang tra cứu…';
-      const res = await postToSheet({ action: 'lookup', empCode, phoneLast4 });
-      setBusy(form, false);
-      if (!res || !res.ok) { out.innerHTML = `<span style="color:var(--lg-heritage); font-weight:600;">${esc((res && res.message) || 'Không tra cứu được.')}</span>`; return; }
-      lastLookup = { empCode, phoneLast4, orders: res.orders || [] };
-      if (!lastLookup.orders.length) { out.innerHTML = 'Không tìm thấy đơn nào với Mã NV và 4 số cuối SĐT này.'; return; }
-      renderLookup();
+    // ===== Tab 3: Tra Cứu & Đồng Bộ Lịch Sử Đơn Hàng =====
+    function syncTab3AuthView() {
+      const isAuth = !!(currentUser && currentUser.id);
+      const guestFields = document.getElementById('lookup-guest-fields');
+      const authFields = document.getElementById('lookup-auth-fields');
+      const empInput = document.getElementById('lookup-emp');
+      const phoneInput = document.getElementById('lookup-phone');
+      const userBadge = document.getElementById('lookup-user-badge');
+      const desc = document.getElementById('lookup-desc');
+      const btnLabel = document.getElementById('btn-lookup-label');
+
+      if (isAuth) {
+        if (guestFields) guestFields.style.display = 'none';
+        if (authFields) authFields.style.display = 'flex';
+        if (empInput) {
+          empInput.value = currentUser.id;
+          empInput.removeAttribute('required');
+        }
+        if (phoneInput) {
+          phoneInput.removeAttribute('required');
+        }
+        if (userBadge) {
+          userBadge.style.display = 'inline-block';
+          userBadge.textContent = `Tài khoản: ${currentUser.id} · ${currentUser.name || ''}`;
+        }
+        if (desc) {
+          desc.innerHTML = `Hệ thống tự động tra cứu lịch sử đơn hàng của tài khoản <strong>${esc(currentUser.id)}</strong> (${esc(currentUser.name || '')}). Mặc định hiển thị 1 năm gần nhất. Nút <strong>Nộp tiền</strong> mở khi PM duyệt mở cổng thanh toán (hoặc sau <strong class="pay-delay-text">${PAY_OPEN_DELAY_HOURS} giờ</strong>).`;
+        }
+        if (btnLabel) btnLabel.textContent = 'Làm mới / Tra cứu';
+      } else {
+        if (guestFields) guestFields.style.display = 'flex';
+        if (authFields) authFields.style.display = 'none';
+        if (empInput) empInput.setAttribute('required', 'required');
+        if (phoneInput) phoneInput.setAttribute('required', 'required');
+        if (userBadge) userBadge.style.display = 'none';
+        if (desc) {
+          desc.innerHTML = `Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn và <strong>số tiền cần nộp</strong>. Nút <strong>Nộp tiền</strong> mở sau <strong class="pay-delay-text">${PAY_OPEN_DELAY_HOURS} giờ</strong> kể từ lúc đăng ký thành công (hoặc khi PM mở cổng thanh toán).`;
+        }
+        if (btnLabel) btnLabel.textContent = 'Tra cứu';
+      }
     }
-    let lastLookup = null;
-    function renderLookup() {
-      if (!lastLookup) return;
+
+    function handleTimeFilterChange() {
+      const filterSelect = document.getElementById('lookup-time-filter');
+      const customDates = document.getElementById('lookup-custom-dates');
+      if (!filterSelect) return;
+      const val = filterSelect.value;
+      if (val === 'custom') {
+        if (customDates) customDates.style.display = 'flex';
+        const fromInput = document.getElementById('lookup-date-from');
+        const toInput = document.getElementById('lookup-date-to');
+        if (fromInput && !fromInput.value) {
+          const d = new Date(); d.setFullYear(d.getFullYear() - 1);
+          fromInput.value = d.toISOString().split('T')[0];
+        }
+        if (toInput && !toInput.value) {
+          toInput.value = new Date().toISOString().split('T')[0];
+        }
+      } else {
+        if (customDates) customDates.style.display = 'none';
+      }
+
+      if (lastLookup && lastLookup.allOrders && lastLookup.allOrders.length) {
+        renderLookup();
+      } else if (currentUser && currentUser.id) {
+        handleLookup();
+      }
+    }
+
+    async function handleLookup(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      const form = document.getElementById('lookup-form');
       const out = document.getElementById('lookup-result');
       const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      const isAuth = !!(currentUser && currentUser.id);
+      let empCode = '';
+      let phoneLast4 = '';
+
+      if (isAuth) {
+        empCode = currentUser.id.trim();
+      } else {
+        const empEl = document.getElementById('lookup-emp');
+        const phoneEl = document.getElementById('lookup-phone');
+        empCode = empEl ? empEl.value.trim() : '';
+        phoneLast4 = phoneEl ? phoneEl.value.trim() : '';
+        if (!empCode || phoneLast4.length !== 4) {
+          alert('Vui lòng nhập Mã NV và đúng 4 số cuối điện thoại.');
+          return;
+        }
+      }
+
+      if (form) setBusy(form, true);
+      out.innerHTML = '<span style="color:var(--lg-ink); display:inline-flex; align-items:center; gap:6px;"><svg class="lg-icon lg-spin" style="width:16px;height:16px;stroke:var(--lg-red);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"/></svg> Đang tra cứu dữ liệu đơn hàng…</span>';
+
+      let orders = [];
+
+      // 1. Check if connected to backend API
+      if (SHEET_API_URL) {
+        try {
+          const payload = {
+            action: 'lookup',
+            empCode: empCode,
+            phoneLast4: phoneLast4,
+            userId: currentUser ? currentUser.id : '',
+            token: currentUser ? (currentUser.token || '') : ''
+          };
+          const res = await postToSheet(payload);
+          if (res && res.ok && Array.isArray(res.orders)) {
+            orders = res.orders;
+          } else if (res && !res.ok && res.message && !res.offline) {
+            if (form) setBusy(form, false);
+            out.innerHTML = `<span style="color:var(--lg-heritage); font-weight:600;">${esc(res.message)}</span>`;
+            return;
+          }
+        } catch (eNet) {
+          console.warn('Network lookup error, falling back to local storage:', eNet);
+        }
+      }
+
+      // 2. Offline / Local fallback with DEMO_REGISTRATIONS & localStorage
+      if (!orders.length) {
+        let localRegs = (typeof DEMO_REGISTRATIONS !== 'undefined') ? DEMO_REGISTRATIONS.slice() : [];
+        try {
+          const stored = localStorage.getItem('lg_demo_registrations');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) localRegs = parsed;
+          }
+        } catch (eSt) {}
+
+        const matched = localRegs.filter(r => {
+          const rCode = String(r.empCode || r.payerCode || '').toUpperCase();
+          if (rCode !== empCode.toUpperCase()) return false;
+          if (!isAuth) {
+            const rPhone = String(r.phone || '').replace(/\D/g, '');
+            if (rPhone.slice(-4) !== phoneLast4) return false;
+          }
+          return true;
+        });
+
+        if (matched.length > 0) {
+          orders = matched.map(m => {
+            const amt = Number(m.amount) || Number(m.internalPrice) || Number(m.price) || SLOT_PRICE[m.slotId || m.slot] || 0;
+            return {
+              time: m.timestamp || m.time || new Date().toISOString(),
+              slot: m.slotId || m.slot || '',
+              kho: m.kho || '',
+              model: m.model || '',
+              empCode: m.empCode || empCode,
+              empName: m.empName || (currentUser && currentUser.name) || '',
+              name: m.empName || (currentUser && currentUser.name) || '',
+              amount: amt,
+              price: amt,
+              status: m.status || 'Chờ nộp tiền',
+              paid: !!(m.bankTxn || m.paid || (m.status && m.status.includes('Đã nộp'))),
+              receipt: !!(m.receiptUrl || m.receipt)
+            };
+          });
+        }
+      }
+
+      if (form) setBusy(form, false);
+
+      lastLookup = {
+        empCode,
+        phoneLast4,
+        isAuth,
+        allOrders: orders,
+        orders: orders
+      };
+
+      if (!orders.length) {
+        const msg = isAuth
+          ? `Tài khoản <strong>${esc(empCode)}</strong> chưa có đơn đăng ký nào trên hệ thống.`
+          : `Không tìm thấy đơn nào khớp với Mã NV <strong>${esc(empCode)}</strong> và 4 số cuối SĐT <strong>${esc(phoneLast4)}</strong>.`;
+        out.innerHTML = `<div style="padding:12px; background:var(--lg-panel); border-radius:8px; color:var(--lg-text-2);">${msg}</div>`;
+        return;
+      }
+
+      renderLookup();
+    }
+
+    let lastLookup = null;
+    function renderLookup() {
+      if (!lastLookup || !lastLookup.allOrders) return;
+      const out = document.getElementById('lookup-result');
+      if (!out) return;
+      const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const blocked = s => /h[uủ]y|cancel|từ chối|tu choi|reject/i.test(String(s || ''));
+
+      // Filter by time range
+      let filtered = lastLookup.allOrders.slice();
+      const timeFilterEl = document.getElementById('lookup-time-filter');
+      const filterMode = timeFilterEl ? timeFilterEl.value : '1year';
+
+      if (lastLookup.isAuth && filterMode !== 'all') {
+        const now = new Date();
+        let fromDate = null;
+        let toDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+        if (filterMode === '1year') {
+          fromDate = new Date(now.getTime() - 365 * 24 * 3600 * 1000);
+        } else if (filterMode === '6months') {
+          fromDate = new Date(now.getTime() - 180 * 24 * 3600 * 1000);
+        } else if (filterMode === '30days') {
+          fromDate = new Date(now.getTime() - 30 * 24 * 3600 * 1000);
+        } else if (filterMode === 'custom') {
+          const fromVal = document.getElementById('lookup-date-from') ? document.getElementById('lookup-date-from').value : '';
+          const toVal = document.getElementById('lookup-date-to') ? document.getElementById('lookup-date-to').value : '';
+          if (fromVal) fromDate = new Date(fromVal + 'T00:00:00');
+          if (toVal) toDate = new Date(toVal + 'T23:59:59');
+        }
+
+        if (fromDate) {
+          filtered = filtered.filter(o => {
+            const dt = parseVNTime(o.time);
+            if (!dt) return true;
+            return dt >= fromDate && dt <= toDate;
+          });
+        }
+      }
+
+      lastLookup.orders = filtered;
+
+      if (!filtered.length) {
+        out.innerHTML = `
+          <div style="padding:14px; background:var(--lg-panel); border-radius:8px; color:var(--lg-text-2); text-align:center;">
+            Không có đơn hàng nào trong khoảng thời gian đã chọn (Tổng cộng tài khoản có ${lastLookup.allOrders.length} đơn).<br>
+            <button type="button" class="btn-action btn-sm" onclick="document.getElementById('lookup-time-filter').value='all'; handleTimeFilterChange();" style="margin-top:8px;">
+              Xem tất cả ${lastLookup.allOrders.length} đơn
+            </button>
+          </div>
+        `;
+        return;
+      }
+
       out.innerHTML = `<div style="overflow-x:auto;"><table class="custom-table"><thead><tr><th>Thời gian đăng ký</th><th>Slot</th><th>Kho</th><th>Model</th><th class="num" style="text-align:right;">Số tiền cần nộp</th><th>Trạng thái</th><th>Đã khai nộp tiền</th><th>Biên lai</th><th>Nộp tiền</th></tr></thead><tbody>` +
-        lastLookup.orders.map((o, i) => {
+        filtered.map((o, i) => {
           const price = Number(o.amount) || Number(o.price) || SLOT_PRICE[o.slot] || 0;
           const at = payOpenAt(o.time);
           let act;
@@ -11598,11 +12082,14 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         }).join('') +
         `</tbody></table></div>`;
     }
+
     function openPaymentFromLookup(i) {
-      const o = lastLookup && lastLookup.orders[i]; if (!o) return;
-      let name = o.name || o.empName || '';
+      const o = lastLookup && lastLookup.orders && lastLookup.orders[i]; if (!o) return;
+      let name = o.name || o.empName || (currentUser && currentUser.name) || '';
       if (!name) { try { name = sessionStorage.getItem('regName_' + o.slot) || ''; } catch (e) {} }
-      openPayment(Object.assign({}, o, { name }), lastLookup.empCode, lastLookup.phoneLast4);
+      const empCode = o.empCode || (lastLookup && lastLookup.empCode) || (currentUser && currentUser.id) || '';
+      const phoneLast4 = (lastLookup && lastLookup.phoneLast4) || '';
+      openPayment(Object.assign({}, o, { name, empCode }), empCode, phoneLast4);
     }
     // Đơn đang chờ: mỗi phút vẽ lại để nút Nộp tiền tự hiện khi đến giờ
     setInterval(() => { if (lastLookup && !payCtx) renderLookup(); }, 60000);

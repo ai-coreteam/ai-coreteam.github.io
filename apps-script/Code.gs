@@ -1651,9 +1651,15 @@ function findOrder_(reg, slotId, empCode) {
 
 /* ---------- Tra cứu đơn (Mã NV + 4 số cuối SĐT) ---------- */
 function lookup_(d) {
-  var empCode = str_(d.empCode).toUpperCase();
+  var empCode = str_(d.empCode || d.userId).toUpperCase();
   var last4 = str_(d.phoneLast4).replace(/\D/g, '');
-  if (!empCode || last4.length !== 4) return { ok: false, message: 'Vui lòng nhập Mã NV và đúng 4 số cuối điện thoại đã đăng ký.' };
+  var token = str_(d.token);
+  var auth = token ? verifyToken_(token) : null;
+  var isAuthenticated = auth && auth.ok && (auth.payload.uid === empCode || auth.payload.role === 'ADMIN' || auth.payload.role === 'PM');
+
+  if (!isAuthenticated && (!empCode || last4.length !== 4)) {
+    return { ok: false, message: 'Vui lòng nhập Mã NV và đúng 4 số cuối điện thoại đã đăng ký.' };
+  }
 
   var reg = book_().getSheetByName(SHEET_REG);
   var n = reg.getLastRow() - 1;
@@ -1675,19 +1681,28 @@ function lookup_(d) {
 
   for (var r = 0; r < v.length; r++) {
     if (String(v[r][C.EMP_CODE - 1]).toUpperCase() !== empCode) continue;
-    var phone = String(v[r][C.PHONE - 1]).replace(/\D/g, '');
-    if (phone.slice(-4) !== last4) continue;
+    if (!isAuthenticated) {
+      var phone = String(v[r][C.PHONE - 1]).replace(/\D/g, '');
+      if (phone.slice(-4) !== last4) continue;
+    }
     var curSlot = str_(v[r][C.SLOT - 1]);
     var curAmt = Number(v[r][C.AMOUNT - 1]) || prodPrices[curSlot] || 0;
+    var empName = str_(v[r][C.EMP_NAME - 1]);
     out.push({
       time: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0]),
       slot: curSlot, kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
+      empCode: empCode,
+      empName: empName,
+      name: empName,
       amount: curAmt, price: curAmt,
       status: str_(v[r][C.STATUS - 1]) || 'Chưa có trạng thái',
       paid: !!str_(v[r][C.BANK_TXN - 1]), receipt: !!str_(v[r][C.RECEIPT - 1])
     });
   }
   if (!out.length) {
+    if (isAuthenticated) {
+      return { ok: true, orders: [], message: 'Bạn chưa có đơn đăng ký mua hàng nào.' };
+    }
     log_('LOOKUP_NOT_FOUND', empCode, '', d.userAgent, 'Tra cứu không khớp');
     return { ok: false, message: 'Không tìm thấy đơn khớp Mã NV và 4 số cuối điện thoại này.' };
   }
