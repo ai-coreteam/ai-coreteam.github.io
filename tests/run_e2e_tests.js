@@ -763,6 +763,28 @@ assert(htmlContentSuite15.includes("quickLogin('VH11111', 'test123')"), 'Quick d
 assert(htmlContentSuite15.includes('setTimeout(() => controller.abort(), 12000)'), 'Apps Script login timeout increased to 12s');
 
 // ----------------------------------------------------------------
+// SUITE 16: Receipt Image Modal & Confirmation Table Department Integrity
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 16: Receipt Image Modal & Confirmation Table Department Integrity ---');
+
+// 1. Verify openReceiptModal handles receipt image, reset, and amount formatting
+assert(htmlContentSuite15.includes('function openReceiptModal(title, payer, amount, txnCode, receiptUrl, slotId)'), 'openReceiptModal supports receiptUrl and slotId parameters');
+assert(htmlContentSuite15.includes('if (typeof resetReceiptImage === \'function\') resetReceiptImage();'), 'openReceiptModal resets zoom and rotation on open');
+assert(htmlContentSuite15.includes('img.src = url;'), 'openReceiptModal binds real image URL to modal img element');
+assert(htmlContentSuite15.includes('modalAmount.innerText = typeof amount === \'number\' ? fmtVND(amount) :'), 'openReceiptModal properly displays formatted payment amount');
+assert(htmlContentSuite15.includes('modalApproveBtn.style.display = isPM ? \'inline-flex\' : \'none\';'), 'openReceiptModal secures PM buttons from normal user view');
+
+// 2. Verify handlePaymentSubmit dynamically resolves department and caches receipt
+assert(htmlContentSuite15.includes('window.PAYMENT_RECEIPTS[slotId] = uploadedFileBase64;'), 'handlePaymentSubmit caches receipt in memory for instant modal viewing');
+assert(htmlContentSuite15.includes("sessionStorage.setItem('receipt_' + slotId, uploadedFileBase64);"), 'handlePaymentSubmit persists receipt to sessionStorage');
+assert(htmlContentSuite15.includes("const deptVal = (currentUser && (currentUser.dept || currentUser.division)) ||"), 'handlePaymentSubmit derives department from user profile');
+assert(!htmlContentSuite15.includes('<td>N/A</td>\n          <td>Internal Model</td>'), 'handlePaymentSubmit eliminated hardcoded N/A and Internal Model table cells');
+
+// 3. Verify openPayment preserves division, model, and kho in payCtx
+assert(htmlContentSuite15.includes("division: order.division || (currentUser && (currentUser.dept || currentUser.division)) || ''"), 'openPayment propagates department and division into payCtx');
+assert(htmlContentSuite15.includes("model: order.model || ''"), 'openPayment preserves model in payCtx');
+
+// ----------------------------------------------------------------
 // FINAL TEST RESULTS
 // ----------------------------------------------------------------
 console.log('\n================================================================');

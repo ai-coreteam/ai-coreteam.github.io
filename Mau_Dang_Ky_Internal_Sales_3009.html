@@ -10785,7 +10785,18 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       }
       const finalPrice = Number(order.amount) || Number(order.price) || SLOT_PRICE[order.slot] || 0;
       const empNameVal = order.empName || order.name || (currentUser && (currentUser.name || currentUser.empName)) || '';
-      payCtx = { slot: order.slot, empCode, phoneLast4, time: order.time, status: order.status || '', name: empNameVal, price: finalPrice };
+      payCtx = {
+        slot: order.slot,
+        empCode,
+        phoneLast4,
+        time: order.time,
+        status: order.status || '',
+        name: empNameVal,
+        price: finalPrice,
+        model: order.model || '',
+        kho: order.kho || '',
+        division: order.division || (currentUser && (currentUser.dept || currentUser.division)) || ''
+      };
       const form = document.getElementById('payment-form');
       form.reset();
       clearReceipt();
@@ -11810,6 +11821,45 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const doneOrder = payCtx; lockPayment();
       if (doneOrder) setTimeout(() => document.getElementById('lookup-form').requestSubmit(), 300);
 
+      // 1. Cache receipt image in memory & storage
+      if (typeof window.PAYMENT_RECEIPTS === 'undefined') window.PAYMENT_RECEIPTS = {};
+      if (uploadedFileBase64) {
+        window.PAYMENT_RECEIPTS[slotId] = uploadedFileBase64;
+        try { sessionStorage.setItem('receipt_' + slotId, uploadedFileBase64); } catch (e) {}
+      }
+
+      // Sync into DEMO_REGISTRATIONS if present
+      if (typeof DEMO_REGISTRATIONS !== 'undefined') {
+        const reg = DEMO_REGISTRATIONS.find(r => r.slotId === slotId || r.slot === slotId);
+        if (reg) {
+          reg.payerName = payerName;
+          reg.payerCode = payerCode;
+          reg.bankTxn = txnId;
+          reg.payTime = payDate;
+          reg.amount = paidN || payCtx.price;
+          if (uploadedFileBase64) reg.receiptUrl = uploadedFileBase64;
+          reg.status = 'Đã khai nộp - chờ đối soát';
+        }
+      }
+
+      const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const deptVal = (currentUser && (currentUser.dept || currentUser.division)) ||
+                      (payCtx && (payCtx.division || payCtx.dept)) ||
+                      'Channel development';
+
+      let modelText = '';
+      if (payCtx && payCtx.model) {
+        modelText = esc(payCtx.model) + (payCtx.kho ? `<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${esc(payCtx.kho)}</strong></span>` : '');
+      } else {
+        const prod = (typeof currentProducts !== 'undefined' && currentProducts.find(p => p.uniqueCode === slotId)) ||
+                     (typeof DEMO_PRODUCTS !== 'undefined' && DEMO_PRODUCTS[activeProgram] && DEMO_PRODUCTS[activeProgram].find(p => p.uniqueCode === slotId));
+        if (prod) {
+          modelText = esc(prod.model) + (prod.kho ? `<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${esc(prod.kho)}</strong></span>` : '');
+        } else {
+          modelText = 'Thiết bị LG';
+        }
+      }
+
       const rows = document.querySelectorAll('#confirmation-tbody tr');
       let found = false;
       rows.forEach(row => {
@@ -11818,9 +11868,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           row.style.background = 'var(--lg-panel)';
           row.cells[3].innerHTML = `<strong style="color:var(--lg-text);">${payerName}</strong>`;
           row.cells[4].innerHTML = `<span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-text);">${payerCode}</span>`;
+          row.cells[5].innerHTML = esc(deptVal);
+          if (modelText) row.cells[6].innerHTML = modelText;
           row.cells[7].innerText = txnId;
           row.cells[8].innerHTML = `
-            <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền ${slotId}', '${payerName} (${payerCode})', '', '${txnId}')">
+            <button type="button" class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền ${slotId}', '${payerName} (${payerCode})', '${amount}', '${txnId}', '', '${slotId}')">
               Xem Biên Lai (${fileName})
             </button>
           `;
@@ -11839,11 +11891,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           <td><strong>${empName}</strong></td>
           <td><strong style="color:var(--lg-text);">${payerName}</strong></td>
           <td><span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-text);">${payerCode}</span></td>
-          <td>N/A</td>
-          <td>Internal Model</td>
+          <td>${esc(deptVal)}</td>
+          <td>${modelText}</td>
           <td>${txnId}</td>
           <td>
-            <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền ${slotId}', '${payerName} (${payerCode})', '', '${txnId}')">
+            <button type="button" class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền ${slotId}', '${payerName} (${payerCode})', '${amount}', '${txnId}', '', '${slotId}')">
               Xem Biên Lai (${fileName})
             </button>
           </td>
@@ -12018,6 +12070,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
               empCode: m.empCode || empCode,
               empName: m.empName || (currentUser && currentUser.name) || '',
               name: m.empName || (currentUser && currentUser.name) || '',
+              division: m.division || (currentUser && (currentUser.dept || currentUser.division)) || '',
               amount: amt,
               price: amt,
               status: m.status || 'Chờ nộp tiền',
@@ -12140,10 +12193,65 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     setInterval(() => { if (lastLookup && !payCtx) renderLookup(); }, 60000);
 
     // Modal Receipt Viewing Functions
-    function openReceiptModal(title, payer, amount, txnCode) {
-      document.getElementById('modal-title').innerText = '' + title;
-      document.getElementById('modal-payer-name').innerText = payer;
-      document.getElementById('modal-txn-code').innerText = txnCode;
+    function openReceiptModal(title, payer, amount, txnCode, receiptUrl, slotId) {
+      if (typeof resetReceiptImage === 'function') resetReceiptImage();
+
+      const inferredSlot = slotId || (title && title.match(/([A-Z0-9]+-[A-Z0-9-]+)/) ? title.match(/([A-Z0-9]+-[A-Z0-9-]+)/)[1] : '');
+      const modalTitle = document.getElementById('modal-title');
+      const modalSubtitle = document.getElementById('modal-subtitle');
+      const modalPayer = document.getElementById('modal-payer-name');
+      const modalTxn = document.getElementById('modal-txn-code');
+      const modalAmount = document.getElementById('modal-amount');
+      const modalApproveBtn = document.getElementById('modal-btn-approve');
+      const modalRejectBtn = document.getElementById('modal-btn-reject');
+      const img = document.getElementById('modal-receipt-img');
+
+      if (modalTitle) modalTitle.innerText = '' + (title || 'CHỨNG TỪ BIÊN LAI NỘP TIỀN NGÂN HÀNG');
+      if (modalSubtitle) modalSubtitle.innerText = 'Chi tiết giao dịch đối soát thanh toán chuyển khoản' + (inferredSlot ? ` · ${inferredSlot}` : '');
+      if (modalPayer) modalPayer.innerText = payer || '-';
+      if (modalTxn) modalTxn.innerText = txnCode || '-';
+      if (modalAmount) {
+        if (amount) {
+          modalAmount.innerText = typeof amount === 'number' ? fmtVND(amount) : (amount.includes('đ') ? amount : amount + ' đ');
+        } else {
+          modalAmount.innerText = '-';
+        }
+      }
+
+      // Hide PM approve/reject buttons when opened by normal user
+      const isPM = currentUser && (currentUser.role === 'PM' || currentUser.role === 'Admin');
+      if (modalApproveBtn) modalApproveBtn.style.display = isPM ? 'inline-flex' : 'none';
+      if (modalRejectBtn) modalRejectBtn.style.display = isPM ? 'inline-flex' : 'none';
+
+      // Resolve receipt image URL
+      let url = receiptUrl || '';
+      if (!url && inferredSlot) {
+        if (window.PAYMENT_RECEIPTS && window.PAYMENT_RECEIPTS[inferredSlot]) {
+          url = window.PAYMENT_RECEIPTS[inferredSlot];
+        } else {
+          try { url = sessionStorage.getItem('receipt_' + inferredSlot); } catch (e) {}
+        }
+      }
+      if (!url && typeof uploadedFileBase64 !== 'undefined' && uploadedFileBase64) {
+        url = uploadedFileBase64;
+      }
+      if (!url && inferredSlot && typeof DEMO_REGISTRATIONS !== 'undefined') {
+        const reg = DEMO_REGISTRATIONS.find(r => r.slotId === inferredSlot || r.slot === inferredSlot);
+        if (reg && reg.receiptUrl) url = reg.receiptUrl;
+      }
+
+      if (img) {
+        if (url && (url.startsWith('data:image') || url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:'))) {
+          img.src = url;
+          img.style.display = 'block';
+        } else {
+          // Fallback SVG Voucher
+          const amtText = amount ? (typeof amount === 'number' ? fmtVND(amount) : amount) : 'ĐÃ KHAI NỘP';
+          img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280" viewBox="0 0 460 280"><rect width="460" height="280" fill="%23FFFFFF" rx="10" stroke="%23D1CEC7" stroke-width="2"/><circle cx="230" cy="65" r="28" fill="%23E8F5E9"/><path d="M220 65l7 7 14-14" stroke="%232E7D32" stroke-width="3" fill="none" stroke-linecap="round"/><text x="230" y="120" font-family="sans-serif" font-size="14" font-weight="bold" fill="%23262626" text-anchor="middle">VIETCOMBANK · XÁC NHẬN CHUYỂN TIỀN</text><text x="230" y="142" font-family="sans-serif" font-size="12" fill="%23716F6A" text-anchor="middle">LGEVN HAI PHONG - 0991000012525</text><text x="230" y="172" font-family="sans-serif" font-size="18" font-weight="bold" fill="%23A50034" text-anchor="middle">' + encodeURIComponent(amtText) + '</text><text x="230" y="200" font-family="monospace" font-size="12" fill="%23262626" text-anchor="middle">Mã GD: ' + encodeURIComponent(txnCode || 'FT24098912389') + '</text><text x="230" y="225" font-family="sans-serif" font-size="11.5" fill="%23595959" text-anchor="middle">Người nộp: ' + encodeURIComponent(payer || '') + '</text><text x="230" y="250" font-family="sans-serif" font-size="11" fill="%230E6251" text-anchor="middle">● Trạng thái: Đã khai nộp chứng từ thành công</text></svg>';
+          img.style.display = 'block';
+        }
+      }
+
       document.getElementById('receipt-modal').classList.add('active');
     }
 
