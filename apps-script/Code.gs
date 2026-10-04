@@ -727,11 +727,13 @@ function register_product_(d) {
   if (progSheet) {
     var pn = progSheet.getLastRow() - 1;
     if (pn > 0) {
-      var pData = progSheet.getRange(2, 1, pn, 7).getValues();
+      var pData = progSheet.getRange(2, 1, pn, 10).getValues();
       for (var pi = 0; pi < pn; pi++) {
-        if (String(pData[pi][0]).trim().toUpperCase() === programId.toUpperCase()) {
-          maxPer = Number(pData[pi][6]) || 1;
-          if (String(pData[pi][3]).trim() !== 'Open') {
+        var pId = String(pData[pi][PROG_COL.ID - 1]).trim().toUpperCase();
+        if (pId === programId.toUpperCase()) {
+          maxPer = Number(pData[pi][PROG_COL.MAX_PER - 1]) || 1;
+          var pStatus = String(pData[pi][PROG_COL.STATUS - 1]).trim();
+          if (pStatus !== 'Open') {
             return { ok: false, message: 'Chương trình ' + programId + ' đã kết sổ, không thể đăng ký.' };
           }
           break;

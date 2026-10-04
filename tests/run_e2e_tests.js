@@ -359,6 +359,9 @@ console.log('\n--- SUITE 6: Database Schema & API Contract ---');
   // Validate Programs 10-column schema
   assert(codeContent.includes("PROG_COL = {") && codeContent.includes("CREATED: 10"), 'PROG_COL has 10 columns defined (ID to CREATED: 10)');
 
+  // Validate register_product_ uses PROG_COL to check program status (preventing false "program closed" bug)
+  assert(codeContent.includes("PROG_COL.STATUS - 1") && codeContent.includes("PROG_COL.MAX_PER - 1"), 'register_product_ references PROG_COL.STATUS and MAX_PER correctly');
+
   // Validate Watchdog Trigger Installer
   assert(codeContent.includes("function setupWatchdogTrigger()"), 'setupWatchdogTrigger() 1-click trigger installer exists');
 
@@ -508,6 +511,37 @@ console.log('\n--- SUITE 9: Frontend Multi-PM Authorization & Program Sync Safet
   // 4. Verify createProgram checks for offline/API connection
   assert(html.includes("THÔNG BÁO CHẾ ĐỘ NGOẠI TUYẾN (DEMO MODE)"), 'createProgram warns when running offline without Web App URL');
   assert(html.includes("ĐÃ KHỞI TẠO VÀ ĐỒNG BỘ THÀNH CÔNG VÀO GOOGLE SHEET"), 'createProgram confirms sync to Google Sheet when online');
+}
+
+// ----------------------------------------------------------------
+// SUITE 10: Password Visibility & Status Indicator Icons Compliance
+// ----------------------------------------------------------------
+console.log('\n--- SUITE 10: Password Visibility & Status Indicator Icons Compliance ---');
+{
+  const htmlPath = path.join(__dirname, '../Mau_Dang_Ky_Internal_Sales_3009.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+
+  // Verify togglePasswordVisibility function exists
+  assert(html.includes("function togglePasswordVisibility(inputId, btn)"), 'togglePasswordVisibility function is defined');
+  assert(html.includes("window.togglePasswordVisibility = togglePasswordVisibility"), 'togglePasswordVisibility is exported to window');
+
+  // Verify all 4 password inputs have .btn-toggle-pw toggle button
+  assert(html.includes("onclick=\"togglePasswordVisibility('login-password', this)\""), 'login-password has toggle button');
+  assert(html.includes("onclick=\"togglePasswordVisibility('cp-old-pw', this)\""), 'cp-old-pw has toggle button');
+  assert(html.includes("onclick=\"togglePasswordVisibility('cp-new-pw', this)\""), 'cp-new-pw has toggle button');
+  assert(html.includes("onclick=\"togglePasswordVisibility('cp-confirm-pw', this)\""), 'cp-confirm-pw has toggle button');
+
+  // Verify prog-id-status uses SVG check icon instead of unicode tick
+  assert(html.includes("id=\"prog-id-status\"") && html.includes("<svg class=\"lg-icon lg-icon-sm\""), 'prog-id-status renders SVG icon in HTML');
+
+  // Verify raw emojis were eliminated from all UI components
+  assert(!html.includes("🛠️"), '🛠️ emoji completely removed');
+  assert(!html.includes("🔄 Sinh mã"), '🔄 Sinh mã emoji completely removed');
+  assert(!html.includes("⚙️ Cấu hình"), '⚙️ Cấu hình emoji completely removed');
+  assert(!html.includes("🟢 Đang kết nối"), '🟢 Đang kết nối emoji completely removed');
+  assert(!html.includes("⚪ Đang ở chế độ"), '⚪ Đang ở chế độ emoji completely removed');
+  assert(!html.includes("❌ Kết nối thất bại"), '❌ Kết nối thất bại emoji completely removed');
+  assert(!html.includes("❌ Đã tồn tại mã"), '❌ Đã tồn tại mã emoji completely removed');
 }
 
 // ----------------------------------------------------------------
