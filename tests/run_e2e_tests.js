@@ -760,7 +760,8 @@ assert(vh99999 && vh99999.role === 'PM', 'VH99999 has role PM');
 assert(htmlContentSuite15.includes("quickLogin('VH11111', 'test123')"), 'Quick demo login button for VH11111 exists in HTML');
 
 // 3. Verify Apps Script auth timeout increased to withstand cold starts
-assert(htmlContentSuite15.includes('setTimeout(() => controller.abort(), 12000)'), 'Apps Script login timeout increased to 12s');
+// v1.4 (mục 30): 12 giây không đủ cho máy chủ khởi động nguội (15–40 giây) → 45 giây; hành vi kiểm ở cloud_mode_regression.py Kịch bản 13
+assert(htmlContentSuite15.includes('const LOGIN_TIMEOUT_MS = 45000;') && htmlContentSuite15.includes('setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS)'), 'Apps Script login timeout increased to 45s (cold start)');
 
 // ----------------------------------------------------------------
 // SUITE 16: Receipt Image Modal & Confirmation Table Department Integrity

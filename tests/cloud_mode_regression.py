@@ -424,6 +424,32 @@ def main():
                 check(started and held_ok and gap <= 2, f'{label}: khung đỏ bước 1 khớp thanh chương trình (lệch {gap:.0f}px)')
                 check(not errs, f'{label}: không có lỗi JS ({errs})')
 
+            print('Scenario 13: máy chủ khởi động nguội — đăng nhập chờ được tới 15 giây (CURRENT_STATE mục 30)')
+            s = MockServer()
+            held = []
+            plain = s.handle
+            def slow_auth(route):
+                if route.request.method == 'POST' and json.loads(route.request.post_data or '{}').get('action') == 'auth' and not held:
+                    held.append(route)
+                    return
+                plain(route)
+            ctx, page = open_page(browser, port, None)
+            ctx.route(API + '**', slow_auth)
+            page.fill('#login-id', ME); page.fill('#login-password', 'any-password'); page.click('#login-btn')
+            page.wait_for_timeout(13500)                     # quá mốc 12 giây cũ
+            mid_err = page.evaluate("document.getElementById('login-error').classList.contains('show')")
+            mid_btn = page.inner_text('#login-btn')
+            check(not mid_err and 'khởi động' in mid_btn, f'sau 13,5 giây: chưa báo lỗi, nút báo đang chờ máy chủ ({mid_btn!r})')
+            if held:
+                try:
+                    plain(held[0])                           # máy chủ trả lời ở giây ~14
+                except Exception:
+                    pass
+            page.wait_for_timeout(4000)
+            check(page.evaluate("!!currentUser"), 'máy chủ trả lời sau 14 giây → đăng nhập thành công')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()

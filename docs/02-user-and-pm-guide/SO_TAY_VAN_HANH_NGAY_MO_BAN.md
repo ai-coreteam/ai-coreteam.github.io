@@ -3,7 +3,7 @@
 
 | | |
 |---|---|
-| Áp dụng cho | Bản **v1.3** (phát hành 05/10/2026) |
+| Áp dụng cho | Bản **v1.4** (phát hành 05/10/2026) |
 | Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | Đợt bán | Mở **10:00 ngày 14/10/2026** → kết thúc **17:00 ngày 16/10/2026** |
 | Đối chiếu | Mọi bước dưới đây đã được kiểm tra với mã nguồn ngày 05/10/2026 |
@@ -121,7 +121,8 @@
 | Bạn thấy | Nghĩa là | Làm gì | Gọi ai |
 |---|---|---|---|
 | Nhân viên báo "Đang kết nối máy chủ…" | Máy chủ Google đang chậm (hay gặp vài phút đầu) | Bảo nhân viên chờ, trang tự thử lại sau 15 giây hoặc bấm **"Thử lại ngay"**. Mạng công ty chặn → dùng 4G/5G | — |
-| Màn hình đăng nhập báo "Kết nối máy chủ Google Sheet quá thời gian chờ (12s)" | Máy chủ vừa "ngủ", lần đầu thức dậy mất 15–40 giây (lâu hơn 12 giây trang chờ) | Bấm **Đăng nhập** lại sau 10–20 giây — lần sau nhanh (đo 05/10: 6 giây). Phòng tránh: ADMIN khởi động máy chủ lúc 9:45 (Phần 2-B) | — |
+| Nút đăng nhập ghi "Máy chủ đang khởi động… vui lòng chờ (tối đa 45 giây)" | Máy chủ vừa "ngủ", lần đầu thức dậy mất 15–40 giây | **Chờ, không bấm lại.** Phòng tránh: ADMIN khởi động máy chủ lúc 9:45 (Phần 2-B) | — |
+| Báo "quá thời gian chờ (45s)" (hoặc "(12s)" nếu đang mở bản cũ) | Máy chủ quá tải / mạng chặn | Tải lại trang (Cmd/Ctrl+Shift+R) rồi đăng nhập lại sau 1–2 phút; vẫn lỗi → dùng 4G/5G, báo ADMIN | ADMIN |
 | Ô 02 ghi "Đang tải…" | Danh sách sản phẩm chưa về | Chờ 15–40 giây. **Không phải** hết hàng | — |
 | Nhân viên báo "đã có người đăng ký trước" | Người khác bấm nhanh hơn vài giây | Bình thường. Chọn máy khác | — |
 | "Phiên đăng nhập không khớp / không hợp lệ" | Phiên cũ | Đăng xuất → đăng nhập lại | — |

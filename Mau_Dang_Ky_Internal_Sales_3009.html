@@ -6581,6 +6581,7 @@
       }
     }
 
+    const LOGIN_TIMEOUT_MS = 45000; // v1.4: đủ cho máy chủ khởi động nguội (xem handleLogin)
     async function handleLogin(e) {
       if (e) e.preventDefault();
       const btn = document.getElementById('login-btn');
@@ -6630,14 +6631,17 @@
       let serverErrorMsg = '';
       if (SHEET_API_URL) {
         try {
+          // v1.4 (CURRENT_STATE mục 30): máy chủ Apps Script sau thời gian nghỉ cần 15–40 giây để khởi động
+          // (đo staging 05/10: 33–37 giây) → chờ tối đa 45 giây thay vì 12, và báo người dùng đừng bấm lại.
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 12000);
+          const timer = setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS);
+          const slowHint = setTimeout(() => { if (btn.disabled) btn.textContent = 'Máy chủ đang khởi động… vui lòng chờ (tối đa 45 giây)'; }, 10000);
           const res = await fetch(SHEET_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'auth', id: id, password: pw }),
             signal: controller.signal
-          });
+          }).finally(() => clearTimeout(slowHint));
           clearTimeout(timer);
           if (res.ok) {
             const data = await res.json();
@@ -6660,7 +6664,7 @@
           console.warn('Apps Script unreachable, falling back to local demo accounts:', netErr);
           serverError = true;
           serverErrorMsg = (netErr && netErr.name === 'AbortError')
-            ? 'Kết nối máy chủ Google Sheet quá thời gian chờ (12s). Vui lòng thử lại.'
+            ? 'Kết nối máy chủ Google Sheet quá thời gian chờ (45s). Vui lòng thử lại sau ít phút.'
             : 'Không thể kết nối đến máy chủ Google Sheet. Vui lòng kiểm tra kết nối mạng hoặc URL Web App.';
         }
       }
