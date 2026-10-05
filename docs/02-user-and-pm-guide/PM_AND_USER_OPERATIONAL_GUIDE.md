@@ -161,6 +161,8 @@ flowchart TD
 ---
 
 ### Bước 3: Đối soát thanh toán bằng Modal Phóng to Lightbox
+
+> 🔴 **Lỗi đã biết (05/10/2026, chờ duyệt sửa):** với đơn trên máy chủ, cửa sổ này **không** hiện biên lai thật mà hiện **hình minh họa "VIETCOMBANK · Giao dịch thành công qua App"**; nếu nhân viên chưa nhập mã giao dịch, hình còn ghi một mã GD **không có thật** (`FT24098912389`). **Không duyệt theo hình này.** Đối soát bằng sao kê ngân hàng và link biên lai thật ở Google Sheet tab `Registrations` cột R `Receipt` — xem [Sổ tay vận hành](SO_TAY_VAN_HANH_NGAY_MO_BAN.md) Phần 2-D.
 1. Mở tab **`1. Bảng Điều Khiển PM`**. Bảng ở chế độ máy chủ **không tự làm mới** — bấm **`Tải lại`** để thấy đơn mới.
 2. Khi có nhân viên nộp tiền, đơn hàng hiển thị tại bảng danh sách với trạng thái `"Đã khai nộp - chờ đối soát"`.
 3. **Soi kỹ chứng từ bằng Lightbox:**

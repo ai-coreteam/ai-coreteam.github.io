@@ -39,6 +39,8 @@ Mục tiêu: nhân viên bấm Gửi ở Tab 2 (đăng ký) và Tab 3 (khai nộ
 
 
 ## Thiết lập Bộ quét Tự động Giải phóng Slot 24h (Time-driven Trigger)
+
+> ⚠️ **BẮT BUỘC — cập nhật 05/10/2026.** Thiếu bước này, đơn quá 24 giờ chưa nộp tiền sẽ **không** tự trả máy về kho. Ngày 05/10 dự án chính thức đã chạy với 0 trigger cho tới khi được phát hiện. Danh sách đầy đủ mọi bước cài đặt một lần: [Runbook mục 3b](../04-v1-hardening/V1_RELEASE_RUNBOOK.md). **Kiểm tra:** biểu tượng đồng hồ (Triggers) phải có đúng 1 dòng `runExpirationWatchdog`.
 Để hệ thống tự động kiểm tra và giải phóng các slot giữ chỗ quá hạn 24 giờ cũng như gửi email cảnh báo trước 2 giờ:
 
 - **Cách 1 (1-Click Tự Động Khuyến Nghị):**

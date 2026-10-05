@@ -43,6 +43,7 @@ docs/
 
 | Tài liệu | Tính chất | Mô tả chi tiết | Đối tượng |
 |---|---|---|---|
+| **[`SO_TAY_VAN_HANH_NGAY_MO_BAN.md`](02-user-and-pm-guide/SO_TAY_VAN_HANH_NGAY_MO_BAN.md)** | 🟢 | **[ĐỌC TRƯỚC NGÀY MỞ BÁN]** Checklist ADMIN / PM theo mốc giờ (trước 14/10 → kết sổ 16/10), ô đánh dấu, bảng xử lý sự cố cho người không chuyên. |
 | **[`PM_AND_USER_OPERATIONAL_GUIDE.md`](02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md)** | 🟢 | **[CẨM NANG TOÀN DIỆN]** Sơ đồ chu trình bán hàng trực quan (Mermaid), hướng dẫn từng bước cho **Nhân viên** (xem catalog, đặt suất, chuyển khoản, khai báo chứng từ) và cho **Quản trị viên PM** (tạo đợt bán, nạp Excel mẫu, hẹn giờ tự động, mở cổng, soi ảnh Lightbox, duyệt hàng loạt, kết sổ). **Phần C** = những gì khác đi trong bản v1 (gồm ADMIN). | Tất cả nhân viên, PM, ADMIN |
 | **[`HUONG_DAN_KIEM_THU_THUC_TE_3_VAI_TRO_E2E.md`](02-user-and-pm-guide/HUONG_DAN_KIEM_THU_THUC_TE_3_VAI_TRO_E2E.md)** | 🟢 | Hướng dẫn tự kiểm thử toàn trình 3 vai trò (Admin → PM → Nhân viên) với file mẫu 10 model. | Người kiểm thử, PM, Admin |
 | **[`ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md`](02-user-and-pm-guide/ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md)** | 🔵 | **[KẾ HOẠCH LUỒNG HƯỚNG DẪN SPOTLIGHT TOUR]** Đặc tả chi tiết 2 luồng hướng dẫn tự động phân quyền (Nhân viên 4 bước, PM 5 bước), kiến trúc Spotlight không mờ nét quang học, hợp đồng dữ liệu localStorage và quy trình tích hợp an toàn. | Lãnh đạo duyệt, PM, Devs |

@@ -97,6 +97,7 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 3 | Dán `Code.gs` mới vào **dự án Apps Script đang chạy** | Thay toàn bộ → Lưu | Không báo lỗi cú pháp |
 | 4 | Chạy **`rotateSessionSecret`** 1 lần | Chọn hàm → Run | Execution log: "Đã thay khóa ký phiên đăng nhập" |
 | 5 | Deploy **phiên bản mới trên deployment cũ** | Manage deployments → ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
+| 5b | **Cài đồng hồ quét quá hạn 24h** (bắt buộc, chỉ làm 1 lần cho mỗi dự án Apps Script) | Chọn hàm **`setupWatchdogTrigger`** → **Run** | Biểu tượng đồng hồ (Triggers): **đúng 1 dòng** `runExpirationWatchdog`, Time-based. Sau ~1 giờ: Last run có giờ, Error rate 0% |
 | 6 | Kiểm tra tab `Config` | Không có `ALLOW_DEMO_TOKENS` (hoặc = `false`) · `ENABLE_AUTO_EMAIL` theo quyết định (mục 4) | — |
 | 7 | Sinh bản cho nhân viên | `python3 scripts/build_production.py --api-url <URL /exec chính thức>` → tạo `portal.html` | Script in "Đã tách 8 khóa bộ nhớ trình duyệt khỏi bản demo" và "Kiểm tra: không còn mật khẩu demo…" |
 | 8 | Đưa `portal.html` lên GitHub Pages (**chỉ sau khi bước 0 xong — không còn tài khoản `test123`**) | Commit `portal.html` → push (sau khi chủ dự án duyệt) | Link: `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
@@ -112,6 +113,7 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 1 | ✅ Bản sao "Copy of LG Internal Sales Database - 2026-10-04 (Appscript v6)" | Ảnh |
 | 2 | ✅ Version cũ: **6** (đường lùi: Edit → chọn Version 6 → Deploy) | Tên bản sao |
 | 3–5 | ✅ `rotateSessionSecret` 14:37:04; **Version 7** deploy 14:37, URL `/exec` không đổi | Ảnh Execution log + Manage deployments |
+| 5b | ✅ **Làm bù 05/10/2026 15:46** — trước đó dự án chính thức có **0 trigger** (bước này thiếu trong Runbook bản đầu; xem mục 3b). Đã có 1 trigger `runExpirationWatchdog` | Ảnh Triggers + Execution log |
 | 6 | ✅ Không có `ALLOW_DEMO_TOKENS` · `ENABLE_AUTO_EMAIL = FALSE` (chủ dự án tắt 05/10; máy chủ xác nhận TẮT) | Ảnh tab `Config` + kiểm tra máy chủ |
 | Dữ liệu test | ✅ 4 chương trình test → `CLOSED`; nhân viên thấy 0 chương trình | Kiểm tra máy chủ |
 | Kiểm tra máy chủ chính thức (Claude, chỉ đọc) | ✅ **10/10**: 4/4 token giả bị từ chối (chứng minh Version 7 = code v1) · `VH12345/test123` bị từ chối · ADMIN đọc công tắc email (BẬT, còn 94 email) · PM bị chặn · PM không chọn chương trình chỉ thấy chương trình của mình | Không tạo đơn, không gửi email; mỗi lượt đăng nhập ghi 1 dòng `AUTH_LOGIN` vào ActivityLog |
@@ -121,6 +123,28 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 11 | ⏳ Làm vào **sáng 14/10**, 10 phút trước 10:00 | — |
 
 Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet tự đổi chuỗi `0991000012525` thành số khi `setupNewDatabase()` ghi). Code **không đọc** các ô `BANK_*`; nhân viên thấy số **đầy đủ `0991000012525`** ở ô 01, cửa sổ nộp tiền, mã VietQR (`970436-0991000012525`) và email — đã kiểm chứng trên `portal.html` 05/10. Muốn ô trong Sheet cũng đúng: gõ lại `'0991000012525` (có dấu nháy đơn ở đầu).
+
+### 3b. Danh mục cài đặt một lần (đối chiếu toàn bộ `Code.gs` ngày 05/10/2026)
+
+> **Vì sao có mục này:** ngày 05/10, bước cài trigger quét quá hạn chỉ có trong [`SETUP_APPS_SCRIPT.md`](../01-setup-and-deployment/SETUP_APPS_SCRIPT.md) (hướng dẫn cài mới), **không** có trong trình tự mục 3 → dự án chính thức chạy với 0 trigger cho tới khi chủ dự án kiểm tra. Bảng dưới liệt kê **mọi** thứ code cần mà không tự làm, để mỗi lần dựng / chuyển dự án Apps Script đều đối chiếu đủ.
+
+| # | Hạng mục | Bắt buộc? | Cách làm | Cách kiểm tra | Bản chính thức 05/10 |
+|---|---|---|---|---|---|
+| 1 | Deployment Web app: Execute as **Me**, Who has access **Anyone** | ✅ | Deploy → New deployment | Mở URL `/exec` thấy JSON `ok` | ✅ |
+| 2 | Sheet dữ liệu: `SPREADSHEET_ID` dòng 21 `Code.gs` **hoặc** Script Property `SPREADSHEET_ID` | ✅ | Sửa dòng 21 / Project Settings → Script Properties | Đăng nhập được | ✅ |
+| 3 | Khóa ký phiên: `rotateSessionSecret` | ✅ | Run 1 lần | Log "Đã thay khóa ký phiên đăng nhập" | ✅ 14:37 |
+| 4 | **Trigger quét quá hạn: `setupWatchdogTrigger`** | ✅ | Run 1 lần (tự xóa trigger trùng) | Triggers: 1 dòng `runExpirationWatchdog`; Last run có giờ | ✅ 15:46 (làm bù) |
+| 5 | Cấp quyền Google (Sheet, Drive, Gmail) cho tài khoản chạy script | ✅ | Tự hỏi ở lần Run đầu tiên → Allow | Không còn hộp "Authorization required" | ✅ |
+| 6 | Tab `Config`: không có `ALLOW_DEMO_TOKENS` (hoặc `false`); `ENABLE_AUTO_EMAIL` theo quyết định | ✅ | Sửa Sheet | ADMIN đọc công tắc email trên web | ✅ (email TẮT) |
+| 7 | Tab `Users`: ≥ 1 ADMIN, mật khẩu riêng; nhân viên thật | ✅ | Sửa Sheet | Đăng nhập thử | ⚠️ còn mật khẩu yếu |
+| 8 | Thư mục biên lai Drive "Bien lai nop tien" | Tự động | Tạo ở lần nộp tiền đầu tiên, cạnh file Sheet; ID lưu vào Script Property `RECEIPT_FOLDER_ID` | Thư mục xuất hiện sau đơn nộp tiền đầu tiên | — chưa có đơn thật |
+| 9 | Quyền **xem** thư mục biên lai cho người đối soát (PM / Kế toán) | Khi cần | Drive → thư mục "Bien lai nop tien" → Share → Viewer | Người đối soát mở được link cột R `Receipt` | Chưa làm — cần sau đơn nộp tiền đầu tiên |
+| 10 | `setupNewDatabase` | ❌ chỉ khi tạo Sheet **mới** | — | Tự từ chối chạy trên Sheet đã có dữ liệu | Không dùng |
+| 11 | `clearCache`, `testSetup` | ❌ tiện ích | Chạy khi kỹ thuật cần | — | Không dùng |
+
+⚠️ Trigger chạy bản code **đang lưu trong trình soạn thảo** (cột Deployment = `Head`), không phải Version đã deploy. Sau khi deploy: **không** để code đang sửa dở trong trình soạn thảo của dự án chính thức.
+
+Staging **không cần** trigger (tránh tự hủy đơn test).
 
 **Bản demo** (`Mau_Dang_Ky_Internal_Sales_3009.html`, `index.html`) giữ nguyên để đào tạo. Việc đổi `index.html` trỏ sang `portal.html` là **quyết định của chủ dự án**, chưa thực hiện.
 

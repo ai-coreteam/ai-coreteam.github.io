@@ -138,6 +138,10 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | 21 | ✅ **Đã sửa 05/10**: ô 02 ghi "Đang tải…" khi danh mục chưa về, "Chưa có sản phẩm" khi chương trình trống, **"Chưa có đợt bán"** khi không có chương trình nào; "Hết hàng" chỉ khi đã tải và hết thật. Test Kịch bản 9–10 | — |
 | 22 | ✅ 05/10: chủ dự án đã đóng (`CLOSED`) cả 4 chương trình test trong Sheet chính; nhân viên hiện thấy 0 chương trình (kiểm chứng trên máy chủ) | — |
 | 23 | Khi **không có chương trình nào mở**: ô 03 trống, bước 1 của Tour chỉ vào thanh chương trình rỗng (thấy trên link thật 05/10; có từ trước, chỉ là hiển thị) | v1.2 — chờ duyệt |
+| 24 | 🔴 **Cửa sổ "Chứng từ thanh toán" của PM hiện biên lai GIẢ**: đơn trên máy chủ lưu biên lai dạng link Drive (trường `receipt`), nhưng cửa sổ chỉ hiện ảnh khi `receiptUrl` là `data:image` → còn lại vẽ hình "Giao dịch thành công qua App" và chèn mã GD bịa `FT24098912389` khi thiếu mã; nút Duyệt vẫn bấm được. Đã tái hiện bằng trình duyệt thật 05/10. Rủi ro Jeong-Do: duyệt tiền theo hình do hệ thống tự vẽ. **Tạm thời:** đối soát bằng sao kê + cột R `Receipt` (Sổ tay vận hành). **Đề xuất sửa:** bỏ hình minh họa; hiện ảnh/link biên lai thật hoặc "Chưa có biên lai" | **Chờ duyệt — trước khi có đơn nộp tiền** |
+| 25 | 🟠 Máy chủ **không** chặn theo giờ bắt đầu: "Kích Hoạt Mở Bán" tạo chương trình `Open` ngay → nhân viên giữ chỗ được trước giờ G. **Tạm thời:** đặt `Draft` ngay sau khi tạo, 10:00 bấm "Mở bán ngay" (Sổ tay vận hành A, C). Đề xuất v1.2: tạo ở trạng thái Draft hoặc máy chủ kiểm tra giờ bắt đầu | Chủ dự án |
+| 26 | 🟡 Nút "Mở lại chương trình" hiện với chương trình đã kết sổ, nhưng máy chủ chỉ cho Draft → Open → Closed nên bấm sẽ báo lỗi | v1.2 — ẩn nút hoặc đổi quy tắc |
+| 27 | ✅ Trigger quét quá hạn 24h: dự án chính thức có **0 trigger** tới 05/10 15:46 (Runbook §3 thiếu bước). Chủ dự án đã chạy `setupWatchdogTrigger`; Runbook thêm bước 5b + mục 3b "Danh mục cài đặt một lần" | Theo dõi Last run / Error rate |
 
 ## 10. Kiểm thử
 
@@ -154,6 +158,7 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | Thư mục | Tính chất | Đọc khi |
 |---|---|---|
 | [`04-v1-hardening/`](04-v1-hardening/README.md) | **Hiện hành** — thay đổi v1, Runbook triển khai & khôi phục, nhật ký thay đổi | Triển khai, xử lý sự cố, cần biết thay đổi gì |
+| [`02-user-and-pm-guide/SO_TAY_VAN_HANH_NGAY_MO_BAN.md`](02-user-and-pm-guide/SO_TAY_VAN_HANH_NGAY_MO_BAN.md) | **Hiện hành** — checklist ngày mở bán cho ADMIN / PM + bảng xử lý sự cố | Trước và trong đợt bán |
 | [`02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) | **Hiện hành** — hướng dẫn sử dụng (Phần C = bản v1) | Đào tạo nhân viên, PM, ADMIN |
 | [`01-setup-and-deployment/`](01-setup-and-deployment/) | **Hiện hành** (đã cập nhật 05/10) | Cài đặt, Git, cấu trúc Sheet |
 | `02-…/PROPOSAL_*`, `ONBOARDING_TOUR_…` | Đề xuất **đã triển khai** | Hiểu lý do thiết kế Tour và Tab 2 |
