@@ -472,6 +472,44 @@ def main():
                     check(not on, f'{label} → giao diện v1.4 (không có class ui-v2)')
                 ctx.close()
 
+            print('Scenario 15: link xem tính năng model (v2) — LG.com nếu có, Google nếu không; không ảnh hưởng đăng ký')
+            def links_view(q, view='cards'):
+                s = MockServer()
+                s.products = [product(1, '55QNED80ASA.ATV', 'Available'), product(2, 'DVH09B', 'Available')]
+                ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
+                ctx.add_init_script("localStorage.setItem('lg_tour_completed_employee','true');" + f"localStorage.setItem('LGE_PORTAL_API_URL', '{API}');")
+                ctx.route(API + '**', s.handle)
+                page = ctx.new_page(); page.errors = []; page.on('pageerror', lambda e: page.errors.append(str(e)[:200]))
+                page.goto(f'http://127.0.0.1:{port}/{PAGE}{q}')
+                login(page, ME)
+                page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1500)
+                if view == 'table':
+                    page.evaluate("setUnifiedViewMode('table')"); page.wait_for_timeout(600)
+                links = page.evaluate('''() => [...document.querySelectorAll('.lg-card-info-link')].filter(a => a.getBoundingClientRect().width)
+                                           .map(a => ({m: a.dataset.model, href: a.href, t: a.textContent.trim(), blank: a.target === '_blank', rel: a.rel}))''')
+                note = page.evaluate("!!document.querySelector('.lg-ext-note')")
+                return ctx, page, s, links, note
+            ctx, page, s, links, note = links_view('?ui=v2')
+            by = {l['m']: l for l in links}
+            q = by.get('55QNED80ASA.ATV', {}); d = by.get('DVH09B', {})
+            check(q.get('href') == 'https://www.lg.com/vn/tv-va-loa-thanh/qned/55qned80asa/' and q.get('t') == 'Xem trên LG.com ↗',
+                  f"model có trên LG.com (bỏ hậu tố .ATV) → trang sản phẩm chính thức ({q.get('href')})")
+            check(d.get('href', '').startswith('https://www.google.com/search?q=LG%20DVH09B') and d.get('t') == 'Tìm thông tin model ↗',
+                  f"model không có trên LG.com → tìm Google ({d.get('href')})")
+            check(all(l['blank'] and 'noopener' in l['rel'] for l in links) and len(links) == 2, 'link mở tab mới, rel=noopener')
+            check(note, 'có dòng lưu ý: giá/quà tặng LG.com không áp dụng cho bán nội bộ')
+            page.evaluate("document.querySelectorAll('.lg-card-info-link').forEach(a => a.addEventListener('click', e => e.preventDefault()))")
+            page.click('.lg-card-info-link >> nth=0'); page.wait_for_timeout(800)
+            check(not any(c[0] == 'register_product' for c in s.calls), 'bấm link KHÔNG gửi đăng ký giữ chỗ')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            ctx, page, s, links, note = links_view('?ui=v2', 'table')
+            check(len(links) == 2, f'dạng Bảng cũng có link ({len(links)})')
+            ctx.close()
+            ctx, page, s, links, note = links_view('')
+            check(not links and not note, 'tắt v2 → không có link / lưu ý (giữ nguyên v1.4)')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()

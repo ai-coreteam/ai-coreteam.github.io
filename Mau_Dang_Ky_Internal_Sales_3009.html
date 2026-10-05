@@ -3142,6 +3142,13 @@
     html.ui-v2[data-theme="dark"] .grap-card-light .grap-card-num { color: #4A4946 !important; }
     html.ui-v2[data-theme="dark"] .sec-card [style*="var(--lg-heritage)"],
     html.ui-v2[data-theme="dark"] .pm-dash-title p { color: #F6F3EB !important; }
+
+    /* Link xem tính năng model (v2) */
+    html.ui-v2 .lg-card-info-link { display: inline-flex; margin-top: 8px; font-size: 14px; line-height: 20px; font-weight: 600; color: #262626; text-decoration: underline; text-underline-offset: 3px; }
+    html.ui-v2 .lg-card-info-link:hover { color: #A50034; }
+    html.ui-v2 .lg-ext-note { font-size: 14px; line-height: 20px; color: #4A4946; margin: -6px 0 16px; }
+    html.ui-v2[data-theme="dark"] .lg-card-info-link { color: #F6F3EB; }
+    html.ui-v2[data-theme="dark"] .lg-ext-note { color: #CBC8C2; }
     html.ui-v2[data-theme="dark"] .tab-content .grap-section-header p { color: #CBC8C2 !important; }
     html.ui-v2[data-theme="dark"] [style*="color:var(--lg-ok)"],
     html.ui-v2[data-theme="dark"] .sec-card strong[style*="var(--lg-red"],
@@ -8835,7 +8842,43 @@
       return new Intl.NumberFormat('vi-VN').format(n) + ' đ';
     }
 
+    // v2 (design/UI_V2_DIRECTION_PROPOSAL.md §12, chủ dự án duyệt 06/10/2026): link xem tính năng model.
+    // Trang chính thức lg.com/vn nếu model có trong assets/content/lgcom_product_links.json (tạo từ sitemap LG.com
+    // bằng scripts/build_product_links.py); không có → tìm Google. Chỉ hiển thị khi bật giao diện v2; không đụng đăng ký / dữ liệu.
+    let lgcomProductLinks = null;
+    let lgcomProductLinksRequested = false;
+    function uiV2On() { return document.documentElement.classList.contains('ui-v2'); }
+    function baseModelCode(model) { return String(model || '').trim().split('.')[0]; }   // 55QNED80ASA.ATV → 55QNED80ASA
+    function productInfoHref(model) {
+      const base = baseModelCode(model);
+      const path = lgcomProductLinks && lgcomProductLinks[base.toLowerCase()];
+      if (path && /^\/vn\/[a-z0-9\/-]+\/$/.test(path)) return { href: 'https://www.lg.com' + path, label: 'Xem trên LG.com' };
+      return { href: 'https://www.google.com/search?q=' + encodeURIComponent('LG ' + base), label: 'Tìm thông tin model' };
+    }
+    function productInfoLink(model) {
+      if (!uiV2On() || !baseModelCode(model)) return '';
+      const l = productInfoHref(model);
+      return `<a class="lg-card-info-link" data-model="${esc(model)}" href="${esc(l.href)}" target="_blank" rel="noopener noreferrer">${l.label} ↗</a>`;
+    }
+    function loadLgcomProductLinks() {
+      if (lgcomProductLinksRequested || !uiV2On()) return;
+      lgcomProductLinksRequested = true;
+      fetch('assets/content/lgcom_product_links.json')
+        .then(r => (r.ok ? r.json() : null))
+        .then(map => {
+          if (!map || !map.links) return;
+          lgcomProductLinks = map.links;
+          document.querySelectorAll('.lg-card-info-link').forEach(a => {
+            const l = productInfoHref(a.dataset.model);
+            a.href = l.href;
+            a.textContent = l.label + ' ↗';
+          });
+        })
+        .catch(() => {});   // không tải được → giữ link tìm Google, không báo lỗi
+    }
+
     function renderProductTable(products) {
+      loadLgcomProductLinks();
       // Find or create product container
       let container = document.getElementById('product-container');
       if (!container) {
@@ -8930,6 +8973,10 @@
       </div>
       `;
 
+      if (uiV2On()) {
+        html += `<p class="lg-ext-note">Link “Xem trên LG.com” chỉ để tham khảo tính năng. Giá, quà tặng và khuyến mãi trên LG.com không áp dụng cho đợt bán nội bộ.</p>`;
+      }
+
       if (filtered.length === 0) {
         html += `
           <div style="padding:36px 20px; text-align:center; background:#FFF; border:1px solid #E6E1D6; border-radius:12px; color:#716F6A; margin:16px 0;">
@@ -8993,6 +9040,7 @@
                 <div class="lg-card-meta">Kho ${esc(p.kho)} · Slot: <strong>${esc(p.uniqueCode)}</strong></div>
                 <div class="lg-card-model">${esc(p.model)}</div>
                 <div class="lg-card-desc">${esc(p.description)}</div>
+                ${productInfoLink(p.model)}
               </div>
               <div>
                 <div class="lg-price-box">
@@ -9027,7 +9075,7 @@
             html += `<tr class="${p.status !== 'Available' ? 'row-taken' : ''}">`;
             html += `<td class="code-cell">${esc(p.uniqueCode)}</td>`;
             html += `<td>${esc(p.category)}</td>`;
-            html += `<td><strong>${esc(p.model)}</strong></td>`;
+            html += `<td><strong>${esc(p.model)}</strong>${productInfoLink(p.model) ? '<br>' + productInfoLink(p.model) : ''}</td>`;
             html += `<td>${esc(p.description)}</td>`;
             html += `<td class="price-cell">${formatVND(p.rrp)}</td>`;
             html += `<td class="price-cell price-internal">${formatVND(p.internalPrice)}</td>`;
