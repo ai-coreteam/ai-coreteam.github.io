@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Internal Sales UI v2 direction</title>
+<link rel="stylesheet" href="SKILL/templates/lg-tokens.css">
+<style>
+/* ===== Proposed v2 tokens (all values from lg-brand web-system.md / color.md) ===== */
+:root{
+  --bg:#F6F3EB;          /* Light Gray 1 / Warm Gray 07 - page canvas */
+  --track:#F0ECE4;       /* Light Gray 2 - segmented track, wells */
+  --line:#E6E1D6;        /* Light Gray 3 - hairlines */
+  --line-2:#CBC8C2;      /* Mid Gray 1 - input borders (never text) */
+  --ink:#262626;         /* Dark Gray 2 - titles/body on light */
+  --body:#4A4946;        /* Mid Gray 3 - secondary text */
+  --mute:#716F6A;        /* Warm Gray 03 - captions on white/canvas only */
+  --focus:#1A1A1A;       /* Dark Gray 3 - Focus card */
+  --red:#EA1917;         /* Active Red (LG.com) - primary CTA, promo flag on white */
+  --heritage:#A50034;    /* Heritage Red - promo flag on warm grey, error on grey */
+  --ok:#287D00;          /* validation on white */
+  --r-sm:8px; --r-md:16px; --r-lg:24px; --r-pill:999px;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{font-family:"LG EI Text",sans-serif;font-weight:400;color:var(--ink);font-size:16px;line-height:24px}
+button,input{font:inherit;color:inherit}
+h1,h2,h3,.num{font-family:"LG EI Headline",sans-serif;font-weight:600}
+.wrap{max-width:1392px;margin:0 auto;padding:0 24px}
+section{padding:48px 0 0}
+
+/* Header: no white box, sits on the canvas */
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:16px}
+.brand img{height:40px;display:block}
+.brand .sep{width:1px;height:28px;background:var(--line-2)}
+.brand b{font-family:"LG EI Headline";font-weight:600;font-size:20px;line-height:24px}
+.brand small{display:block;font-size:14px;line-height:16px;color:var(--mute)}
+.actions{display:flex;align-items:center;gap:8px}
+.user{display:flex;align-items:center;gap:10px;padding:0 6px 0 16px;height:44px;border-radius:var(--r-pill);background:#fff;box-shadow:var(--shadow)}
+.user .n{font-weight:600}
+.tag{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:var(--r-pill);font-size:14px;line-height:14px;background:var(--track);color:var(--body)}
+.tag.live{background:#fff;color:var(--ok);border:1px solid var(--line)}
+.tag.live:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:44px;min-width:100px;padding:0 20px;border-radius:var(--r-pill);font-size:16px;line-height:16px;font-weight:600;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.btn.sm{height:36px;min-width:80px;padding:0 14px;font-size:14px;line-height:14px}
+.btn.red{background:var(--red);color:#fff}
+.btn.out{background:transparent;border-color:#000;color:#000}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.off{background:var(--line);color:var(--body);cursor:not-allowed}
+.btn.dark{background:#fff;color:#000}
+
+/* Segmented control (pattern from LG design-system reference: track + white active pill) */
+.seg{display:inline-flex;gap:4px;padding:6px;border-radius:var(--r-pill);background:var(--track)}
+.seg button{height:44px;padding:0 24px;border:0;border-radius:var(--r-pill);background:transparent;font-size:16px;line-height:16px;color:var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.seg button.on{background:#fff;color:#000;box-shadow:var(--shadow)}
+.seg .count{font-size:14px;color:var(--body)} /* not Warm Gray 03: 4.26:1 on the track */
+.seg button.on .count{color:var(--heritage)}
+
+/* Titles on canvas */
+.eyebrow{font-size:14px;line-height:16px;color:var(--body);letter-spacing:.02em;text-transform:uppercase}
+.title{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:8px}
+h1{font-size:40px;line-height:48px}
+.sub{margin-top:8px;color:var(--body)}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:20px}
+.card{background:#fff;border-radius:var(--r-lg);padding:28px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:300px}
+.card h3{font-size:20px;line-height:24px}
+.card .k{font-size:14px;line-height:20px;color:var(--mute)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.acct{font-family:"LG EI Headline";font-weight:600;font-size:24px;line-height:28px;letter-spacing:.02em}
+.big{font-family:"LG EI Headline";font-weight:300;font-size:64px;line-height:64px}
+.big small{font-size:24px;color:var(--mute);font-weight:400}
+.bar{height:6px;border-radius:3px;background:var(--track);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--heritage)}
+.bar.ok i{background:var(--ok)}
+.foot{margin-top:auto;padding-top:20px;display:flex;justify-content:space-between;align-items:center}
+.link{color:#000;font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+
+/* Focus card - pattern from LG design-system reference "Focus Mode" (dark info card) */
+.focus{background:var(--focus);color:#F6F3EB}
+.focus .k{color:#CBC8C2}                     /* 9.1:1+ on dark - NOT Warm Gray 03 */
+.focus .big{color:#fff}
+.focus .row{border-color:rgba(255,255,255,.12)}
+.tag.dark{background:rgba(255,255,255,.1);color:#E6E1D6}
+
+/* Catalog */
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:20px}
+.search{height:44px;width:360px;border:1px solid var(--line-2);border-radius:var(--r-pill);background:#fff;padding:0 20px;color:var(--mute)}
+.wh{display:flex;align-items:center;gap:12px;margin:32px 0 16px}
+.wh h3{font-size:20px;line-height:24px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.prod{background:#fff;border-radius:var(--r-md);padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.well{background:var(--track);border-radius:12px;height:180px;display:flex;align-items:center;justify-content:center;position:relative}
+.well img{width:88px;height:88px}
+.flag{position:absolute;top:12px;left:12px;height:24px;padding:0 10px;border-radius:var(--r-pill);background:#000;color:#fff;font-size:14px;line-height:24px}
+.meta{margin-top:16px;font-size:14px;line-height:20px;color:var(--mute)}
+.model{font-family:"LG EI Headline";font-weight:600;font-size:20px;line-height:24px;margin-top:4px}
+.desc{font-size:14px;line-height:20px;color:var(--body);margin-top:4px;min-height:40px}
+.price{margin-top:16px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price .now{font-family:"LG EI Text";font-weight:600;font-size:28px;line-height:28px}
+.price s{font-size:16px;line-height:20px;color:var(--mute)}
+.price .pct{font-size:14px;font-weight:600;color:var(--red)}
+.prod .btn{margin-top:20px;width:100%}
+
+/* PM strip */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:20px}
+.kpi{background:#fff;border-radius:var(--r-md);padding:20px 24px;box-shadow:var(--shadow)}
+.kpi .num{font-weight:300;font-size:48px;line-height:56px;margin-top:8px}
+.kpi .k{font-size:14px;line-height:20px;color:var(--mute)}
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:20px;background:#fff;border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow)}
+th{font-size:14px;line-height:20px;font-weight:600;color:var(--body);text-align:left;padding:14px 16px;background:var(--track)}
+td{font-size:14px;line-height:20px;padding:16px;border-top:1px solid var(--line);vertical-align:middle}
+td b{font-weight:600}
+.st{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-pill);font-size:14px}
+.st.wait{background:#FEF4DE;color:#262626}
+.st.ok{background:#EAF3E5;color:#316D15}
+.label{display:inline-block;margin:56px 0 0;font-size:14px;color:var(--mute)}
+/* Mobile (LG.com S: 360+, 16 px margin) */
+@media (max-width:767px){
+  .wrap{padding:0 16px}
+  section{padding-top:24px}
+  .top{flex-wrap:wrap;gap:12px}
+  .actions{flex-wrap:wrap}
+  .actions .btn.ghost{display:none}               /* moved into a menu on mobile */
+  .user{width:100%;justify-content:space-between}
+  .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}
+  .seg button{flex:0 0 auto;padding:0 18px}
+  h1{font-size:28px;line-height:32px}
+  .title{flex-direction:column;align-items:flex-start}
+  .cards,.grid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search{width:100%}
+  .big{font-size:48px;line-height:52px}
+  table{display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="top">
+    <div class="brand">
+      <img src="SKILL/assets/logo/LGE_Logo_HeritageRed_Grey_RGB.png" alt="LG">
+      <span class="sep"></span>
+      <div><b>Internal Sales Portal</b><small>Đăng ký mua hàng nội bộ · LGEVH</small></div>
+    </div>
+    <div class="actions">
+      <span class="tag live">Google Cloud Live</span>
+      <button class="btn ghost sm">Hướng dẫn nhanh</button>
+      <button class="btn ghost sm">In / PDF</button>
+      <button class="btn ghost sm">Đêm / Sáng</button>
+      <div class="user"><span class="n">Trần Văn Nam</span><span class="tag">Nhân viên</span><button class="btn out sm">Đổi MK</button><button class="btn out sm">Đăng xuất</button></div>
+    </div>
+  </header>
+
+  <!-- PROGRAM SWITCH -->
+  <section style="padding-top:32px">
+    <div class="seg">
+      <button class="on">Chương trình HA - Q3/2026</button>
+      <button>Chương trình HE (Tivi &amp; Loa) - Q3/2026</button>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section>
+    <div class="eyebrow">LG Electronics · Internal sales</div>
+    <div class="title">
+      <h1>Chương trình Bán hàng Nội bộ HA - Q3/2026</h1>
+      <span class="tag live">Đang mở bán</span>
+    </div>
+    <p class="sub">Hạn mức 1 SP / nhân viên · Ai bấm trước được trước (FCFS) · Giữ chỗ 24 giờ kể từ khi mở cổng thanh toán</p>
+
+    <div class="cards">
+      <div class="card">
+        <span class="k">01</span>
+        <h3 style="margin-top:4px">Thể lệ &amp; chuyển khoản</h3>
+        <div style="margin-top:16px">
+          <div class="row"><span class="k">Ngân hàng</span><b>VIETCOMBANK</b></div>
+          <div class="row"><span class="k">Số tài khoản</span><span class="acct">0991000012525</span></div>
+          <div class="row"><span class="k">Chủ tài khoản</span><b>CTY TNHH LG Electronics VN HP</b></div>
+          <div class="row"><span class="k">Cú pháp</span><b>[MãNV]_[MãSlot]</b></div>
+        </div>
+        <div class="foot"><button class="btn out sm">Sao chép số TK</button><span class="link">Xem thể lệ chi tiết</span></div>
+      </div>
+
+      <div class="card">
+        <span class="k">02</span>
+        <h3 style="margin-top:4px">Tiến độ kho &amp; thanh toán</h3>
+        <div style="margin-top:20px"><span class="big">4<small> / 4 SP đã đăng ký</small></span></div>
+        <div class="bar"><i style="width:100%"></i></div>
+        <div style="margin-top:20px" class="k">Thanh toán: 3 / 4 đơn · 75%</div>
+        <div class="bar ok"><i style="width:75%"></i></div>
+        <div style="margin-top:16px" class="k">Kho AYA 100% · Kho AYB 100% · Kho AYC 100%</div>
+        <div class="foot"><span class="tag">Hết hàng</span><span class="link">Xem báo cáo kho</span></div>
+      </div>
+
+      <div class="card focus">
+        <span class="k">03</span>
+        <h3 style="margin-top:4px;color:#fff">Đơn hàng của bạn</h3>
+        <div style="margin-top:20px" class="k">V10APFUV · HA-004 · Kho AYC</div>
+        <div class="big" style="margin-top:8px">7.800.000<small style="color:#CBC8C2"> đ</small></div>
+        <div style="margin-top:8px" class="k">Đăng ký 12/09/2026 09:14</div>
+        <div class="foot"><span class="tag dark">Đã khai nộp · chờ đối soát</span><button class="btn dark sm">Tra cứu chi tiết</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN TABS -->
+  <section>
+    <div class="seg">
+      <button>Thư thông báo &amp; quy định</button>
+      <button class="on">Danh mục &amp; đăng ký <span class="count">4</span></button>
+      <button>Xác nhận &amp; nộp tiền <span class="count">0</span></button>
+      <button>Bảng chi tiết sản phẩm</button>
+    </div>
+  </section>
+
+  <!-- CATALOG -->
+  <section style="padding-top:40px">
+    <div class="title"><h1 style="font-size:32px;line-height:40px">Danh mục &amp; đăng ký mua hàng</h1><span class="link">Xem thể lệ &amp; quy định</span></div>
+    <div class="toolbar">
+      <div class="seg"><button class="on">Tất cả kho <span class="count">4</span></button><button>Kho AYA <span class="count">2</span></button><button>Kho AYB <span class="count">1</span></button><button>Kho AYC <span class="count">1</span></button></div>
+      <input class="search" value="Tìm model, loại sản phẩm…">
+    </div>
+    <div class="grid" style="margin-top:24px">
+      <div class="prod">
+        <div class="well"><span class="flag">Ưu đãi nội bộ</span><img src="REPO/assets/images/quick-links-ani/cat_instaview_refrigerator.svg" alt=""></div>
+        <div class="meta">Kho AYA · Slot HA-001</div>
+        <div class="model">GR-X257BG</div>
+        <div class="desc">Tủ lạnh InstaView Door-in-Door 635L</div>
+        <div class="price"><span class="now">24.900.000 đ</span><s>42.990.000 đ</s><span class="pct">-42%</span></div>
+        <button class="btn red">Đăng ký giữ chỗ</button>
+      </div>
+      <div class="prod">
+        <div class="well"><span class="flag">Ưu đãi nội bộ</span><img src="REPO/assets/images/quick-links-ani/cat_washtower.svg" alt=""></div>
+        <div class="meta">Kho AYA · Slot HA-002</div>
+        <div class="model">WT1410NHEG</div>
+        <div class="desc">Tháp giặt sấy WashTower 14kg giặt / 10kg sấy</div>
+        <div class="price"><span class="now">32.500.000 đ</span><s>54.990.000 đ</s><span class="pct">-41%</span></div>
+        <button class="btn off">Đã có người giữ chỗ</button>
+      </div>
+      <div class="prod">
+        <div class="well"><span class="flag">Ưu đãi nội bộ</span><img src="REPO/assets/images/quick-links-ani/cat_washtower.svg" alt=""></div>
+        <div class="meta">Kho AYB · Slot HA-003</div>
+        <div class="model">DVH09B</div>
+        <div class="desc">Máy sấy HeatPump DUAL Inverter 9kg</div>
+        <div class="price"><span class="now">12.900.000 đ</span><s>21.990.000 đ</s><span class="pct">-41%</span></div>
+        <button class="btn off">Đã có người giữ chỗ</button>
+      </div>
+      <div class="prod">
+        <div class="well"><span class="flag">Ưu đãi nội bộ</span><img src="REPO/assets/images/quick-links-ani/cat_air_conditioner.svg" alt=""></div>
+        <div class="meta">Kho AYC · Slot HA-004</div>
+        <div class="model">V10APFUV</div>
+        <div class="desc">Điều hòa Inverter UVnano lọc khí 1HP</div>
+        <div class="price"><span class="now">7.800.000 đ</span><s>13.490.000 đ</s><span class="pct">-42%</span></div>
+        <button class="btn off">Đã có người giữ chỗ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PM STRIP -->
+  <span class="label">— Bảng Điều Khiển PM (cùng hệ thống thẻ, chữ số lớn, bảng 14 px) —</span>
+  <section style="padding-top:16px">
+    <div class="title"><h1 style="font-size:32px;line-height:40px">Bảng điều khiển quản trị</h1>
+      <div class="actions"><button class="btn red">Mở cổng thanh toán (1)</button><button class="btn out">Duyệt hàng loạt (2)</button><button class="btn out">Xuất Excel (CSV)</button><button class="btn ghost">Tải lại</button></div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">Tổng sản phẩm</div><div class="num">4</div></div>
+      <div class="kpi"><div class="k">Đã đăng ký</div><div class="num">4</div></div>
+      <div class="kpi"><div class="k">Còn khả dụng</div><div class="num">0</div></div>
+      <div class="kpi"><div class="k">Doanh thu dự kiến</div><div class="num" style="font-size:36px">78.100.000</div></div>
+      <div class="kpi"><div class="k">Đã duyệt / đối soát</div><div class="num">1 / 4</div></div>
+    </div>
+    <table>
+      <tr><th>Slot</th><th>Model</th><th>Nhân viên</th><th>Giá nội bộ</th><th>Trạng thái</th><th>Chứng từ</th><th>Thao tác</th></tr>
+      <tr><td><b>HA-004</b> · AYC</td><td><b>V10APFUV</b><br><span style="color:var(--mute)">Điều hòa Inverter 1HP</span></td><td>Trần Văn Nam<br><span style="color:var(--mute)">VH88921</span></td><td><b>7.800.000 đ</b></td><td><span class="st wait">Chờ đối soát</span></td><td><span class="link">Mở biên lai thật</span></td><td><button class="btn red sm">Duyệt</button> <button class="btn out sm">Từ chối</button></td></tr>
+      <tr><td><b>HA-003</b> · AYB</td><td><b>DVH09B</b><br><span style="color:var(--mute)">Máy sấy HeatPump 9kg</span></td><td>Lê Hoàng Anh<br><span style="color:var(--mute)">VH55432</span></td><td><b>12.900.000 đ</b></td><td><span class="st ok">Đã duyệt</span></td><td><span class="link">Mở biên lai thật</span></td><td style="color:var(--mute)">Duyệt 12/09 08:30</td></tr>
+    </table>
+  </section>
+  <div style="height:64px"></div>
+</div>
+</body>
+</html>

@@ -2,6 +2,17 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <script>
+    // UI v2 (design/UI_V2_DIRECTION_PROPOSAL.md): lớp giao diện mới, chỉ đổi CSS, bật/tắt bằng class `ui-v2` trên <html>.
+    // UI_V2_DEFAULT = false → mọi người vẫn thấy giao diện v1.4. Xem trước: thêm ?ui=v2 vào link. Tắt hẳn: ?ui=v1.
+    var UI_V2_DEFAULT = false;
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search).get('ui');
+        if (q === 'v2' || (UI_V2_DEFAULT && q !== 'v1')) document.documentElement.classList.add('ui-v2');
+      } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#A50034">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3083,6 +3094,58 @@
       color: #FFFFFF;
       box-shadow: 0 4px 14px rgba(253, 49, 46, 0.4);
     }
+
+    /* =====================================================================================
+       UI v2 — GIAI ĐOẠN 1 (05/10/2026): font & tương phản. Chỉ có hiệu lực khi <html class="ui-v2">.
+       Không đổi ID / class / bố cục mà JS hay test dùng. Giá trị màu: lg-brand color.md (bảng tương phản đo sẵn).
+       ===================================================================================== */
+    /* 1. Font: nút / ô nhập không kế thừa font trang (mặc định trình duyệt là Arial).
+          :where() = độ ưu tiên 0 → chỉ thay mặc định trình duyệt, không đè các class đã chọn font riêng. */
+    :where(html.ui-v2) :where(button, input, select, textarea, optgroup) { font-family: inherit; }
+    /* 2. Không "tô đậm giả": trang chỉ nhúng LG EI Headline 600 → yêu cầu 700 hiển thị bằng nét 600 thật. */
+    html.ui-v2 { font-synthesis: style; }
+
+    /* 3. Tương phản — nền sáng */
+    html.ui-v2:not([data-theme="dark"]) .grap-card-light { background: #FFFFFF; }                       /* ô 02: chữ Warm Gray 03 trên #F0ECE4 = 4,3:1 → trên trắng 4,9:1 */
+    html.ui-v2 #top-api-badge,
+    html.ui-v2 .role-tag.role-user,
+    html.ui-v2 .user-dept,
+    html.ui-v2 .kho-count { color: #4A4946; }                                   /* chữ phụ TRONG panel xám: Warm Gray 02 (color.md) */
+    html.ui-v2 #top-api-badge span { color: inherit; }
+    html.ui-v2 .user-bar .role-tag.role-user { color: #4A4946 !important; }       /* màu viết inline */
+    html.ui-v2 code[style*="#E6E1D6"] { color: #262626; }                         /* mã trên nền #E6E1D6 thừa hưởng Warm Gray 03 (3,9:1) */
+    html.ui-v2 .lg-rrp-value { color: #716F6A; }                                /* #8C8A84 (ngoài bảng màu, 3,1:1) → Warm Gray 03 */
+    html.ui-v2 .lg-btn-buy:disabled { background: #E6E1D6; color: #4A4946; }    /* trắng trên #CBC8C2 = 1,7:1 */
+    html.ui-v2 .pm-status-open,
+    html.ui-v2 .pm-pill-approved { color: #316D15 !important; }                 /* xanh trên nền xám: Tree Green (web-system) */
+    html.ui-v2 button[onclick="openApiConfigModal()"] { color: #262626 !important; border-color: #262626 !important; } /* xanh #2980B9 ngoài bảng màu */
+
+    /* 4. Tương phản — chế độ Đêm (#262626 / #333333). Heritage Red 1,9:1 và Warm Gray 03 3,0:1 không dùng cho chữ nhỏ trên nền tối;
+          Active Red trên tối chỉ 3,3–4,1:1 → chữ dùng Warm Gray 07/04, màu đỏ chỉ còn ở viền/điểm nhấn (lg-tokens.css .lg-dark). */
+    html.ui-v2[data-theme="dark"] .badge-ordinal { color: #F6F3EB; border-color: #EA1917; }
+    html.ui-v2[data-theme="dark"] .user-name,
+    html.ui-v2[data-theme="dark"] .cat-label,
+    html.ui-v2[data-theme="dark"] .cat-circle-item.active .cat-label { color: #F6F3EB; }
+    html.ui-v2[data-theme="dark"] .kho-card.is-empty b { color: #E6E1D6; }
+    html.ui-v2[data-theme="dark"] .sec-card [style*="#A50034"],
+    html.ui-v2[data-theme="dark"] .sec-card [style*="#EA1917"],
+    html.ui-v2[data-theme="dark"] .sec-card [style*="#287D00"],
+    html.ui-v2[data-theme="dark"] tr.is-taken [style*="#A50034"],
+    html.ui-v2[data-theme="dark"] tr [style*="#287D00"],
+    html.ui-v2[data-theme="dark"] #lookup-user-badge { color: #F6F3EB !important; }
+    html.ui-v2[data-theme="dark"] #tab-pm p[style*="#716F6A"] { color: #CBC8C2 !important; }
+    /* Lỗi có từ trước: thẻ hero Tab 1 viết cứng nền #FFFFFF, chữ thì đổi sang sáng ở chế độ Đêm → không đọc được (1,1:1) */
+    html.ui-v2[data-theme="dark"] .lg-hero-showcase { background: var(--lg-card-bg); }
+    html.ui-v2[data-theme="dark"] .hero-kicker { color: #F6F3EB; }
+    /* ô 02 ở chế độ Đêm vẫn là thẻ sáng #F0ECE4 → chữ phụ dùng Warm Gray 02 */
+    html.ui-v2[data-theme="dark"] #grap-wh-breakdown,
+    html.ui-v2[data-theme="dark"] .grap-card-light .grap-card-num { color: #4A4946 !important; }
+    html.ui-v2[data-theme="dark"] .sec-card [style*="var(--lg-heritage)"],
+    html.ui-v2[data-theme="dark"] .pm-dash-title p { color: #F6F3EB !important; }
+    html.ui-v2[data-theme="dark"] .tab-content .grap-section-header p { color: #CBC8C2 !important; }
+    html.ui-v2[data-theme="dark"] [style*="color:var(--lg-ok)"],
+    html.ui-v2[data-theme="dark"] .sec-card strong[style*="var(--lg-red"],
+    html.ui-v2[data-theme="dark"] .sec-card .req { color: #F6F3EB !important; }
   </style>
   <!-- P0: SheetJS for Client-Side Excel Import (.xlsx) -->
   <script src="data/xlsx.mini.min.js"></script>

@@ -158,7 +158,7 @@ def open_page(browser, port, server, page_name=PAGE, set_api=True, extra_init=''
     page.errors = []
     page.on('pageerror', lambda e: page.errors.append(str(e)[:200]))
     page.on('dialog', lambda dlg: dlg.accept())
-    page.goto(f'http://127.0.0.1:{port}/{page_name}')
+    page.goto(f'http://127.0.0.1:{port}/{page_name}' + os.environ.get('UI_QUERY', ''))   # UI_QUERY='?ui=v2' → chạy toàn bộ kịch bản với giao diện v2
     return ctx, page
 
 
@@ -449,6 +449,28 @@ def main():
             check(page.evaluate("!!currentUser"), 'máy chủ trả lời sau 14 giây → đăng nhập thành công')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
+
+            print('Scenario 14: UI v2 GĐ1 — công tắc, font LG EI, không tô đậm giả (design/UI_V2_DIRECTION_PROPOSAL.md)')
+            RUNS = '''() => [...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().width &&
+                        [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()))'''
+            arial = RUNS + ".filter(e => getComputedStyle(e).fontFamily.startsWith('Arial')).length"
+            faux = RUNS + ".filter(e => { const s = getComputedStyle(e); return s.fontFamily.includes('Headline') && +s.fontWeight > 600 && s.fontSynthesisWeight !== 'none'; }).length"
+            for q, label in (('', 'mặc định'), ('?ui=v2', '?ui=v2'), ('?ui=v1', '?ui=v1')):
+                ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
+                ctx.add_init_script("localStorage.setItem('lg_tour_completed_employee','true');localStorage.setItem('lg_tour_completed_pm','true');")
+                page = ctx.new_page(); page.errors = []; page.on('pageerror', lambda e: page.errors.append(str(e)[:200]))
+                page.goto(f'http://127.0.0.1:{port}/{PAGE}{q}'); page.wait_for_timeout(800)
+                on = page.evaluate("document.documentElement.classList.contains('ui-v2')")
+                if q == '?ui=v2':
+                    login(page, 'VH12345', 'test123', settle_ms=3000)
+                    page.evaluate("document.getElementById('tab-pm-btn').click()"); page.wait_for_timeout(1000)
+                    check(on, '?ui=v2 → bật lớp giao diện v2')
+                    check(page.evaluate(arial) == 0, f'v2: không còn chữ Arial ({page.evaluate(arial)})')
+                    check(page.evaluate(faux) == 0, f'v2: không tô đậm giả LG EI Headline ({page.evaluate(faux)})')
+                    check(not page.errors, f'v2: không có lỗi JS ({page.errors[:2]})')
+                else:
+                    check(not on, f'{label} → giao diện v1.4 (không có class ui-v2)')
+                ctx.close()
 
             browser.close()
     finally:
