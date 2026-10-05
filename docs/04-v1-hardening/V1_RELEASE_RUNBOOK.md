@@ -77,7 +77,10 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 4. Chạy: `python3 tests/staging_smoke_test.py --url <URL_STAGING> --program IS-2026Q4-OTHER-01 --samples 5 --admin VH22222:<mk> --pm VH99999:<mk>` → mục **2b phải ĐẠT** (ADMIN đọc được cài đặt email, PM bị chặn).
 
 **Kết quả 2b ngày 05/10/2026 (staging Version 2, có role ADMIN): ĐẠT** — ADMIN `VH22222` đọc cài đặt email (đang TẮT, còn 94 email hôm nay) và xem Dashboard chương trình của PM khác; PM `VH99999` bị chặn công tắc email; 5/5 token giả bị từ chối; phản hồi p50 ≈ 1,9 s.
-⚠️ Sau đó `Code.gs` có thêm bản sửa **V1-16** (Dashboard PM) → làm lại bước 1–2 và chạy lại lệnh ở bước 4 trước khi sang mục 3.
+**Kết quả 2b lần 2 ngày 05/10/2026 (staging Version 3, có bản sửa V1-16): ĐẠT** — lặp lại toàn bộ kiểm tra trên + **kiểm thử V1-16 trên máy chủ thật**: tạo chương trình test do ADMIN sở hữu và 1 đơn → PM `VH99999` gọi Dashboard không kèm mã chương trình **không thấy** đơn đó, ADMIN thấy. Đã hủy đơn và đóng chương trình test (chương trình có đơn không xóa được — giữ làm dấu vết). Hạn mức email trước/sau không đổi (94) → **không gửi email nào**.
+   - Chương trình test còn lại trên staging (đã đóng, mỗi cái 1 đơn đã hủy): `IS-2026Q4-V116TEST-01`, `IS-SCOPETEST-1005141336`, `IS-SCOPETEST-1005141855`.
+   - **Quan sát độ trễ:** 1 trong 5 lượt chạy (14:13) mất hơn 300 giây thay vì ~30–70 giây; 1 lệnh Dashboard của ADMIN quá 60 giây chờ → báo lỗi. Chạy lại ngay sau đó ĐẠT. Đây là độ trễ phía Google (cùng loại "khởi động nguội 33–37 s" đã đo), không phải lỗi logic — nhưng là lý do giữ bước 11 mục 3 (khởi động máy chủ trước giờ mở bán).
+5. *(Tùy chọn, có GHI vào staging)* thêm `--scope-user <MãNV_USER>:<mk>` để chạy lại kiểm thử V1-16 (mục 2c của script). Script tự dừng nếu email staging đang BẬT.
 
 ---
 
@@ -164,4 +167,4 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | `python3 tests/cloud_mode_regression.py` | Chạy **trang web thật** với máy chủ giả lập: 8 kịch bản nhân viên, PM, ADMIN, bản production, demo, dữ liệu demo còn sót trong trình duyệt | **37/37** (bản trước sửa: 3/7; build cũ: hẹn giờ demo gửi lệnh thật) |
 | `node tests/run_e2e_tests.js` | Bộ kiểm tra cũ (hồi quy) | **164/164** |
 | `python3 tests/polling_race_simulation.py` | Mô phỏng rủi ro polling | Xem đề xuất §4 |
-| `python3 tests/staging_smoke_test.py …` | Máy chủ **staging thật**: thời gian phản hồi, token giả, ADMIN, FCFS, tải | **ĐẠT** 05/10 (bảng mục 2); mục 2b ADMIN **ĐẠT** 05/10 |
+| `python3 tests/staging_smoke_test.py …` | Máy chủ **staging thật**: thời gian phản hồi, token giả, ADMIN, FCFS, tải | **ĐẠT** 05/10 (bảng mục 2); mục 2b ADMIN + 2c V1-16 **ĐẠT** 05/10 (Version 3) |

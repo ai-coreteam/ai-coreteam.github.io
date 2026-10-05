@@ -66,6 +66,8 @@ def main():
     ap.add_argument('--samples', type=int, default=20)
     ap.add_argument('--admin', default='', help='MãNV:mậtkhẩu tài khoản role ADMIN trên staging (kiểm thử công tắc email)')
     ap.add_argument('--pm', default='', help='MãNV:mậtkhẩu tài khoản role PM trên staging (phải bị chặn đổi công tắc email)')
+    ap.add_argument('--scope-user', default='', help='MãNV:mậtkhẩu 1 nhân viên test — bật kiểm thử V1-16 (cần --admin và --pm; GHI vào staging: '
+                    'tạo 1 chương trình test, 1 đơn, rồi hủy đơn và đóng chương trình)')
     ap.add_argument('--load-rps', type=float, default=0, help='yêu cầu polling / giây cho bài tải (0 = bỏ qua)')
     ap.add_argument('--load-seconds', type=int, default=30)
     a = ap.parse_args()
@@ -128,6 +130,37 @@ def main():
                 print(f"   {'PASS' if ok2 else 'FAIL'} ADMIN xem Dashboard chương trình {a.program} (của PM khác): {(dash or {}).get('message', 'OK')}")
                 if not ok2:
                     failures.append('ADMIN không vào được Dashboard')
+
+    if a.scope_user and a.admin and a.pm:
+        print('2c) V1-16: PM không chọn chương trình chỉ thấy đơn chương trình của mình (GHI vào staging)')
+        c = lambda p: call(a.url, p)[1] or {}
+        A = c({'action': 'auth', 'id': a.admin.split(':', 1)[0], 'password': a.admin.split(':', 1)[1]}).get('token')
+        P = c({'action': 'auth', 'id': a.pm.split(':', 1)[0], 'password': a.pm.split(':', 1)[1]}).get('token')
+        su, spw = a.scope_user.split(':', 1)
+        U = c({'action': 'auth', 'id': su, 'password': spw})
+        if c({'action': 'email_setting', 'token': A}).get('enabled') is not False:
+            print('   BỎ QUA: email staging đang BẬT — tắt trước để không gửi email thật')
+            failures.append('V1-16: email staging chưa tắt')
+        else:
+            pid = 'IS-SCOPETEST-' + time.strftime('%m%d%H%M%S')
+            c({'action': 'program_create', 'token': A, 'programId': pid, 'programName': 'TEST V1-16 (staging)',
+               'startDate': '2026-01-01', 'endDate': '2099-12-31', 'status': 'Open'})
+            c({'action': 'product_upload', 'token': A, 'programId': pid, 'items': [{'kho': 'AYA', 'category': 'TEST', 'model': 'SCOPE-TEST',
+               'description': 'test V1-16', 'rrp': 1000, 'internalPrice': 1000, 'qty': 1}]})
+            code = pid + '-AYA-001'
+            r = c({'action': 'register_product', 'token': U.get('token'), 'uniqueCode': code, 'programId': pid,
+                   'empCode': su.upper(), 'empName': (U.get('user') or {}).get('name', su)})
+            seen = lambda tok: {x.get('programId') for x in c({'action': 'pm_dashboard', 'token': tok, 'programId': ''}).get('registrations', [])}
+            pm_ok, adm_ok = pid not in seen(P), pid in seen(A)
+            for ok, msg in ((bool(r.get('ok')), f"tạo 1 đơn trong chương trình test {pid}: {r.get('message')}"),
+                            (pm_ok, 'PM không chọn chương trình → KHÔNG thấy đơn chương trình của người khác'),
+                            (adm_ok, 'ADMIN không chọn chương trình → thấy đơn đó')):
+                print(f"   {'PASS' if ok else 'FAIL'} {msg}")
+                if not ok:
+                    failures.append('V1-16: ' + msg)
+            c({'action': 'user_cancel_registration', 'token': U.get('token'), 'empCode': su.upper(), 'slotId': code, 'programId': pid})
+            c({'action': 'program_update', 'token': A, 'programId': pid, 'newStatus': 'Closed'})
+            print(f'   Dọn dẹp: đã hủy đơn và đóng {pid} (chương trình có đơn không xóa được — giữ làm dấu vết kiểm toán)')
 
     users = [u.split(':', 1) for u in a.users.split(',') if ':' in u]
     if users and a.slot:
