@@ -12650,10 +12650,22 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (targetEl) {
           targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+        watchTourLayout(targetEl);
         updateTourPositions();
         setTimeout(updateTourPositions, 280);
         setTimeout(updateTourPositions, 550);
       }, 120);
+    }
+
+    // v1.3: Hướng dẫn tự mở 0,8 giây sau đăng nhập, khi danh sách chương trình từ máy chủ CHƯA về.
+    // Danh sách về sau → thanh chương trình đổi kích thước → đo lại khung đỏ (không chỉ khi resize/scroll cửa sổ).
+    let tourLayoutObserver = null;
+    function watchTourLayout(targetEl) {
+      if (typeof ResizeObserver === 'undefined') return;
+      if (!tourLayoutObserver) tourLayoutObserver = new ResizeObserver(() => { if (isTourActive) updateTourPositions(); });
+      tourLayoutObserver.disconnect();
+      tourLayoutObserver.observe(document.body);
+      if (targetEl) tourLayoutObserver.observe(targetEl);
     }
 
     function findTourTargetElement(selectorString) {
@@ -12762,6 +12774,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       }
       document.body.classList.remove('lg-tour-active');
       isTourActive = false;
+      if (tourLayoutObserver) tourLayoutObserver.disconnect();
       const storageKey = currentTourRole === 'pm' ? 'lg_tour_completed_pm' : 'lg_tour_completed_employee';
       localStorage.setItem(storageKey, 'true');
     }

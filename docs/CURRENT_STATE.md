@@ -4,8 +4,8 @@
 | Mục | Giá trị |
 |---|---|
 | Cập nhật | **05/10/2026** — đối chiếu trực tiếp mã nguồn nhánh `v1-hardening` và số đo trên máy chủ STAGING thật |
-| Phiên bản | **v1.2** — git tag `v1.2` trên `main` (05/10/2026; v1.1 + sửa cửa sổ biên lai). Web: nguồn `Mau_Dang_Ky_Internal_Sales_3009.html` → bản nhân viên `portal.html` · Apps Script: `apps-script/Code.gs` (nhãn trong code `8.3-v1-hardening`) = **Version 7** bản chính thức, **Version 3** staging |
-| Trạng thái | **v1.2 đã phát hành 05/10/2026** (v1.1 cùng ngày): máy chủ chính thức Version 7 (kiểm tra 10/10), `portal.html` trên GitHub Pages, `v1-hardening` đã gộp vào `main`. Mọi thay đổi sau này bắt đầu từ tag `v1.1` ([quy trình](04-v1-hardening/README.md#phiên-bản-chuẩn-v11)) |
+| Phiên bản | **v1.3** — git tag `v1.3` trên `main` (05/10/2026; v1.1 + sửa cửa sổ biên lai (v1.2) + sửa khung Hướng dẫn bước 1 (v1.3)). Web: nguồn `Mau_Dang_Ky_Internal_Sales_3009.html` → bản nhân viên `portal.html` · Apps Script: `apps-script/Code.gs` (nhãn trong code `8.3-v1-hardening`) = **Version 7** bản chính thức, **Version 3** staging |
+| Trạng thái | **v1.3 đã phát hành 05/10/2026** (v1.1, v1.2 cùng ngày): máy chủ chính thức Version 7 (kiểm tra 10/10), `portal.html` trên GitHub Pages, `v1-hardening` đã gộp vào `main`. Mọi thay đổi sau này bắt đầu từ tag `v1.1` ([quy trình](04-v1-hardening/README.md#phiên-bản-chuẩn-v11)) |
 | Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | Mở bán | **10:00, 14/10/2026** → hạn chót **17:00, 16/10/2026** (theo Tab 1 của trang) |
 | Khi tài liệu khác mâu thuẫn với trang này | Trang này đúng. Tài liệu trong `03-architecture-and-analysis/` là **lịch sử phân tích**, mỗi file có khung "Trạng thái" ở đầu |
@@ -143,6 +143,7 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | 26 | 🟡 Nút "Mở lại chương trình" hiện với chương trình đã kết sổ, nhưng máy chủ chỉ cho Draft → Open → Closed nên bấm sẽ báo lỗi | v1.2 — ẩn nút hoặc đổi quy tắc |
 | 27 | ✅ Trigger quét quá hạn 24h: dự án chính thức có **0 trigger** tới 05/10 15:46 (Runbook §3 thiếu bước). Chủ dự án đã chạy `setupWatchdogTrigger`; **đã chạy thật 16:15:39, Error rate 0%**. Runbook thêm bước 5b + mục 3b | — |
 | 28 | 🟠 Thư mục biên lai "Bien lai nop tien" đang **"Anyone with the link – Viewer"** (kiểm chứng quyền Drive 05/10): ai có link thư mục / link file đều xem được biên lai (tên, số tiền, thông tin ngân hàng). Link chỉ đi tới PM / ADMIN (nhân viên chỉ nhận cờ có/không), nhưng link chuyển tiếp được. Phương án: **Restricted + thêm email Google của từng PM (Viewer)** — cần PM có tài khoản Google. Kèm: staging đang ghi biên lai test vào cùng thư mục (Runbook §3b) | Chủ dự án (Jeong-Do) chốt |
+| 29 | ✅ **Đã sửa ở v1.3**: Hướng dẫn tự mở lần đầu — khung đỏ bước 1 lệch khỏi thanh chương trình (dữ liệu máy chủ về sau khi đo). Nay đo lại khi bố cục đổi. Kịch bản 12 | — |
 
 ## 10. Kiểm thử
 

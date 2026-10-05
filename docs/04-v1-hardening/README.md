@@ -22,10 +22,10 @@ Thư mục này lưu mọi thay đổi trong giai đoạn chuẩn bị go-live b
 
 | Thành phần | Bản chuẩn v1.1 | Đường lùi |
 |---|---|---|
-| Mã nguồn | Git tag **`v1.1`** trên `main` · **`v1.2`** (bản mới nhất: v1.1 + sửa cửa sổ biên lai, chỉ đổi web) | `v1.1` → tag `checkpoint-pre-v1-hardening-20261005` |
+| Mã nguồn | Git tag **`v1.1`** trên `main` · `v1.2` (sửa cửa sổ biên lai) · **`v1.3`** (bản mới nhất: sửa khung Hướng dẫn bước 1; chỉ đổi web) | `v1.1` → tag `checkpoint-pre-v1-hardening-20261005` |
 | Apps Script chính thức | **Version 7** (deployment cũ, URL không đổi) | Version 6 |
 | Apps Script staging | Version 3 | — |
-| Web nhân viên | `portal.html` build từ tag **`v1.2`** (Apps Script không đổi: vẫn Version 7) | Bản `portal.html` của tag trước |
+| Web nhân viên | `portal.html` build từ tag **`v1.3`** (Apps Script không đổi: vẫn Version 7) | Bản `portal.html` của tag trước |
 | Dữ liệu | Bản sao "Copy of LG Internal Sales Database - 2026-10-04 (Appscript v6)" | — |
 
 **Quy trình nâng cấp từ v1.1 (bắt buộc):**
@@ -93,3 +93,4 @@ graph LR
 | 05/10/2026 | Phát hiện | 🔴 Cửa sổ biên lai PM hiện hình "Giao dịch thành công" giả (tái hiện bằng trình duyệt); 🟠 máy chủ không chặn theo giờ bắt đầu; 🟡 nút "Mở lại chương trình" luôn lỗi | PM | **Chờ duyệt** — đã có cách làm tạm trong Sổ tay | CURRENT_STATE §9 (24–26) |
 | 05/10/2026 | **v1.2** / 24 | **Cửa sổ biên lai chỉ hiện biên lai thật** (chủ dự án duyệt): bỏ 2 hình minh họa "Giao dịch thành công" + mã GD bịa; hàm chung `renderReceiptView()` — ảnh thật / nút mở link Drive / "Chưa có ảnh biên lai". Nhánh `fix/receipt-modal-v1.2` từ `main`. Chỉ đổi web; `Code.gs` không đổi | PM, ADMIN | Kịch bản 11 → 49/49 (bản cũ FAIL 3); e2e 165 (sửa 1 kiểm tra chuỗi + thêm 1); harness 67/67; luồng thật staging ĐẠT. Phát hành: gộp `main`, tag `v1.2`, build `portal.html` | Sổ tay vận hành; Guide B.3; CURRENT_STATE §9 |
 | 05/10/2026 | Setup | Trigger kiểm chứng: Last run 16:15:39, Error rate 0%. Thư mục biên lai: kiểm quyền Drive — "Anyone with the link"; staging ghi file test vào thư mục chính thức | Admin | Trigger xong; quyền thư mục **chờ chốt** | Runbook §3b; CURRENT_STATE §9 (27, 28) |
+| 05/10/2026 | **v1.3** | **Hướng dẫn nhanh bước 1 — khung đỏ lệch khi tự mở lần đầu** (chủ dự án báo, cả Nhân viên / PM / ADMIN). Nguyên nhân: tour tự mở 0,8 giây sau đăng nhập, danh sách chương trình từ máy chủ về sau đó làm thanh chương trình đổi kích thước, nhưng khung chỉ được đo lại khi cửa sổ resize/scroll. Sửa: `ResizeObserver` theo dõi bố cục trong lúc tour mở (`watchTourLayout`), ngắt khi thoát tour. Không đổi nội dung / thứ tự bước | Nhân viên, PM, ADMIN (lần đăng nhập đầu) | Kịch bản 12: bản cũ lệch 10–28 px (FAIL 3), bản mới 0 px → 55/55; mọi bước tour (4 NV + 5 PM) lệch 0 px; e2e 165, harness 67 | CURRENT_STATE §9 |

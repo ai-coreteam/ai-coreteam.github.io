@@ -3,7 +3,7 @@
 
 | | |
 |---|---|
-| Áp dụng cho | Bản **v1.2** (phát hành 05/10/2026) |
+| Áp dụng cho | Bản **v1.3** (phát hành 05/10/2026) |
 | Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | Đợt bán | Mở **10:00 ngày 14/10/2026** → kết thúc **17:00 ngày 16/10/2026** |
 | Đối chiếu | Mọi bước dưới đây đã được kiểm tra với mã nguồn ngày 05/10/2026 |

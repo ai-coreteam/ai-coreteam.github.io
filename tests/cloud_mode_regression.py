@@ -393,6 +393,37 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 12: Hướng dẫn tự mở lần đầu — khung đỏ bước 1 khớp thanh chương trình sau khi danh sách về')
+            def tour_fit(role_id):
+                s = MockServer()
+                held = []
+                plain = s.handle
+                def slow_programs(route):
+                    if route.request.method == 'POST' and json.loads(route.request.post_data or '{}').get('action') == 'programs' and not held:
+                        held.append(route)
+                        return
+                    plain(route)
+                first_time = "localStorage.removeItem('lg_tour_completed_employee'); localStorage.removeItem('lg_tour_completed_pm');"
+                ctx, page = open_page(browser, port, None, extra_init=first_time)
+                ctx.route(API + '**', slow_programs)
+                login(page, role_id, settle_ms=3000)          # tour tự mở sau 0,8 giây, danh sách chương trình chưa về
+                started = page.evaluate("isTourActive && currentTourStepIndex === 0")
+                if held:
+                    plain(held[0])                             # máy chủ trả danh sách chương trình
+                page.wait_for_timeout(2500)
+                gap = page.evaluate('''() => {
+                    const step = TOURS[currentTourRole][0], t = findTourTargetElement(step.targetSelector), h = document.getElementById('lg-tour-hole');
+                    if (!t || !h) return 999;
+                    const a = t.getBoundingClientRect(), b = h.getBoundingClientRect();
+                    return Math.max(Math.abs((a.top - 8) - b.top), Math.abs((a.height + 16) - b.height)); }''')
+                errs = page.errors[:2]
+                ctx.close()
+                return started, len(held) == 1, gap, errs
+            for label, uid in (('Nhân viên', ME), ('PM', PM), ('ADMIN', ADMIN)):
+                started, held_ok, gap, errs = tour_fit(uid)
+                check(started and held_ok and gap <= 2, f'{label}: khung đỏ bước 1 khớp thanh chương trình (lệch {gap:.0f}px)')
+                check(not errs, f'{label}: không có lỗi JS ({errs})')
+
             browser.close()
     finally:
         srv.shutdown()
