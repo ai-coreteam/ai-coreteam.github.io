@@ -98,10 +98,25 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 5 | Deploy **phiên bản mới trên deployment cũ** | Manage deployments → ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
 | 6 | Kiểm tra tab `Config` | Không có `ALLOW_DEMO_TOKENS` (hoặc = `false`) · `ENABLE_AUTO_EMAIL` theo quyết định (mục 4) | — |
 | 7 | Sinh bản cho nhân viên | `python3 scripts/build_production.py --api-url <URL /exec chính thức>` → tạo `portal.html` | Script in "Đã tách 8 khóa bộ nhớ trình duyệt khỏi bản demo" và "Kiểm tra: không còn mật khẩu demo…" |
-| 8 | Đưa `portal.html` lên GitHub Pages | Commit `portal.html` → push (sau khi chủ dự án duyệt) | Link: `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
+| 8 | Đưa `portal.html` lên GitHub Pages (**chỉ sau khi bước 0 xong — không còn tài khoản `test123`**) | Commit `portal.html` → push (sau khi chủ dự án duyệt) | Link: `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | 9 | Nạp danh sách nhân viên thật vào tab `Users` | Sheet đã ở chế độ **Restricted** (05/10) | Chỉ Admin/HR có quyền |
 | 10 | Kiểm tra cuối | Mở `portal.html` ở cửa sổ ẩn danh → đăng nhập 1 tài khoản thật → thấy danh mục; thử `VH12345/test123` → **bị từ chối** | Cả hai đúng |
 | 11 | **Khởi động máy chủ** 10 phút trước giờ mở bán | Mở `portal.html` và đăng nhập 1–2 lần (đo 05/10: lượt đầu sau thời gian nghỉ có thể chậm 33–37 s) | Lượt sau phản hồi ≤ 3 s |
+
+### Tiến độ mục 3 (cập nhật 05/10/2026, 14:45)
+
+| Bước | Trạng thái | Bằng chứng |
+|---|---|---|
+| 0 | ⚠️ **Một nửa** — `VH22222` đã là ADMIN; nhưng `VH22222` (ADMIN), `VH99999` (PM), `VH88921`, `VH55432`, `VH11111` **vẫn dùng `test123`** (mật khẩu công khai trong repo) | Ảnh tab `Users` |
+| 1 | ✅ Bản sao "Copy of LG Internal Sales Database - 2026-10-04 (Appscript v6)" | Ảnh |
+| 2 | ✅ Version cũ: **6** (đường lùi: Edit → chọn Version 6 → Deploy) | Tên bản sao |
+| 3–5 | ✅ `rotateSessionSecret` 14:37:04; **Version 7** deploy 14:37, URL `/exec` không đổi | Ảnh Execution log + Manage deployments |
+| 6 | ✅ Không có `ALLOW_DEMO_TOKENS` · `ENABLE_AUTO_EMAIL = TRUE` (email thật đang BẬT) | Ảnh tab `Config` |
+| Kiểm tra máy chủ chính thức (Claude, chỉ đọc) | ✅ **10/10**: 4/4 token giả bị từ chối (chứng minh Version 7 = code v1) · `VH12345/test123` bị từ chối · ADMIN đọc công tắc email (BẬT, còn 94 email) · PM bị chặn · PM không chọn chương trình chỉ thấy chương trình của mình | Không tạo đơn, không gửi email; mỗi lượt đăng nhập ghi 1 dòng `AUTH_LOGIN` vào ActivityLog |
+| 7 | ✅ `portal.html` build với URL chính thức; mở bằng trình duyệt thật, đăng nhập 1 nhân viên: thấy 3 chương trình + danh mục, không lỗi JS, chỉ gọi lệnh đọc | Lượt đầu tải danh mục **> 15 giây** (máy chủ nguội) |
+| 8 | ⏸ **Chưa làm — chờ chủ dự án duyệt** và xử lý xong bước 0 | — |
+
+Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (mất số 0 đầu do Sheet định dạng số). Code **không đọc** các ô `BANK_*` (web, VietQR và email dùng số viết cứng `0991000012525`) → không ảnh hưởng; có thể định dạng ô là Văn bản cho khỏi nhầm.
 
 **Bản demo** (`Mau_Dang_Ky_Internal_Sales_3009.html`, `index.html`) giữ nguyên để đào tạo. Việc đổi `index.html` trỏ sang `portal.html` là **quyết định của chủ dự án**, chưa thực hiện.
 

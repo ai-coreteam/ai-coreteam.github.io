@@ -115,9 +115,9 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | # | Việc | Người quyết / làm |
 |---|---|---|
 | 1 | ✅ **Xong 05/10**: staging Version 3 (role ADMIN + V1-16) — Runbook §2b ĐẠT, V1-16 kiểm chứng trên máy chủ thật | — |
-| 2 | Triển khai bản chính thức ([Runbook §3](04-v1-hardening/V1_RELEASE_RUNBOOK.md)), phát hành `portal.html` | PIC, chủ dự án duyệt |
+| 2 | Triển khai bản chính thức ([Runbook §3](04-v1-hardening/V1_RELEASE_RUNBOOK.md)): **bước 1–7 xong 05/10** (Version 7, kiểm tra 10/10, `portal.html` đã build). Còn bước 0 (mật khẩu) và **bước 8 phát hành** | Chủ dự án duyệt bước 8 |
 | 3 | Gộp `v1-hardening` vào `main` và đẩy lên 2 remote | Chủ dự án duyệt |
-| 4 | Đổi mật khẩu / xóa các tài khoản dùng `test123` trong Sheet chính (có tài khoản ADMIN và PM) | Admin — **trước go-live** |
+| 4 | 🔴 Đổi mật khẩu / xóa các tài khoản dùng `test123` trong Sheet chính — **còn 5 tài khoản ngày 05/10, gồm ADMIN `VH22222` và PM `VH99999`**. Khi `portal.html` công khai, ai biết `test123` (có trong repo) đăng nhập được quyền ADMIN | Admin — **trước bước 8** |
 | 5 | Xác nhận phạm vi ADMIN: thao tác trên **mọi** chương trình (đang làm như vậy) | Chủ dự án |
 | 6 | ✅ **Đã sửa 05/10 (V1-16, chủ dự án duyệt)**: PM gọi Dashboard không kèm mã chương trình nay chỉ nhận đơn của chương trình mình phụ trách; ADMIN vẫn thấy tất cả. Test máy chủ: bản cũ lộ đơn chương trình khác, bản mới không; **staging thật ĐẠT** | Chờ deploy bản chính thức (Runbook §3) |
 | 7 | Chi nhánh Vietcombank: giao diện và email ghi **"Tây Hồ"**; `assets/content/bank_accounts.json` và hướng dẫn PM ghi **"Tây Hà Nội"**. Số TK `0991000012525` thống nhất ở mọi nơi | Tài chính xác nhận |
@@ -134,6 +134,8 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | 18 | Không thu địa chỉ: email ghi "Địa điểm nhận hàng: <kho>" → mô hình hiện tại là **nhận tại kho**. Hướng dẫn cũ ghi "SĐT & Địa chỉ nhận hàng" (đã sửa) | Chủ dự án xác nhận chính sách giao nhận |
 | 19 | Câu chữ trong Tour lệch v1: "khóa máy riêng 24H" (thực tế 24 giờ tính từ lúc mở cổng); "tự động gửi Email khi PM duyệt" (email mặc định TẮT); kho "Hải Phòng AYA, Hà Nội AYB, Hưng Yên AYC" (gộp với mục 9) | Chờ duyệt sửa chữ |
 | 20 | `assets/content/*.json` không được ứng dụng đọc; số tài khoản viết cứng 9 chỗ HTML + 2 chỗ `Code.gs`. File mẫu Excel ở `assets/templates/` và `data/` khác nhau; web tải bản nhúng trong HTML | Biết để không sửa nhầm chỗ; hợp nhất ở v1.1 |
+| 21 | Khi máy chủ chậm (lượt đầu > 15 giây), ô 02 tạm hiện **"0 / 0 SP · Hết hàng (100% Slot đã đăng ký)"** cho tới khi danh mục tải xong — nhân viên có thể hiểu nhầm là hết hàng. Đã thấy trên bản chính thức 05/10 | Chờ duyệt sửa chữ (vd. "Đang tải…") |
+| 22 | Sheet chính đang có dữ liệu test hiển thị cho nhân viên: chương trình `IS2026Q3-HA`, `IS2026Q3-HE` (Open), `IS2026Q4-BS` (Draft) mỗi cái 1 sản phẩm mẫu; `IS-2026Q4-OTHER-01` có 1 đơn | Chủ dự án quyết định đóng / dọn trước bước 8 |
 
 ## 10. Kiểm thử
 
