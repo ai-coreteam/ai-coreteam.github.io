@@ -324,6 +324,46 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 9: ô 02 khi danh mục đang tải / chương trình trống — CURRENT_STATE mục 21')
+            badge = "(document.getElementById('grap-avail-badge') || {}).textContent || ''"
+            s = MockServer()   # máy chủ nguội: GIỮ câu trả lời danh mục, chỉ trả khi test cho phép (không chặn luồng test)
+            held = []
+            plain = s.handle
+            def slow_products(route):
+                if route.request.method == 'POST' and json.loads(route.request.post_data or '{}').get('action') == 'products' and not held:
+                    held.append(route)
+                    return
+                plain(route)
+            ctx, page = open_page(browser, port, None)
+            ctx.route(API + '**', slow_products)
+            login(page, ME, settle_ms=3000)
+            early = page.evaluate(badge)
+            check(len(held) == 1 and 'Đang tải' in early and 'Hết hàng' not in early,
+                  f'đang tải: ô 02 ghi "Đang tải…", không ghi "Hết hàng" ({early!r})')
+            if held:
+                plain(held[0])   # máy chủ trả danh mục
+            page.wait_for_timeout(4000)
+            late = page.evaluate(badge)
+            check(late.startswith('Còn '), f'tải xong: ô 02 ghi số SP còn lại ({late!r})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            s = MockServer(); s.products = []
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            empty = page.evaluate(badge)
+            check(empty == 'Chưa có sản phẩm', f'chương trình không có sản phẩm: ô 02 ghi "Chưa có sản phẩm" ({empty!r})')
+            ctx.close()
+
+            print('Scenario 10: không có chương trình nào mở — ô 02 ghi "Chưa có đợt bán"')
+            s = MockServer()
+            s.do_programs = lambda d: {'ok': True, 'programs': []}
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            none = page.evaluate(badge)
+            check(none == 'Chưa có đợt bán', f'0 chương trình: ô 02 ghi "Chưa có đợt bán" ({none!r})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()

@@ -97,7 +97,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 1. Mở file Google Sheet `LG Internal Sales Database` trên Google Drive của bạn.
 2. Chuyển sang trang tính **`Users`** — *(cập nhật 05/10: thứ tự cột dưới đây khớp với máy chủ; bản cũ ghi `Role` ở cột C là **sai** và sẽ làm tài khoản bị phân quyền nhầm)*:
    - Cột A (`ID`): Mã nhân viên (ví dụ: `PM01`, `NV01`, `NV02`).
-   - Cột B (`Password`): Mật khẩu ban đầu dạng chữ (ví dụ: `admin123` cho PM, `123456` cho NV). Người dùng tự đổi sau khi đăng nhập.
+   - Cột B (`Password`): Mật khẩu ban đầu dạng chữ (mật khẩu tạm, **riêng từng người, ≥ 10 ký tự** — không dùng chuỗi số đơn giản). Người dùng tự đổi sau khi đăng nhập.
    - Cột C (`Name`): Họ tên đầy đủ.
    - Cột D (`Department`): Phòng ban (ví dụ: `HS PM Support`, `R&D`, `Sales`).
    - Cột E (`Phone`): Số điện thoại.
@@ -181,7 +181,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 
 ### Bước 3.1: Đăng nhập & Đổi mật khẩu cá nhân
 1. Nhân viên mở link portal — màn hình **đăng nhập** hiện ngay.
-2. Nhập Mã NV (ví dụ: `NV01`) và mật khẩu được cấp ban đầu (`123456`).
+2. Nhập Mã NV (ví dụ: `NV01`) và mật khẩu tạm Admin cấp riêng cho bạn.
 3. Đổi mật khẩu cá nhân qua nút **`🔑 Đổi MK`** để bảo mật quyền lợi mua hàng.
 
 ### Bước 3.2: Khám phá Danh mục Sản phẩm (Tab 2)

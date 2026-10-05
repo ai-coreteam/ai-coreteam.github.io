@@ -206,6 +206,7 @@ flowchart TD
 | Hủy giữ chỗ | Có hiệu lực thật trên máy chủ, slot trả về kho cho đồng nghiệp ngay. Chỉ hủy được **trước khi khai nộp tiền** (xem Bước 4). |
 | Thấy "Đang kết nối máy chủ…" | Máy chủ Google đang chậm (thường vài phút đầu mở bán). Trang tự thử lại sau 15 giây, hoặc bấm **Thử lại ngay**. Nếu mạng công ty chặn, chuyển sang 4G/5G. Dữ liệu của bạn không bị mất. |
 | Báo "phiên đăng nhập không khớp / không hợp lệ" | Đăng xuất rồi đăng nhập lại. |
+| Ô 02 ghi "Đang tải…" | Máy chủ đang gửi danh mục (lượt đầu có thể mất 15–40 giây). Chờ — **không** phải hết hàng. "Hết hàng" chỉ hiện khi danh mục đã tải xong và mọi slot đã có người giữ. |
 
 ### C.2. PM
 

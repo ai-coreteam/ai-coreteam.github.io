@@ -199,7 +199,7 @@ Lúc 10:00 còn cộng thêm tải đăng nhập + tải danh mục + đăng ký
 - Smoke test trên Apps Script **staging** (bản sao Sheet) — cần PIC deploy.
 - Cập nhật `02-user-and-pm-guide/` cho mọi thay đổi chạm luồng; thống nhất dữ kiện mâu thuẫn sau khi chủ dự án chốt.
 
-### Không làm trong đợt này (v1.1, sau go-live)
+### Không làm trong đợt này (v1.2, sau go-live — trước đây ghi "v1.1"; tên v1.1 nay là bản phát hành 05/10/2026)
 - Chuẩn hóa 177 vị trí màu ngoài bảng màu LG; đo lại tương phản khi đã đăng nhập; quyết định Active Red `#EA1917` (web LG.com) hay `#FD312E` (BI nội bộ).
 - Tách file HTML 1 MB.
 

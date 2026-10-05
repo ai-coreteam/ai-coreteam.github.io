@@ -29,6 +29,7 @@
 |---|---|---|
 | Mã nguồn (web + Code.gs) | Git tag **`checkpoint-pre-v1-hardening-20261005`** (commit `5404e1a`) và nhánh **`backup/pre-v1-hardening-20261005`** | `git checkout checkpoint-pre-v1-hardening-20261005 -- Mau_Dang_Ky_Internal_Sales_3009.html apps-script/Code.gs` rồi commit; hoặc quay hẳn: `git switch main` (main chưa bị sửa) |
 | Dữ liệu Google Sheet | Bản sao **"LG Internal Sales Database - BACKUP 2026-10-05 (pre-v1-hardening) - KHONG SUA"** (ID `1WIUrSzTYxqKKtt5RbJ2bF2xZiZRVpXC_pxFdpQQ9lL4`, riêng tư) | Sao chép dữ liệu từ bản backup sang Sheet chính (không xóa Sheet chính) |
+| **Bản chuẩn v1.1** (05/10/2026) | Git tag **`v1.1`** · Apps Script chính thức **Version 7** | Lùi về trước v1.1: dòng dưới + Apps Script **Version 6** |
 | Apps Script đang chạy | Phiên bản (Version) hiện tại trong **Deploy → Manage deployments** | Trước khi deploy: **ghi lại số Version đang chạy**. Muốn quay lại: Manage deployments → ✏️ Edit → chọn Version cũ → Deploy (URL giữ nguyên) |
 
 > Bản sao Sheet là ảnh chụp lúc 05/10. Dữ liệu phát sinh sau đó **không** có trong backup — trước khi go-live nên tạo thêm 1 bản sao mới (File → Make a copy).
@@ -107,16 +108,17 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 
 | Bước | Trạng thái | Bằng chứng |
 |---|---|---|
-| 0 | ⚠️ **Một nửa** — `VH22222` đã là ADMIN; nhưng `VH22222` (ADMIN), `VH99999` (PM), `VH88921`, `VH55432`, `VH11111` **vẫn dùng `test123`** (mật khẩu công khai trong repo) | Ảnh tab `Users` |
+| 0 | ⚠️ `test123` đã gỡ (bị từ chối trên máy chủ). Còn mật khẩu dễ đoán: ADMIN `VH22222`, PM `VH99999` + 3 USER dùng chuỗi số 6 chữ số đơn giản — **phải đổi trước 14/10** | Kiểm tra máy chủ 05/10 |
 | 1 | ✅ Bản sao "Copy of LG Internal Sales Database - 2026-10-04 (Appscript v6)" | Ảnh |
 | 2 | ✅ Version cũ: **6** (đường lùi: Edit → chọn Version 6 → Deploy) | Tên bản sao |
 | 3–5 | ✅ `rotateSessionSecret` 14:37:04; **Version 7** deploy 14:37, URL `/exec` không đổi | Ảnh Execution log + Manage deployments |
-| 6 | ✅ Không có `ALLOW_DEMO_TOKENS` · `ENABLE_AUTO_EMAIL = TRUE` (email thật đang BẬT) | Ảnh tab `Config` |
+| 6 | ✅ Không có `ALLOW_DEMO_TOKENS` · `ENABLE_AUTO_EMAIL = FALSE` (chủ dự án tắt 05/10; máy chủ xác nhận TẮT) | Ảnh tab `Config` + kiểm tra máy chủ |
+| Dữ liệu test | ✅ 4 chương trình test → `CLOSED`; nhân viên thấy 0 chương trình | Kiểm tra máy chủ |
 | Kiểm tra máy chủ chính thức (Claude, chỉ đọc) | ✅ **10/10**: 4/4 token giả bị từ chối (chứng minh Version 7 = code v1) · `VH12345/test123` bị từ chối · ADMIN đọc công tắc email (BẬT, còn 94 email) · PM bị chặn · PM không chọn chương trình chỉ thấy chương trình của mình | Không tạo đơn, không gửi email; mỗi lượt đăng nhập ghi 1 dòng `AUTH_LOGIN` vào ActivityLog |
 | 7 | ✅ `portal.html` build với URL chính thức; mở bằng trình duyệt thật, đăng nhập 1 nhân viên: thấy 3 chương trình + danh mục, không lỗi JS, chỉ gọi lệnh đọc | Lượt đầu tải danh mục **> 15 giây** (máy chủ nguội) |
-| 8 | ⏸ **Chưa làm — chờ chủ dự án duyệt** và xử lý xong bước 0 | — |
+| 8 | ✅ Chủ dự án duyệt 05/10 (biết rủi ro bước 0): gộp `main`, tag `v1.1`, đẩy 2 remote | `git log` / GitHub Pages |
 
-Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (mất số 0 đầu do Sheet định dạng số). Code **không đọc** các ô `BANK_*` (web, VietQR và email dùng số viết cứng `0991000012525`) → không ảnh hưởng; có thể định dạng ô là Văn bản cho khỏi nhầm.
+Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet tự đổi chuỗi `0991000012525` thành số khi `setupNewDatabase()` ghi). Code **không đọc** các ô `BANK_*`; nhân viên thấy số **đầy đủ `0991000012525`** ở ô 01, cửa sổ nộp tiền, mã VietQR (`970436-0991000012525`) và email — đã kiểm chứng trên `portal.html` 05/10. Muốn ô trong Sheet cũng đúng: gõ lại `'0991000012525` (có dấu nháy đơn ở đầu).
 
 **Bản demo** (`Mau_Dang_Ky_Internal_Sales_3009.html`, `index.html`) giữ nguyên để đào tạo. Việc đổi `index.html` trỏ sang `portal.html` là **quyết định của chủ dự án**, chưa thực hiện.
 

@@ -4,8 +4,9 @@
 | Mục | Giá trị |
 |---|---|
 | Cập nhật | **05/10/2026** — đối chiếu trực tiếp mã nguồn nhánh `v1-hardening` và số đo trên máy chủ STAGING thật |
-| Phiên bản | Web `Mau_Dang_Ky_Internal_Sales_3009.html` · Apps Script `8.3-v1-hardening` |
-| Trạng thái | Bản v1 đã gia cố và **ĐẠT trên staging**. **Chưa** triển khai lên bản chính thức. Nhánh `v1-hardening` **chưa** gộp vào `main` |
+| Phiên bản | **v1.1** — git tag `v1.1` trên `main` (05/10/2026). Web: nguồn `Mau_Dang_Ky_Internal_Sales_3009.html` → bản nhân viên `portal.html` · Apps Script: `apps-script/Code.gs` (nhãn trong code `8.3-v1-hardening`) = **Version 7** bản chính thức, **Version 3** staging |
+| Trạng thái | **v1.1 đã phát hành 05/10/2026**: máy chủ chính thức Version 7 (kiểm tra 10/10), `portal.html` trên GitHub Pages, `v1-hardening` đã gộp vào `main`. Mọi thay đổi sau này bắt đầu từ tag `v1.1` ([quy trình](04-v1-hardening/README.md#phiên-bản-chuẩn-v11)) |
+| Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | Mở bán | **10:00, 14/10/2026** → hạn chót **17:00, 16/10/2026** (theo Tab 1 của trang) |
 | Khi tài liệu khác mâu thuẫn với trang này | Trang này đúng. Tài liệu trong `03-architecture-and-analysis/` là **lịch sử phân tích**, mỗi file có khung "Trạng thái" ở đầu |
 
@@ -115,27 +116,27 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | # | Việc | Người quyết / làm |
 |---|---|---|
 | 1 | ✅ **Xong 05/10**: staging Version 3 (role ADMIN + V1-16) — Runbook §2b ĐẠT, V1-16 kiểm chứng trên máy chủ thật | — |
-| 2 | Triển khai bản chính thức ([Runbook §3](04-v1-hardening/V1_RELEASE_RUNBOOK.md)): **bước 1–7 xong 05/10** (Version 7, kiểm tra 10/10, `portal.html` đã build). Còn bước 0 (mật khẩu) và **bước 8 phát hành** | Chủ dự án duyệt bước 8 |
-| 3 | Gộp `v1-hardening` vào `main` và đẩy lên 2 remote | Chủ dự án duyệt |
-| 4 | 🔴 Đổi mật khẩu / xóa các tài khoản dùng `test123` trong Sheet chính — **còn 5 tài khoản ngày 05/10, gồm ADMIN `VH22222` và PM `VH99999`**. Khi `portal.html` công khai, ai biết `test123` (có trong repo) đăng nhập được quyền ADMIN | Admin — **trước bước 8** |
+| 2 | ✅ Bản chính thức triển khai 05/10 (Runbook §3 bước 1–8; bước 10 xem Runbook) | — |
+| 3 | ✅ `v1-hardening` gộp vào `main`, gắn tag `v1.1`, đẩy lên 2 remote (05/10, chủ dự án duyệt) | — |
+| 4 | 🔴 `test123` đã gỡ. **Còn mật khẩu dễ đoán**: ADMIN `VH22222`, PM `VH99999` và 3 tài khoản USER đang dùng **chuỗi số 6 chữ số đơn giản** (kiểm chứng trên máy chủ 05/10; không ghi giá trị vào repo). URL máy chủ nay công khai trong `portal.html` → ai đoán đúng có quyền ADMIN. Đề xuất: `VH88921`, `VH55432` → `Inactive`; ADMIN / PM đặt mật khẩu riêng ≥ 10 ký tự rồi tự đổi trên web (lưu SHA-256) | Admin — **trước 14/10** |
 | 5 | Xác nhận phạm vi ADMIN: thao tác trên **mọi** chương trình (đang làm như vậy) | Chủ dự án |
 | 6 | ✅ **Đã sửa 05/10 (V1-16, chủ dự án duyệt)**: PM gọi Dashboard không kèm mã chương trình nay chỉ nhận đơn của chương trình mình phụ trách; ADMIN vẫn thấy tất cả. Test máy chủ: bản cũ lộ đơn chương trình khác, bản mới không; **staging thật ĐẠT** | Chờ deploy bản chính thức (Runbook §3) |
-| 7 | Chi nhánh Vietcombank: giao diện và email ghi **"Tây Hồ"**; `assets/content/bank_accounts.json` và hướng dẫn PM ghi **"Tây Hà Nội"**. Số TK `0991000012525` thống nhất ở mọi nơi | Tài chính xác nhận |
+| 7 | Số tài khoản: web (9 chỗ), mã VietQR và email đều hiện **đầy đủ `0991000012525`** (kiểm chứng trên `portal.html` 05/10). Riêng ô `BANK_ACC` tab `Config` mất số 0 do Sheet tự đổi thành số — code không đọc ô này. Chi nhánh Vietcombank: giao diện và email ghi **"Tây Hồ"**; `assets/content/bank_accounts.json` và hướng dẫn PM ghi **"Tây Hà Nội"**. Số TK `0991000012525` thống nhất ở mọi nơi | Tài chính xác nhận |
 | 8 | Cú pháp chuyển khoản: ô 01 ghi `[MãNV]_[MãSlot]` (gạch dưới); mã VietQR và email dùng `MãNV MãSlot` (khoảng trắng) | Chủ dự án chốt 1 dạng |
 | 9 | Vị trí kho AYA / AYB / AYC: các tài liệu cũ ghi 3 cách khác nhau | PM xác nhận |
 | 10 | Liên hệ hỗ trợ: nút "Hỗ trợ" ghi `minhhien.hoang@lge.com`; màn hình đăng nhập ghi `internalsales.support@lge.com` | Chủ dự án chốt |
 | 11 | PIC chính thức và phân quyền Sheet cho HR / Admin | Chủ dự án |
 | 12 | Chuyển Apps Script sang tài khoản LG Workspace (1.500 email/ngày) | Khi IT sẵn sàng |
-| 13 | v1.1: chuẩn hóa màu ngoài bảng màu LG (verifier lg-brand ngày 05/10: 177 cảnh báo), chọn Active Red `#EA1917` (web) hay `#FD312E` (BI) | Sau go-live |
+| 13 | v1.2: chuẩn hóa màu ngoài bảng màu LG (verifier lg-brand ngày 05/10: 177 cảnh báo), chọn Active Red `#EA1917` (web) hay `#FD312E` (BI) | Sau go-live |
 | 14 | ✅ **Đã sửa 05/10 (chủ dự án duyệt)** — Đơn ảo / hẹn giờ cũ từ bản demo trong `portal.html`. Nguyên nhân: bản demo và `portal.html` cùng tên miền nên dùng chung bộ nhớ trình duyệt. Test xác nhận bản cũ: hiện đơn ảo "Đã duyệt thanh toán" **và hẹn giờ cũ của bản demo gửi lệnh thật `program_update` lên máy chủ**. Sửa: `build_production.py` đổi tên 8 khóa bộ nhớ trong `portal.html` (bản demo không đổi); test Kịch bản 8 | Áp dụng khi build `portal.html` |
 | 15 | Bảng Điều Khiển PM ở chế độ máy chủ **không tự làm mới** — PM phải bấm `Tải lại` để thấy đơn mới | Chủ dự án: giữ / thêm tự làm mới |
 | 16 | **Hẹn giờ (Timer) chỉ chạy khi trang PM đang mở** (lưu trong trình duyệt của PM, kiểm tra mỗi giây). Watchdog 24 giờ chạy trên máy chủ, không bị ảnh hưởng | PM vận hành tay ngày mở bán; chủ dự án quyết định có chuyển lên máy chủ không |
 | 17 | Giữ chỗ 1 chạm **không có ô tích cam kết Jeong-Do riêng**; máy chủ ghi "Đồng ý" vào đơn | Chủ dự án (Jeong-Do) |
 | 18 | Không thu địa chỉ: email ghi "Địa điểm nhận hàng: <kho>" → mô hình hiện tại là **nhận tại kho**. Hướng dẫn cũ ghi "SĐT & Địa chỉ nhận hàng" (đã sửa) | Chủ dự án xác nhận chính sách giao nhận |
 | 19 | Câu chữ trong Tour lệch v1: "khóa máy riêng 24H" (thực tế 24 giờ tính từ lúc mở cổng); "tự động gửi Email khi PM duyệt" (email mặc định TẮT); kho "Hải Phòng AYA, Hà Nội AYB, Hưng Yên AYC" (gộp với mục 9) | Chờ duyệt sửa chữ |
-| 20 | `assets/content/*.json` không được ứng dụng đọc; số tài khoản viết cứng 9 chỗ HTML + 2 chỗ `Code.gs`. File mẫu Excel ở `assets/templates/` và `data/` khác nhau; web tải bản nhúng trong HTML | Biết để không sửa nhầm chỗ; hợp nhất ở v1.1 |
-| 21 | Khi máy chủ chậm (lượt đầu > 15 giây), ô 02 tạm hiện **"0 / 0 SP · Hết hàng (100% Slot đã đăng ký)"** cho tới khi danh mục tải xong — nhân viên có thể hiểu nhầm là hết hàng. Đã thấy trên bản chính thức 05/10 | Chờ duyệt sửa chữ (vd. "Đang tải…") |
-| 22 | Sheet chính đang có dữ liệu test hiển thị cho nhân viên: chương trình `IS2026Q3-HA`, `IS2026Q3-HE` (Open), `IS2026Q4-BS` (Draft) mỗi cái 1 sản phẩm mẫu; `IS-2026Q4-OTHER-01` có 1 đơn | Chủ dự án quyết định đóng / dọn trước bước 8 |
+| 20 | `assets/content/*.json` không được ứng dụng đọc; số tài khoản viết cứng 9 chỗ HTML + 2 chỗ `Code.gs`. File mẫu Excel ở `assets/templates/` và `data/` khác nhau; web tải bản nhúng trong HTML | Biết để không sửa nhầm chỗ; hợp nhất ở v1.2 |
+| 21 | ✅ **Đã sửa 05/10**: ô 02 ghi "Đang tải…" khi danh mục chưa về, "Chưa có sản phẩm" khi chương trình trống, **"Chưa có đợt bán"** khi không có chương trình nào; "Hết hàng" chỉ khi đã tải và hết thật. Test Kịch bản 9–10 | — |
+| 22 | ✅ 05/10: chủ dự án đã đóng (`CLOSED`) cả 4 chương trình test trong Sheet chính; nhân viên hiện thấy 0 chương trình (kiểm chứng trên máy chủ) | — |
 
 ## 10. Kiểm thử
 

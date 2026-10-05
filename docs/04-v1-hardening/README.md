@@ -16,11 +16,42 @@ Thư mục này lưu mọi thay đổi trong giai đoạn chuẩn bị go-live b
 | [`V1_RELEASE_RUNBOOK.md`](V1_RELEASE_RUNBOOK.md) | Điểm khôi phục & cách quay lại, staging, trình tự triển khai, **công tắc email**, xử lý sự cố, lệnh kiểm thử | Admin / PIC, PM (mục 4) |
 | [`../02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](../02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) — Phần C | Những gì nhân viên & PM thấy khác đi trong bản v1 | Nhân viên, PM |
 
+## Phiên bản chuẩn v1.1
+
+**v1.1** (05/10/2026) là bản chuẩn để mọi nâng cấp sau này dựa vào. Gồm toàn bộ việc gia cố trong thư mục này.
+
+| Thành phần | Bản chuẩn v1.1 | Đường lùi |
+|---|---|---|
+| Mã nguồn | Git tag **`v1.1`** trên `main` | Tag `checkpoint-pre-v1-hardening-20261005` (trước v1.1) |
+| Apps Script chính thức | **Version 7** (deployment cũ, URL không đổi) | Version 6 |
+| Apps Script staging | Version 3 | — |
+| Web nhân viên | `portal.html` build từ tag `v1.1` | Bản `portal.html` của tag trước |
+| Dữ liệu | Bản sao "Copy of LG Internal Sales Database - 2026-10-04 (Appscript v6)" | — |
+
+**Quy trình nâng cấp từ v1.1 (bắt buộc):**
+
+```mermaid
+graph LR
+  A[Nhánh mới từ tag v1.1] --> B[Đề xuất + chủ dự án duyệt]
+  B --> C[Sửa + test chạy code thật]
+  C --> D[3 bộ test ĐẠT]
+  D --> E[Staging ĐẠT]
+  E --> F[Gộp main + tag v1.x]
+  F --> G[Deploy + build portal.html]
+```
+
+1. `git switch -c <tên-việc> v1.1` — không sửa thẳng trên `main`.
+2. Chạm Vùng Bất Khả Xâm Phạm hoặc luồng Admin / PM / Nhân viên → đề xuất trước, chờ duyệt.
+3. Trước khi gộp: `node tests/backend_gas_harness.js`, `python3 tests/cloud_mode_regression.py`, `node tests/run_e2e_tests.js` đều ĐẠT; có sửa `Code.gs` → staging ĐẠT (Runbook §2b).
+4. Gộp vào `main`, gắn tag mới (`v1.2`, `v1.3`…), cập nhật bảng trên, nhật ký bên dưới và `docs/CURRENT_STATE.md`.
+5. Build lại `portal.html` **từ đúng tag** và deploy Apps Script phiên bản mới; ghi số Version.
+
 ## Vùng Bất Khả Xâm Phạm — ngoại lệ đã dùng (ghi minh bạch)
 
 | Hàm (No-Touch #) | Thay đổi | Lý do | Duyệt |
 |---|---|---|---|
 | `loadProducts` (#8) | Chờ 8 giây + thử lại 2 lần; tài khoản thật không rơi về dữ liệu demo | V1-03 | Gói A — 05/10 |
+| `loadProducts` (#8) — lần 2 | Thêm 3 dòng `productsLoadedFor = programId` (đánh dấu danh mục đã tải). Logic tải không đổi | Mục 21 — chữ "Hết hàng" khi đang tải | Chủ dự án — 05/10 |
 | `handleRegisterProduct` (#1) | **Chỉ thêm 2 dòng gọi hàm**: làm mới ô 03 khi giữ chỗ thành công; áp danh sách slot đã hết khi bị từ chối. Logic giữ chỗ không đổi | V1-02, C6 | Gói A + C — 05/10 (phần này chưa ghi rõ trong bảng đề xuất, bổ sung tại đây) |
 
 ## Nhật ký thay đổi
@@ -52,3 +83,7 @@ Thư mục này lưu mọi thay đổi trong giai đoạn chuẩn bị go-live b
 | 05/10/2026 | 14 | `build_production.py` đổi tên 8 khóa bộ nhớ trình duyệt trong `portal.html` → không đọc đơn ảo và **hẹn giờ cũ của bản demo** (build cũ: hẹn giờ demo gửi lệnh thật `program_update`). Bản demo không đổi | Nhân viên, PM | Code xong, Kịch bản 8 — 37/37 (build cũ FAIL 3) | CURRENT_STATE §9; Runbook §3 bước 7, §5 |
 | 05/10/2026 | 2b/2c | Staging Version 3 (có V1-16): 2b ĐẠT lần 2; V1-16 kiểm chứng trên máy chủ thật (PM không thấy đơn chương trình ADMIN, ADMIN thấy); không gửi email. Thêm cờ `--scope-user` vào `staging_smoke_test.py` | Không | **ĐẠT** | Runbook §2b |
 | 05/10/2026 | §3 | Bản chính thức Version 7 (PIC deploy): kiểm tra chỉ đọc 10/10; `portal.html` build với URL chính thức, kiểm bằng trình duyệt thật. Phát hiện: còn 5 tài khoản `test123` (gồm ADMIN), chữ "Hết hàng" khi đang tải, dữ liệu test trong Sheet chính | Không | Bước 1–7 xong; bước 8 chờ duyệt | Runbook §3; CURRENT_STATE §9 (4, 21, 22) |
+| 05/10/2026 | 21 | Ô 02: "Đang tải…" khi danh mục chưa về, "Chưa có sản phẩm" khi trống (trước: "Hết hàng (100% Slot đã đăng ký)") | Nhân viên | Code xong; Kịch bản 9 → 41/41 (bản cũ FAIL 2); `portal.html` build lại | CURRENT_STATE §9 |
+| 05/10/2026 | §3 | Chủ dự án: gỡ `test123`, đóng 4 chương trình test, TẮT email. Máy chủ xác nhận cả 3. Số tài khoản hiện đầy đủ ở web / VietQR / email. Còn: mật khẩu dạng chuỗi số đơn giản (giá trị không ghi vào repo) | Admin | Chờ đổi mật khẩu → bước 8 | Runbook §3 |
+| 05/10/2026 | — | Ô 02 ghi **"Chưa có đợt bán"** khi không có chương trình nào (trước: kẹt "Đang tải...") | Nhân viên | Code xong; Kịch bản 10 → 43/43 (bản cũ FAIL) | CURRENT_STATE §9 |
+| 05/10/2026 | **v1.1** | **Phát hành v1.1**: gộp `v1-hardening` vào `main` (fast-forward), tag `v1.1`, đẩy lên 2 remote → `portal.html` lên GitHub Pages. Kế hoạch nâng cấp sau go-live đổi tên thành **v1.2** | Tất cả | Chủ dự án duyệt | Mục "Phiên bản chuẩn v1.1"; CURRENT_STATE; Runbook §1, §3 |

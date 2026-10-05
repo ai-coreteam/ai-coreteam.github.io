@@ -8242,6 +8242,12 @@
             ? 'Bấm "+ Tạo chương trình" trên thanh tab để khởi tạo đợt bán đầu tiên của bạn.'
             : 'Hiện tại chưa có đợt bán hàng nội bộ nào đang mở.';
         }
+        // v1.1: không có chương trình nào → ô 02 không còn kẹt chữ "Đang tải..."
+        const emptyBadgeEl = document.getElementById('grap-avail-badge');
+        if (emptyBadgeEl) {
+          emptyBadgeEl.textContent = 'Chưa có đợt bán';
+          emptyBadgeEl.style.cssText = 'background:#F5F5F5; color:#716F6A; border:1px solid #E0E0E0; font-weight:600;';
+        }
         return;
       }
 
@@ -8303,6 +8309,10 @@
         if (stats.nationwide.availCount > 0) {
           availBadgeEl.textContent = `Còn ${stats.nationwide.availCount} SP khả dụng`;
           availBadgeEl.style.cssText = 'background:#FEF9E7; color:#7D6608; border:1px solid #F9E79F; font-weight:600;';
+        } else if (stats.nationwide.totalListed === 0) {
+          // v1-hardening (mục 21): danh mục chưa tải xong (máy chủ chậm) ≠ hết hàng
+          availBadgeEl.textContent = productsLoadedFor === pid ? 'Chưa có sản phẩm' : 'Đang tải…';
+          availBadgeEl.style.cssText = 'background:#F5F5F5; color:#716F6A; border:1px solid #E0E0E0; font-weight:600;';
         } else {
           availBadgeEl.textContent = 'Hết hàng (100% Slot đã đăng ký)';
           availBadgeEl.style.cssText = 'background:#FDEDEC; color:#922B21; border:1px solid #F5B7B1; font-weight:600;';
@@ -8692,6 +8702,7 @@
       renderProductTable(currentProducts);
     }
 
+    let productsLoadedFor = null; // v1-hardening (mục 21): ô 02 chỉ báo "Hết hàng" khi danh mục chương trình đã tải xong
     async function loadProducts(programId) {
       if (!currentUser) return;
       unifiedCatalogKho = '';
@@ -8702,6 +8713,7 @@
       const cached = getSwrCache('products_' + programId);
       if (cached && Array.isArray(cached) && cached.length > 0) {
         currentProducts = cached;
+        productsLoadedFor = programId;
         syncProductRegistrationStatus(programId, currentProducts);
         renderProductTable(cached);
         renderTab4ProductTable(cached);
@@ -8722,6 +8734,7 @@
             const data = await res.json();
             if (data.ok && Array.isArray(data.products)) {
               currentProducts = data.products;
+              productsLoadedFor = programId;
               if (data.products.length > 0) setSwrCache('products_' + programId, data.products);
               syncProductRegistrationStatus(programId, currentProducts);
               renderProductTable(data.products);
@@ -8743,6 +8756,7 @@
 
       if (!fetched) {
         currentProducts = (DEMO_PRODUCTS[programId] || []).slice();
+        productsLoadedFor = programId;
         syncProductRegistrationStatus(programId, currentProducts);
         renderProductTable(currentProducts);
         renderTab4ProductTable(currentProducts);
