@@ -134,18 +134,20 @@ Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet t
 | 1 | Deployment Web app: Execute as **Me**, Who has access **Anyone** | ✅ | Deploy → New deployment | Mở URL `/exec` thấy JSON `ok` | ✅ |
 | 2 | Sheet dữ liệu: `SPREADSHEET_ID` dòng 21 `Code.gs` **hoặc** Script Property `SPREADSHEET_ID` | ✅ | Sửa dòng 21 / Project Settings → Script Properties | Đăng nhập được | ✅ |
 | 3 | Khóa ký phiên: `rotateSessionSecret` | ✅ | Run 1 lần | Log "Đã thay khóa ký phiên đăng nhập" | ✅ 14:37 |
-| 4 | **Trigger quét quá hạn: `setupWatchdogTrigger`** | ✅ | Run 1 lần (tự xóa trigger trùng) | Triggers: 1 dòng `runExpirationWatchdog`; Last run có giờ | ✅ 15:46 (làm bù) |
+| 4 | **Trigger quét quá hạn: `setupWatchdogTrigger`** | ✅ | Run 1 lần (tự xóa trigger trùng) | Triggers: 1 dòng `runExpirationWatchdog`; Last run có giờ | ✅ 15:46 (làm bù) — **đã chạy thật 16:15:39, Error rate 0%** |
 | 5 | Cấp quyền Google (Sheet, Drive, Gmail) cho tài khoản chạy script | ✅ | Tự hỏi ở lần Run đầu tiên → Allow | Không còn hộp "Authorization required" | ✅ |
 | 6 | Tab `Config`: không có `ALLOW_DEMO_TOKENS` (hoặc `false`); `ENABLE_AUTO_EMAIL` theo quyết định | ✅ | Sửa Sheet | ADMIN đọc công tắc email trên web | ✅ (email TẮT) |
 | 7 | Tab `Users`: ≥ 1 ADMIN, mật khẩu riêng; nhân viên thật | ✅ | Sửa Sheet | Đăng nhập thử | ⚠️ còn mật khẩu yếu |
-| 8 | Thư mục biên lai Drive "Bien lai nop tien" | Tự động | Tạo ở lần nộp tiền đầu tiên, cạnh file Sheet; ID lưu vào Script Property `RECEIPT_FOLDER_ID` | Thư mục xuất hiện sau đơn nộp tiền đầu tiên | — chưa có đơn thật |
-| 9 | Quyền **xem** thư mục biên lai cho người đối soát (PM / Kế toán) | Khi cần | Drive → thư mục "Bien lai nop tien" → Share → Viewer | Người đối soát mở được link cột R `Receipt` | Chưa làm — cần sau đơn nộp tiền đầu tiên |
+| 8 | Thư mục biên lai Drive "Bien lai nop tien" | Tự động | Tạo ở lần nộp tiền đầu tiên, cạnh file Sheet; ID lưu vào Script Property `RECEIPT_FOLDER_ID` | Thư mục xuất hiện sau đơn nộp tiền đầu tiên | ✅ Có (tạo 04/10 khi test), cùng thư mục với Sheet chính · ⚠️ **có cả 1 file test của STAGING** (xem dưới) |
+| 9 | Quyền **xem** thư mục biên lai cho người đối soát (PM / Kế toán) | Khi cần | Drive → thư mục "Bien lai nop tien" → Share → Viewer | Người đối soát mở được link cột R `Receipt` | ⚠️ 05/10 đang để **"Anyone with the link – Viewer"** — chờ chủ dự án chốt (CURRENT_STATE mục 28) |
 | 10 | `setupNewDatabase` | ❌ chỉ khi tạo Sheet **mới** | — | Tự từ chối chạy trên Sheet đã có dữ liệu | Không dùng |
 | 11 | `clearCache`, `testSetup` | ❌ tiện ích | Chạy khi kỹ thuật cần | — | Không dùng |
 
 ⚠️ Trigger chạy bản code **đang lưu trong trình soạn thảo** (cột Deployment = `Head`), không phải Version đã deploy. Sau khi deploy: **không** để code đang sửa dở trong trình soạn thảo của dự án chính thức.
 
-Staging **không cần** trigger (tránh tự hủy đơn test). Chương trình test thêm trên staging ngày 05/10 (đã đóng): `IS-RECEIPTTEST-1005161946` (1 đơn đã từ chối, 1 file ảnh test 1×1 px trong thư mục biên lai của staging).
+Staging **không cần** trigger (tránh tự hủy đơn test).
+
+⚠️ **Thư mục biên lai dùng chung (phát hiện 05/10):** chỉ có **1** thư mục "Bien lai nop tien" (cạnh Sheet chính), nhưng biên lai test của **staging** (`BL_IS-RECEIPTTEST-…png`) cũng nằm trong đó, dù Sheet staging ở thư mục khác. Nguyên nhân **chưa xác minh**; khả năng cao dự án staging có Script Property `RECEIPT_FOLDER_ID` trỏ vào thư mục chính thức. Cách kiểm tra: dự án STAGING → ⚙️ Project Settings → Script Properties → nếu có `RECEIPT_FOLDER_ID` = `1UBgtt…` thì **xóa** dòng đó (lần nộp tiền test sau, staging tự tạo thư mục riêng cạnh Sheet staging). Chương trình test thêm trên staging ngày 05/10 (đã đóng): `IS-RECEIPTTEST-1005161946` (1 đơn đã từ chối, 1 file ảnh test 1×1 px trong thư mục biên lai của staging).
 
 **Bản demo** (`Mau_Dang_Ky_Internal_Sales_3009.html`, `index.html`) giữ nguyên để đào tạo. Việc đổi `index.html` trỏ sang `portal.html` là **quyết định của chủ dự án**, chưa thực hiện.
 
