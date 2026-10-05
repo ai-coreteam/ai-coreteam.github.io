@@ -320,3 +320,23 @@ graph LR
 | Chọn phương án | **B** |
 | Ai chọn ảnh cho mỗi đợt bán | Kỹ thuật chạy script, **PM duyệt** trang chọn ảnh (≈ 1–2 phút / 10 model) |
 | Nhãn "Ảnh minh họa" | Có |
+
+
+### 11.4. Giai đoạn 2 — nền & header & thanh chọn (06/10/2026) + link sản phẩm
+
+| Hạng mục | Kết quả [ĐO] |
+|---|---|
+| Header, tổng quan, thanh danh mục nằm thẳng trên nền; vùng làm việc = 1 thẻ trắng bo 24 px | ✅ |
+| Nền trang `#F6F3EB` (v1.4 thực tế là `#F0ECE4` → trùng màu thanh chọn); chế độ Đêm nền `#1A1A1A` | ✅ |
+| Chọn chương trình + 4 tab → segmented (track xám ấm, viên trắng); tab PM đỏ đặc → cùng kiểu | ✅ |
+| Desktop: không tab nào bị giấu (thanh xuống dòng); mobile: vuốt ngang | ✅ 1440 / 1280 / 390 px |
+| Chữ header & thanh chọn ≥ 14 px (cờ HOT/NEW 12 px = LG.com Tag Small) | ✅ |
+| Tương phản AA, 12 màn hình Sáng + Đêm | **0 lỗi** (giữa chừng có 29 lỗi Đêm do chính GĐ2 gây ra — đã sửa hết) |
+| Test giao diện tắt / bật v2 · e2e · máy chủ | 75/75 · 75/75 · 165 · 67 |
+| Tắt v2 | Giống hệt v1.4 (216 / 266 / 136) |
+
+**Link xem tính năng model** (thay cho ảnh sản phẩm, chủ dự án chọn 06/10): thẻ và bảng sản phẩm có link **"Xem trên LG.com ↗"** tới trang sản phẩm chính thức nếu model có trong sitemap lg.com/vn (mã nội bộ `.ATV`… được bỏ khi tra), không có thì **"Tìm thông tin model ↗"** (Google). Dòng lưu ý: giá, quà tặng, khuyến mãi trên LG.com không áp dụng cho đợt bán nội bộ. Bản đồ link: `assets/content/lgcom_product_links.json` (2.342 model, ~20 KB nén) tạo bằng `python3 scripts/build_product_links.py` — **chạy lại trước mỗi đợt bán** để cập nhật model mới. Độ phủ trên dữ liệu demo: 37/52 model (71 %) có trang LG.com.
+
+⚠️ Giới hạn kiểm chứng: LG.com (Akamai) chặn trình duyệt tự động và sau đó chặn cả máy kiểm thử (HTTP 403) → **chưa mở được link bằng trình duyệt thật của người dùng**; trước đó cùng các trang này trả HTTP 200 với nội dung đúng model. Cần chủ dự án bấm thử 2–3 link trên link xem trước.
+
+![GĐ2: PM (Sáng) và Nhân viên (Đêm)](v2/phase2_pm_light_employee_dark.png)

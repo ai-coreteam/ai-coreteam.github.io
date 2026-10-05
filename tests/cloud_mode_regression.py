@@ -467,6 +467,15 @@ def main():
                     check(on, '?ui=v2 → bật lớp giao diện v2')
                     check(page.evaluate(arial) == 0, f'v2: không còn chữ Arial ({page.evaluate(arial)})')
                     check(page.evaluate(faux) == 0, f'v2: không tô đậm giả LG EI Headline ({page.evaluate(faux)})')
+                    p2 = page.evaluate('''() => {
+                        const bodyBg = getComputedStyle(document.body).backgroundColor, nav = document.querySelector('.nav-tabs'), bar = document.querySelector('#program-tab-bar');
+                        const small = [...document.querySelectorAll('.top-header *, #program-tab-bar *, .nav-tabs *')].filter(e => e.getBoundingClientRect().width &&
+                              [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 14).length;
+                        return { trackVisible: getComputedStyle(bar).backgroundColor !== bodyBg, navHidden: nav.scrollWidth > nav.clientWidth + 1,
+                                 barHidden: bar.scrollWidth > bar.clientWidth + 1, small }; }''')
+                    check(p2['trackVisible'], 'v2 GĐ2: thanh chọn chương trình phân biệt được với nền trang')
+                    check(not p2['navHidden'] and not p2['barHidden'], 'v2 GĐ2: desktop không giấu tab / chương trình nào')
+                    check(p2['small'] == 0, f"v2 GĐ2: chữ header / thanh chọn ≥ 14 px ({p2['small']} chỗ nhỏ hơn)")
                     check(not page.errors, f'v2: không có lỗi JS ({page.errors[:2]})')
                 else:
                     check(not on, f'{label} → giao diện v1.4 (không có class ui-v2)')
