@@ -1,4 +1,7 @@
 # BÁO CÁO PHÂN TÍCH CHUYÊN SÂU & ĐIỂM MÙ VẬN HÀNH GO-LIVE (PHASE P8)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). Polling hiện hành: **6–8 giây** khi đang ở Tab 2 / Tab 4, 45–60 giây ở tab khác, dừng khi ẩn trang. Bước "dán URL vào `SHEET_API_URL`" đã được thay bằng bản build `portal.html`.
+
 ## DEEP ANALYSIS, BLINDSPOTS & ARCHITECTURAL AUDIT — LG INTERNAL SALES PORTAL
 *Dự án: Cổng Đăng Ký Mua Hàng Nội Bộ — LG Electronics Việt Nam Hải Phòng (LGEVH)*  
 *Chuẩn quản trị: McKinsey Executive Problem Solving & Kỷ luật Kỹ thuật Karpathy Epistemic*  

@@ -1,4 +1,7 @@
 # LG INTERNAL SALES PORTAL — MASTER DESIGN GAP ANALYSIS
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md).
+
 **Bản Đánh Giá Chuyên Sâu Lỗ Hổng Thiết Kế & Nhận Diện Thương Hiệu Dưới Góc Nhìn Chuyên Gia 30 Năm Kinh Nghiệm Tại LG Electronics**
 
 * **Chủ nhiệm đánh giá (Lead Auditor):** Senior Principal Brand & UI/UX Designer *(30+ năm cống hiến tại Trung tâm Thiết kế Toàn cầu LG Electronics, đồng tác giả và người thực thi từ kỷ nguyên tái định vị Lucky-Goldstar sang LG 1995 đến Brand Reinvention V5.2 2024)*

@@ -1,4 +1,7 @@
 # ĐỀ XUẤT TỐI ƯU HÓA FLOW HƯỚNG DẪN QUẢN TRỊ PM & GIẢI PHÁP TRIỆT TIÊU ĐIỂM TRÙNG LẶP UX
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** ✅ **Đã triển khai** (dòng "Chờ phê duyệt" bên dưới là trạng thái cũ): tour PM 5 bước khớp mục 5; mục 6 — `#pm-controls` tự ẩn khi đang ở tab Bảng Điều Khiển PM. Hướng dẫn hiện hành: [`PM_AND_USER_OPERATIONAL_GUIDE.md`](PM_AND_USER_OPERATIONAL_GUIDE.md); thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md).
+
 ## (PM ONBOARDING FLOW & UX REDUNDANCY OPTIMIZATION PROPOSAL)
 
 **Dự án:** LG Internal Sales Platform (Cổng Bán Hàng Nội Bộ LG Electronics Việt Nam)  

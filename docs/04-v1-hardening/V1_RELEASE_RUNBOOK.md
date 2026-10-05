@@ -149,6 +149,7 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | Nhân viên không hủy được giữ chỗ | Đã khai nộp tiền (quy tắc đã duyệt 05/10) | PM xử lý từ chối / hoàn tiền theo quy trình |
 | Lỡ chạy `setupNewDatabase()` trên Sheet chính | — | Hàm tự **dừng**, không xóa gì (log: "DỪNG: Sheet … đã có dữ liệu") |
 | Nghi ngờ lộ phiên đăng nhập | — | Chạy `rotateSessionSecret()` → mọi người đăng nhập lại |
+| Nhân viên / PM thấy đơn **"Đã duyệt thanh toán" mà mình không đăng ký** trong `portal.html` | Dữ liệu cũ của **bản demo** còn trong trình duyệt (cùng tên miền) — lỗi đã biết, [`CURRENT_STATE.md`](../CURRENT_STATE.md) mục 14, chưa sửa | Tạm thời: mở `portal.html` ở cửa sổ ẩn danh, hoặc xóa dữ liệu trang web (Cài đặt trình duyệt → Quyền riêng tư → Dữ liệu trang web của `gobitangocbao.github.io`). Máy chủ **không** bị ghi sai |
 
 ---
 

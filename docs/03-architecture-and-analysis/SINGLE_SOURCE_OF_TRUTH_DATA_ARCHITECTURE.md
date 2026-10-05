@@ -1,4 +1,7 @@
 # Kiến Trúc Đồng Bộ Dữ Liệu Tập Trung (Single Source of Truth - SSOT)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). Thay đổi v1 liên quan: nhân viên thật **không** rơi về dữ liệu demo khi máy chủ chậm (hiện panel "Thử lại"); ô 03 đọc đơn từ máy chủ.
+
 ### LG Internal Sales Portal — Đồng Bộ Dữ Liệu Thời Gian Thực & Cơ Chế Đảm Bảo Cho Tương Lai
 
 *Tài liệu kỹ thuật lưu hành nội bộ — Thiết kế và bàn giao cho Đội ngũ Kỹ thuật & AI Agent kế thừa.*

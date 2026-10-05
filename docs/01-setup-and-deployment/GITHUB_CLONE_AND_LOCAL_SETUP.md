@@ -95,15 +95,20 @@ Mở URL được hiển thị trên terminal (thường là `http://localhost:3
 
 ## 4. Tài khoản Demo kiểm thử có sẵn (Demo Credentials)
 
-Hệ thống tích hợp sẵn các tài khoản demo để người dùng và quản trị viên có thể kiểm thử ngay:
+Hệ thống tích hợp sẵn các tài khoản demo để người dùng và quản trị viên có thể kiểm thử ngay *(bảng đã đối chiếu với mã nguồn ngày 05/10/2026 — bản cũ ghi mật khẩu `pm123456`/`emp123456` và mã `VH67890` là không đúng)*:
 
 | Vai trò (Role) | Mã NV (Account) | Mật khẩu mặc định | Họ tên hiển thị | Quyền hạn chính |
 |---|---|---|---|---|
-| **PM Quản Trị** | `VH12345` | `pm123456` | Nguyễn Thị Quỳnh Như | Tạo đợt bán, import Excel, mở/kết sổ chương trình, mở cổng nộp tiền, duyệt thanh toán bằng Lightbox, đối soát hàng loạt, xuất báo cáo. |
-| **Nhân Viên 1** | `VH67890` | `emp123456` | Trần Văn Tuấn | Xem catalog, đăng ký giữ chỗ suất máy (Slot), nộp chứng từ ủy nhiệm chi, tra cứu đơn hàng cá nhân. |
-| **Nhân Viên 2** | `VH11111` | `emp123456` | Lê Thị Mai | Đăng ký thử nghiệm và kiểm thử tính năng giữ chỗ cạnh tranh (FCFS). |
+| **PM Quản Trị** | `VH12345` | `test123` | Nguyễn Thị Quỳnh Như | Tạo đợt bán, import Excel, mở/kết sổ chương trình, mở cổng nộp tiền, duyệt thanh toán bằng Lightbox, đối soát hàng loạt, xuất báo cáo. |
+| **PM Quản Trị** | `VH99999` | `test123` | Nguyen Ngoc Bao | Như trên (dùng thử cô lập đa PM). |
+| **Nhân Viên 1** | `VH88921` | `test123` | Trần Văn Nam | Xem catalog, đăng ký giữ chỗ suất máy (Slot), nộp chứng từ ủy nhiệm chi, tra cứu đơn hàng cá nhân. |
+| **Nhân Viên 2** | `VH11111` | `test123` | Nguyen Ngoc Bao | Đăng ký thử nghiệm và kiểm thử tính năng giữ chỗ cạnh tranh (FCFS). |
+| Nhân viên khác | `VH55432`, `VH33211`, `VH99120` | `test123` | Lê Hoàng Anh, Hoàng Minh Trí, Đặng Thanh Hà | Thử nhiều người cùng lúc. |
+| Tài khoản bị khóa | `VH00001` | `disabled` | Test Inactive | Thử thông báo "tài khoản đã bị vô hiệu hóa". |
 
-> **Cách đăng nhập:** Bấm vào nút `Đổi vai trò / Đăng nhập` hoặc icon người dùng ở góc trên bên phải màn hình để chuyển đổi giữa tài khoản **Nhân viên** và **PM Quản trị**.
+> **Cách đăng nhập:** màn hình đăng nhập hiện ngay khi mở trang. Gõ Mã NV + mật khẩu, hoặc bấm 1 trong 3 nút đăng nhập nhanh (`VH12345`, `VH88921`, `VH11111`). Đổi tài khoản: bấm **Đăng xuất** ở góc trên bên phải rồi đăng nhập lại.
+>
+> ⚠️ Tài khoản demo **chỉ có trong bản demo**. Bản chính thức `portal.html` không có, và máy chủ chính thức từ chối phiên đăng nhập demo. Role **ADMIN** chỉ có với tài khoản trong Sheet — xem [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md).
 
 ---
 
@@ -119,7 +124,7 @@ Khi muốn triển khai lên môi trường sản xuất có lưu trữ dữ li�
    * Tại menu chọn hàm, chọn **`setupNewDatabase`** và bấm **Chạy (Run)**.
    * Cấp quyền Google khi được hỏi. Hàm sẽ **tự động tạo tệp Google Sheet "LG Internal Sales Database"** ngay trên Drive của bạn với đầy đủ 8 sheets chuẩn LG Brand V5.2.
 2. **Triển khai Web App:**
-   * Sao chép mã `SPREADSHEET_ID` được in ra ở cửa sổ nhật ký, dán vào dòng 21 `Code.gs`: `var SPREADSHEET_ID = '<ID_VỪA_TẠO>';` và bấm **Lưu**.
+   * Sao chép mã `SPREADSHEET_ID` được in ra ở cửa sổ nhật ký, dán vào dòng 21 `Code.gs`: `var SPREADSHEET_ID = '<ID_VỪA_TẠO>';` và bấm **Lưu**. *(Từ 05/10/2026 có cách tốt hơn: Project Settings → Script Properties → `SPREADSHEET_ID` = ID vừa tạo, không cần sửa code.)*
    * Bấm **Triển khai (Deploy)** → **Tùy chọn triển khai mới (New deployment)**.
    * Chọn loại: **Ứng dụng web (Web App)** (Execute as: **Tôi / Me**, Who has access: **Bất kỳ ai / Anyone**).
    * Bấm **Triển khai** và sao chép đường dẫn **Web App URL** (Dạng `https://script.google.com/macros/s/.../exec`).
@@ -127,7 +132,8 @@ Khi muốn triển khai lên môi trường sản xuất có lưu trữ dữ li�
    * Mở file [`Mau_Dang_Ky_Internal_Sales_3009.html`](Mau_Dang_Ky_Internal_Sales_3009.html) trên trình duyệt.
    * Nhấp vào huy hiệu **`⚪ Demo Mode (Offline)`** trên góc phải thanh tiêu đề (hoặc nút **`Cấu hình API`** trong Tab PM).
    * Dán Web App URL vào ô và bấm **Kiểm Tra & Lưu Cấu Hình**.
-   * Hệ thống sẽ ping kiểm tra kết nối và chuyển sang trạng thái **`🟢 Google Cloud Live`**. Dữ liệu được lưu an toàn trong `localStorage` trình duyệt của bạn!
+   * Hệ thống sẽ ping kiểm tra kết nối và chuyển sang trạng thái **`🟢 Google Cloud Live`**. URL được lưu trong `localStorage` của **riêng trình duyệt này**.
+4. **Phát hành cho nhân viên (từ 05/10/2026):** nhân viên không cần làm bước 3. Sinh bản chính thức đã gắn sẵn URL: `python3 scripts/build_production.py --api-url <URL /exec>` → `portal.html`. Trình tự đầy đủ: [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) mục 3.
 
 ---
 

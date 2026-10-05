@@ -1,4 +1,7 @@
 # ĐỀ XUẤT CẢI TIẾN LUỒNG HƯỚNG DẪN NGƯỜI DÙNG (USER/EMPLOYEE ONBOARDING FLOW OPTIMIZATION)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** ✅ **Đã triển khai**: tour Nhân viên 4 bước khớp mục 4 (xem lưu ý câu chữ ở [`ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md`](ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md)). Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md).
+
 > **Dự án:** LG Internal Sales Portal — Cổng Đăng Ký Mua Hàng Nội Bộ LGEVH  
 > **Tài liệu tham chiếu:** `Mau_Dang_Ky_Internal_Sales_3009.html`, `docs/02-user-and-pm-guide/ONBOARDING_TOUR_GUIDANCE_FLOW_PLAN.md`  
 > **Chuẩn nhận diện:** LG Electronics Brand Guidelines V5.2 (Tháng 8/2024)  

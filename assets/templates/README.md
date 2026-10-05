@@ -1,5 +1,11 @@
 # LG Internal Sales — System Templates Directory
 
+> **📌 Trạng thái (cập nhật 05/10/2026, đối chiếu code):**
+> - Nút tải file mẫu trên web dùng **bản nhúng sẵn** trong HTML (biến `b64Data` trong `downloadExcelTemplate()`), **không** đọc file trong thư mục này. Sửa file ở đây mà không nhúng lại thì web vẫn tải bản cũ.
+> - `assets/templates/Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx` và `data/Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx` hiện **khác nhau** (khác mã băm MD5). Chưa xác định bản nào khớp bản nhúng — PM kiểm tra trước khi dùng làm chuẩn.
+> - `parseExcelCatalog()` nhận diện cột **theo tên tiêu đề**, không theo vị trí, nên nhận cả mẫu 7 cột bên dưới lẫn file kiểm kê kho của PM (No, CAT, W/H, Model, Serial, NOTE, Grade, MRP, D/C, Selling price). Thứ tự "Cột 1…7" bên dưới chỉ là gợi ý.
+> - CSDL thật có **8 tab** do `setupNewDatabase()` tạo — danh sách tab chuẩn xem [`docs/CURRENT_STATE.md`](../../docs/CURRENT_STATE.md) mục 8; danh sách 8 sheet ghi ở bảng dưới là của file Excel mẫu cũ.
+
 Thư mục này lưu trữ toàn bộ các tệp tin mẫu (Templates) chính thức của Cổng Bán Hàng Nội Bộ LG Electronics Việt Nam (LGEVH).
 
 ---

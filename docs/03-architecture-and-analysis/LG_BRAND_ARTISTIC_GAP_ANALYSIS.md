@@ -1,4 +1,7 @@
 # LG INTERNAL SALES PORTAL — BRAND CONSISTENCY & ARTISTIC EXCELLENCE AUDIT
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). Việc màu còn tồn (Active Red `#EA1917` web vs `#FD312E` BI; màu ngoài bảng màu) là hạng mục v1.1.
+
 **Tài liệu Phân Tích Lỗ Hổng Nhận Diện Thương Hiệu LG & Thiết Kế Nghệ Thuật (Brand Consistency & Artistic Design Gap Analysis)**
 
 * **Tác giả (Auditor):** LG Master Brand Designer & Global Design Director *(50 năm kinh nghiệm thiết kế nhận diện số & web thương hiệu toàn cầu)*

@@ -1,4 +1,7 @@
 # LG INTERNAL SALES PORTAL — DESIGN IMPROVEMENT PLAN PROPOSAL
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). **Mục 3B "Vùng Bất Khả Xâm Phạm" vẫn còn hiệu lực**; các ngoại lệ đã dùng ghi tại [`04-v1-hardening/README.md`](../04-v1-hardening/README.md).
+
 **Đề Án Nâng Cấp Toàn Diện Thẩm Mỹ & Trải Nghiệm Giao Diện Cổng Bán Hàng Nội Bộ Theo Tiêu Chuẩn GRAP & LG.com Flagship**
 
 * **Chủ nhiệm đề án (Design Lead):** Senior Principal Brand & UI/UX Designer *(30+ năm kinh nghiệm thiết kế nhận diện thương hiệu tại LG Electronics HQ)*

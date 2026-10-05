@@ -2,9 +2,11 @@
 
 Hệ thống số hóa toàn diện quy trình đăng ký, giữ chỗ theo nguyên tắc First-Come, First-Served (FCFS), thanh toán đối soát qua VietQR và quản trị các đợt bán hàng nội bộ ưu đãi dành riêng cho cán bộ công nhân viên **LG Electronics Việt Nam (LGEVH)**.
 
-> 🚀 **TRẢI NGHIỆM TRỰC TUYẾN (GO-LIVE DEMO LINK):**  
+> 📌 **THÔNG TIN MỚI NHẤT (05/10/2026): đọc [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md) trước.** Bản v1 đã gia cố trên nhánh `v1-hardening` và đạt kiểm thử trên máy chủ staging; **chưa** triển khai bản chính thức. Mở bán: **10:00 14/10/2026**.
+
+> 🚀 **BẢN DEMO TRỰC TUYẾN (đào tạo / thử nghiệm):**  
 > 🔗 **[https://gobitangocbao.github.io/lg-internal-sales-portal/](https://gobitangocbao.github.io/lg-internal-sales-portal/)**  
-> *Hệ thống đã Go-Live chính thức: Tự động chạy chế độ Demo Offline, hỗ trợ kết nối Google Sheet cá nhân 1-Click, VietQR thanh toán 1-chạm và tối ưu hóa 100% trên điện thoại di động chuẩn LG Brand Guidelines V5.2.*
+> *Đây là **bản demo**: mặc định chạy Demo Offline với tài khoản mẫu. Bản chính thức cho nhân viên là `portal.html`, sinh bằng `scripts/build_production.py` (không có tài khoản/dữ liệu demo) — xem [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md).*
 
 > 🔒 **LƯU Ý BẢO MẬT & BẢN QUYỀN:** Kho lưu trữ chứa thông tin tài khoản ngân hàng thụ hưởng pháp nhân, danh mục sản phẩm và quy trình kiểm toán Jeong-Do. Dữ liệu đã được **khử định danh (sanitized)** toàn diện để có thể triển khai an toàn trên môi trường cá nhân hóa mà không làm rò rỉ dữ liệu cá nhân của bất kỳ ai.
 
@@ -35,6 +37,7 @@ graph TD
 
 | Pha | Mục tiêu | Tài liệu cần đọc | Trọng tâm cần nắm |
 |---|---|---|---|
+| **Pha 0** | **Nắm trạng thái hiện tại** | [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md)<br>[`docs/04-v1-hardening/`](docs/04-v1-hardening/README.md) | Phiên bản, vai trò (USER/PM/ADMIN), việc còn mở, Runbook triển khai & khôi phục, nhật ký thay đổi. |
 | **Pha 1** | **Thiết lập, Git & CSDL riêng** | [`docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md`](docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md)<br>[`docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md`](docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md)<br>[`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md)<br>[`docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md`](docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md) | **Cấu hình mạng Git kép (all, origin, gobita):** Đẩy đồng bộ cả 2 kho bằng `git push all main`.<br>**1-Click setupNewDatabase():** Hướng dẫn PIC chạy hàm để Google Apps Script tự tạo Google Sheet trên Drive cá nhân của họ, lấy `SPREADSHEET_ID` và dán Web App URL vào Modal Cấu hình API trên giao diện web. |
 | **Pha 2** | **Vận hành & Nghiệp vụ** | [`docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) | **Luồng 4 bước của Nhân viên:** Chọn đợt bán → Đặt suất FCFS → Nhận thông báo mở cổng → Quét VietQR nộp tiền.<br>**Luồng 5 bước của PM:** Tạo đợt bán mới → Nạp Excel sản phẩm → Hẹn giờ tự động → Duyệt/từ chối đơn qua Lightbox → Kết sổ. |
 | **Pha 3** | **Hỗ trợ User & Sự cố** | [`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md) *(Mục 6)*<br>[`assets/content/bank_accounts.json`](assets/content/bank_accounts.json)<br>[`assets/templates/`](assets/templates/) | **Sự cố mạng Intranet:** Hướng dẫn user chuyển sang **4G/5G** nếu mạng nội bộ nhà máy chặn Webhook Google.<br>**Cập nhật cấu hình:** Sửa số tài khoản ngân hàng hoặc nạp thêm máy từ file mẫu `.xlsx`. |
@@ -95,11 +98,15 @@ lg-internal-sales-portal/
 │   │   └── USERS_SHEET_TEMPLATE.md          # Đặc tả định dạng bảng tính Google Sheets
 │   ├── 02-user-and-pm-guide/                # Cẩm nang quy trình cho Người dùng & Quản trị viên
 │   │   └── PM_AND_USER_OPERATIONAL_GUIDE.md # [CẨM NANG VẬN HÀNH KÈM SƠ ĐỒ QUY TRÌNH]
+│   ├── CURRENT_STATE.md                     # [ĐỌC TRƯỚC] Thông tin hiện hành — nguồn chuẩn duy nhất
+│   ├── 04-v1-hardening/                     # Bản v1: đề xuất, Runbook triển khai & khôi phục, nhật ký thay đổi
 │   ├── 03-architecture-and-analysis/        # Báo cáo kiểm toán bảo mật, nhận diện thương hiệu
 │   │   ├── GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md
 │   │   ├── LG_BRAND_ARTISTIC_GAP_ANALYSIS.md
 │   │   └── KE_HOACH_TOI_UU_TOAN_DIEN_INTERNAL_SALES.md
 │   └── README.md                            # Mục lục điều hướng tài liệu docs
+├── scripts/build_production.py              # Sinh portal.html (bản chính thức, không dữ liệu demo)
+├── tests/                                   # Kiểm thử: backend_gas_harness.js, cloud_mode_regression.py, staging_smoke_test.py, run_e2e_tests.js
 ├── PROJECT_PLANNING.md                      # Lộ trình kỹ thuật & kế hoạch phát triển
 └── README.md                                # Tài liệu tổng quan dự án (File này)
 ```
@@ -107,6 +114,8 @@ lg-internal-sales-portal/
 ---
 
 ## 3. Tài khoản Demo có sẵn để thử nghiệm (Demo Credentials)
+
+> ⚠️ **Chỉ có trong bản demo.** Bản chính thức (`portal.html`) không có tài khoản demo, và máy chủ chính thức từ chối mọi phiên đăng nhập demo. Danh sách đầy đủ (gồm `VH11111`, `VH99999`, tài khoản khóa `VH00001`) và vai trò mới **ADMIN**: [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md) mục 3–4.
 
 Hệ thống tích hợp sẵn các tài khoản demo trên thanh đăng nhập để kiểm thử ngay lập tức (chỉ cần bấm nút đăng nhập nhanh hoặc gõ mật khẩu `test123`):
 
@@ -122,6 +131,8 @@ Hệ thống tích hợp sẵn các tài khoản demo trên thanh đăng nhập 
 
 ## 4. Hướng Dẫn Vận Hành & Khắc Phục Sự Cố Cho User
 
+> Mục 1–2 dưới đây áp dụng cho **bản demo**. Ở **bản chính thức** (`portal.html`) không có huy hiệu Demo / nút "Cấu hình API": trang tự kết nối máy chủ. Hướng dẫn sử dụng bản v1: [`docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) — Phần C.
+
 1. **Khi chạy thử nghiệm (Demo Mode):**
    - Mặc định khi mở trang, huy hiệu ở góc trên bên phải hiển thị `⚪ Demo Mode (Offline)`.
    - Dữ liệu được lưu trữ tự động trong `localStorage` của trình duyệt, người dùng có thể thoải mái thao tác mà không ảnh hưởng tới dữ liệu thật.
@@ -134,6 +145,7 @@ Hệ thống tích hợp sẵn các tài khoản demo trên thanh đăng nhập 
 4. **Bàn giao kỹ thuật & Đồng bộ Git kép (Multi-Agent & PIC Handover):**
    - Đọc cẩm nang chi tiết: [`docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md`](docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md).
    - Đẩy cập nhật đồng bộ lên cả 2 kho lưu trữ GitHub bằng 1 lệnh duy nhất: `git push all main`.
+5. **Bản v1 (05/10/2026):** thay đổi đang nằm trên nhánh `v1-hardening` (chưa gộp vào `main`). Điểm khôi phục: tag `checkpoint-pre-v1-hardening-20261005`. Kiểm thử chạy code thật: `node tests/backend_gas_harness.js` và `python3 tests/cloud_mode_regression.py`.
 
 ---
 

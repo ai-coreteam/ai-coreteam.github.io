@@ -5,6 +5,8 @@
 > **Mục tiêu:** Giúp bất kỳ ai, kể cả người không rành công nghệ, có thể tự mình thiết lập và trải nghiệm kiểm thử toàn diện một hệ thống bán hàng thực tế khép kín qua 3 vai trò: **Admin $\rightarrow$ PM $\rightarrow$ User**.  
 > **Tài nguyên mẫu đính kèm:** `data/Mockup_10_Models_Internal_Sales_Template.xlsx` (10 model sản phẩm LG cao cấp).
 
+> 📌 **Đã đối chiếu với giao diện & mã nguồn ngày 05/10/2026 (bản v1).** Các chỗ sửa được đánh dấu *"(cập nhật 05/10)"*. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md). Lưu ý: kiểm thử trên Sheet đang **bật email tự động** sẽ gửi email thật — tắt email (công tắc của ADMIN) hoặc dùng email test `@example.com` trước khi thử.
+
 ---
 
 ## TỔNG QUAN LUỒNG VẬN HÀNH 3 VAI TRÒ
@@ -19,7 +21,7 @@ sequenceDiagram
     Note over Admin: BƯỚC 1: KHỞI TẠO CƠ SỞ DỮ LIỆU
     Admin->>Admin: 1. Mở script.google.com & chạy setupNewDatabase
     Admin->>Admin: 2. Nhận SPREADSHEET_ID & Triển khai Web App (URL)
-    Admin->>Admin: 3. Cấp tài khoản tại tab 'Users' (PM & Nhân viên)
+    Admin->>Admin: 3. Cấp tài khoản tại tab 'Users' (USER / PM / ADMIN)
     Admin->>Admin: 4. Chạy setupWatchdogTrigger kích hoạt quét 24h
     Admin->>Admin: 5. Dán URL vào Portal kích hoạt Google Cloud Live
 
@@ -32,8 +34,8 @@ sequenceDiagram
     Note over User: BƯỚC 3: XEM SẢN PHẨM & GIỮ CHỖ FCFS
     User->>User: 1. Đăng nhập tài khoản Nhân viên & Đổi mật khẩu
     User->>User: 2. Xem danh mục (Tab 2), lọc Kho, chọn Model
-    User->>User: 3. Điền Form giữ chỗ (Tab 1), cam kết Jeong-Do
-    User->>User: 4. Nhận mã đơn ORD-..., trạng thái "Chờ mở thanh toán"
+    User->>User: 3. Bấm "Đăng Ký Giữ Chỗ Ngay" + xác nhận (1 chạm)
+    User->>User: 4. Đơn hiện ở ô 03, trạng thái "Chờ mở thanh toán"
 
     Note over PM: BƯỚC 4: RÀ SOÁT FCFS & MỞ CỔNG THANH TOÁN
     PM->>PM: 1. Rà soát đơn đúng nguyên tắc ai trước giữ trước
@@ -41,14 +43,14 @@ sequenceDiagram
     PM->>User: Hệ thống kích hoạt đếm ngược 24h & gửi email thông báo
 
     Note over User: BƯỚC 5: NỘP TIỀN VIETQR & TẢI BIÊN LAI
-    User->>User: 1. Tra cứu đơn bằng Mã NV + 4 số cuối SĐT
+    User->>User: 1. Ô 03 báo "CỔNG TT ĐÃ MỞ" → Nộp tiền ngay
     User->>User: 2. Quét VietQR chuyển khoản chính xác số tiền
     User->>User: 3. Tải ảnh chụp biên lai ngân hàng & bấm Gửi
 
     Note over PM: BƯỚC 6: ĐỐI SOÁT & XUẤT EXCEL GIAO HÀNG
     PM->>PM: 1. Xem ảnh biên lai, so khớp số tiền & mã GD
     PM->>PM: 2. Bấm "Duyệt thanh toán" (hoặc "Từ chối hoàn slot")
-    PM->>PM: 3. Chốt đợt bán (Closed) & Xuất Excel gửi Logistics
+    PM->>PM: 3. Kết sổ (Closed) & Xuất Excel (CSV)
 ```
 
 ---
@@ -62,8 +64,8 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 1. Mở trình duyệt web, truy cập: **[https://script.google.com](https://script.google.com)**.
 2. Nhấn nút **Dự án mới (New project)** ở góc trên bên trái.
 3. **Lấy nội dung mã nguồn Apps Script:**
-   - **Vị trí tệp:** Nằm tại thư mục `apps-script/` $\rightarrow$ tệp [`Code.gs`](file:///Users/macbook/Documents/antigravity/AI%20study/LG%20other/Internal%20sales%20platform/apps-script/Code.gs) (đường dẫn đầy đủ: `/Users/macbook/Documents/antigravity/AI study/LG other/Internal sales platform/apps-script/Code.gs`).
-   - **Cách 1 (Nhanh nhất):** Nhấp trực tiếp vào liên kết tệp này: 👉 **[apps-script/Code.gs](file:///Users/macbook/Documents/antigravity/AI%20study/LG%20other/Internal%20sales%20platform/apps-script/Code.gs)** để mở mã nguồn trong trình soạn thảo $\rightarrow$ Nhấn `Cmd + A` (chọn toàn bộ 1.798 dòng) $\rightarrow$ Nhấn `Cmd + C` để Copy.
+   - **Vị trí tệp:** thư mục `apps-script/` $\rightarrow$ tệp [`apps-script/Code.gs`](../../apps-script/Code.gs) (đường dẫn tương đối tính từ thư mục gốc của repo).
+   - **Cách 1 (Nhanh nhất):** Mở tệp [`apps-script/Code.gs`](../../apps-script/Code.gs) trong trình soạn thảo $\rightarrow$ Nhấn `Cmd + A` (chọn toàn bộ) $\rightarrow$ Nhấn `Cmd + C` để Copy.
    - **Cách 2 (Sao chép 1-Click bằng Terminal):** Mở cửa sổ Terminal và gõ lệnh sau để hệ thống tự động nạp toàn bộ mã nguồn vào khay nhớ tạm (Clipboard) của máy:
      ```bash
      cat "apps-script/Code.gs" | pbcopy
@@ -79,7 +81,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 
 ### Bước 1.2: Triển khai Web App (Lấy đường dẫn API)
 1. Nhìn vào màn hình *Nhật ký thực thi (Execution Log)* bên dưới, copy chuỗi ký tự **`SPREADSHEET_ID`** vừa in ra (ví dụ: `1A2b3C...`).
-2. Quay lại dòng 21 của `Code.gs`, dán mã đó vào:
+2. *(Cách khuyến nghị từ 05/10)* Project Settings → Script Properties → thêm `SPREADSHEET_ID` = mã vừa copy. Hoặc cách cũ: quay lại dòng 21 của `Code.gs`, dán mã đó vào:
    ```javascript
    var SPREADSHEET_ID = '<DÁN_MÃ_VỪA_COPY_VÀO_ĐÂY>';
    ```
@@ -93,14 +95,16 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 
 ### Bước 1.3: Cấp tài khoản tại tab `Users`
 1. Mở file Google Sheet `LG Internal Sales Database` trên Google Drive của bạn.
-2. Chuyển sang trang tính **`Users`**:
-   - Cột A (`User_ID`): Nhập Mã nhân viên (ví dụ: `PM01`, `NV01`, `NV02`).
-   - Cột B (`Password`): Gõ trực tiếp mật khẩu ban đầu dạng chữ thường (ví dụ: `admin123` cho PM, `123456` cho NV).
-   - Cột C (`Role`): Điền `PM` (quản lý) hoặc `USER` (nhân viên).
-   - Cột D (`Name`): Họ tên đầy đủ.
-   - Cột E (`Email`): Hộp thư nhận thông báo.
-   - Cột F (`Division`): Khối phòng ban (ví dụ: `HS PM Support`, `R&D`, `Sales`).
-   - Cột G (`Status`): Điền `Active`.
+2. Chuyển sang trang tính **`Users`** — *(cập nhật 05/10: thứ tự cột dưới đây khớp với máy chủ; bản cũ ghi `Role` ở cột C là **sai** và sẽ làm tài khoản bị phân quyền nhầm)*:
+   - Cột A (`ID`): Mã nhân viên (ví dụ: `PM01`, `NV01`, `NV02`).
+   - Cột B (`Password`): Mật khẩu ban đầu dạng chữ (ví dụ: `admin123` cho PM, `123456` cho NV). Người dùng tự đổi sau khi đăng nhập.
+   - Cột C (`Name`): Họ tên đầy đủ.
+   - Cột D (`Department`): Phòng ban (ví dụ: `HS PM Support`, `R&D`, `Sales`).
+   - Cột E (`Phone`): Số điện thoại.
+   - Cột F (`Email`): Hộp thư nhận thông báo.
+   - Cột G (`Role`): `USER` (nhân viên), `PM` (quản lý đợt bán) hoặc `ADMIN` (toàn quyền + công tắc email).
+   - Cột H (`Status`): `Active`.
+   - Chi tiết: [`USERS_SHEET_TEMPLATE.md`](../01-setup-and-deployment/USERS_SHEET_TEMPLATE.md).
 
 ### Bước 1.4: Kích hoạt Bộ quét Tự động 24h (1-Click Trigger)
 1. Quay lại màn hình Google Apps Script, tại ô chọn hàm, chọn hàm:
@@ -111,7 +115,8 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 1. Mở tệp `Mau_Dang_Ky_Internal_Sales_3009.html` trên trình duyệt.
 2. Nhấp vào huy hiệu **`⚪ Demo Mode (Offline)`** ở góc trên cùng bên phải.
 3. Dán URL Web App (lấy ở Bước 1.2) vào ô nhập liệu $\rightarrow$ Nhấn **Kiểm Tra & Lưu Cấu Hình**.
-4. Huy hiệu chuyển sang **`🟢 Google Cloud Live`** $\rightarrow$ Hệ thống đã sẵn sàng 100%!
+4. Huy hiệu chuyển sang **`🟢 Google Cloud Live`** $\rightarrow$ trình duyệt này đã nối máy chủ.
+5. *(cập nhật 05/10)* Bước 1–4 chỉ áp dụng cho **bản demo** trên máy của người kiểm thử. Bản phát hành cho nhân viên là `portal.html` (tự nối máy chủ, không có tài khoản demo): `python3 scripts/build_production.py --api-url <URL>` — xem [`V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) mục 3.
 
 ---
 
@@ -119,16 +124,16 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 *(Tạo đợt bán hàng, duyệt mở cổng thanh toán, đối soát biên lai & xuất Excel kho)*
 
 ### Bước 2.1: Đăng nhập & Đổi mật khẩu cá nhân
-1. Trên thanh tiêu đề trang, nhấp **Đăng nhập**.
+1. Màn hình **đăng nhập** hiện ngay khi mở trang.
 2. Nhập Mã NV (ví dụ: `PM01`) và mật khẩu được cấp (`admin123`).
-3. Đăng nhập thành công, góc trên sẽ hiển thị huy hiệu đỏ **`PM Quản trị`**.
+3. Đăng nhập thành công, góc trên hiển thị huy hiệu đỏ **`PM Quản trị`** (tài khoản role ADMIN hiển thị **`Admin hệ thống`**).
 4. Để bảo mật, PM nhấp vào nút **`🔑 Đổi MK`** trên thanh header:
    - Nhập mật khẩu cũ $\rightarrow$ Nhập mật khẩu mới (ví dụ: `PmSecure@2026`).
    - Bấm **Cập nhật** $\rightarrow$ Hệ thống tự động băm SHA-256 kèm Salt và đồng bộ về CSDL.
 
 ### Bước 2.2: Khởi tạo Đợt Bán Hàng Mới bằng Excel Mẫu
-1. Nhấp sang **Tab 5 (⚙️ Quản Trị PM)**.
-2. Nhấp nút **`+ Tạo đợt bán mới`** (hoặc *Thiết lập đợt bán*). Cửa sổ popup sẽ xuất hiện:
+1. PM được đưa thẳng vào tab **`1. Bảng Điều Khiển PM`** *(cập nhật 05/10: bản cũ gọi là "Tab 5")*.
+2. Nhấp nút **`+ Tạo chương trình`** trên thanh chọn chương trình phía trên. Cửa sổ popup sẽ xuất hiện:
    - **Ngành hàng / Phân khúc:** Nhấp chọn phân khúc (ví dụ: `TV · Tivi OLED / QNED / UHD`).
    - **Mã đợt bán:** Hệ thống sẽ **tự động điền mã chuẩn hóa** `IS-2026Q4-TV-01` (có tích xanh `✓ Mã hợp lệ`).
    - **Tên chương trình:** Hệ thống tự sinh `Đợt Bán Hàng Nội Bộ Q4/2026 – Ngành Tivi OLED & QNED`.
@@ -141,7 +146,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 4. Nhấn **`🚀 Kích Hoạt Mở Bán`** $\rightarrow$ Chương trình mới chuyển sang trạng thái **`Open`**.
 
 ### Bước 2.3: Giám sát Đăng ký & Mở cổng Thanh toán 24h
-1. Khi nhân viên đăng ký giữ chỗ, danh sách trong Bảng Quản Trị PM sẽ nhảy số tức thì (nhờ cơ chế Adaptive Polling 6–8s).
+1. Khi nhân viên đăng ký giữ chỗ, bấm nút **`Tải lại`** trên Bảng Điều Khiển PM để xem danh sách mới nhất *(cập nhật 05/10: ở chế độ máy chủ, bảng PM **không** tự làm mới; polling 6–8 giây chỉ áp dụng cho danh mục của nhân viên)*.
 2. Các đơn mới đăng ký ban đầu sẽ có trạng thái: **`Đã đăng ký - Chờ mở thanh toán`**.
    *(Lợi ích: Tránh nhân viên chuyển tiền trước khi PM kiểm soát số lượng, hạn chế tối đa việc phải hoàn tiền kế toán).*
 3. Khi PM đã rà soát xong danh sách theo nguyên tắc FCFS (ai nhanh giữ trước):
@@ -151,11 +156,11 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 
 ### Bước 2.4: Đối soát Biên lai Ngân hàng
 1. Khi nhân viên chuyển khoản và tải ảnh biên lai lên hệ thống, trạng thái đơn sẽ chuyển sang **`Đã khai nộp - chờ đối soát`**.
-2. PM nhấp nút **`🔍 Xem Biên Lai`** trên từng đơn:
+2. PM nhấp nút **`Xem Biên Lai`** trên từng đơn:
    - Màn hình popup phóng to hình ảnh ủy nhiệm chi/biên lai chuyển khoản.
    - Kiểm tra: Tên tài khoản nhận (Công ty TNHH LG Electronics VN Hải Phòng), Số tiền và Cú pháp chuyển khoản.
-3. Nếu hợp lệ: Bấm **`✓ Duyệt Thanh Toán`** $\rightarrow$ Đơn chuyển sang `Đã duyệt thanh toán` (chốt thành công).
-4. Nếu sai sót: Bấm **`✕ Từ Chối / Bổ Sung`** (nhập lý do: sai số tiền, mờ biên lai) $\rightarrow$ Slot được hoàn trả hoặc yêu cầu nộp lại.
+3. Nếu hợp lệ: Bấm **`Duyệt Thanh Toán Này`** (trong cửa sổ xem biên lai) $\rightarrow$ Đơn chuyển sang `Đã duyệt thanh toán`. Nhiều đơn: nút **`Duyệt hàng loạt`** — hệ thống báo đúng số đơn máy chủ đã duyệt.
+4. Nếu sai sót: Bấm **`Từ Chối Đơn`** (nhập lý do: sai số tiền, mờ biên lai) $\rightarrow$ Đơn chuyển `Từ chối`, slot được trả về kho.
 
 ### Bước 2.5: Đóng Đợt, Xóa Đợt An Toàn & Xuất Danh Sách Giao Hàng
 1. **Phân quyền Độc lập Đa PM (Multi-PM Isolation):**
@@ -165,9 +170,9 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 2. **Quy tắc Xóa Đợt Bán vs Kết Sổ (Tuân thủ Kiểm toán Jeong-Do):**
    - **Xóa hoàn toàn (0 đơn):** Nếu đợt bán vừa tạo thử hoặc đang ở trạng thái Nháp/Mở nhưng **chưa có bất kỳ nhân viên nào đăng ký giữ chỗ (0 đơn)**, PM có thể bấm nút **`🗑️ Xóa đợt bán (0 đơn)`** để xóa sạch vĩnh viễn khỏi hệ thống và database Google Sheet.
    - **Khóa xóa khi đã có giao dịch ( $\ge 1$ đơn):** Nếu đợt bán đã phát sinh đơn đăng ký hoặc giao dịch chuyển khoản, hệ thống sẽ **khóa chặt tính năng xóa** nhằm bảo toàn tính liêm chính kiểm toán thuế và đối soát dòng tiền Vietcombank. PM chỉ được phép bấm **`🔒 Kết sổ chương trình (Closed)`**.
-3. **Xuất Excel Bàn Giao Logistics:**
-   - Sau khi kết sổ, PM nhấn nút **`📥 Xuất Excel Bàn Giao Logistics`**:
-   - Hệ thống tải về file Excel tổng hợp các đơn đã duyệt thanh toán đầy đủ Mã NV, Tên, Số điện thoại, Địa chỉ giao hàng, Kho xuất (AYA/AYB/AYC), Model và Serial chính xác để điều phối kho xuất hàng.
+3. **Xuất danh sách:**
+   - PM nhấn nút **`Xuất Excel (CSV)`** trên Bảng Điều Khiển PM.
+   - *(cập nhật 05/10, đối chiếu code)* File CSV gồm **22 cột** (STT, Mã Slot, Kho, Ngành hàng, Model, Mô tả, Giá nội bộ, Mã NV, Họ tên, Bộ phận, SĐT, Địa chỉ giao hàng, Thời gian ĐK, Trạng thái, Người nộp, Mã NV nộp, Số tiền, Mã GD, Thời gian nộp, PM duyệt bởi, Ngày duyệt, Ghi chú), chứa **mọi đơn** của chương trình đang chọn — lọc theo cột *Trạng thái* nếu chỉ cần đơn đã duyệt. File **không có cột Serial**; cột *Địa chỉ giao hàng* thường trống vì luồng giữ chỗ 1-chạm không hỏi địa chỉ (xem `CURRENT_STATE.md` mục 9).
 
 ---
 
@@ -175,38 +180,34 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 *(Xem hàng, giữ chỗ FCFS, thanh toán VietQR & tra cứu tiến độ)*
 
 ### Bước 3.1: Đăng nhập & Đổi mật khẩu cá nhân
-1. Nhân viên truy cập portal, nhấp **Đăng nhập** ở góc trên.
+1. Nhân viên mở link portal — màn hình **đăng nhập** hiện ngay.
 2. Nhập Mã NV (ví dụ: `NV01`) và mật khẩu được cấp ban đầu (`123456`).
 3. Đổi mật khẩu cá nhân qua nút **`🔑 Đổi MK`** để bảo mật quyền lợi mua hàng.
 
 ### Bước 3.2: Khám phá Danh mục Sản phẩm (Tab 2)
-1. Nhấp sang **Tab 2 (💻 Danh Mục & Đặt Hàng)**.
+1. Chọn đợt bán trên **thanh chương trình** phía trên, rồi nhấp sang tab **`2. Danh Mục & Đăng Ký Mua Hàng`**.
 2. Sử dụng thanh công cụ trực quan:
-   - **Bộ lọc kho:** Nhấp `Kho AYA` (Hải Phòng), `Kho AYB` (Hưng Yên), hoặc `Kho AYC`.
+   - **Bộ lọc kho:** Nhấp `Kho AYA`, `Kho AYB`, hoặc `Kho AYC` *(vị trí địa lý của từng kho đang chờ PM xác nhận — các tài liệu cũ ghi khác nhau)*.
    - **Tìm kiếm:** Gõ tên model (ví dụ: `OLED`, `InstaView`, `WashTower`).
 3. Đọc kỹ thông tin sản phẩm trên thẻ card:
    - Phân hạng chất lượng: `Loại A` (như mới) hoặc `Loại B` (hộp cũ/xước dăm).
    - Tình trạng chi tiết: Đọc mô tả thực tế từ kho (ví dụ: *Cấn nhẹ cạnh hông 1mm, khay kính nguyên bản*).
    - Giá nội bộ (đã giảm 50% - 65% so với giá niêm yết hãng RRP).
-4. Chọn được sản phẩm ưng ý $\rightarrow$ Nhấn nút đỏ **`🛒 Đăng Ký Mua`**.
+4. Chọn được sản phẩm ưng ý $\rightarrow$ Nhấn nút đỏ **`Đăng Ký Giữ Chỗ Ngay`** trên thẻ sản phẩm.
 
-### Bước 3.3: Gửi Đơn Đăng Ký Giữ Chỗ FCFS (Tab 1)
-1. Hệ thống tự động chuyển sang Form đăng ký tại Tab 1 và điền sẵn Model + Mã Slot ID.
-2. Nhân viên kiểm tra và điền các trường còn lại:
-   - Số điện thoại liên hệ nhận hàng.
-   - Địa chỉ giao hàng chi tiết (nhà riêng hoặc công ty).
-   - Tích chọn ô cam kết:  
-     *`☑ Tôi cam kết tuân thủ quy định Jeong-Do Management: Mua sử dụng cá nhân, không bán lại cho bên thứ ba.`*
-3. Nhấn nút **`Gửi Đăng Ký Mua Hàng`**:
-   - Hệ thống ghi nhận giữ chỗ theo mili-giây máy chủ.
-   - Màn hình hiện thông báo chúc mừng kèm Mã đơn hàng dạng `ORD-20261004-xxxx-xxxx`.
-   - Trạng thái đơn lúc này là: **`Đã đăng ký - Chờ mở thanh toán`**.
+### Bước 3.3: Xác nhận giữ chỗ FCFS (1 chạm) — *cập nhật 05/10, đối chiếu code*
+1. Hộp xác nhận hiện Model, mô tả, giá nội bộ, kho $\rightarrow$ bấm **OK**. Thông tin nhân viên (Mã NV, họ tên, bộ phận, SĐT) lấy tự động từ tài khoản đăng nhập — **không có form nhập tay**.
+2. Kết quả:
+   - **Thành công:** thông báo *"Đăng ký thành công sản phẩm …"*, trạng thái **`Đã đăng ký - Chờ mở thanh toán`**, đơn hiện ngay ở ô **"03 Đơn Hàng Của Bạn"**. Hệ thống **không** sinh mã đơn dạng `ORD-…` (bản cũ ghi có — không đúng); mã định danh là **Mã Slot**.
+   - **Có người nhanh hơn:** thông báo *"đã có người đăng ký trước"*, slot đó chuyển "Đã có người giữ" ngay trên màn hình $\rightarrow$ chọn sản phẩm khác.
+3. Cam kết Jeong-Do: luồng 1 chạm hiện **không** có ô tích riêng; máy chủ ghi "Đồng ý" vào cột Cam kết. Nội dung cam kết nằm ở Tab 1 (Thư thông báo & Quy định) — đang chờ chủ dự án quyết định có thêm ô tích hay không (`CURRENT_STATE.md` mục 9).
+4. Đổi ý trước khi khai nộp tiền: bấm **`Hủy giữ chỗ`** ở ô 03 — slot trả về kho ngay.
 
 ### Bước 3.4: Chuyển Khoản VietQR 1-Chạm & Tải Biên Lai (Tab 3)
-1. Khi PM mở cổng thanh toán, nhân viên nhận được thông báo trạng thái đơn chuyển sang: **`Chờ nộp tiền`** (có 24h để thanh toán).
-2. Nhấp sang **Tab 3 (✅ Tra Cứu & Xác Nhận Nộp Tiền)**:
-   - Tại khung tra cứu, nhập: **Mã NV** + **4 số cuối SĐT** $\rightarrow$ Bấm *Tìm kiếm*.
-   - Đơn hàng xuất hiện $\rightarrow$ Bấm nút màu xanh **`💳 Nộp Tiền Ngay`**.
+1. Khi PM mở cổng thanh toán, ô **"03 Đơn Hàng Của Bạn"** chuyển sang **`CỔNG TT ĐÃ MỞ`** (tự kiểm tra lại mỗi 60 giây) và trạng thái đơn là **`Chờ nộp tiền`** — có **24 giờ** tính từ lúc cổng mở.
+2. Nộp tiền bằng một trong hai cách:
+   - Ô 03: bấm **`Nộp tiền ngay (1-Chạm) →`**; hoặc
+   - Tab **`3. Xác Nhận Mua & Nộp Tiền`**: khi đã đăng nhập, hệ thống tự tra cứu đơn của bạn (không cần nhập Mã NV + 4 số cuối SĐT) $\rightarrow$ bấm **`Nộp tiền`** trên dòng đơn.
 3. **Thanh toán VietQR siêu tốc:**
    - Hệ thống mở popup hiển thị mã QR ngân hàng Vietcombank đã nạp sẵn chính xác 100% số tiền và cú pháp chuyển khoản (không cần gõ tay).
    - Mở app ngân hàng bất kỳ (VCB, Techcombank, MB, Momo...) quét mã QR $\rightarrow$ Xác nhận chuyển khoản.
@@ -219,7 +220,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 ### Bước 3.5: Theo dõi Tiến Độ Giao Hàng
 1. Nhân viên có thể vào lại Tab 3 bất kỳ lúc nào để tra cứu.
 2. Khi PM đối soát xong, trạng thái cập nhật thành: **`Đã duyệt thanh toán`**.
-3. Nhân viên yên tâm chờ bộ phận Logistics điều phối xe giao hàng tận nơi theo địa chỉ đã đăng ký.
+3. Nhận hàng: email duyệt thanh toán hiện hướng dẫn *"mang thẻ nhân viên LG đến kho … để làm thủ tục nhận sản phẩm theo lịch thông báo của PM"*. Hình thức giao / nhận chính thức do PM thông báo *(cập nhật 05/10: bản cũ ghi "giao tận nơi theo địa chỉ đã đăng ký" — mâu thuẫn với email; chờ chủ dự án chốt)*.
 
 ---
 
@@ -243,8 +244,9 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 
 ## DANH MỤC TÀI LIỆU LIÊN QUAN TRONG HỆ THỐNG
 
-- **File giao diện web chính thức:** [Mau_Dang_Ky_Internal_Sales_3009.html](Mau_Dang_Ky_Internal_Sales_3009.html)
-- **Mã nguồn Backend Google Apps Script:** [apps-script/Code.gs](apps-script/Code.gs)
-- **Tệp Excel mẫu 10 sản phẩm để PM nạp đợt:** [data/Mockup_10_Models_Internal_Sales_Template.xlsx](data/Mockup_10_Models_Internal_Sales_Template.xlsx)
-- **Kịch bản kiểm thử tự động E2E (54 tiêu chí pass 100%):** [tests/run_e2e_tests.js](tests/run_e2e_tests.js)
-- **Hồ sơ bàn giao chi tiết cho chuyên viên:** [docs/03-architecture-and-analysis/HANDOVER.md](docs/03-architecture-and-analysis/HANDOVER.md)
+- **File giao diện web:** [Mau_Dang_Ky_Internal_Sales_3009.html](../../Mau_Dang_Ky_Internal_Sales_3009.html) (bản demo / nguồn) · bản chính thức `portal.html` sinh bằng `scripts/build_production.py`
+- **Mã nguồn Backend Google Apps Script:** [apps-script/Code.gs](../../apps-script/Code.gs)
+- **Tệp Excel mẫu 10 sản phẩm để PM nạp đợt:** [data/Mockup_10_Models_Internal_Sales_Template.xlsx](../../data/Mockup_10_Models_Internal_Sales_Template.xlsx)
+- **Kiểm thử tự động (05/10/2026):** `tests/backend_gas_harness.js` (63/63, chạy Code.gs thật), `tests/cloud_mode_regression.py` (32/32, chạy trang thật), `tests/run_e2e_tests.js` (164/164, dò chuỗi)
+- **Thông tin hiện hành & việc còn mở:** [docs/CURRENT_STATE.md](../CURRENT_STATE.md)
+- **Hồ sơ bàn giao chi tiết cho chuyên viên:** [docs/03-architecture-and-analysis/HANDOVER.md](../03-architecture-and-analysis/HANDOVER.md)

@@ -1,4 +1,7 @@
 # ĐỀ ÁN TỐI ƯU TOÀN DIỆN HỆ THỐNG BÁN HÀNG NỘI BỘ LG (INTERNAL SALES PORTAL)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). Số đo tải thật trên staging (05/10): 60 yêu cầu/giây 0% lỗi, p50 ≈ 1,7–2,1 giây, khởi động nguội 33–37 giây — xem [Đề xuất §4.5](../04-v1-hardening/V1_HARDENING_CHANGE_PROPOSAL.md).
+
 ## ĐÁNH GIÁ ĐIỂM MÙ (BLINDSPOTS) CHỊU TẢI 200–300 USERS & BẢN THIẾT KẾ KIẾN TRÚC GRAP-STYLE COMPACT DASHBOARD
 
 > **Chủ trì dự án:** Hoàng Minh Hiền — Internal Audit & Jeong-Do Management, LG Electronics Vietnam  

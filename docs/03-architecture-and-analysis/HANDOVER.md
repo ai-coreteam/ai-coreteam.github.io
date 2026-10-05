@@ -1,5 +1,8 @@
 # HỒ SƠ BÀN GIAO DỰ ÁN — CỔNG ĐĂNG KÝ BÁN HÀNG NỘI BỘ LG (INTERNAL SALES PORTAL)
 
+> **📌 Trạng thái (cập nhật 05/10/2026):** Mục 0.3 bên dưới là bản mới nhất. Mục 0.2 và các mục từ 1 trở đi là **lịch sử**. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md).
+
+
 > **Mục đích:** Đưa file này cho một chat mới hoặc một agent khác để làm tiếp dự án mà không cần giải thích lại.
 > **Chủ dự án:** Hoàng Minh Hiền, kiểm toán nội bộ & phụ trách đạo đức doanh nghiệp (Jeong-Do), LG.
 > **Ngày lập:** 24/09/2026.
@@ -20,6 +23,28 @@
 **Những gì file này KHÔNG có:**
 - Lịch sử các cuộc trò chuyện trước giữa chị Hiền và Claude về dự án. Chat lập file này không đọc được các chat cũ. Nếu còn yêu cầu nào đã trao đổi mà file này không ghi, đó là do thiếu nguồn, không phải do yêu cầu bị bỏ.
 - Backend, database, domain thật. **Dự án hiện KHÔNG có backend, KHÔNG có database, KHÔNG có domain chạy thật.** Chi tiết ở mục 3.
+
+---
+
+## 0.3. CẬP NHẬT 05/10/2026 — V1 HARDENING (ĐỌC MỤC NÀY TRƯỚC MỤC 0.2)
+
+> Nguồn chuẩn duy nhất về trạng thái hiện tại: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md). Mục này chỉ tóm tắt cho agent mới.
+
+| Chủ đề | Hiện trạng 05/10/2026 | Khác gì so với mục 0.2 |
+|---|---|---|
+| Nhánh code | Việc v1 nằm trên nhánh `v1-hardening` (commit `e489bfa`, `9268fbf`), **chưa** gộp vào `main`, **chưa** đẩy lên remote | — |
+| Điểm khôi phục | Tag `checkpoint-pre-v1-hardening-20261005`, nhánh `backup/pre-v1-hardening-20261005`, Sheet BACKUP riêng tư | Mới |
+| Vai trò | `USER`, `PM`, **`ADMIN`** (toàn quyền PM trên mọi chương trình + công tắc email) | 0.2 chỉ có USER / PM |
+| Bảo mật máy chủ | Khóa phiên ngẫu nhiên + `rotateSessionSecret()`; không nhận token demo; giữ chỗ / nộp tiền / hủy phải đúng chính chủ | 0.2: khóa phiên suy ra từ ID Sheet |
+| Bản giao diện | `Mau_Dang_Ky_Internal_Sales_3009.html` = bản **demo**; `python3 scripts/build_production.py <URL>` sinh `portal.html` = bản **chính thức** (không có dữ liệu demo) | 0.2: dùng 1 file cho cả hai |
+| Email tự động | Mặc định **TẮT**; chỉ ADMIN bật/tắt trên web. Gmail thường: 100 email/ngày dùng chung | 0.2: cờ `ENABLE_AUTO_EMAIL` chỉ sửa trong tab Config, Sheet mới tạo = `true`, không có nút trên web |
+| Hủy giữ chỗ | Nhân viên tự hủy được **trước khi khai nộp tiền** | Mới |
+| Polling | 6–8 giây (đo staging: 60 yêu cầu/giây, 0% lỗi) | Giữ nguyên |
+| Số tải "903.7 req/s" ở mục 0.2 | **Chưa được đo lại**; số đo thật trên staging xem [Đề xuất §4.5](../04-v1-hardening/V1_HARDENING_CHANGE_PROPOSAL.md) | Thay thế |
+| Kiểm thử | `backend_gas_harness.js` 63/63 · `cloud_mode_regression.py` 32/32 · `run_e2e_tests.js` 164/164 · staging ĐẠT | 0.2: 54/54 |
+| Việc còn mở | 20 mục (mục 14 🔴 cần xử lý trước go-live), xem [`CURRENT_STATE.md` mục 9](../CURRENT_STATE.md) | — |
+
+**Tài liệu hiện hành theo thứ tự đọc:** [`CURRENT_STATE.md`](../CURRENT_STATE.md) → [`04-v1-hardening/README.md`](../04-v1-hardening/README.md) → [`V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) → [`PM_AND_USER_OPERATIONAL_GUIDE.md`](../02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md).
 
 ---
 

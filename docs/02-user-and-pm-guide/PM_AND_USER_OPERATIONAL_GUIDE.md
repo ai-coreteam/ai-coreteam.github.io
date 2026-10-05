@@ -53,14 +53,14 @@ sequenceDiagram
 
     NV->>Web: Chọn Tab chương trình (HA / HE / B2B)
     NV->>Web: Lọc theo Kho (AYA/AYB/AYC) & Xem sản phẩm còn trống
-    NV->>Web: Bấm "Đăng ký giữ chỗ" & Xác nhận cam kết Jeong-Do
+    NV->>Web: Bấm "Đăng Ký Giữ Chỗ Ngay" & xác nhận (1 chạm)
     Web-->>NV: Giữ slot thành công! Trạng thái "Chờ mở cổng thanh toán"
     Note over NV,Web: Cổng nộp tiền mở (thời hạn 24 giờ)
     NV->>Bank: Chuyển khoản đúng cú pháp: [MãNV]_[MãSlot]
     NV->>Web: Nhập Mã giao dịch (Txn Ref) & Tải ảnh ủy nhiệm chi
     Web-->>PM: Ghi nhận đơn: "Đã khai nộp - Chờ đối soát"
     PM-->>Web: Kiểm tra chứng từ & Bấm "Duyệt thanh toán"
-    Web-->>NV: Thông báo thành công: "Đã xác nhận thanh toán"
+    Web-->>NV: Trạng thái "Đã duyệt thanh toán"
 ```
 
 ### Bước 1: Khám phá danh mục & Tìm kiếm sản phẩm
@@ -68,42 +68,37 @@ sequenceDiagram
    * *Gia dụng (HA):* Tủ lạnh InstaView, Tháp giặt sấy WashTower, Máy sấy HeatPump, Điều hòa.
    * *Nghe nhìn (HE):* Tivi OLED evo, Tivi QNED, Loa thanh Soundbar, Loa XBOOM.
    * *B2B / Màn hình (BS):* Màn hình UltraWide, Ergo UltraFine, gram +view, Bảng One:Quick.
-2. **Lọc theo vị trí kho:** Bấm chọn các tab kho hàng để tìm sản phẩm gần địa bàn công tác:
+2. **Lọc theo vị trí kho:** Bấm chọn các tab kho hàng để tìm sản phẩm gần địa bàn công tác *(⚠️ vị trí địa lý dưới đây chưa được PM xác nhận — các tài liệu khác ghi khác; xem `docs/CURRENT_STATE.md` mục 9)*:
    * **Kho AYA (Miền Bắc):** Hải Phòng / Hà Nội.
    * **Kho AYB (Miền Trung):** Đà Nẵng.
    * **Kho AYC (Miền Nam):** TP. Hồ Chí Minh / Bình Dương.
 3. **Kiểm tra tình trạng suất máy:**
-   * Thẻ hiển thị **"Có sẵn" (Available):** Bấm nút màu đỏ `Đăng ký giữ chỗ ngay`.
+   * Thẻ hiển thị **"Có sẵn" (Available):** Bấm nút màu đỏ `Đăng Ký Giữ Chỗ Ngay`.
    * Thẻ hiển thị **"Đã giữ chỗ" (Registered):** Đã có đồng nghiệp khác đăng ký trước.
 
 ---
 
-### Bước 2: Điền thông tin đăng ký & Cam kết Jeong-Do
-1. Cửa sổ Modal Đăng ký mở ra, kiểm tra lại thông tin:
-   * Mã Model, Tên sản phẩm, Kho xuất, Giá bán nội bộ ưu đãi.
-2. Nhập thông tin nhân viên:
-   * **Mã nhân viên:** Bắt buộc (VD: `VH67890`).
-   * **Họ và tên:** Tự động điền theo tài khoản.
-   * **Bộ phận (Division):** Tìm kiếm và chọn đúng phòng ban của bạn.
-   * **Số điện thoại & Địa chỉ nhận hàng.**
-3. **Ký cam kết Jeong-Do:**
-   * Đánh dấu tích vào ô cam kết tuân thủ chính sách sử dụng nội bộ (không mua đi bán lại, không đầu cơ trục lợi).
-4. Bấm **"Xác Nhận Giữ Chỗ"**:
-   * Hệ thống lập tức khóa suất máy đó lại cho bạn và tính giờ giữ chỗ 24 tiếng.
+### Bước 2: Xác nhận giữ chỗ (1 chạm) — *cập nhật 05/10/2026, đối chiếu giao diện*
+1. Sau khi bấm `Đăng Ký Giữ Chỗ Ngay`, hộp xác nhận hiện Mã Model, mô tả, giá nội bộ, kho → bấm **OK**.
+2. **Không có form nhập tay:** Mã NV, họ tên, bộ phận, SĐT lấy tự động từ tài khoản đăng nhập.
+3. **Cam kết Jeong-Do:** nội dung cam kết ở Tab `1. Thư Thông Báo & Quy Định`. Luồng 1 chạm hiện **không** có ô tích riêng; máy chủ ghi "Đồng ý" vào hồ sơ đơn *(chờ chủ dự án quyết định có thêm ô tích hay không)*.
+4. Kết quả:
+   * Thành công → trạng thái `Đã đăng ký - Chờ mở thanh toán`, đơn hiện ở ô **03 Đơn Hàng Của Bạn**. **Đồng hồ 24 giờ chưa chạy** — chỉ bắt đầu khi PM mở cổng thanh toán.
+   * Có đồng nghiệp nhanh hơn vài giây → thông báo *"đã có người đăng ký trước"*, slot chuyển "Đã giữ chỗ" ngay → chọn sản phẩm khác.
 
 ---
 
 ### Bước 3: Nộp tiền chuyển khoản & Khai báo chứng từ
 1. **Kiểm tra trạng thái mở cổng thanh toán:**
-   * Khi Thẻ 01 hiển thị thông tin ngân hàng và Thẻ 03 chuyển sang nút `Nộp Tiền Ngay`, bạn bắt đầu thực hiện chuyển khoản.
+   * Khi ô 03 hiện **`CỔNG TT ĐÃ MỞ`** và nút **`Nộp tiền ngay (1-Chạm) →`** (ô 03 tự kiểm tra lại mỗi 60 giây), bạn bắt đầu chuyển khoản. Bạn có **24 giờ** tính từ lúc cổng mở.
 2. **Thông tin ngân hàng thụ hưởng chính thức của LG:**
-   * **Ngân hàng:** Vietcombank (Chi nhánh Tây Hà Nội).
+   * **Ngân hàng:** Vietcombank *(tên chi nhánh chưa thống nhất: giao diện & email ghi "Tây Hồ", tài liệu này trước đây ghi "Tây Hà Nội" — chờ Tài chính xác nhận; số tài khoản bên dưới thống nhất ở mọi nơi)*.
    * **Số tài khoản:** `0991000012525` *(Bấm icon sao chép nhanh trên web)*.
    * **Tên chủ tài khoản:** `CTY TNHH LG Electronics VN HP`.
    * **Số tiền:** Chuyển chính xác 100% số tiền hiển thị trên đơn hàng.
-   * **Cú pháp chuyển khoản bắt buộc:** `[MãNV]_[MãSlot]` (VD: `VH67890_HA001`).
+   * **Cú pháp chuyển khoản:** dùng **mã VietQR** trong cửa sổ nộp tiền — mã đã điền sẵn số tiền và nội dung `MãNV MãSlot` (VD: `VH88921 HA-001`). *(Lưu ý: ô 01 trên trang ghi dạng `[MãNV]_[MãSlot]` có gạch dưới — chờ chủ dự án chốt 1 dạng.)*
 3. **Khai báo chứng từ lên hệ thống:**
-   * Bấm nút **"Nộp Tiền Ngay"** tại Thẻ 03.
+   * Bấm **`Nộp tiền ngay (1-Chạm) →`** tại ô 03, hoặc nút **`Nộp tiền`** trên dòng đơn ở Tab 3 (khi đã đăng nhập, Tab 3 tự tra cứu đơn của bạn).
    * Nhập **Mã giao dịch ngân hàng (Txn Ref / Mã tham chiếu)** từ app ngân hàng của bạn *(Có nút "Xem hướng dẫn tìm mã GD" cho từng ngân hàng VCB, TCB, MB, VietinBank)*.
    * Kéo thả hoặc tải lên **Ảnh chụp màn hình biên lai chuyển khoản thành công** *(Hỗ trợ mọi định dạng JPG, PNG và tự động chuyển đổi ảnh HEIC từ iPhone)*.
    * Bấm **"Xác Nhận Nộp Tiền"**.
@@ -111,7 +106,7 @@ sequenceDiagram
 ---
 
 ### Bước 4: Theo dõi đơn hàng & Hủy giữ chỗ khi cần
-* **Theo dõi:** Đơn hàng sẽ chuyển sang trạng thái `"Đã khai nộp - Chờ đối soát"`. Sau khi kế toán kiểm tra xong, trạng thái sẽ đổi thành `"Đã xác nhận thanh toán"`.
+* **Theo dõi:** Đơn hàng sẽ chuyển sang trạng thái `"Đã khai nộp - chờ đối soát"`. Sau khi PM / kế toán kiểm tra xong, trạng thái đổi thành `"Đã duyệt thanh toán"`.
 * **Hủy giữ chỗ:** Nếu bạn đổi ý hoặc muốn chọn model khác:
   * Vào Thẻ 03 (*Đơn Hàng Của Bạn*).
   * Bấm nút **"Hủy giữ chỗ"**. Suất máy sẽ lập tức được trả về kho khả dụng cho đồng nghiệp khác và hạn mức 1 SP của bạn được hoàn lại.
@@ -138,7 +133,7 @@ flowchart TD
 1. Đăng nhập bằng tài khoản PM (Mã `VH12345`).
 2. Trên thanh Tab chương trình, bấm nút `+ Tạo chương trình`.
 3. Điền thông tin cơ bản:
-   * **Mã đợt bán:** Viết hoa, không dấu (VD: `IS2026Q4-HA`).
+   * **Ngành hàng / Phân khúc → Mã đợt bán:** chọn phân khúc, hệ thống **tự sinh mã** dạng `IS-<Năm>Q<Quý>-<PHÂN KHÚC>-<STT>` (VD: `IS-2026Q4-TV-01`) và báo trùng nếu mã đã tồn tại.
    * **Tên hiển thị:** VD: `Đợt Bán Hàng Nội Bộ Q4/2026 – Gia Dụng HA`.
    * **Thời gian mở bán & kết thúc:** Có các nút bấm nhanh `+7 Ngày`, `+14 Ngày`, `Hết tháng này`.
    * **Hạn mức:** Mặc định `1 SP / Nhân viên`.
@@ -153,7 +148,10 @@ flowchart TD
 ---
 
 ### Bước 2: Cài đặt Hẹn Giờ Tự Động (Automation Timer)
-1. Tại góc trên bên phải khung PM Command Center, bấm nút **"Cài Đặt Hẹn Giờ"** (Icon đồng hồ).
+
+> ⚠️ **Quan trọng — đối chiếu code 05/10/2026:** hẹn giờ được **lưu trong trình duyệt của PM** và **chỉ chạy khi PM đang mở trang, đã đăng nhập và đang chọn đúng chương trình đó**. Tắt máy / đóng trang / mở trên máy khác → hẹn giờ **không chạy**. Ngày mở bán: PM nên **thao tác tay** (mở cổng, kết sổ) hoặc giữ một máy luôn mở trang. Watchdog 24 giờ (hủy đơn quá hạn) chạy trên máy chủ nên **không** bị ảnh hưởng.
+
+1. Trên thanh nút của Bảng Điều Khiển PM, bấm nút **"Hẹn Giờ (Timer)"** (icon đồng hồ).
 2. Thiết lập 3 mốc thời gian tự động:
    * **Hẹn giờ Mở bán:** Tự động mở chương trình khi đến giờ G.
    * **Hẹn giờ Mở cổng thanh toán:** Tự động cho phép nhân viên nộp tiền sau khi đã hoàn thành đợt đăng ký giữ chỗ.
@@ -163,8 +161,8 @@ flowchart TD
 ---
 
 ### Bước 3: Đối soát thanh toán bằng Modal Phóng to Lightbox
-1. Chuyển sang Tab **"PM Dashboard"** hoặc khu vực **"Giám sát bán hàng (PM View)"**.
-2. Khi có nhân viên nộp tiền, đơn hàng hiển thị tại bảng danh sách với trạng thái màu vàng: `"Chờ đối soát"`.
+1. Mở tab **`1. Bảng Điều Khiển PM`**. Bảng ở chế độ máy chủ **không tự làm mới** — bấm **`Tải lại`** để thấy đơn mới.
+2. Khi có nhân viên nộp tiền, đơn hàng hiển thị tại bảng danh sách với trạng thái `"Đã khai nộp - chờ đối soát"`.
 3. **Soi kỹ chứng từ bằng Lightbox:**
    * Bấm vào nút ảnh thumbnail biên lai.
    * Hộp thoại Lightbox mở ra toàn màn hình, hỗ trợ:
@@ -172,23 +170,23 @@ flowchart TD
      * **Xoay ảnh (Rotate):** Xoay 90°, 180° đối với các ảnh chụp ngang/ngược từ điện thoại.
      * **Đối chiếu thông tin:** Hiển thị song song Mã NV, Tên NV, Số tiền cần nộp, Số tiền thực nộp và Mã GD ngân hàng.
 4. **Phê duyệt:**
-   * Bấm nút màu xanh `Phê duyệt thanh toán` ngay bên trong Lightbox để hoàn tất xác nhận đơn.
-   * Hoặc bấm `Từ chối đơn` (kèm lý do) để hủy giao dịch và hoàn trả slot về kho khả dụng.
+   * Bấm nút màu xanh **`Duyệt Thanh Toán Này`** ngay bên trong Lightbox để hoàn tất xác nhận đơn.
+   * Hoặc bấm **`Từ Chối Đơn`** (kèm lý do) để hủy giao dịch và hoàn trả slot về kho khả dụng.
 
 ---
 
 ### Bước 4: Duyệt thanh toán hàng loạt 1-Click (Batch Approve)
 * Khi đợt bán có hàng trăm đơn nộp tiền cùng lúc:
   1. Kiểm tra tài khoản ngân hàng của công ty qua sao kê kế toán.
-  2. Bấm nút **"Duyệt Hàng Loạt Đơn Chờ Đối Soát"** (Icon sấm sét màu vàng).
-  3. Xác nhận số lượng đơn cần duyệt. Hệ thống sẽ tự động đối soát và chuyển toàn bộ đơn hàng sang trạng thái `Đã xác nhận thanh toán` chỉ trong 1 giây.
+  2. Bấm nút xanh lá **`Duyệt hàng loạt (N)`** trên thanh nút Bảng Điều Khiển PM.
+  3. Xác nhận số lượng đơn cần duyệt. Hệ thống chuyển các đơn `Đã khai nộp - chờ đối soát` sang `Đã duyệt thanh toán`, **chờ máy chủ xác nhận** rồi báo *"Máy chủ đã duyệt X / Y đơn"* và tự tải lại bảng. Duyệt hàng loạt **không** tự so khớp sao kê — PM chịu trách nhiệm đối chiếu ở bước 1.
 
 ---
 
 ### Bước 5: Kết sổ đợt bán & Xuất báo cáo
 1. Khi hết thời hạn đăng ký, bấm nút màu đỏ **"Kết sổ chương trình"**.
 2. **Xuất dữ liệu quyết toán:**
-   * Bấm nút **"Xuất CSV"** hoặc **"Xuất Excel"** tại bảng quản trị PM.
+   * Bấm nút **`Xuất Excel (CSV)`** tại Bảng Điều Khiển PM (file gồm **mọi đơn** của chương trình đang chọn; lọc theo cột Trạng thái nếu chỉ cần đơn đã duyệt).
    * File xuất ra chứa đầy đủ 22 trường thông tin: Mã đợt, Mã NV, Họ tên, Phòng ban, Model, Kho, Số tiền, Mã GD ngân hàng, Giờ nộp, Người phê duyệt, sẵn sàng nộp cho Giám đốc Tài chính và Kế toán kho LGEVH.
 
 ---

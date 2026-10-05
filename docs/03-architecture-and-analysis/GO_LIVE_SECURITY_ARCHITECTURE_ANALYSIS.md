@@ -1,4 +1,7 @@
 # BÁO CÁO PHÂN TÍCH RỦI RO BẢO MẬT & KIẾN TRÚC HỆ THỐNG KHI GO-LIVE
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). Đã xử lý ở v1: máy chủ không nhận token demo, giữ chỗ / nộp tiền bắt buộc phiên chính chủ, bản chính thức `portal.html` không chứa danh sách tài khoản mẫu. Hạn mức email: tài khoản Gmail thường **100 email/ngày dùng chung mọi script** → v1 thêm công tắc email (chỉ ADMIN), mặc định TẮT.
+
 ## DỰ ÁN: CỔNG BÁN HÀNG NỘI BỘ LG ELECTRONICS VIETNAM (INTERNAL SALES PORTAL)
 *Tác giả: Senior IT Developer & Global AI Architect*  
 *Phương châm: "Nếu không đo lường được thì không quản trị được" — Peter Drucker*  

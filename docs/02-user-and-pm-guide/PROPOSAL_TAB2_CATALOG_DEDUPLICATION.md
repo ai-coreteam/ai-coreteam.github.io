@@ -1,4 +1,7 @@
 # BẢN ĐỀ XUẤT NÂNG CẤP & HỢP NHẤT DANH MỤC TAB 2 (PROPOSAL: TAB 2 CATALOG DEDUPLICATION & UX UNIFICATION)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** ✅ **Đã triển khai**: chuyển Thẻ / Bảng (`catalogViewMode`), form cũ `#system-reg-form` ẩn, giữ chỗ 1 chạm lấy thông tin từ phiên đăng nhập. Số dòng code trong tài liệu này đã lệch sau các bản sửa — dùng tên hàm để tìm. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md).
+
 **Hệ thống:** LG Internal Sales Portal — Cổng Đăng Ký Mua Hàng Nội Bộ  
 **Tài liệu:** `docs/02-user-and-pm-guide/PROPOSAL_TAB2_CATALOG_DEDUPLICATION.md`  
 **Ngày lập:** 04/10/2026 | **Phương pháp luận:** Karpathy Epistemic Discipline & LG Brand Guidelines V5.2  

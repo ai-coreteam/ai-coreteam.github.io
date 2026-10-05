@@ -1,4 +1,7 @@
 # BÁO CÁO ĐÁNH GIÁ KHOẢNG TRỐNG VẬN HÀNH & TRẢI NGHIỆM NGƯỜI DÙNG (DEEP GAP ANALYSIS)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md).
+
 ## HỆ THỐNG CỔNG BÁN HÀNG NỘI BỘ LG (INTERNAL SALES PORTAL V8)
 *Tiêu chuẩn thẩm định: Karpathy Epistemics & LG Brand Identity V5.2*  
 *Ngày lập: 01/10/2026 | Phiên bản mã nguồn đối chiếu: `Mau_Dang_Ky_Internal_Sales_3009.html` & `apps-script/Code.gs`*

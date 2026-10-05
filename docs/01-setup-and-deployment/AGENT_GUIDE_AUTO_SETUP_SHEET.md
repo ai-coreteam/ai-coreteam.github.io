@@ -3,6 +3,8 @@
 > **Dành cho:** AI Coding Assistants (Antigravity, Claude, Copilot, ChatGPT) & Kỹ sư phụ trách (PIC - Person In Charge).  
 > **Mục tiêu tối thượng:** Đảm bảo **bảo mật tuyệt đối thông tin cá nhân** của tác giả gốc; mọi AI Agent hoặc PIC khi clone mã nguồn từ GitHub về sẽ tự động tạo và vận hành trên Google Sheet nằm trong **Google Drive cá nhân của chính họ**, không phụ thuộc và không chạm vào Drive của bất kỳ ai khác.
 
+> 📌 **Cập nhật 05/10/2026 (bản v1):** thông tin hiện hành ở [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md). Khi triển khai bản chính thức hoặc staging, làm theo [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) (có điểm khôi phục, `rotateSessionSecret()`, Script Property `SPREADSHEET_ID`, build `portal.html`). `setupNewDatabase()` nay **tự dừng** nếu Sheet đã có dữ liệu, và CSDL mới tạo có email tự động **TẮT**.
+
 ---
 
 ## 1. Nguyên Tắc Cách Ly Dữ Liệu (Cloud Drive Isolation Principle)
@@ -100,12 +102,14 @@ Khi PIC gửi lại URL Web App:
    👉 **`setupWatchdogTrigger`** rồi bấm **Chạy (Run)**.
 2. Hàm sẽ tự động tạo trình kích hoạt theo giờ (Hourly Time-driven Trigger) chạy ngầm hàm `runExpirationWatchdog` mà PIC không cần cài đặt thủ công trong menu Triggers.
 
-### Bước 7: Xác thực Toàn diện bằng Bộ Kiểm thử Tự động E2E
-Sau khi thiết lập, chạy kiểm thử tự động toàn bộ 7 tính năng trọng yếu:
+### Bước 7: Xác thực bằng bộ kiểm thử tự động (cập nhật 05/10/2026)
 ```bash
-node tests/run_e2e_tests.js
+node tests/backend_gas_harness.js        # chạy Code.gs thật với Sheet giả lập — 63/63
+python3 tests/cloud_mode_regression.py   # chạy trang web thật với máy chủ giả lập — 32/32
+node tests/run_e2e_tests.js              # bộ kiểm tra cũ (dò chuỗi) — 164/164
+python3 tests/staging_smoke_test.py --url <URL_STAGING> --program <MÃ_ĐỢT>   # máy chủ staging thật
 ```
-Kết quả kiểm thử đạt **54/54 PASS (100% Success)** đảm bảo không có bất kỳ blindspot nào trước giờ mở bán.
+> Lưu ý: con số "54/54" ghi trước đây là của phiên bản cũ của `run_e2e_tests.js`; bộ này chủ yếu dò chuỗi trong mã nguồn nên **không đủ** để kết luận hệ thống chạy đúng — luôn chạy kèm 2 bộ kiểm thử chạy code thật ở trên.
 
 ---
 
@@ -122,14 +126,15 @@ Kết quả kiểm thử đạt **54/54 PASS (100% Success)** đảm bảo khôn
 
 ## 4. Bảng Kiểm Tra An Toàn Trước Khi Đẩy Mã Nguồn Lên GitHub (Sanitization Checklist)
 
-Trước khi commit mã nguồn lên GitHub, Agent hoặc PIC cần kiểm tra nhanh các tiêu chí sau:
+Trước khi commit mã nguồn lên GitHub, Agent hoặc PIC cần kiểm tra nhanh các tiêu chí sau. Cột "Kết quả" là **kết quả kiểm tra lại ngày 05/10/2026** trên nhánh `v1-hardening`:
 
-| STT | Hạng mục kiểm tra | Tiêu chuẩn đạt | Kết quả |
+| STT | Hạng mục kiểm tra | Tiêu chuẩn đạt | Kết quả (05/10/2026) |
 |---|---|---|---|
-| 1 | `SPREADSHEET_ID` trong `apps-script/Code.gs` | Để trống chuỗi `''` (hoặc placeholder). Không được hardcode ID cá nhân. | ✅ ĐẠT |
-| 2 | `SHEET_API_URL` trong `Mau_Dang_Ky_Internal_Sales_3009.html` | Đọc động từ `localStorage.getItem('LGE_PORTAL_API_URL')`. Không chứa URL thật. | ✅ ĐẠT |
-| 3 | Email liên hệ hỗ trợ | Dùng bí danh chính thức chung: `internalsales.support@lge.com`. Không dùng email cá nhân. | ✅ ĐẠT |
+| 1 | `SPREADSHEET_ID` trong `apps-script/Code.gs` | Để trống chuỗi `''` (hoặc placeholder). Không được hardcode ID cá nhân. | ❌ **CHƯA ĐẠT** — dòng 21 đang ghi ID Sheet thật (có trong lịch sử repo từ commit `0235f72`). Đã giảm rủi ro: Sheet chuyển **Restricted** 05/10; khóa phiên không còn suy ra từ ID. Cách đạt: để trống dòng 21 và dùng Script Property `SPREADSHEET_ID` |
+| 2 | `SHEET_API_URL` trong `Mau_Dang_Ky_Internal_Sales_3009.html` | Đọc động từ `localStorage.getItem('LGE_PORTAL_API_URL')`. Không chứa URL thật. | ✅ ĐẠT với file nguồn (bản demo). Bản chính thức `portal.html` **gắn cố định** URL Web App theo thiết kế (URL này vốn hiển thị trong tab Network của mọi trình duyệt; an toàn nhờ token có chữ ký) |
+| 3 | Email liên hệ hỗ trợ | Dùng bí danh chính thức chung: `internalsales.support@lge.com`. Không dùng email cá nhân. | ⚠️ Màn hình đăng nhập: bí danh chung. Nút "Hỗ trợ": `minhhien.hoang@lge.com` **theo chỉ định của chủ dự án 05/10** |
 | 4 | Tên hiển thị người phụ trách | Dùng đơn vị chung: `Ban Quản Trị Bán Hàng Nội Bộ (Internal Sales PM Team)`. | ✅ ĐẠT |
-| 5 | Đường dẫn tệp máy tính | Dùng đường dẫn tương đối (e.g. `docs/...`, `assets/...`). Tuyệt đối không chứa `/Users/<tên_máy>/`. | ✅ ĐẠT |
-| 6 | Tài khoản ngân hàng công ty | Tài khoản chính thức của LGEVH (`0991000012525` - Vietcombank), không dùng tài khoản cá nhân. | ✅ ĐẠT |
+| 5 | Đường dẫn tệp máy tính | Dùng đường dẫn tương đối (e.g. `docs/...`, `assets/...`). Tuyệt đối không chứa `/Users/<tên_máy>/`. | ✅ ĐẠT (đã gỡ đường dẫn `/Users/...` khỏi hướng dẫn E2E ngày 05/10) |
+| 6 | Tài khoản ngân hàng công ty | Tài khoản chính thức của LGEVH (`0991000012525` - Vietcombank), không dùng tài khoản cá nhân. | ✅ ĐẠT về số tài khoản. ⚠️ Tên chi nhánh chưa thống nhất (xem `CURRENT_STATE.md` mục 9) |
 | 7 | Tệp nhạy cảm (`.env`, `.key`) | Đã khai báo trong `.gitignore`. Không có tệp private key hay credential. | ✅ ĐẠT |
+| 8 | Dữ liệu demo trong bản phát hành cho nhân viên | Bản chính thức không chứa tài khoản / mật khẩu / dữ liệu demo | ✅ `scripts/build_production.py` tự kiểm tra và từ chối tạo file nếu còn sót |

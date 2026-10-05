@@ -1,4 +1,7 @@
 # KẾ HOẠCH TRIỂN KHAI & ĐẶC TẢ BẢN THIẾT KẾ GO-LIVE (PHASE P8)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). Polling hiện hành: **6–8 giây** khi đang ở Tab 2 / Tab 4, 45–60 giây ở tab khác (không phải 30 giây), dừng khi ẩn trang. Trình tự go-live hiện hành: [Runbook §3](../04-v1-hardening/V1_RELEASE_RUNBOOK.md).
+
 ## PRODUCTION GO-LIVE DETAILED BLUEPRINT & IMPLEMENTATION SPECIFICATIONS
 *Cổng Đăng Ký Mua Hàng Nội Bộ — LG Electronics Việt Nam Hải Phòng (LGEVH)*  
 *Chuẩn quản trị: McKinsey Executive Action Plan & Kỷ luật Kỹ thuật Karpathy Epistemic*  

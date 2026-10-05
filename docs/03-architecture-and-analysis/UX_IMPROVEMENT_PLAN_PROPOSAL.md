@@ -1,4 +1,7 @@
 # ĐỀ ÁN CẢI TIẾN TOÀN DIỆN & KẾ HOẠCH HÀNH ĐỘNG (IMPROVEMENT PLAN PROPOSAL)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md).
+
 ## NÂNG CẤP HỆ THỐNG CỔNG BÁN HÀNG NỘI BỘ LG (INTERNAL SALES PORTAL V8+)
 *Phương châm: "Nếu không đo lường được thì không quản trị được" — Peter Drucker*  
 *Kỷ luật kỹ thuật: Karpathy Simplicity & Surgical Changes | Chuẩn nhận diện: LG Brand Identity V5.2*  

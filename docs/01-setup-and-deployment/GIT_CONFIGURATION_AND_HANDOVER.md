@@ -44,15 +44,22 @@ git pull origin main
 - **Surgical Changes (Chỉnh sửa phẫu thuật):** Chỉ sửa đúng tệp và khối code liên quan trực tiếp đến yêu cầu của người dùng. Không xóa các file cấu trúc trong `assets/` hay `docs/`.
 - **Giữ nguyên nhận diện LG BI V5.2:**
   - Màu Đỏ Heritage: `#A50034`
-  - Màu Đỏ Active: `#FD003A`
+  - Màu Đỏ Active: `#EA1917` cho giao diện web (biến `--lg-red` trong trang; LG.com Web Style Guide) · `#FD312E` cho ấn phẩm BI (in ấn, slide). *(Bản cũ ghi `#FD003A` — không thuộc bảng màu LG, đã sửa 05/10/2026 theo skill `lg-brand`.)*
   - Nền Xám ấm Warm Gray 06: `#F0ECE4`
   - Phông chữ chuẩn: `LG EI Text` & `LG EI Headline`
 - **Không bao giờ hardcode dữ liệu bí mật (Zero-Hardcode):**
-  - Không điền Google Sheet ID thật vào `apps-script/Code.gs` (để trống chuỗi `''`).
-  - Không hardcode Web App URL trong `Mau_Dang_Ky_Internal_Sales_3009.html` (để đọc động qua `localStorage`).
+  - Không điền Google Sheet ID thật vào `apps-script/Code.gs` (để trống chuỗi `''`). *Hiện trạng 05/10/2026: dòng 21 vẫn đang có ID thật — dùng Script Property `SPREADSHEET_ID` để có thể để trống (xem `docs/CURRENT_STATE.md` mục 7).*
+  - Không hardcode Web App URL trong `Mau_Dang_Ky_Internal_Sales_3009.html` (để đọc động qua `localStorage`). Ngoại lệ có chủ đích: `portal.html` (bản chính thức) do `scripts/build_production.py` gắn URL — **không sửa tay** file nguồn để gắn URL.
+- **Không tự ý đổi chức năng đã duyệt** và tôn trọng **Vùng Bất Khả Xâm Phạm** (`docs/03-architecture-and-analysis/IMPROVEMENT_PLAN_PROPOSAL.md` §3B). Mọi thay đổi chạm luồng Admin / PM / Nhân viên phải được duyệt và ghi vào `docs/04-v1-hardening/README.md`.
 
 ### Bước 3: Kiểm thử tự động trước khi đóng gói
-Trước khi commit, Agent cần chạy kiểm tra nhanh:
+**Bắt buộc từ 05/10/2026** — 2 bộ kiểm thử chạy code thật (phải xanh 100%):
+```bash
+node tests/backend_gas_harness.js
+python3 tests/cloud_mode_regression.py
+node tests/run_e2e_tests.js
+```
+Và kiểm tra nhanh (cũ, vẫn dùng):
 ```bash
 # Kiểm tra cú pháp và đảm bảo không có đường dẫn tuyệt đối máy tính còn sót lại
 python3 -c "
@@ -73,6 +80,11 @@ git commit -m "feat(portal): mô tả ngắn gọn tính năng mới bổ sung"
 # hoặc
 git commit -m "fix(brand): chỉnh sửa giao diện theo chuẩn LG BI V5.2"
 ```
+
+### Bước 4b: Làm việc trên nhánh & điểm khôi phục (áp dụng từ bản v1)
+- Thay đổi lớn làm trên **nhánh riêng** (vd. `v1-hardening`), **không** sửa trực tiếp `main`.
+- Trước khi sửa, tạo điểm khôi phục: `git tag -a checkpoint-<tên>-<YYYYMMDD> -m "..."`. Điểm hiện có: `checkpoint-pre-v1-hardening-20261005` (+ nhánh `backup/pre-v1-hardening-20261005`).
+- Gộp vào `main` và đẩy lên 2 remote **chỉ khi chủ dự án duyệt**: `git switch main && git merge --no-ff v1-hardening && git push all main`.
 
 ### Bước 5: Đẩy lên cả 2 remote chỉ bằng 1 lệnh
 ```bash
@@ -141,6 +153,7 @@ PIC mới đọc tài liệu [`docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SET
 PIC mới có thể bắt đầu vận hành ngay với các tài khoản thử nghiệm:
 - **Tài khoản Quản lý (PM):** `VH12345` / Mật khẩu: `test123` (Nguyễn Thị Quỳnh Như)
 - **Tài khoản Nhân viên (User):** `VH88921` / Mật khẩu: `test123` (Trần Văn Nam)
+- ⚠️ Các tài khoản này chỉ dùng trong **bản demo**. Trên Sheet chính thức, mọi tài khoản dùng mật khẩu `test123` (công khai trong repo) phải đổi mật khẩu hoặc xóa trước go-live. Role **ADMIN** gán trong tab `Users` — xem `docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md` mục 4b.
 
 ---
 
@@ -161,8 +174,8 @@ PIC mới có thể bắt đầu vận hành ngay với các tài khoản thử 
 ## 5. Danh Mục Liên Hệ & Kênh Hỗ Trợ Dự Án
 
 - **Đơn vị chủ quản nghiệp vụ:** Ban Quản Trị Bán Hàng Nội Bộ (Internal Sales PM Team / HS PM Support).
-- **Hộp thư tiếp nhận yêu cầu hỗ trợ:** `internalsales.support@lge.com`.
+- **Hộp thư tiếp nhận yêu cầu hỗ trợ:** `internalsales.support@lge.com` (màn hình đăng nhập). Nút "Hỗ trợ" trong trang ghi `minhhien.hoang@lge.com` theo chỉ định của chủ dự án 05/10/2026 — chờ chốt 1 đầu mối (`docs/CURRENT_STATE.md` mục 9).
 - **Tài khoản ngân hàng thụ hưởng chính thức:**
-  - Ngân hàng: **Vietcombank (VCB)** — Chi nhánh Tây Hồ, Hà Nội
+  - Ngân hàng: **Vietcombank (VCB)** — Chi nhánh Tây Hồ, Hà Nội *(giao diện & email ghi "Tây Hồ"; `assets/content/bank_accounts.json` ghi "Tây Hà Nội" — chờ Tài chính xác nhận)*
   - Số tài khoản: **`0991000012525`**
   - Đơn vị thụ hưởng: **CTY TNHH LG ELECTRONICS VN HP**

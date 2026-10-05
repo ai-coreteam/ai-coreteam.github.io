@@ -1,4 +1,7 @@
 # ĐỀ ÁN CẢI TIẾN KỸ THUẬT & TỐI ƯU HẠ TẦNG GO-LIVE (TECHNICAL IMPROVEMENT PLAN)
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** Tài liệu **lịch sử** — phân tích / đề xuất tại thời điểm lập, **không** mô tả đúng 100% ứng dụng hiện nay. Thông tin hiện hành: [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md); thay đổi v1: [`04-v1-hardening/`](../04-v1-hardening/README.md). ⚠️ **Không sao chép** khóa `SERVER_SECRET` viết cứng trong ví dụ code của tài liệu này: máy chủ hiện dùng khóa **ngẫu nhiên** lưu trong Script Properties, đổi bằng `rotateSessionSecret()` ([Runbook §3](../04-v1-hardening/V1_RELEASE_RUNBOOK.md)).
+
 ## DỰ ÁN: CỔNG BÁN HÀNG NỘI BỘ LG ELECTRONICS VIETNAM (INTERNAL SALES PORTAL V8.3+)
 *Tác giả: Senior IT Developer & Global AI Architect*  
 *Phương châm: "Nếu không đo lường được thì không quản trị được" — Peter Drucker*  

@@ -1,4 +1,7 @@
 # KẾ HOẠCH TRIỂN KHAI & ĐẶC TẢ LUỒNG HƯỚNG DẪN TƯƠNG TÁC
+
+> **📌 Trạng thái (cập nhật 05/10/2026):** ✅ **Đã triển khai** (đối chiếu code): tour 4 bước Nhân viên / 5 bước PM, nút mở lại trên thanh tiêu đề (`#btn-header-tour`), tự mở lần đầu (khóa `lg_tour_completed_employee` / `lg_tour_completed_pm`). ⚠️ 3 câu chữ trong tour **lệch hành vi v1** — chưa sửa, chờ duyệt ([`docs/CURRENT_STATE.md`](../CURRENT_STATE.md) mục 9): (1) NV bước 2 "khóa máy riêng 24H" — thực tế 24 giờ tính **từ lúc PM mở cổng thanh toán**; (2) NV bước 2 ghi kho "Hải Phòng AYA, Hà Nội AYB, Hưng Yên AYC" — chưa được PM xác nhận; (3) PM bước 3 "tự động gửi Email … khi PM bấm duyệt" — v1: email **mặc định TẮT**, chỉ gửi khi ADMIN bật. Hướng dẫn sử dụng hiện hành: [`PM_AND_USER_OPERATIONAL_GUIDE.md`](PM_AND_USER_OPERATIONAL_GUIDE.md).
+
 ## (ONBOARDING SPOTLIGHT TOUR GUIDANCE FLOW PLAN)
 ### Cổng Đăng Ký Mua Hàng Nội Bộ — LG Electronics Việt Nam Hải Phòng (LGEVH)
 

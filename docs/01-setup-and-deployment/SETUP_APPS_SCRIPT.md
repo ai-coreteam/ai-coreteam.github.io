@@ -90,4 +90,4 @@ Mục tiêu: nhân viên bấm Gửi ở Tab 2 (đăng ký) và Tab 3 (khai nộ
 
 ## Rủi ro & Khuyến nghị Bảo mật
 - **Bảo mật mật khẩu:** Hệ thống hỗ trợ song song băm một chiều SHA-256 kèm Salt (`LG_VN_INTERNAL_SALES_2026_SALT_`) khi người dùng tự đổi và plaintext khi Admin can thiệp nhanh qua Sheet.
-- **Hạn mức Gmail:** Tài khoản Google Workspace doanh nghiệp của LG cho phép gửi tối đa 1.500 email/ngày. Với quy mô chương trình 200–300 nhân viên, hạn mức này hoàn toàn đáp ứng tốt mà không lo chạm ngưỡng.
+- **Hạn mức Gmail (đính chính 05/10/2026):** Apps Script hiện chạy dưới **tài khoản Gmail cá nhân → tối đa 100 email/ngày**, dùng chung cho mọi dự án Apps Script của tài khoản (kể cả staging). Ngày mở bán dự kiến ~180 email → sẽ chạm hạn mức; hệ thống tự ngưng gửi 1 giờ, đơn hàng vẫn xử lý bình thường. ADMIN bật/tắt email bằng công tắc trên web. Khi chuyển sang tài khoản Google Workspace của LG: 1.500 email/ngày. Nguồn: [Google Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas).
