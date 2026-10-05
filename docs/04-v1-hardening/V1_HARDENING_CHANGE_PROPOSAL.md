@@ -125,6 +125,21 @@ Lúc 10:00 còn cộng thêm tải đăng nhập + tải danh mục + đăng ký
 - Máy chủ cache danh sách 5 giây để mỗi lượt polling chạy ngắn.
 - **Điều kiện:** đo thời gian `doGet` thật trước (cần URL Web App). Nếu ≥ 0,7 giây → dùng **15 giây** (bấm hụt tăng thêm ~0,1 lần/người so với 10 giây theo mô phỏng).
 
+### 4.5. Đo trên máy chủ STAGING thật (05/10/2026) — thay thế giả định ở 4.3 `[VERIFIED-LIVE]`
+
+| Tải polling `doGet?action=taken` | Số yêu cầu | Lỗi | p50 | p95 |
+|---|---|---|---|---|
+| 10 / giây × 20 s | 200 | **0%** | 1,66 s | 2,56 s |
+| 20 / giây × 20 s | 400 | **0%** | 1,77 s | 4,87 s |
+| 30 / giây × 20 s | 600 | **0%** | 1,95 s | 3,73 s |
+| 45 / giây × 20 s | 900 | **0%** | 2,08 s | 2,79 s |
+| 60 / giây × 20 s | 1.200 | **0%** | 2,00 s | 2,40 s |
+| 50 / giây × 30 s **+ 3 người tranh 1 slot cùng lúc** | 1.500 | **0%** | 1,72 s | 2,29 s |
+
+- Giả định ở 4.3 (lấy thời gian phản hồi × tốc độ để ước lượng lượt chạy đồng thời) **sai**: thời gian phản hồi gồm cả mạng và bước chuyển hướng của Google, không phải thời gian script chạy. Số đo thực: 60 yêu cầu/giây vẫn 0% lỗi.
+- **Quyết định:** giữ đúng thiết kế đã duyệt **6–8 giây** (300 người ≈ 43 yêu cầu/giây, nằm trong vùng đã đo an toàn) + làm mới ngay khi bị từ chối. Theo mô phỏng 4.2: ~0,9–1,0 lần bấm hụt / người.
+- Giới hạn của phép đo `[UNCERTAIN]`: tải gửi từ 1 máy; chưa đo 300 trình duyệt thật cùng lúc. Lượt đầu sau thời gian nghỉ có thể chậm 33–37 s (khởi động nguội) → Runbook §3 bước 11 "khởi động máy chủ" trước giờ mở bán.
+
 ---
 
 ## 5. Các gói thay đổi
@@ -228,7 +243,7 @@ gantt
 | # | Nội dung | Trạng thái |
 |---|---|---|
 | Q1 | Duyệt gói P, A, B, C, D+E | ✅ **Đã duyệt cả 5 gói 05/10** — đã thực hiện |
-| Q2 | Polling | ✅ Đã làm 10–12 s + làm mới khi bị từ chối (hằng số `TAKEN_POLL_MS`). **Chốt** sau khi `staging_smoke_test.py` đo p95 thật (< 0,7 s → giữ 10 s; ngược lại đổi 15 s) |
+| Q2 | Polling | ✅ **Chốt 6–8 s** (thiết kế đã duyệt) sau khi đo staging thật 05/10: 60 yêu cầu/giây 0% lỗi (mục 4.5). Hằng số `TAKEN_POLL_MS = 6000` |
 | Q3 | Quy tắc hủy giữ chỗ | ✅ **Đã duyệt 05/10:** chỉ trước khi khai nộp tiền |
 | Q4 | Cách tạo bản production | ✅ Đã duyệt & làm: `scripts/build_production.py` → `portal.html` |
 | Q5 | Dữ kiện chuẩn: chi nhánh VCB, cú pháp CK, vị trí kho AYA/AYB/AYC | Chờ chủ dự án |

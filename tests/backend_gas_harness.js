@@ -122,9 +122,11 @@ function freshBook() {
       ['VH12345', 'test123', 'PM Owner', 'HS PM', '0912345678', 'pm@x.com', 'PM', 'Active'],
       ['VH70001', 'pw1', 'Nhan Vien 1', 'QA', '0900001111', 'a@x.com', 'USER', 'Active'],
       ['VH70002', 'pw2', 'Nhan Vien 2', 'QA', '0900002222', 'b@x.com', 'USER', 'Active'],
-      ['VH80000', 'pw3', 'PM Khac', 'HE PM', '0900003333', 'c@x.com', 'PM', 'Active']],
+      ['VH80000', 'pw3', 'PM Khac', 'HE PM', '0900003333', 'c@x.com', 'PM', 'Active'],
+      ['VH77777', 'pwA', 'Admin He Thong', 'Audit', '0900007777', 'adm@x.com', 'ADMIN', 'Active']],
     Programs: [['ProgramID', 'Name', 'PM_ID', 'PM_Name', 'Status', 'Start', 'End', 'Desc', 'Max', 'Created'],
-      [PID, 'Dot test', 'VH12345', 'PM Owner', 'Open', '', '', '', 1, now]],
+      [PID, 'Dot test', 'VH12345', 'PM Owner', 'Open', '', '', '', 1, now],
+      ['IS-DRAFT-01', 'Dot nhap', 'VH80000', 'PM Khac', 'Draft', '', '', '', 1, now]],
     Products: [['ProgramID', 'UniqueCode', 'Kho', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Qty', 'Status', 'EmpCode', 'Timestamp'],
       [PID, PID + '-AYA-001', 'AYA', 'TV', 'M1', 'd', 10000000, 5000000, 1, 'Available', '', now],
       [PID, PID + '-AYA-002', 'AYA', 'TV', 'M2', 'd', 10000000, 5000000, 1, 'Available', '', now],
@@ -271,31 +273,57 @@ console.log('--- B4 / C1: Từ chối, mở cổng, watchdog ---');
   check(state.mails.every(m => !m.duringLock), 'không email nào gửi trong lúc giữ khóa (toàn bộ test)');
 }
 
-console.log('--- K2: Công tắc email ---');
+console.log('--- K2: Công tắc email (chỉ ADMIN) ---');
 {
   const book = freshBook(); const { post, cache } = load(book);
   const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const adm = post({ action: 'auth', id: 'VH77777', password: 'pwA' });
   const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
   check(post({ action: 'email_setting', token: u1.token, enabled: false }).ok === false, 'nhân viên không đổi được công tắc email');
-  const r0 = post({ action: 'email_setting', token: pm.token });
-  check(r0.ok && r0.enabled === true && r0.remainingDailyQuota === 100, 'PM đọc trạng thái + hạn mức email còn lại');
+  check(post({ action: 'email_setting', token: pm.token, enabled: false }).ok === false, 'PM KHÔNG đổi được công tắc email (chỉ ADMIN)');
+  check(post({ action: 'email_setting', token: pm.token }).ok === false, 'PM cũng không đọc được cài đặt email');
+  const r0 = post({ action: 'email_setting', token: adm.token });
+  check(r0.ok && r0.enabled === true && r0.remainingDailyQuota === 100, 'ADMIN đọc trạng thái + hạn mức email còn lại');
   post({ action: 'auth', id: 'VH70001', password: 'pw1' }); // làm ấm cache cfg
-  const off = post({ action: 'email_setting', token: pm.token, enabled: false });
-  check(off.ok && off.enabled === false && !cache.has('cfg'), 'PM TẮT email → ghi Config, xóa cache để có hiệu lực ngay');
+  const off = post({ action: 'email_setting', token: adm.token, enabled: false });
+  check(off.ok && off.enabled === false && !cache.has('cfg'), 'ADMIN TẮT email → ghi Config, xóa cache để có hiệu lực ngay');
   const mailsBefore = state.mails.length;
   post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-002', programId: PID, empCode: 'VH70001', empName: 'NV1' });
   check(state.mails.length === mailsBefore, 'khi TẮT: đăng ký không gửi email thật');
   const ae = book.getSheetByName('AutoEmail').rows;
   check(/SIMULATED/.test(ae[ae.length - 1][3]), 'khi TẮT: vẫn ghi nhật ký AutoEmail [SIMULATED]');
-  check(post({ action: 'email_setting', token: pm.token, enabled: true }).enabled === true, 'PM BẬT lại được');
+  check(post({ action: 'email_setting', token: adm.token, enabled: true }).enabled === true, 'ADMIN BẬT lại được');
   check(book.getSheetByName('ActivityLog').rows.some(r => r[1] === 'EMAIL_SETTING'), 'mọi lần đổi công tắc ghi ActivityLog');
+}
+
+console.log('--- ADMIN: toàn quyền PM trên mọi chương trình, PM thường vẫn bị giới hạn ---');
+{
+  const book = freshBook(); const { post } = load(book);
+  const adm = post({ action: 'auth', id: 'VH77777', password: 'pwA' });
+  const other = post({ action: 'auth', id: 'VH80000', password: 'pw3' });
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  check(adm.ok && adm.user.role === 'ADMIN', 'đăng nhập trả role ADMIN từ sheet Users');
+  check(post({ action: 'pm_dashboard', token: adm.token, programId: PID }).ok === true, 'ADMIN xem Dashboard chương trình của PM khác');
+  check(post({ action: 'pm_dashboard', token: other.token, programId: PID }).ok === false, 'PM khác vẫn KHÔNG xem được (cô lập đa PM giữ nguyên)');
+  post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'NV1' });
+  const g = post({ action: 'pm_allow_payment', token: adm.token, programId: PID });
+  check(g.ok && g.count === 1, 'ADMIN mở cổng thanh toán chương trình của PM khác');
+  check(post({ action: 'pm_allow_payment', token: other.token, programId: PID }).count === 0, 'PM khác không mở cổng được (0 đơn)');
+  const list = post({ action: 'programs', role: 'ADMIN', userId: 'VH77777' });
+  check(list.ok && list.programs.length === 2, `ADMIN thấy mọi chương trình kể cả Draft (${list.programs.length})`);
+  const pmList = post({ action: 'programs', role: 'PM', userId: 'VH80000' });
+  check(pmList.programs.length === 1 && pmList.programs[0].id === 'IS-DRAFT-01', 'PM thường chỉ thấy chương trình của mình');
+  const upd = post({ action: 'program_update', token: adm.token, programId: 'IS-DRAFT-01', newStatus: 'Open' });
+  check(upd.ok === true, 'ADMIN đổi trạng thái chương trình của PM khác');
+  check(post({ action: 'pm_dashboard', token: u1.token }).ok === false, 'nhân viên vẫn không vào API PM');
 }
 
 console.log('--- C3 / C4 / C5: Cài đặt an toàn & cache ---');
 {
   const book = freshBook(); const { ctx, post, cache } = load(book);
+  const usersBefore = JSON.stringify(book.getSheetByName('Users').rows);
   const res = ctx.setupNewDatabase();
-  check(res.ok === false && book.getSheetByName('Users').rows.length === 5, 'setupNewDatabase() từ chối chạy đè Sheet có dữ liệu, dữ liệu còn nguyên');
+  check(res.ok === false && JSON.stringify(book.getSheetByName('Users').rows) === usersBefore, 'setupNewDatabase() từ chối chạy đè Sheet có dữ liệu, dữ liệu còn nguyên');
   post({ action: 'programs', role: 'USER' });
   check(cache.has('prog_USER_all'), 'danh sách chương trình được cache');
   const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });

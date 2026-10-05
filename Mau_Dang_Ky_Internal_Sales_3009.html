@@ -3395,7 +3395,7 @@
       function openSupportModal() {
         if (typeof showToast === 'function') {
           // v1-hardening: dùng bí danh hỗ trợ chung (như màn hình đăng nhập), không hiện tên/hotline/email cá nhân mẫu
-          showToast('Hỗ trợ nội bộ: Ban Quản Trị Bán Hàng Nội Bộ (HS PM Support) · Email: internalsales.support@lge.com', 'info', 6000);
+          showToast('Hỗ trợ nội bộ: Ban Quản Trị Bán Hàng Nội Bộ · Liên hệ hỗ trợ: minhhien.hoang@lge.com', 'info', 6000);
         }
       }
     </script>
@@ -4470,8 +4470,8 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A50034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <span>Hẹn Giờ (Timer)</span>
             </button>
-            <!-- v1-hardening (K2): công tắc bật/tắt email tự động — hướng dẫn: docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md -->
-            <button type="button" class="btn-pm-action btn-pm-outline btn-email-switch" id="btn-email-switch" role="switch" aria-checked="false" onclick="toggleAutoEmailSetting()" title="Bật/tắt gửi email tự động cho nhân viên (Config: ENABLE_AUTO_EMAIL)">
+            <!-- v1-hardening (K2): công tắc bật/tắt email tự động — CHỈ tài khoản ADMIN thấy. Hướng dẫn: docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md -->
+            <button type="button" class="btn-pm-action btn-pm-outline btn-email-switch" id="btn-email-switch" style="display:none;" role="switch" aria-checked="false" onclick="toggleAutoEmailSetting()" title="Bật/tắt gửi email tự động cho nhân viên (Config: ENABLE_AUTO_EMAIL)">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
               <span>Email tự động</span>
               <span class="email-switch-state" id="email-switch-state">…</span>
@@ -5800,7 +5800,7 @@
     // ===== v1-hardening (Gói A): dữ liệu của nhân viên thật lấy từ máy chủ, không lấy từ dữ liệu demo =====
     var myServerOrders = [];   // đơn của chính nhân viên (action 'lookup'), dùng cho ô "03 Đơn Hàng Của Bạn"
     var takenProgramId = '';   // chương trình mà danh sách slot đã hết (takenSet, từ máy chủ) đang đại diện
-    var TAKEN_POLL_MS = 10000; // nhịp polling kho: 10 giây + ngẫu nhiên 0–2 giây (đo & lý do: docs/04-v1-hardening §4)
+    var TAKEN_POLL_MS = 6000;  // nhịp polling kho: 6 giây + ngẫu nhiên 0–2 giây = thiết kế đã duyệt; đo staging 05/10: 60 req/giây, 0% lỗi (docs/04-v1-hardening §4)
 
     function isDemoAccount(user) {
       return !!(user && typeof DEMO_USERS !== 'undefined' && DEMO_USERS.some(u => u.id === user.id));
@@ -5888,7 +5888,7 @@
         (remaining !== null && remaining !== undefined ? ` · Hạn mức email còn lại hôm nay: ${remaining}` : '') + ' · Bấm để đổi';
     }
     async function loadAutoEmailSetting() {
-      if (!currentUser || currentUser.role !== 'PM') return;
+      if (!currentUser || !currentUser.isAdmin) return; // chỉ ADMIN
       if (!isServerUser()) {
         let on = false; try { on = localStorage.getItem('lg_demo_auto_email') === 'true'; } catch (e) {}
         renderEmailSwitch(on, null);
@@ -5906,6 +5906,7 @@
     async function toggleAutoEmailSetting() {
       const btn = document.getElementById('btn-email-switch');
       if (!btn || btn.getAttribute('aria-busy') === 'true') return;
+      if (!currentUser || !currentUser.isAdmin) { showToast('Chỉ tài khoản ADMIN được đổi cài đặt email.', 'error'); return; }
       const next = btn.getAttribute('aria-checked') !== 'true';
       const msg = next
         ? 'BẬT gửi email tự động tới nhân viên?\n\nLưu ý: tài khoản Gmail cá nhân chỉ gửi được tối đa 100 email/ngày. Khi chạm hạn mức, hệ thống tự ngừng gửi trong 1 giờ; đơn hàng vẫn xử lý bình thường.'
@@ -6503,6 +6504,9 @@
     }
 
     function applyLogin(user) {
+      // v1-hardening (ADMIN): ADMIN dùng toàn bộ giao diện PM (role hiển thị 'PM') + quyền hệ thống (isAdmin).
+      // Quyền thật do máy chủ kiểm tra qua token có chữ ký (token vẫn mang role ADMIN).
+      if (String(user.role || '').toUpperCase() === 'ADMIN') { user.isAdmin = true; user.role = 'PM'; }
       currentUser = user;
       // Auto-fill employee fields in new and legacy forms (Zero-typing)
       const empCode = document.getElementById('reg-emp-code');
@@ -6543,7 +6547,9 @@
           bar.className = 'user-bar';
           headerActions.prepend(bar);
         }
-        const roleBadge = user.role === 'PM'
+        const roleBadge = user.isAdmin
+          ? '<span class="role-tag role-pm" style="font-size:10.5px; padding:2px 7px; border-radius:10px; background:rgba(165,0,52,0.12); color:#A50034; font-weight:700; border:1px solid rgba(165,0,52,0.25); margin-left:4px;">Admin hệ thống</span>'
+          : user.role === 'PM'
           ? '<span class="role-tag role-pm" style="font-size:10.5px; padding:2px 7px; border-radius:10px; background:rgba(165,0,52,0.12); color:#A50034; font-weight:700; border:1px solid rgba(165,0,52,0.25); margin-left:4px;">PM Quản trị</span>'
           : '<span class="role-tag role-user" style="font-size:10.5px; padding:2px 7px; border-radius:10px; background:#F0ECE4; color:#716F6A; font-weight:600; border:1px solid #CBC8C2; margin-left:4px;">Nhân viên</span>';
         bar.innerHTML = `<span class="user-name">${esc(user.name)}</span>${roleBadge}<span class="user-dept">${esc(user.dept || '')}</span><button class="btn-logout" onclick="openChangePasswordModal()" style="margin-left:6px; background:#fff; color:#262626; border:1px solid #CBC8C2;" title="Tự đổi mật khẩu">Đổi MK</button><button class="btn-logout" onclick="handleLogout()">Đăng xuất</button>`;
@@ -6565,7 +6571,10 @@
       // P1: Load programs after login
       loadPrograms();
       // v1-hardening: PM → trạng thái công tắc email (K2); nhân viên thật → đơn của mình cho ô 03 (V1-02)
-      if (user.role === 'PM') loadAutoEmailSetting(); else refreshMyServerOrders();
+      const emailSwitch = document.getElementById('btn-email-switch');
+      if (emailSwitch) emailSwitch.style.display = user.isAdmin ? '' : 'none'; // chỉ ADMIN thấy công tắc email (05/10/2026)
+      if (user.isAdmin) loadAutoEmailSetting();
+      if (user.role !== 'PM') refreshMyServerOrders();
       // Onboarding Tour check for first-time login
       if (typeof checkAndAutoLaunchTour === 'function') {
         setTimeout(() => checkAndAutoLaunchTour(user.role), 800);
@@ -7011,13 +7020,13 @@
           // v1-hardening (V1-03): chờ tối đa 8 giây, tự thử lại 2 lần (máy chủ Google hay chậm lúc mở bán)
           const res = await fetchWithBackoff(SHEET_API_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'programs', role: currentUser.role, userId: currentUser.id })
+            body: JSON.stringify({ action: 'programs', role: currentUser.isAdmin ? 'ADMIN' : currentUser.role, userId: currentUser.id })
           }, 2, 1000, 8000);
           if (res.ok) {
             const data = await res.json();
             if (data.ok && Array.isArray(data.programs)) {
               let pList = data.programs;
-              if (currentUser.role === 'PM' && currentUser.id !== 'ADMIN') {
+              if (currentUser.role === 'PM' && currentUser.id !== 'ADMIN' && !currentUser.isAdmin) {
                 const cUid = String(currentUser.id || '').trim().toUpperCase();
                 const cUName = String(currentUser.name || '').trim().toLowerCase();
                 pList = pList.filter(p => {
@@ -7068,7 +7077,7 @@
           const cUid = String(currentUser.id || '').trim().toUpperCase();
           const cUName = String(currentUser.name || '').trim().toLowerCase();
           programs = DEMO_PROGRAMS.filter(p => {
-            if (currentUser.id === 'ADMIN') return true;
+            if (currentUser.id === 'ADMIN' || currentUser.isAdmin) return true;
             const pOwner = String(p.pmId || '').trim().toUpperCase();
             const pOwnerName = String(p.pmName || '').trim().toLowerCase();
             return pOwner === cUid || (pOwnerName && pOwnerName === cUName);
@@ -9636,7 +9645,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     function isCurrentPMAssigned(progId) {
       if (!currentUser) return false;
-      if (currentUser.id === 'ADMIN' || currentUser.role === 'ADMIN') return true;
+      if (currentUser.id === 'ADMIN' || currentUser.role === 'ADMIN' || currentUser.isAdmin) return true;
       if (!progId) return true;
       const allP = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs : [];
       let p = allP.find(x => x.id === progId);
@@ -11549,7 +11558,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     // P8: Adaptive Background Polling (6–8 giây khi xem Kho để chống tranh chấp slot)
     (function pollTaken() {
-      const interval = takenTabActive() ? (TAKEN_POLL_MS + Math.floor(Math.random() * 2000)) : (45000 + Math.floor(Math.random() * 15000)); // v1-hardening: 10–12 giây (docs/04-v1-hardening §4)
+      const interval = takenTabActive() ? (TAKEN_POLL_MS + Math.floor(Math.random() * 2000)) : (45000 + Math.floor(Math.random() * 15000)); // v1-hardening: 6–8 giây (docs/04-v1-hardening §4)
       setTimeout(() => {
         if (!document.hidden && takenTabActive()) refreshTaken(true);
         pollTaken();

@@ -61,7 +61,7 @@ Mục tiêu: nhân viên bấm Gửi ở Tab 2 (đăng ký) và Tab 3 (khai nộ
   - Mở sheet `Config`.
   - Tìm khóa `ENABLE_AUTO_EMAIL` và đổi giá trị thành `true`.
   - Hệ thống sẽ gửi email thật qua `MailApp` với template chuẩn nhận diện thương hiệu LG V5.2.
-- **Cập nhật v1 (05/10/2026):** PM bật/tắt ngay trên web bằng nút **"Email tự động [BẬT/TẮT]"** ở Bảng Điều Khiển PM (có hiệu lực ngay, ghi `ActivityLog`). Tài khoản Gmail cá nhân giới hạn **100 email/ngày**. Xem [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) mục 4.
+- **Cập nhật v1 (05/10/2026):** tài khoản role **ADMIN** bật/tắt ngay trên web bằng nút **"Email tự động [BẬT/TẮT]"** ở Bảng Điều Khiển PM (có hiệu lực ngay, ghi `ActivityLog`). PM thường không thấy nút này. Tài khoản Gmail cá nhân giới hạn **100 email/ngày**. Xem [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) mục 4.
 
 ## Cập nhật bảo mật & vận hành bản v1 (05/10/2026)
 - **`rotateSessionSecret()`** — chạy tay 1 lần trước go-live (và khi nghi lộ phiên): thay khóa ký phiên đăng nhập, mọi người đăng nhập lại 1 lần.

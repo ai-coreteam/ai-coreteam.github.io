@@ -31,7 +31,7 @@ PAGE = 'Mau_Dang_Ky_Internal_Sales_3009.html'
 PROD_PAGE = '.portal_regression_test.html'   # temporary production build, deleted at the end
 API = 'https://script.google.com/macros/s/MOCK/exec'
 PID = 'IS-2026Q4-TV-01'
-ME, PM = 'VH70001', 'VH70000'   # deliberately NOT in DEMO_USERS
+ME, PM, ADMIN = 'VH70001', 'VH70000', 'VH70009'   # deliberately NOT in DEMO_USERS
 WAIT_GATE, NEW = 'Đã đăng ký - Chờ mở thanh toán', 'Chờ nộp tiền'
 
 
@@ -79,11 +79,12 @@ class MockServer:
         route.fulfill(status=200, content_type='application/json', body=json.dumps(body))
 
     def do_auth(self, d):
-        users = {ME: ('Nhan Vien That', 'USER'), PM: ('PM That', 'PM')}
+        users = {ME: ('Nhan Vien That', 'USER'), PM: ('PM That', 'PM'), ADMIN: ('Admin That', 'ADMIN')}
         if d.get('id') not in users:
             return {'ok': False, 'message': 'Mã nhân viên không tồn tại.'}
         name, role = users[d['id']]
-        return {'ok': True, 'token': 'mock.sig', 'user': {'id': d['id'], 'name': name, 'dept': 'QA',
+        token = 'mock.admin' if role == 'ADMIN' else 'mock.sig'
+        return {'ok': True, 'token': token, 'user': {'id': d['id'], 'name': name, 'dept': 'QA',
                 'phone': '0900001234', 'email': 'x@example.com', 'role': role}}
 
     def do_programs(self, d):
@@ -126,8 +127,8 @@ class MockServer:
         return {'ok': True, 'message': f"Đã hủy giữ chỗ {d.get('slotId')}. Slot đã được trả về kho cho đồng nghiệp khác."}
 
     def do_email_setting(self, d):
-        if d.get('token') != 'mock.sig':
-            return {'ok': False, 'message': 'Thiếu token'}
+        if d.get('token') != 'mock.admin':   # máy chủ thật: verifySessionToken_(token, 'ADMIN')
+            return {'ok': False, 'message': 'Bạn không có quyền ADMIN để thực hiện thao tác này.'}
         if 'enabled' in d and d['enabled'] is not None:
             self.email_enabled = bool(d['enabled'])
             return {'ok': True, 'enabled': self.email_enabled, 'remainingDailyQuota': 97,
@@ -261,16 +262,28 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
-            print('Scenario 6: PM bật/tắt email tự động')
+            print('Scenario 6: công tắc email — chỉ ADMIN thấy & đổi được')
             s = MockServer()
             ctx, page = open_page(browser, port, s)
             login(page, PM)
+            check(page.locator('#tab-pm-btn').is_visible(), 'PM vào được Bảng điều khiển PM (hồi quy)')
+            check(not page.locator('#btn-email-switch').is_visible(), 'PM KHÔNG thấy công tắc email')
+            check(not any(c[0] == 'email_setting' for c in s.calls), 'PM không gọi API email_setting')
+            ctx.close()
+            s = MockServer()
+            ctx, page = open_page(browser, port, s)
+            login(page, ADMIN)
+            check(page.locator('#tab-pm-btn').is_visible(), 'ADMIN có toàn bộ giao diện PM')
+            check('Admin hệ thống' in page.inner_text('#user-bar'), 'thanh người dùng ghi "Admin hệ thống"')
+            check(page.locator('#btn-email-switch').is_visible(), 'ADMIN thấy công tắc email')
             check(page.inner_text('#email-switch-state').strip() == 'BẬT', 'công tắc hiển thị trạng thái máy chủ: BẬT')
             page.click('#btn-email-switch')
             page.wait_for_timeout(2500)
             check(page.inner_text('#email-switch-state').strip() == 'TẮT', 'bấm → TẮT, theo xác nhận của máy chủ')
             sets = [c for c in s.calls if c[0] == 'email_setting' and c[1].get('enabled') is not None]
-            check(sets and sets[-1][1].get('enabled') is False and sets[-1][1].get('token') == 'mock.sig', 'gửi enabled=false kèm token')
+            check(sets and sets[-1][1].get('enabled') is False and sets[-1][1].get('token') == 'mock.admin', 'gửi enabled=false kèm token ADMIN')
+            progs = [c for c in s.calls if c[0] == 'programs']
+            check(progs and progs[-1][1].get('role') == 'ADMIN', 'ADMIN yêu cầu danh sách MỌI chương trình (role ADMIN)')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

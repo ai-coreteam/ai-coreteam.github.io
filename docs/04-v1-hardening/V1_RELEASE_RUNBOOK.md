@@ -17,7 +17,8 @@
 | Vai trò | Thay đổi nhìn thấy | Việc phải làm |
 |---|---|---|
 | **Nhân viên** | Mở **link chính thức** là đăng nhập được ngay (không cấu hình gì) · Danh mục và ô "03 Đơn Hàng Của Bạn" hiện đúng dữ liệu máy chủ · "Hủy giữ chỗ" có hiệu lực thật (chỉ trước khi khai nộp tiền) · Máy chủ chậm → thấy "Đang kết nối máy chủ…" + nút **Thử lại** | Đăng nhập lại 1 lần sau khi Admin đổi khóa phiên |
-| **PM** | Nút **Email tự động BẬT/TẮT** trên Bảng điều khiển PM · "Duyệt hàng loạt" báo đúng số đơn máy chủ đã duyệt | Đăng nhập lại 1 lần |
+| **PM** | "Duyệt hàng loạt" báo đúng số đơn máy chủ đã duyệt · vẫn chỉ quản lý chương trình của mình | Đăng nhập lại 1 lần |
+| **ADMIN** *(role mới, 05/10)* | Toàn bộ chức năng PM trên **mọi chương trình** + nút **Email tự động BẬT/TẮT** (chỉ ADMIN thấy) · thanh người dùng ghi "Admin hệ thống" | Admin gán role trong tab `Users` (mục 4b) |
 | **Admin / PIC** | Hàm mới `rotateSessionSecret()` · `setupNewDatabase()` từ chối chạy đè dữ liệu · Script Property `SPREADSHEET_ID` cho staging · script `scripts/build_production.py` | Làm theo mục 2 → 3 |
 
 ---
@@ -51,7 +52,29 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
      --users VH90001:mk1,VH90002:mk2,VH90003:mk3 --slot <MÃ_SLOT_AVAILABLE> --load-rps 20 --load-seconds 30
    ```
    Kết quả phải là **ĐẠT**. Script in luôn **nhịp polling đề xuất (10 hay 15 giây)** từ thời gian phản hồi đo được.
-8. Nếu muốn thử bằng tài khoản demo trên staging: thêm dòng `ALLOW_DEMO_TOKENS | true` vào tab `Config` **của staging**. Tuyệt đối **không** thêm vào bản chính thức.
+8. *(Tùy chọn — đã quyết định KHÔNG dùng)* Muốn thử bằng tài khoản demo trên staging thì thêm `ALLOW_DEMO_TOKENS | true` vào tab `Config` **của staging**. Ngày 05/10 đã test bằng tài khoản thật nên không bật — staging giống hệt bản chính thức. Tuyệt đối **không** thêm vào bản chính thức.
+
+> ⚠️ **Trước khi test giữ chỗ trên staging: TẮT email tự động của staging.** Hạn mức 100 email/ngày tính theo **tài khoản Google**, staging và bản chính thức **dùng chung**. Ngày 05/10, 4 lượt giữ chỗ thử đã gửi email xác nhận tới địa chỉ mẫu của tài khoản test (hạn mức 100 → 90) trước khi email staging được tắt. **Không chạy test staging vào ngày mở bán.**
+
+### Kết quả staging ngày 05/10/2026 (code `8.3-v1-hardening`, chưa có role ADMIN)
+
+| Bài kiểm tra | Kết quả |
+|---|---|
+| Thời gian phản hồi `doGet?action=taken` (20 mẫu) | p50 1,7 s · p95 2,3 s · có 1–2 lượt **khởi động nguội 33–37 s** |
+| 5 loại token giả mạo | **5/5 bị từ chối** |
+| Giữ chỗ hộ người khác | **Bị chặn** |
+| 3 người cùng bấm 1 slot (lặp 3 lần, 1 lần kèm tải polling 50 yêu cầu/giây) | **Luôn đúng 1 người thắng** (kiểm chứng bằng tra cứu đơn trên máy chủ) |
+| Người thua nhận kèm danh sách slot đã hết | Đạt |
+| Hủy giữ chỗ → slot trả về kho | Đạt |
+| Tải polling 10 / 20 / 30 / 45 / 60 yêu cầu/giây × 20 giây | **0% lỗi ở mọi mức** (p95 ≤ 4,9 s) |
+
+→ Nhịp polling **giữ đúng thiết kế đã duyệt 6–8 giây** (300 người ≈ 43 yêu cầu/giây, đã đo an toàn tới 60).
+
+### 2b. Cập nhật staging sau mỗi lần sửa `Code.gs` (vd. role ADMIN ngày 05/10)
+1. Dán `Code.gs` mới vào dự án STAGING → Lưu.
+2. **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** (URL staging giữ nguyên).
+3. Tab `Users` của **Sheet STAGING**: thêm 1 dòng role `ADMIN` (vd. `VH22222`).
+4. Chạy: `python3 tests/staging_smoke_test.py --url <URL_STAGING> --program IS-2026Q4-OTHER-01 --samples 5 --admin VH22222:<mk> --pm VH99999:<mk>` → mục **2b phải ĐẠT** (ADMIN đọc được cài đặt email, PM bị chặn).
 
 ---
 
@@ -61,6 +84,7 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 
 | # | Việc | Chi tiết | Kiểm tra |
 |---|---|---|---|
+| 0 | Gán role **ADMIN** cho đúng người (tab `Users`, cột G = `ADMIN`) | Chỉ 1–2 người (mục 4b) | Đăng nhập thấy "Admin hệ thống" |
 | 1 | Tạo backup mới của Sheet chính | File → Make a copy | Có file backup mới, riêng tư |
 | 2 | Ghi lại Version Apps Script đang chạy | Deploy → Manage deployments | Đã ghi số Version |
 | 3 | Dán `Code.gs` mới vào **dự án Apps Script đang chạy** | Thay toàn bộ → Lưu | Không báo lỗi cú pháp |
@@ -71,14 +95,15 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 8 | Đưa `portal.html` lên GitHub Pages | Commit `portal.html` → push (sau khi chủ dự án duyệt) | Link: `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | 9 | Nạp danh sách nhân viên thật vào tab `Users` | Sheet đã ở chế độ **Restricted** (05/10) | Chỉ Admin/HR có quyền |
 | 10 | Kiểm tra cuối | Mở `portal.html` ở cửa sổ ẩn danh → đăng nhập 1 tài khoản thật → thấy danh mục; thử `VH12345/test123` → **bị từ chối** | Cả hai đúng |
+| 11 | **Khởi động máy chủ** 10 phút trước giờ mở bán | Mở `portal.html` và đăng nhập 1–2 lần (đo 05/10: lượt đầu sau thời gian nghỉ có thể chậm 33–37 s) | Lượt sau phản hồi ≤ 3 s |
 
 **Bản demo** (`Mau_Dang_Ky_Internal_Sales_3009.html`, `index.html`) giữ nguyên để đào tạo. Việc đổi `index.html` trỏ sang `portal.html` là **quyết định của chủ dự án**, chưa thực hiện.
 
 ---
 
-## 4. CÔNG TẮC EMAIL TỰ ĐỘNG (PM & Admin)
+## 4. CÔNG TẮC EMAIL TỰ ĐỘNG (CHỈ ADMIN)
 
-**Vị trí:** Bảng Điều Khiển PM → thanh nút phía trên → nút **"Email tự động [BẬT | TẮT]"**.
+**Vị trí:** đăng nhập bằng tài khoản **ADMIN** → Bảng Điều Khiển PM → thanh nút phía trên → nút **"Email tự động [BẬT | TẮT]"**. PM và nhân viên **không thấy** nút này; máy chủ cũng từ chối nếu không phải ADMIN.
 
 | Trạng thái | Nghĩa | Khi nào dùng |
 |---|---|---|
@@ -88,12 +113,29 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 - Bấm nút → hộp xác nhận → **có hiệu lực ngay** (không chờ cache).
 - Rê chuột lên nút để xem **số email còn được gửi hôm nay** (Google cung cấp).
 - Mọi lần đổi được ghi vào tab `ActivityLog` (hành động `EMAIL_SETTING`, ai đổi, lúc nào).
-- Chỉ tài khoản vai trò **PM** đổi được. Nhân viên không thấy nút này.
+- Chỉ tài khoản role **ADMIN** thấy và đổi được (máy chủ kiểm tra qua phiên đăng nhập có chữ ký).
 - Cách dự phòng (không cần web): sửa ô `ENABLE_AUTO_EMAIL` trong tab `Config` thành `true`/`false` (có hiệu lực sau tối đa 5 phút).
 
 **Hạn mức hiện tại:** Apps Script chạy dưới **tài khoản Gmail cá nhân → tối đa 100 email/ngày** ([nguồn Google](https://developers.google.com/apps-script/guides/services/quotas)). Ngày mở bán dự kiến ~180 email. Khi chạm hạn mức, hệ thống tự ngừng gửi 1 giờ và **đơn hàng vẫn xử lý bình thường**.
 
+**Hạn mức dùng chung:** mọi dự án Apps Script của cùng một tài khoản Google (staging + chính thức) chia nhau 100 email/ngày.
+
 **Khi nâng cấp lên LG Workspace (1.500 email/ngày):** tạo lại dự án Apps Script dưới tài khoản Workspace, làm lại mục 3 (bước 3–7) với URL mới, rồi build lại `portal.html` bằng URL mới.
+
+---
+
+## 4b. ROLE ADMIN (thêm ngày 05/10/2026)
+
+| | PM | **ADMIN** |
+|---|---|---|
+| Tạo chương trình, nạp Excel, mở cổng, duyệt / từ chối, kết sổ, quét quá hạn | Chỉ chương trình **của mình** | **Mọi chương trình** |
+| Xem danh sách chương trình | Của mình | Tất cả (kể cả Dự thảo / Đã kết sổ) |
+| Công tắc email tự động | ✗ | ✓ |
+| Giao diện | Bảng điều khiển PM | Như PM, thanh người dùng ghi **"Admin hệ thống"** |
+
+- **Cách gán:** tab `Users`, cột G (`Role`) = `ADMIN`. Có hiệu lực ở lần đăng nhập kế tiếp. Muốn bỏ quyền: đổi lại `PM` hoặc `USER`.
+- **Nguyên tắc Jeong-Do:** ADMIN thao tác được trên chương trình của mọi PM → chỉ gán cho **1–2 người** (vd. Kiểm toán nội bộ). Mọi thao tác vẫn ghi `ActivityLog` kèm mã NV của ADMIN.
+- Tài khoản demo không có ADMIN; role này chỉ dùng với tài khoản trong Sheet.
 
 ---
 
@@ -114,8 +156,8 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 
 | Lệnh | Kiểm tra gì | Kết quả 05/10/2026 |
 |---|---|---|
-| `node tests/backend_gas_harness.js` | Chạy **Code.gs thật** với Sheet giả lập: xác thực, giữ chỗ, hủy, mở cổng, watchdog, công tắc email, khóa ghi | **52/52** (bản trước sửa: token giả mạo lọt qua) |
-| `python3 tests/cloud_mode_regression.py` | Chạy **trang web thật** với máy chủ giả lập: 7 kịch bản nhân viên, PM, bản production, demo | **25/25** (bản trước sửa: 3/7) |
+| `node tests/backend_gas_harness.js` | Chạy **Code.gs thật** với Sheet giả lập: xác thực, giữ chỗ, hủy, mở cổng, watchdog, công tắc email, role ADMIN, khóa ghi | **63/63** (bản trước sửa: token giả mạo lọt qua) |
+| `python3 tests/cloud_mode_regression.py` | Chạy **trang web thật** với máy chủ giả lập: 7 kịch bản nhân viên, PM, ADMIN, bản production, demo | **32/32** (bản trước sửa: 3/7) |
 | `node tests/run_e2e_tests.js` | Bộ kiểm tra cũ (hồi quy) | **164/164** |
 | `python3 tests/polling_race_simulation.py` | Mô phỏng rủi ro polling | Xem đề xuất §4 |
-| `python3 tests/staging_smoke_test.py …` | Máy chủ **staging thật**: thời gian phản hồi, token giả, FCFS, tải | Chờ deploy staging |
+| `python3 tests/staging_smoke_test.py …` | Máy chủ **staging thật**: thời gian phản hồi, token giả, ADMIN, FCFS, tải | **ĐẠT** 05/10 (bảng mục 2); mục 2b ADMIN chờ deploy bản mới |

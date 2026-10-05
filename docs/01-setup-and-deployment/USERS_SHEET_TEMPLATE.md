@@ -14,7 +14,7 @@ Thêm 1 sheet tab mới tên **"Users"** trong Google Sheet CSDL của bạn (ho
 | D | **Dept** | Text | ✅ | Bộ phận / Division (VD: HS PM Support) |
 | E | **Phone** | Text | | Số điện thoại (VD: 0912345678) |
 | F | **Email** | Text | | Email LG (VD: quynhnhu@lge.com) |
-| G | **Role** | Text | ✅ | `PM` hoặc `USER` — mặc định `USER` nếu để trống |
+| G | **Role** | Text | ✅ | `USER`, `PM` hoặc `ADMIN` — mặc định `USER` nếu để trống. **`ADMIN`** (từ 05/10/2026): toàn quyền PM trên mọi chương trình + công tắc email; chỉ gán 1–2 người. Xem `docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md` mục 4b |
 | H | **Status** | Text | ✅ | `Active` hoặc `Inactive` — chỉ `Active` mới đăng nhập được |
 
 ## Dữ liệu mẫu (để test)

@@ -202,7 +202,7 @@ flowchart TD
 | Tình huống | Bản v1 hoạt động thế nào |
 |---|---|
 | Vào hệ thống | Dùng **link chính thức** do PM/Admin gửi (`…/portal.html`). Đăng nhập bằng Mã NV + mật khẩu được cấp — **không cần cấu hình gì**. Bản chính thức không có tài khoản demo. |
-| Xem danh mục | Trạng thái "Còn trống / Đã có người giữ" lấy trực tiếp từ máy chủ và tự cập nhật khoảng **10–12 giây** một lần khi bạn đang ở Tab Danh mục. |
+| Xem danh mục | Trạng thái "Còn trống / Đã có người giữ" lấy trực tiếp từ máy chủ và tự cập nhật khoảng **6–8 giây** một lần khi bạn đang ở Tab Danh mục. |
 | Bấm giữ chỗ nhưng vừa có người nhanh hơn | Hệ thống báo *"đã có người đăng ký trước"* và **cập nhật ngay** các slot đã hết trên màn hình. Không bao giờ có 2 người cùng giữ 1 slot — chọn sản phẩm khác. |
 | Ô "03 Đơn Hàng Của Bạn" | Hiện **đơn thật** của bạn từ máy chủ. Khi đơn đang chờ PM mở cổng, ô này tự kiểm tra lại mỗi 60 giây — khi PM mở cổng sẽ hiện **"CỔNG TT ĐÃ MỞ"** và nút **"Nộp tiền ngay"**. |
 | Hủy giữ chỗ | Có hiệu lực thật trên máy chủ, slot trả về kho cho đồng nghiệp ngay. Chỉ hủy được **trước khi khai nộp tiền** (xem Bước 4). |
@@ -213,10 +213,19 @@ flowchart TD
 
 | Tình huống | Bản v1 hoạt động thế nào |
 |---|---|
-| Bật/tắt email tự động | Nút **"Email tự động [BẬT/TẮT]"** trên thanh nút Bảng Điều Khiển PM. Rê chuột để xem số email còn gửi được hôm nay (tài khoản hiện tại: tối đa 100/ngày). Hướng dẫn đầy đủ: [`V1_RELEASE_RUNBOOK.md` mục 4](../04-v1-hardening/V1_RELEASE_RUNBOOK.md). |
+| Bật/tắt email tự động | **Chỉ tài khoản ADMIN** thấy nút **"Email tự động [BẬT/TẮT]"** trên thanh nút Bảng Điều Khiển PM. PM cần đổi thì liên hệ ADMIN. Hướng dẫn: [`V1_RELEASE_RUNBOOK.md` mục 4](../04-v1-hardening/V1_RELEASE_RUNBOOK.md). |
 | Duyệt hàng loạt | Hệ thống chờ máy chủ xác nhận rồi mới báo **"Máy chủ đã duyệt X / Y đơn"**, sau đó tự tải lại bảng. Nếu máy chủ lỗi: không đơn nào bị đánh dấu duyệt nhầm — bấm lại. |
 | Đơn nhân viên tự hủy | Hiện trạng thái **"Đã hủy bởi nhân viên"**, slot đã trả về kho. |
 | Tài khoản demo | Chỉ dùng trong **bản demo** để đào tạo. Không thao tác được trên máy chủ chính thức. |
+
+### C.3. ADMIN (role mới, 05/10/2026)
+
+| Tình huống | Bản v1 hoạt động thế nào |
+|---|---|
+| Đăng nhập | Giao diện giống PM, thanh người dùng ghi **"Admin hệ thống"**. |
+| Quản lý chương trình | Thấy và thao tác **mọi chương trình** của mọi PM (mở cổng, duyệt, từ chối, kết sổ…). Mọi thao tác ghi `ActivityLog`. |
+| Cài đặt hệ thống | Nút **"Email tự động [BẬT/TẮT]"** — rê chuột xem số email còn gửi được hôm nay. |
+| Gán / bỏ quyền | Admin sửa cột `Role` trong tab `Users` (`ADMIN` / `PM` / `USER`). Chi tiết: [`V1_RELEASE_RUNBOOK.md` mục 4b](../04-v1-hardening/V1_RELEASE_RUNBOOK.md). |
 
 ## BẢNG TRA CỨU MÃ MÀU TRẠNG THÁI CHUẨN THƯƠNG HIỆU LG
 

@@ -245,13 +245,23 @@ function verifySessionToken_(tokenStr, requiredRole) {
     if (payload.exp && payload.exp < now) {
       return { valid: false, message: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.' };
     }
-    if (requiredRole && String(payload.role).toUpperCase() !== String(requiredRole).toUpperCase()) {
-      return { valid: false, message: 'Bạn không có quyền ' + requiredRole + ' để thực hiện thao tác này.' };
+    // v1-hardening (ADMIN): ADMIN có toàn bộ quyền PM; quyền 'ADMIN' (cài đặt hệ thống) chỉ ADMIN có
+    if (requiredRole) {
+      var have = String(payload.role).toUpperCase(), need = String(requiredRole).toUpperCase();
+      if (!(have === need || (need === 'PM' && have === 'ADMIN'))) {
+        return { valid: false, message: 'Bạn không có quyền ' + requiredRole + ' để thực hiện thao tác này.' };
+      }
     }
     return { valid: true, payload: payload };
   } catch (e) {
     return { valid: false, message: 'Không thể giải mã dữ liệu token: ' + e };
   }
+}
+
+// v1-hardening (ADMIN): role ADMIN trong sheet Users (hoặc mã NV 'ADMIN' như trước) = quản trị toàn hệ thống:
+// làm mọi việc của PM trên MỌI chương trình + cài đặt hệ thống (vd. công tắc email).
+function isAdminPayload_(payload) {
+  return !!payload && (String(payload.role || '').toUpperCase() === 'ADMIN' || String(payload.uid || '').toUpperCase() === 'ADMIN');
 }
 
 function verifyToken_(tokenStr, requiredRole) {
@@ -458,7 +468,7 @@ var PROG_COL = { ID: 1, NAME: 2, PM_ID: 3, PM_NAME: 4, STATUS: 5, START: 6, END:
 function programs_(d) {
   var role = str_(d.role) || 'USER';
   var userId = str_(d.userId).toUpperCase();
-  var cacheKey = 'prog_' + role + '_' + (role === 'PM' ? userId : 'all');
+  var cacheKey = 'prog_' + role + '_' + (role === 'PM' ? userId : 'all'); // ADMIN → 'prog_ADMIN_all'
 
   var cached = getCachedJson_(cacheKey);
   if (cached) return { ok: true, programs: cached, cached: true };
@@ -473,9 +483,9 @@ function programs_(d) {
     var status = String(data[r][PROG_COL.STATUS - 1]).trim();
     var pmId = String(data[r][PROG_COL.PM_ID - 1]).trim().toUpperCase();
     // Multi-PM Isolation & Role-Based Access Control (RBAC):
-    if (role === 'PM') {
-      // SuperAdmin sees all; each PM sees ONLY their own programs
-      if (userId !== 'ADMIN' && pmId !== userId) {
+    if (role === 'PM' || role === 'ADMIN') {
+      // SuperAdmin (role ADMIN hoặc mã 'ADMIN') sees all; each PM sees ONLY their own programs
+      if (role !== 'ADMIN' && userId !== 'ADMIN' && pmId !== userId) {
         continue;
       }
     } else {
@@ -504,6 +514,7 @@ function programs_(d) {
 function invalidateProgramCaches_(ownerPmId) {
   invalidateCache_('prog_USER_all');
   invalidateCache_('prog_PM_ADMIN');
+  invalidateCache_('prog_ADMIN_all');
   if (ownerPmId) invalidateCache_('prog_PM_' + String(ownerPmId).toUpperCase());
 }
 
@@ -568,7 +579,7 @@ function program_update_(d) {
   for (var r = 0; r < n; r++) {
     if (String(data[r][0]).trim().toUpperCase() === progId.toUpperCase()) {
       var pmOwnerId = String(data[r][PROG_COL.PM_ID - 1]).trim().toUpperCase();
-      if (authCheck.payload.uid !== 'ADMIN' && pmOwnerId !== authCheck.payload.uid) {
+      if (!isAdminPayload_(authCheck.payload) && pmOwnerId !== authCheck.payload.uid) {
         return { ok: false, message: 'Từ chối thẩm quyền: Bạn không có quyền kết sổ hoặc cập nhật trạng thái chương trình của PM khác (' + pmOwnerId + ').' };
       }
       var currentStatus = String(data[r][4]).trim();
@@ -618,7 +629,7 @@ function program_delete_(d) {
   if (targetRow === -1) return { ok: false, message: 'Không tìm thấy chương trình: ' + programId };
 
   // Ownership check: Only the PM who created it or ADMIN can delete
-  if (callerId !== 'ADMIN' && ownerId !== callerId) {
+  if (!isAdminPayload_(authCheck.payload) && ownerId !== callerId) {
     return { ok: false, message: 'Bạn không có quyền xóa chương trình này vì thuộc sở hữu của PM khác (' + ownerId + ').' };
   }
 
@@ -717,7 +728,7 @@ function product_upload_(d) {
   if (!authCheck.valid) return { ok: false, message: authCheck.message };
   var programId = str_(d.programId);
   if (!programId) return { ok: false, message: 'Thiếu programId.' };
-  if (!isProgramOwnedByPM_(programId, authCheck.payload.uid)) {
+  if (!isAdminPayload_(authCheck.payload) && !isProgramOwnedByPM_(programId, authCheck.payload.uid)) {
     return { ok: false, message: 'Từ chối thẩm quyền: Bạn không có quyền nạp sản phẩm vào chương trình của PM khác.' };
   }
   var items = d.items || d.products; // array of {kho, category, model, description, rrp, internalPrice, qty}
@@ -791,9 +802,9 @@ function takenCodesFrom_(prodData, programId) {
 
 // Đọc sheet Programs 1 lần: các chương trình PM này sở hữu (ADMIN: tất cả).
 // Dùng thay isProgramOwnedByPM_() trong vòng lặp để không đọc sheet nhiều lần khi đang giữ khóa.
-function ownedPrograms_(pmId) {
+function ownedPrograms_(pmId, isAdmin) {
   var uid = String(pmId || '').toUpperCase();
-  var out = { all: uid === 'ADMIN', ids: {} };
+  var out = { all: uid === 'ADMIN' || !!isAdmin, ids: {} };
   var sh = book_().getSheetByName(SHEET_PROGRAMS);
   if (!sh || sh.getLastRow() < 2) return out;
   var v = sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues();
@@ -973,7 +984,7 @@ function pm_dashboard_(d) {
   var callerId = String(authCheck.payload.uid || '').toUpperCase();
 
   // Multi-PM Isolation Check: PM can only view dashboard of their own program
-  if (programId && callerId !== 'ADMIN') {
+  if (programId && !isAdminPayload_(authCheck.payload)) {
     if (!isProgramOwnedByPM_(programId, callerId)) {
       return { ok: false, message: 'Từ chối truy cập: Chương trình này thuộc quyền quản lý của PM khác.' };
     }
@@ -1051,7 +1062,7 @@ function pm_approve_payment_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var owned = ownedPrograms_(authCheck.payload.uid);
+  var owned = ownedPrograms_(authCheck.payload.uid, isAdminPayload_(authCheck.payload));
   var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
   var nowStr = fmt_(new Date());
   var hit = null;
@@ -1112,7 +1123,7 @@ function pm_batch_approve_payment_(d) {
   var programId = str_(d.programId);
   var pmName = authCheck.payload.name || str_(d.userName) || 'PM Quản trị';
   var nowStr = fmt_(new Date());
-  var owned = ownedPrograms_(authCheck.payload.uid);
+  var owned = ownedPrograms_(authCheck.payload.uid, isAdminPayload_(authCheck.payload));
   var updated = 0;
   var rowsToEmail = [];
 
@@ -1180,7 +1191,7 @@ function pm_reject_payment_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var owned = ownedPrograms_(authCheck.payload.uid);
+  var owned = ownedPrograms_(authCheck.payload.uid, isAdminPayload_(authCheck.payload));
   var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
   var nowStr = fmt_(new Date());
   var hit = null;
@@ -1261,7 +1272,7 @@ function pm_allow_payment_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var owned = ownedPrograms_(authCheck.payload.uid);
+  var owned = ownedPrograms_(authCheck.payload.uid, isAdminPayload_(authCheck.payload));
   var pmName = authCheck.payload.name || str_(d.userName) || 'PM Quản trị';
   var nowStr = fmt_(new Date());
   var count = 0;
@@ -1894,11 +1905,11 @@ function user_cancel_registration_(d) {
 }
 
 /* ---------- v1-hardening (K2): Công tắc bật/tắt email tự động ----------
- * PM xem / đổi Config!ENABLE_AUTO_EMAIL ngay trên Bảng điều khiển PM, không cần mở Sheet.
+ * Chỉ tài khoản role ADMIN xem / đổi Config!ENABLE_AUTO_EMAIL ngay trên web, không cần mở Sheet.
  * Gọi không kèm "enabled" = chỉ đọc. Mọi lần đổi đều ghi ActivityLog (ai, lúc nào, bật hay tắt).
  */
 function email_setting_(d) {
-  var auth = verifySessionToken_(d.token, 'PM');
+  var auth = verifySessionToken_(d.token, 'ADMIN'); // chỉ ADMIN (yêu cầu 05/10/2026)
   if (!auth.valid) return { ok: false, authError: true, message: auth.message };
 
   var remaining = null;
