@@ -364,6 +364,35 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 11: cửa sổ biên lai PM chỉ hiện biên lai THẬT — CURRENT_STATE mục 24')
+            drive = 'https://drive.google.com/file/d/REAL_RECEIPT_ID/view?usp=drivesdk'
+            png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+            def reg(i, receipt, txn=''):
+                return {'id': f'REG-{i}', 'programId': PID, 'slotId': f'{PID}-AYA-00{i}', 'empCode': 'VH5000' + str(i), 'empName': 'NV',
+                        'model': 'M', 'kho': 'AYA', 'status': 'Đã khai nộp - chờ đối soát', 'amount': 5000000, 'internalPrice': 5000000,
+                        'bankTxn': txn, 'payerName': 'NV', 'payerCode': 'VH5000' + str(i), 'receipt': receipt, 'timestamp': '05/10/2026 10:00:00'}
+            s = MockServer()
+            s.do_pm_dashboard = lambda d: {'ok': True, 'registrations': [reg(1, drive), reg(2, ''), dict(reg(3, ''), receiptUrl=png)]}
+            ctx, page = open_page(browser, port, s)
+            login(page, PM)
+            view = '''() => { const i = document.getElementById('modal-receipt-img'), n = document.getElementById('modal-receipt-note'),
+                       a = document.getElementById('modal-receipt-link');
+                       return { src: decodeURIComponent(i.getAttribute('src') || ''), imgShown: i.style.display !== 'none',
+                                note: n && n.style.display !== 'none' ? n.innerText : '', href: a ? a.getAttribute('href') : '' }; }'''
+            def fake(v):
+                return any(t in (v['src'] + v['note']) for t in ('Giao dịch thành công', 'FT24098912389', 'XÁC NHẬN CHUYỂN TIỀN'))
+            page.evaluate("openPMReceiptModal('REG-1')"); v1 = page.evaluate(view)
+            check(not fake(v1) and v1['href'] == drive and not v1['imgShown'], f'biên lai trên Drive → nút mở biên lai thật, không có hình giả ({v1["note"][:40]!r})')
+            page.evaluate("closeReceiptModal(); openPMReceiptModal('REG-2')"); v2 = page.evaluate(view)
+            check(not fake(v2) and 'Chưa có ảnh biên lai' in v2['note'] and not v2['href'], 'không có biên lai → "Chưa có ảnh biên lai", không có hình giả / mã GD bịa')
+            page.evaluate("closeReceiptModal(); openPMReceiptModal('REG-3')"); v3 = page.evaluate(view)
+            check(v3['imgShown'] and v3['src'] == png and not v3['note'], 'ảnh biên lai thật (vừa tải lên) → hiện đúng ảnh đó')
+            check(page.evaluate("getComputedStyle(document.getElementById('modal-btn-approve')).display") != 'none', 'nút Duyệt giữ nguyên (không đổi quy trình duyệt)')
+            page.evaluate("closeReceiptModal(); openReceiptModal('Biên Lai Nộp Tiền X', 'NV (VH1)', '5000000', '', '', 'NO-SUCH-SLOT')"); v4 = page.evaluate(view)
+            check(not fake(v4) and 'Chưa có ảnh biên lai' in v4['note'], 'cửa sổ biên lai thứ hai (bảng xác nhận) cũng không vẽ hình giả')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()

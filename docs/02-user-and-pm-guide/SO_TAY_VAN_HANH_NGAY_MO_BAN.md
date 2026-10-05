@@ -3,7 +3,7 @@
 
 | | |
 |---|---|
-| Áp dụng cho | Bản **v1.1** (phát hành 05/10/2026) |
+| Áp dụng cho | Bản **v1.2** (phát hành 05/10/2026) |
 | Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | Đợt bán | Mở **10:00 ngày 14/10/2026** → kết thúc **17:00 ngày 16/10/2026** |
 | Đối chiếu | Mọi bước dưới đây đã được kiểm tra với mã nguồn ngày 05/10/2026 |
@@ -21,7 +21,7 @@
 | 2 | **Không ghi mật khẩu thật** vào tin nhắn nhóm, email, tài liệu | Ai có mật khẩu ADMIN = xem và duyệt được mọi đơn |
 | 3 | Trạng thái chương trình chỉ đi **một chiều: Dự thảo → Mở bán → Đã kết sổ**. Đã kết sổ thì **không mở lại được** trên web | Máy chủ chặn mở lại (nút "Mở lại chương trình" trên web sẽ báo lỗi) |
 | 4 | Bảng Điều Khiển PM **không tự cập nhật** — luôn bấm **`Tải lại`** trước khi xem số liệu hay duyệt | Để không duyệt trên số liệu cũ |
-| 5 | ⚠️ **Tạm thời KHÔNG tin hình biên lai trong cửa sổ "Chứng từ thanh toán"** | Lỗi đang chờ sửa: cửa sổ này hiện **hình minh họa "Giao dịch thành công"**, không phải biên lai thật. Cách đối soát đúng: Phần 2 – Bước D |
+| 5 | **Duyệt tiền theo sao kê ngân hàng**, biên lai chỉ để đối chiếu thêm | Cửa sổ "Chứng từ thanh toán" (từ v1.2) có nút **"Mở biên lai thật ↗"** mở file trên Google Drive, hoặc ghi "Chưa có ảnh biên lai". Hệ thống **không** tự vẽ biên lai |
 
 ---
 
@@ -99,7 +99,7 @@
 | Bấm **"Mở cổng thanh toán (N)"** — N là số đơn đang chờ. Từ lúc này các đơn đó có 24 giờ | PM | ☐ |
 | ⚠️ Đơn đăng ký **sau** lần bấm này vẫn ở "Chờ mở thanh toán" → **bấm lại** khi thấy N > 0. Mỗi lần bấm, đồng hồ 24 giờ tính riêng cho nhóm đơn đó | PM | ☐ |
 | Mỗi buổi: **`Tải lại`** → xem các đơn "Đã khai nộp - chờ đối soát" | PM | ☐ |
-| **Đối soát (cách đúng, tạm thời):** đối chiếu **sao kê ngân hàng** (số tiền, nội dung chuyển khoản có Mã NV) với đơn. Cần xem biên lai thật: mở Google Sheet → tab `Registrations` → **cột R `Receipt`** → bấm đường link (người mở cần quyền xem thư mục Drive "Bien lai nop tien") | PM, ADMIN | ☐ |
+| **Đối soát:** đối chiếu **sao kê ngân hàng** (số tiền, nội dung chuyển khoản có Mã NV) với đơn. Xem biên lai: bấm nút biên lai của đơn → **"Mở biên lai thật ↗"** (mở Google Drive). Người mở cần quyền xem thư mục Drive "Bien lai nop tien" — ADMIN chia sẻ (Viewer) cho PM sau đơn nộp tiền đầu tiên | PM, ADMIN | ☐ |
 | Khớp sao kê → **"Duyệt Thanh Toán Này"** (từng đơn) hoặc **"Duyệt hàng loạt (N)"**. Chờ báo *"Máy chủ đã duyệt X / Y đơn"* | PM | ☐ |
 | Không khớp → **"Từ Chối Đơn"** (máy được trả về kho) | PM | ☐ |
 | Đơn quá 24 giờ chưa nộp: máy chủ **tự** chuyển "Hết hạn giữ chỗ" mỗi giờ. Muốn quét ngay: nút **"Quét quá hạn 24h"** | PM | ☐ |
@@ -128,7 +128,9 @@
 | Nhân viên không thấy chương trình | Chương trình chưa ở trạng thái `Open`, hoặc cột E gõ sai (phải đúng `Open`) | PM kiểm tra banner chương trình; ADMIN kiểm tra tab `Programs` cột E | PM |
 | Nhân viên muốn hủy nhưng không hủy được | Đã khai nộp tiền — quy định chỉ hủy **trước** khi khai nộp | PM dùng **"Từ Chối Đơn"** và xử lý hoàn tiền theo quy trình kế toán | PM |
 | Có đơn đăng ký **trước 10:00** | Chương trình bị mở sớm (quên đặt `Draft`) | Chụp tab `Registrations`; báo chủ dự án quyết định giữ hay hủy (PM "Từ Chối Đơn"). Không tự xóa dòng | Chủ dự án |
-| Cửa sổ biên lai hiện hình xanh "Giao dịch thành công" với mã GD lạ | Lỗi đã biết (hình minh họa, không phải biên lai thật) | **Không** duyệt theo hình này. Đối soát bằng sao kê + cột R `Receipt` (Phần 2 – D) | — |
+| Bấm "Mở biên lai thật ↗" → Google báo "Bạn cần quyền truy cập" | Tài khoản Google của bạn chưa được chia sẻ thư mục "Bien lai nop tien" | ADMIN: Google Drive → thư mục "Bien lai nop tien" (cạnh file Sheet) → Share → thêm email PM → Viewer | ADMIN |
+| Cửa sổ biên lai ghi "Chưa có ảnh biên lai trong hệ thống" | Nhân viên khai nộp nhưng không tải ảnh | Đối soát bằng sao kê; thiếu thông tin thì liên hệ nhân viên | PM |
+| Cửa sổ biên lai hiện hình xanh "Giao dịch thành công" có mã GD lạ | Đang mở **bản cũ** của trang (trước v1.2) | Tải lại trang (Ctrl+Shift+R / Cmd+Shift+R). Vẫn thấy → báo kỹ thuật | Kỹ thuật |
 | Bấm "Mở lại chương trình" bị báo lỗi | Máy chủ không cho mở lại chương trình đã kết sổ | Nếu thật sự cần mở lại: ADMIN đổi cột E tab `Programs` thành `Draft`, PM bấm "Mở bán ngay" | ADMIN |
 | Trang Triggers: Error rate > 0% hoặc Last run quá 2 giờ trước | Đồng hồ quét lỗi / dừng | ADMIN: Apps Script → chọn hàm **`setupWatchdogTrigger`** → **Run**. Vẫn lỗi → báo kỹ thuật kèm ảnh chụp mục Executions | ADMIN → kỹ thuật |
 | Email không gửi | Công tắc đang TẮT, hoặc hết 100 email/ngày | Rê chuột lên nút "Email tự động" xem số còn lại. Thông báo qua Teams/Zalo thay thế | ADMIN |

@@ -770,7 +770,9 @@ console.log('\n--- SUITE 16: Receipt Image Modal & Confirmation Table Department
 // 1. Verify openReceiptModal handles receipt image, reset, and amount formatting
 assert(htmlContentSuite15.includes('function openReceiptModal(title, payer, amount, txnCode, receiptUrl, slotId)'), 'openReceiptModal supports receiptUrl and slotId parameters');
 assert(htmlContentSuite15.includes('if (typeof resetReceiptImage === \'function\') resetReceiptImage();'), 'openReceiptModal resets zoom and rotation on open');
-assert(htmlContentSuite15.includes('img.src = url;'), 'openReceiptModal binds real image URL to modal img element');
+// v1.2 (mục 24): việc gắn ảnh thật chuyển vào renderReceiptView(); hành vi kiểm bằng trình duyệt ở cloud_mode_regression.py Kịch bản 11
+assert(htmlContentSuite15.includes('renderReceiptView(url);') && htmlContentSuite15.includes('img.src = u;'), 'openReceiptModal binds real image URL to modal img element');
+assert(!htmlContentSuite15.includes('FT24098912389'), 'no invented bank transaction code in receipt viewers (v1.2)');
 assert(htmlContentSuite15.includes('modalAmount.innerText = typeof amount === \'number\' ? fmtVND(amount) :'), 'openReceiptModal properly displays formatted payment amount');
 assert(htmlContentSuite15.includes('modalApproveBtn.style.display = isPM ? \'inline-flex\' : \'none\';'), 'openReceiptModal secures PM buttons from normal user view');
 

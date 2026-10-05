@@ -29,6 +29,7 @@
 |---|---|---|
 | Mã nguồn (web + Code.gs) | Git tag **`checkpoint-pre-v1-hardening-20261005`** (commit `5404e1a`) và nhánh **`backup/pre-v1-hardening-20261005`** | `git checkout checkpoint-pre-v1-hardening-20261005 -- Mau_Dang_Ky_Internal_Sales_3009.html apps-script/Code.gs` rồi commit; hoặc quay hẳn: `git switch main` (main chưa bị sửa) |
 | Dữ liệu Google Sheet | Bản sao **"LG Internal Sales Database - BACKUP 2026-10-05 (pre-v1-hardening) - KHONG SUA"** (ID `1WIUrSzTYxqKKtt5RbJ2bF2xZiZRVpXC_pxFdpQQ9lL4`, riêng tư) | Sao chép dữ liệu từ bản backup sang Sheet chính (không xóa Sheet chính) |
+| **Bản mới nhất v1.2** (05/10/2026) | Git tag **`v1.2`** · Apps Script chính thức **Version 7** (không đổi) | Lùi web về v1.1: build `portal.html` từ tag `v1.1` |
 | **Bản chuẩn v1.1** (05/10/2026) | Git tag **`v1.1`** · Apps Script chính thức **Version 7** | Lùi về trước v1.1: dòng dưới + Apps Script **Version 6** |
 | Apps Script đang chạy | Phiên bản (Version) hiện tại trong **Deploy → Manage deployments** | Trước khi deploy: **ghi lại số Version đang chạy**. Muốn quay lại: Manage deployments → ✏️ Edit → chọn Version cũ → Deploy (URL giữ nguyên) |
 
@@ -144,7 +145,7 @@ Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet t
 
 ⚠️ Trigger chạy bản code **đang lưu trong trình soạn thảo** (cột Deployment = `Head`), không phải Version đã deploy. Sau khi deploy: **không** để code đang sửa dở trong trình soạn thảo của dự án chính thức.
 
-Staging **không cần** trigger (tránh tự hủy đơn test).
+Staging **không cần** trigger (tránh tự hủy đơn test). Chương trình test thêm trên staging ngày 05/10 (đã đóng): `IS-RECEIPTTEST-1005161946` (1 đơn đã từ chối, 1 file ảnh test 1×1 px trong thư mục biên lai của staging).
 
 **Bản demo** (`Mau_Dang_Ky_Internal_Sales_3009.html`, `index.html`) giữ nguyên để đào tạo. Việc đổi `index.html` trỏ sang `portal.html` là **quyết định của chủ dự án**, chưa thực hiện.
 

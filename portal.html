@@ -9939,6 +9939,37 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       updateReceiptTransform();
     }
 
+    // v1.2 (CURRENT_STATE mục 24): biên lai trong cửa sổ đối soát chỉ có 3 trạng thái trung thực.
+    // Ảnh thật (data:/blob:) → hiện ảnh · link https (Google Drive) → nút mở biên lai thật · không có → "Chưa có ảnh biên lai".
+    // Tuyệt đối không tự vẽ biên lai / mã giao dịch.
+    function renderReceiptView(url) {
+      const img = document.getElementById('modal-receipt-img');
+      if (!img) return 'none';
+      let box = document.getElementById('modal-receipt-note');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'modal-receipt-note';
+        box.style.cssText = 'background:#FFFFFF; border:1px solid #D1CEC7; border-radius:10px; padding:22px 20px; max-width:440px; margin:24px auto; text-align:center; color:#262626; font-size:13px; line-height:1.6;';
+        img.parentNode.appendChild(box);
+      }
+      const u = String(url || '');
+      if (/^(data:image\/|blob:)/.test(u)) {
+        img.src = u; img.style.display = 'block'; box.style.display = 'none';
+        return 'image';
+      }
+      img.removeAttribute('src'); img.style.display = 'none'; box.style.display = 'block';
+      if (/^https:\/\//.test(u)) {
+        const href = u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        box.innerHTML = '<div style="font-weight:700; margin-bottom:6px;">Biên lai thật được lưu trên Google Drive</div>' +
+          '<a id="modal-receipt-link" href="' + href + '" target="_blank" rel="noopener" style="color:#A50034; font-weight:700; text-decoration:underline;">Mở biên lai thật ↗</a>' +
+          '<div style="color:#716F6A; font-size:11.5px; margin-top:8px;">Cần quyền xem thư mục Drive "Bien lai nop tien". Đối chiếu thêm với sao kê ngân hàng trước khi duyệt.</div>';
+        return 'link';
+      }
+      box.innerHTML = '<div style="font-weight:700; margin-bottom:6px;">Chưa có ảnh biên lai trong hệ thống</div>' +
+        '<div style="color:#716F6A; font-size:11.5px;">Đối soát bằng sao kê ngân hàng (số tiền, nội dung chuyển khoản có Mã NV) trước khi duyệt.</div>';
+      return 'none';
+    }
+
     function openPMReceiptModal(regId) {
       currentReceiptRegId = regId;
       resetReceiptImage();
@@ -9974,14 +10005,8 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         }
       }
 
-      // Display real slip image or visual SVG voucher
-      if (img) {
-        if (reg.receiptUrl && reg.receiptUrl.startsWith('data:image')) {
-          img.src = reg.receiptUrl;
-        } else {
-          img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280" viewBox="0 0 460 280"><rect width="460" height="280" fill="%23FFFFFF" rx="10" stroke="%23D1CEC7" stroke-width="2"/><circle cx="230" cy="65" r="28" fill="%23E8F5E9"/><path d="M220 65l7 7 14-14" stroke="%232E7D32" stroke-width="3" fill="none" stroke-linecap="round"/><text x="230" y="120" font-family="sans-serif" font-size="14" font-weight="bold" fill="%23262626" text-anchor="middle">VIETCOMBANK · XÁC NHẬN CHUYỂN TIỀN</text><text x="230" y="142" font-family="sans-serif" font-size="12" fill="%23716F6A" text-anchor="middle">LGEVN HAI PHONG - 0991000012525</text><text x="230" y="172" font-family="sans-serif" font-size="18" font-weight="bold" fill="%23A50034" text-anchor="middle">' + encodeURIComponent(fmtVND(reg.amount || reg.internalPrice)) + '</text><text x="230" y="200" font-family="monospace" font-size="12" fill="%23262626" text-anchor="middle">Mã GD: ' + encodeURIComponent(reg.bankTxn || 'FT24098912389') + '</text><text x="230" y="225" font-family="sans-serif" font-size="11.5" fill="%23595959" text-anchor="middle">Người nộp: ' + encodeURIComponent(reg.payerName || reg.empName) + ' (' + encodeURIComponent(reg.payerCode || reg.empCode) + ')</text><text x="230" y="250" font-family="sans-serif" font-size="11" fill="%230E6251" text-anchor="middle">● Trạng thái: Giao dịch thành công qua App</text></svg>';
-        }
-      }
+      // v1.2 (CURRENT_STATE mục 24): chỉ hiện biên lai THẬT — không vẽ hình minh họa
+      renderReceiptView(reg.receiptUrl || reg.receipt || '');
 
       if (modal) modal.classList.add('active');
     }
@@ -12086,17 +12111,8 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (reg && reg.receiptUrl) url = reg.receiptUrl;
       }
 
-      if (img) {
-        if (url && (url.startsWith('data:image') || url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:'))) {
-          img.src = url;
-          img.style.display = 'block';
-        } else {
-          // Fallback SVG Voucher
-          const amtText = amount ? (typeof amount === 'number' ? fmtVND(amount) : amount) : 'ĐÃ KHAI NỘP';
-          img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280" viewBox="0 0 460 280"><rect width="460" height="280" fill="%23FFFFFF" rx="10" stroke="%23D1CEC7" stroke-width="2"/><circle cx="230" cy="65" r="28" fill="%23E8F5E9"/><path d="M220 65l7 7 14-14" stroke="%232E7D32" stroke-width="3" fill="none" stroke-linecap="round"/><text x="230" y="120" font-family="sans-serif" font-size="14" font-weight="bold" fill="%23262626" text-anchor="middle">VIETCOMBANK · XÁC NHẬN CHUYỂN TIỀN</text><text x="230" y="142" font-family="sans-serif" font-size="12" fill="%23716F6A" text-anchor="middle">LGEVN HAI PHONG - 0991000012525</text><text x="230" y="172" font-family="sans-serif" font-size="18" font-weight="bold" fill="%23A50034" text-anchor="middle">' + encodeURIComponent(amtText) + '</text><text x="230" y="200" font-family="monospace" font-size="12" fill="%23262626" text-anchor="middle">Mã GD: ' + encodeURIComponent(txnCode || 'FT24098912389') + '</text><text x="230" y="225" font-family="sans-serif" font-size="11.5" fill="%23595959" text-anchor="middle">Người nộp: ' + encodeURIComponent(payer || '') + '</text><text x="230" y="250" font-family="sans-serif" font-size="11" fill="%230E6251" text-anchor="middle">● Trạng thái: Đã khai nộp chứng từ thành công</text></svg>';
-          img.style.display = 'block';
-        }
-      }
+      // v1.2 (CURRENT_STATE mục 24): không vẽ biên lai minh họa
+      renderReceiptView(url);
 
       document.getElementById('receipt-modal').classList.add('active');
     }

@@ -22,10 +22,10 @@ Thư mục này lưu mọi thay đổi trong giai đoạn chuẩn bị go-live b
 
 | Thành phần | Bản chuẩn v1.1 | Đường lùi |
 |---|---|---|
-| Mã nguồn | Git tag **`v1.1`** trên `main` | Tag `checkpoint-pre-v1-hardening-20261005` (trước v1.1) |
+| Mã nguồn | Git tag **`v1.1`** trên `main` · **`v1.2`** (bản mới nhất: v1.1 + sửa cửa sổ biên lai, chỉ đổi web) | `v1.1` → tag `checkpoint-pre-v1-hardening-20261005` |
 | Apps Script chính thức | **Version 7** (deployment cũ, URL không đổi) | Version 6 |
 | Apps Script staging | Version 3 | — |
-| Web nhân viên | `portal.html` build từ tag `v1.1` | Bản `portal.html` của tag trước |
+| Web nhân viên | `portal.html` build từ tag **`v1.2`** (Apps Script không đổi: vẫn Version 7) | Bản `portal.html` của tag trước |
 | Dữ liệu | Bản sao "Copy of LG Internal Sales Database - 2026-10-04 (Appscript v6)" | — |
 
 **Quy trình nâng cấp từ v1.1 (bắt buộc):**
@@ -91,3 +91,4 @@ graph LR
 | 05/10/2026 | Docs | **Sổ tay vận hành ngày mở bán** (`02-user-and-pm-guide/SO_TAY_VAN_HANH_NGAY_MO_BAN.md`): checklist theo mốc giờ + xử lý sự cố cho người không chuyên | ADMIN, PM | Xong | Sổ tay; CURRENT_STATE §11 |
 | 05/10/2026 | Setup | Trigger quét quá hạn thiếu trên bản chính thức (0 trigger) — nguyên nhân: Runbook §3 không có bước này. Chủ dự án đã chạy `setupWatchdogTrigger`. Thêm Runbook bước 5b + **mục 3b Danh mục cài đặt một lần** (đối chiếu toàn bộ `Code.gs`) | Admin | Xong | Runbook §3, §3b; SETUP_APPS_SCRIPT |
 | 05/10/2026 | Phát hiện | 🔴 Cửa sổ biên lai PM hiện hình "Giao dịch thành công" giả (tái hiện bằng trình duyệt); 🟠 máy chủ không chặn theo giờ bắt đầu; 🟡 nút "Mở lại chương trình" luôn lỗi | PM | **Chờ duyệt** — đã có cách làm tạm trong Sổ tay | CURRENT_STATE §9 (24–26) |
+| 05/10/2026 | **v1.2** / 24 | **Cửa sổ biên lai chỉ hiện biên lai thật** (chủ dự án duyệt): bỏ 2 hình minh họa "Giao dịch thành công" + mã GD bịa; hàm chung `renderReceiptView()` — ảnh thật / nút mở link Drive / "Chưa có ảnh biên lai". Nhánh `fix/receipt-modal-v1.2` từ `main`. Chỉ đổi web; `Code.gs` không đổi | PM, ADMIN | Kịch bản 11 → 49/49 (bản cũ FAIL 3); e2e 165 (sửa 1 kiểm tra chuỗi + thêm 1); harness 67/67; luồng thật staging ĐẠT. Phát hành: gộp `main`, tag `v1.2`, build `portal.html` | Sổ tay vận hành; Guide B.3; CURRENT_STATE §9 |
