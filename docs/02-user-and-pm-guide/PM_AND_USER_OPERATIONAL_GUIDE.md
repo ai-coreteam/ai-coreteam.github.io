@@ -215,6 +215,8 @@ flowchart TD
 | Duyệt hàng loạt | Hệ thống chờ máy chủ xác nhận rồi mới báo **"Máy chủ đã duyệt X / Y đơn"**, sau đó tự tải lại bảng. Nếu máy chủ lỗi: không đơn nào bị đánh dấu duyệt nhầm — bấm lại. |
 | Đơn nhân viên tự hủy | Hiện trạng thái **"Đã hủy bởi nhân viên"**, slot đã trả về kho. |
 | Tài khoản demo | Chỉ dùng trong **bản demo** để đào tạo. Không thao tác được trên máy chủ chính thức. |
+| Phạm vi dữ liệu | PM chỉ thấy đơn của **chương trình mình phụ trách**, kể cả khi chưa chọn chương trình (sửa 05/10). Cần xem chương trình của PM khác → nhờ ADMIN. |
+| Hẹn giờ đặt trên bản demo | **Không** mang sang bản chính thức (`portal.html`), và ngược lại. Hẹn giờ cho đợt bán thật phải đặt lại trên `portal.html` (sửa 05/10). |
 
 ### C.3. ADMIN (role mới, 05/10/2026)
 

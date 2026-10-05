@@ -96,7 +96,9 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | Token phiên ký HMAC, khóa ngẫu nhiên; `rotateSessionSecret()` để thay khóa | ✅ (staging: 5/5 token giả bị từ chối) |
 | Giữ chỗ / nộp tiền / hủy chỉ cho chính chủ phiên đăng nhập | ✅ |
 | Giá nộp tiền do máy chủ áp theo giá chuẩn | ✅ |
-| Quyền Google Sheet: **Restricted** | ✅ (từ 05/10/2026) |
+| PM chỉ xem đơn chương trình mình phụ trách, kể cả khi không chọn chương trình (V1-16) | ✅ code + test, chờ deploy |
+| `portal.html` không đọc dữ liệu / hẹn giờ bản demo để lại trong trình duyệt | ✅ code + test |
+| Quyền Google Sheet: **Restricted** | ✅ (từ 05/10/2026; xác nhận lại 05/10: tài khoản dịch vụ bên ngoài đọc Sheet chính bị từ chối) |
 | `SPREADSHEET_ID` vẫn ghi cứng ở dòng 21 `Code.gs` và có trong lịch sử repo công khai | ⚠️ Rủi ro thấp vì Sheet đã Restricted; có thể dùng Script Property `SPREADSHEET_ID` thay thế |
 | Mật khẩu: nhân viên tự đổi → lưu SHA-256; Admin gõ trực tiếp trên Sheet → lưu dạng chữ | ⚠️ Theo thiết kế đã duyệt |
 
@@ -112,12 +114,12 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 
 | # | Việc | Người quyết / làm |
 |---|---|---|
-| 1 | Deploy bản có role ADMIN lên staging và chạy kiểm thử mục 2b ([Runbook §2b](04-v1-hardening/V1_RELEASE_RUNBOOK.md)) | PIC → Claude chạy test |
+| 1 | ✅ **Xong 05/10**: staging chạy bản có role ADMIN, mục 2b ĐẠT. **Việc mới:** dán `Code.gs` bản sửa V1-16 lên staging (Runbook §2b bước 1–2), Claude chạy lại kiểm thử | PIC dán code → Claude chạy test |
 | 2 | Triển khai bản chính thức ([Runbook §3](04-v1-hardening/V1_RELEASE_RUNBOOK.md)), phát hành `portal.html` | PIC, chủ dự án duyệt |
 | 3 | Gộp `v1-hardening` vào `main` và đẩy lên 2 remote | Chủ dự án duyệt |
 | 4 | Đổi mật khẩu / xóa các tài khoản dùng `test123` trong Sheet chính (có tài khoản ADMIN và PM) | Admin — **trước go-live** |
 | 5 | Xác nhận phạm vi ADMIN: thao tác trên **mọi** chương trình (đang làm như vậy) | Chủ dự án |
-| 6 | Lỗ hổng có từ trước: PM gọi Dashboard **không kèm mã chương trình** thì nhận đơn của mọi chương trình | Chờ duyệt sửa |
+| 6 | ✅ **Đã sửa 05/10 (V1-16, chủ dự án duyệt)**: PM gọi Dashboard không kèm mã chương trình nay chỉ nhận đơn của chương trình mình phụ trách; ADMIN vẫn thấy tất cả. Test máy chủ: bản cũ lộ đơn chương trình khác, bản mới không | Chờ deploy |
 | 7 | Chi nhánh Vietcombank: giao diện và email ghi **"Tây Hồ"**; `assets/content/bank_accounts.json` và hướng dẫn PM ghi **"Tây Hà Nội"**. Số TK `0991000012525` thống nhất ở mọi nơi | Tài chính xác nhận |
 | 8 | Cú pháp chuyển khoản: ô 01 ghi `[MãNV]_[MãSlot]` (gạch dưới); mã VietQR và email dùng `MãNV MãSlot` (khoảng trắng) | Chủ dự án chốt 1 dạng |
 | 9 | Vị trí kho AYA / AYB / AYC: các tài liệu cũ ghi 3 cách khác nhau | PM xác nhận |
@@ -125,7 +127,7 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | 11 | PIC chính thức và phân quyền Sheet cho HR / Admin | Chủ dự án |
 | 12 | Chuyển Apps Script sang tài khoản LG Workspace (1.500 email/ngày) | Khi IT sẵn sàng |
 | 13 | v1.1: chuẩn hóa màu ngoài bảng màu LG (verifier lg-brand ngày 05/10: 177 cảnh báo), chọn Active Red `#EA1917` (web) hay `#FD312E` (BI) | Sau go-live |
-| 14 | 🔴 **Đơn ảo từ bản demo hiện trong bản chính thức** — đã tái hiện 05/10 trên `portal.html` build thử: bản demo và `portal.html` cùng tên miền `gobitangocbao.github.io` nên dùng chung bộ nhớ trình duyệt; `portal.html` vẫn đọc khóa `lg_demo_registrations` (mỗi 10 giây + khi tra cứu Tab 3). Nhân viên có mã trùng tài khoản demo (vd. `VH12345`, `VH22222` — đang có trong Sheet thật) đã từng mở bản demo trên máy đó sẽ thấy đơn **"Đã duyệt thanh toán" không có thật**. Không ghi gì lên máy chủ. Đề xuất sửa nhỏ nhất: `build_production.py` đổi tên khóa này trong `portal.html` (không sửa bản demo) + thêm 1 test | **Chờ duyệt — trước go-live** |
+| 14 | ✅ **Đã sửa 05/10 (chủ dự án duyệt)** — Đơn ảo / hẹn giờ cũ từ bản demo trong `portal.html`. Nguyên nhân: bản demo và `portal.html` cùng tên miền nên dùng chung bộ nhớ trình duyệt. Test xác nhận bản cũ: hiện đơn ảo "Đã duyệt thanh toán" **và hẹn giờ cũ của bản demo gửi lệnh thật `program_update` lên máy chủ**. Sửa: `build_production.py` đổi tên 8 khóa bộ nhớ trong `portal.html` (bản demo không đổi); test Kịch bản 8 | Áp dụng khi build `portal.html` |
 | 15 | Bảng Điều Khiển PM ở chế độ máy chủ **không tự làm mới** — PM phải bấm `Tải lại` để thấy đơn mới | Chủ dự án: giữ / thêm tự làm mới |
 | 16 | **Hẹn giờ (Timer) chỉ chạy khi trang PM đang mở** (lưu trong trình duyệt của PM, kiểm tra mỗi giây). Watchdog 24 giờ chạy trên máy chủ, không bị ảnh hưởng | PM vận hành tay ngày mở bán; chủ dự án quyết định có chuyển lên máy chủ không |
 | 17 | Giữ chỗ 1 chạm **không có ô tích cam kết Jeong-Do riêng**; máy chủ ghi "Đồng ý" vào đơn | Chủ dự án (Jeong-Do) |
@@ -137,10 +139,10 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 
 | Lệnh | Phạm vi | Kết quả 05/10/2026 |
 |---|---|---|
-| `node tests/backend_gas_harness.js` | Chạy `Code.gs` thật với Sheet giả lập | 63/63 |
-| `python3 tests/cloud_mode_regression.py` | Chạy trang web thật với máy chủ giả lập (nhân viên, PM, ADMIN, bản chính thức, demo) | 32/32 |
+| `node tests/backend_gas_harness.js` | Chạy `Code.gs` thật với Sheet giả lập | 67/67 |
+| `python3 tests/cloud_mode_regression.py` | Chạy trang web thật với máy chủ giả lập (nhân viên, PM, ADMIN, bản chính thức, demo, dữ liệu demo còn sót) | 37/37 |
 | `node tests/run_e2e_tests.js` | Bộ kiểm tra cũ (chủ yếu dò chuỗi trong mã nguồn) | 164/164 |
-| `python3 tests/staging_smoke_test.py …` | Máy chủ staging thật | ĐẠT (trước khi có role ADMIN) |
+| `python3 tests/staging_smoke_test.py …` | Máy chủ staging thật | ĐẠT; mục 2b ADMIN ĐẠT 05/10 (chưa gồm bản sửa V1-16) |
 | `python3 tests/polling_race_simulation.py` | Mô phỏng rủi ro polling | — |
 
 ## 11. Bản đồ tài liệu

@@ -8,6 +8,8 @@ Kết quả: portal.html (mặc định) — đã:
   1. Bật PORTAL_MODE = 'production' và gắn cố định URL máy chủ  → nhân viên mở link là đăng nhập được ngay.
   2. XÓA HẲN dữ liệu demo (tài khoản, chương trình, sản phẩm, đơn mẫu) khỏi mã nguồn — không chỉ ẩn.
   3. XÓA HẲN khối nút "Đăng nhập nhanh tài khoản Demo".
+  4. Đổi tên các khóa bộ nhớ trình duyệt (đơn, chương trình, hẹn giờ PM, phiên, bản nháp) → bản chính thức
+     KHÔNG đọc dữ liệu bản demo để lại trên cùng tên miền GitHub Pages (CURRENT_STATE mục 14).
 File nguồn Mau_Dang_Ky_Internal_Sales_3009.html giữ nguyên để đào tạo / thử nghiệm.
 
 Script tự kiểm tra kết quả và DỪNG (không ghi file) nếu còn sót dữ liệu demo.
@@ -31,12 +33,27 @@ EMPTY_DEMO_DATA = (
     "    const DEMO_PRODUCTS = {};\n"
     "    let DEMO_REGISTRATIONS = [];"
 )
+# v1-hardening (mục 14): bản demo và portal.html cùng tên miền → dùng chung localStorage / sessionStorage.
+# Đổi tên mọi khóa chứa DỮ LIỆU hoặc THAO TÁC để bản chính thức không đọc đơn ảo / hẹn giờ cũ của bản demo.
+# Giữ nguyên khóa 'lg_tour_completed_*' (chỉ đánh dấu đã xem hướng dẫn, vô hại).
+STORAGE_KEYS = {
+    "'lg_demo_registrations'": "'lg_prod_registrations'",
+    "'lg_demo_programs'": "'lg_prod_programs'",
+    "'lg_demo_pw_overrides'": "'lg_prod_pw_overrides'",
+    "'lg_demo_auto_email'": "'lg_prod_auto_email'",
+    "'lg_program_timers_v1'": "'lg_prod_program_timers_v1'",
+    "'lg_internal_sales_session'": "'lg_prod_internal_sales_session'",
+    "'lg_qpay_draft_'": "'lg_prod_qpay_draft_'",
+    "'lg_reg_draft'": "'lg_prod_reg_draft'",
+}
+
 # Dấu hiệu không được còn trong bản production
 FORBIDDEN = {
     "mật khẩu demo 'test123'": re.compile(r"test123"),
     'serial sản phẩm demo': re.compile(r'"serial": "\d{3}[A-Z]{4,5}\w+"'),
     'đơn đăng ký mẫu REG-2026-': re.compile(r"REG-2026-\d{3}"),
     'nút đăng nhập nhanh quickLogin(': re.compile(r"quickLogin\('VH"),
+    'khóa bộ nhớ dùng chung với bản demo': re.compile(r"'lg_demo_|'lg_program_timers_v1'|'lg_internal_sales_session'|'lg_qpay_draft_'|'lg_reg_draft'"),
     'hotline / email cá nhân mẫu': re.compile(r"0912 345 678|quynhnhu@lge\.com|vannam@lge\.com|ngocbao\.nguyen@lge\.com"),
 }
 
@@ -75,6 +92,11 @@ def main():
         fail('không tìm thấy khối @@DEMO_UI_BEGIN … @@DEMO_UI_END')
     out = DEMO_UI_RE.sub('', out)
 
+    for old, new in STORAGE_KEYS.items():
+        if old not in out:
+            fail(f'không tìm thấy khóa bộ nhớ {old} trong file nguồn (đã đổi tên? cập nhật STORAGE_KEYS)')
+        out = out.replace(old, new)
+
     leftovers = [name for name, rx in FORBIDDEN.items() if rx.search(out)]
     if leftovers:
         fail('bản production còn sót: ' + ', '.join(leftovers) + '. Không ghi file.')
@@ -83,7 +105,8 @@ def main():
     print(f'Đã tạo {args.out}')
     print(f'  Chế độ: production · Máy chủ: {url}')
     print(f'  Đã xóa: dữ liệu demo ({len(src) - len(out):,} ký tự), {ui_blocks} khối giao diện demo')
-    print('  Kiểm tra: không còn mật khẩu demo, serial demo, đơn mẫu, nút đăng nhập nhanh')
+    print(f'  Đã tách {len(STORAGE_KEYS)} khóa bộ nhớ trình duyệt khỏi bản demo')
+    print('  Kiểm tra: không còn mật khẩu demo, serial demo, đơn mẫu, nút đăng nhập nhanh, khóa bộ nhớ dùng chung')
 
 
 if __name__ == '__main__':

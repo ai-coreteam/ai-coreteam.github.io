@@ -41,7 +41,7 @@
 | Hủy giữ chỗ | Nhân viên tự hủy được **trước khi khai nộp tiền** | Mới |
 | Polling | 6–8 giây (đo staging: 60 yêu cầu/giây, 0% lỗi) | Giữ nguyên |
 | Số tải "903.7 req/s" ở mục 0.2 | **Chưa được đo lại**; số đo thật trên staging xem [Đề xuất §4.5](../04-v1-hardening/V1_HARDENING_CHANGE_PROPOSAL.md) | Thay thế |
-| Kiểm thử | `backend_gas_harness.js` 63/63 · `cloud_mode_regression.py` 32/32 · `run_e2e_tests.js` 164/164 · staging ĐẠT | 0.2: 54/54 |
+| Kiểm thử | `backend_gas_harness.js` 67/67 · `cloud_mode_regression.py` 37/37 · `run_e2e_tests.js` 164/164 · staging ĐẠT | 0.2: 54/54 |
 | Việc còn mở | 20 mục (mục 14 🔴 cần xử lý trước go-live), xem [`CURRENT_STATE.md` mục 9](../CURRENT_STATE.md) | — |
 
 **Tài liệu hiện hành theo thứ tự đọc:** [`CURRENT_STATE.md`](../CURRENT_STATE.md) → [`04-v1-hardening/README.md`](../04-v1-hardening/README.md) → [`V1_RELEASE_RUNBOOK.md`](../04-v1-hardening/V1_RELEASE_RUNBOOK.md) → [`PM_AND_USER_OPERATIONAL_GUIDE.md`](../02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md).

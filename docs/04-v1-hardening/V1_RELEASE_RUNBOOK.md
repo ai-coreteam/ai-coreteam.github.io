@@ -76,6 +76,9 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 3. Tab `Users` của **Sheet STAGING**: thêm 1 dòng role `ADMIN` (vd. `VH22222`).
 4. Chạy: `python3 tests/staging_smoke_test.py --url <URL_STAGING> --program IS-2026Q4-OTHER-01 --samples 5 --admin VH22222:<mk> --pm VH99999:<mk>` → mục **2b phải ĐẠT** (ADMIN đọc được cài đặt email, PM bị chặn).
 
+**Kết quả 2b ngày 05/10/2026 (staging Version 2, có role ADMIN): ĐẠT** — ADMIN `VH22222` đọc cài đặt email (đang TẮT, còn 94 email hôm nay) và xem Dashboard chương trình của PM khác; PM `VH99999` bị chặn công tắc email; 5/5 token giả bị từ chối; phản hồi p50 ≈ 1,9 s.
+⚠️ Sau đó `Code.gs` có thêm bản sửa **V1-16** (Dashboard PM) → làm lại bước 1–2 và chạy lại lệnh ở bước 4 trước khi sang mục 3.
+
 ---
 
 ## 3. TRIỂN KHAI BẢN CHÍNH THỨC
@@ -91,7 +94,7 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 4 | Chạy **`rotateSessionSecret`** 1 lần | Chọn hàm → Run | Execution log: "Đã thay khóa ký phiên đăng nhập" |
 | 5 | Deploy **phiên bản mới trên deployment cũ** | Manage deployments → ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
 | 6 | Kiểm tra tab `Config` | Không có `ALLOW_DEMO_TOKENS` (hoặc = `false`) · `ENABLE_AUTO_EMAIL` theo quyết định (mục 4) | — |
-| 7 | Sinh bản cho nhân viên | `python3 scripts/build_production.py --api-url <URL /exec chính thức>` → tạo `portal.html` | Script in "Kiểm tra: không còn mật khẩu demo…" |
+| 7 | Sinh bản cho nhân viên | `python3 scripts/build_production.py --api-url <URL /exec chính thức>` → tạo `portal.html` | Script in "Đã tách 8 khóa bộ nhớ trình duyệt khỏi bản demo" và "Kiểm tra: không còn mật khẩu demo…" |
 | 8 | Đưa `portal.html` lên GitHub Pages | Commit `portal.html` → push (sau khi chủ dự án duyệt) | Link: `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | 9 | Nạp danh sách nhân viên thật vào tab `Users` | Sheet đã ở chế độ **Restricted** (05/10) | Chỉ Admin/HR có quyền |
 | 10 | Kiểm tra cuối | Mở `portal.html` ở cửa sổ ẩn danh → đăng nhập 1 tài khoản thật → thấy danh mục; thử `VH12345/test123` → **bị từ chối** | Cả hai đúng |
@@ -149,7 +152,7 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | Nhân viên không hủy được giữ chỗ | Đã khai nộp tiền (quy tắc đã duyệt 05/10) | PM xử lý từ chối / hoàn tiền theo quy trình |
 | Lỡ chạy `setupNewDatabase()` trên Sheet chính | — | Hàm tự **dừng**, không xóa gì (log: "DỪNG: Sheet … đã có dữ liệu") |
 | Nghi ngờ lộ phiên đăng nhập | — | Chạy `rotateSessionSecret()` → mọi người đăng nhập lại |
-| Nhân viên / PM thấy đơn **"Đã duyệt thanh toán" mà mình không đăng ký** trong `portal.html` | Dữ liệu cũ của **bản demo** còn trong trình duyệt (cùng tên miền) — lỗi đã biết, [`CURRENT_STATE.md`](../CURRENT_STATE.md) mục 14, chưa sửa | Tạm thời: mở `portal.html` ở cửa sổ ẩn danh, hoặc xóa dữ liệu trang web (Cài đặt trình duyệt → Quyền riêng tư → Dữ liệu trang web của `gobitangocbao.github.io`). Máy chủ **không** bị ghi sai |
+| Nhân viên / PM thấy đơn **"Đã duyệt thanh toán" mà mình không đăng ký** | `portal.html` build **trước** ngày 05/10 còn đọc dữ liệu bản demo trong trình duyệt ([`CURRENT_STATE.md`](../CURRENT_STATE.md) mục 14 — đã sửa) | Build lại `portal.html` bằng script hiện tại (bước 7). Máy chủ **không** bị ghi sai |
 
 ---
 
@@ -157,8 +160,8 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 
 | Lệnh | Kiểm tra gì | Kết quả 05/10/2026 |
 |---|---|---|
-| `node tests/backend_gas_harness.js` | Chạy **Code.gs thật** với Sheet giả lập: xác thực, giữ chỗ, hủy, mở cổng, watchdog, công tắc email, role ADMIN, khóa ghi | **63/63** (bản trước sửa: token giả mạo lọt qua) |
-| `python3 tests/cloud_mode_regression.py` | Chạy **trang web thật** với máy chủ giả lập: 7 kịch bản nhân viên, PM, ADMIN, bản production, demo | **32/32** (bản trước sửa: 3/7) |
+| `node tests/backend_gas_harness.js` | Chạy **Code.gs thật** với Sheet giả lập: xác thực, giữ chỗ, hủy, mở cổng, watchdog, công tắc email, role ADMIN, khóa ghi | **67/67** (bản trước sửa: token giả mạo lọt qua; PM thấy đơn chương trình khác) |
+| `python3 tests/cloud_mode_regression.py` | Chạy **trang web thật** với máy chủ giả lập: 8 kịch bản nhân viên, PM, ADMIN, bản production, demo, dữ liệu demo còn sót trong trình duyệt | **37/37** (bản trước sửa: 3/7; build cũ: hẹn giờ demo gửi lệnh thật) |
 | `node tests/run_e2e_tests.js` | Bộ kiểm tra cũ (hồi quy) | **164/164** |
 | `python3 tests/polling_race_simulation.py` | Mô phỏng rủi ro polling | Xem đề xuất §4 |
-| `python3 tests/staging_smoke_test.py …` | Máy chủ **staging thật**: thời gian phản hồi, token giả, ADMIN, FCFS, tải | **ĐẠT** 05/10 (bảng mục 2); mục 2b ADMIN chờ deploy bản mới |
+| `python3 tests/staging_smoke_test.py …` | Máy chủ **staging thật**: thời gian phản hồi, token giả, ADMIN, FCFS, tải | **ĐẠT** 05/10 (bảng mục 2); mục 2b ADMIN **ĐẠT** 05/10 |

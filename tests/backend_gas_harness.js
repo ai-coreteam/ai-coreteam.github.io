@@ -318,6 +318,27 @@ console.log('--- ADMIN: toàn quyền PM trên mọi chương trình, PM thườ
   check(post({ action: 'pm_dashboard', token: u1.token }).ok === false, 'nhân viên vẫn không vào API PM');
 }
 
+console.log('--- V1-16: Dashboard PM không kèm mã chương trình chỉ trả đơn của PM đó ---');
+{
+  const book = freshBook(); const { post } = load(book);
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const other = post({ action: 'auth', id: 'VH80000', password: 'pw3' });
+  const adm = post({ action: 'auth', id: 'VH77777', password: 'pwA' });
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'NV1' });
+  const foreign = new Array(22).fill(''); foreign[0] = new Date(); foreign[1] = 'IS-DRAFT-01'; foreign[3] = 'VH70002'; foreign[7] = 'X-1'; foreign[11] = 'Chờ nộp tiền';
+  book.getSheetByName('Registrations').rows.push(foreign);
+  const progs = r => (r.registrations || []).map(x => x.programId);
+  const mine = post({ action: 'pm_dashboard', token: pm.token });
+  check(mine.ok && progs(mine).length === 1 && progs(mine).every(id => id === PID), `PM không chọn chương trình → chỉ đơn của mình (${progs(mine).join(',')})`);
+  const theirs = post({ action: 'pm_dashboard', token: other.token, programId: '' });
+  check(theirs.ok && progs(theirs).length === 1 && progs(theirs)[0] === 'IS-DRAFT-01', 'PM khác không chọn chương trình → chỉ đơn của PM đó');
+  const all = post({ action: 'pm_dashboard', token: adm.token });
+  check(all.ok && progs(all).length === 2, 'ADMIN không chọn chương trình → vẫn thấy mọi chương trình');
+  const one = post({ action: 'pm_dashboard', token: pm.token, programId: PID });
+  check(one.ok && progs(one).length === 1, 'PM chọn chương trình của mình → không đổi (hồi quy)');
+}
+
 console.log('--- C3 / C4 / C5: Cài đặt an toàn & cache ---');
 {
   const book = freshBook(); const { ctx, post, cache } = load(book);

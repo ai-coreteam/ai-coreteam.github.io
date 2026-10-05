@@ -146,9 +146,9 @@ STATE_JS = """() => ({
 })"""
 
 
-def open_page(browser, port, server, page_name=PAGE, set_api=True):
+def open_page(browser, port, server, page_name=PAGE, set_api=True, extra_init=''):
     ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
-    init = "localStorage.setItem('lg_tour_completed_employee','true'); localStorage.setItem('lg_tour_completed_pm','true');"
+    init = "localStorage.setItem('lg_tour_completed_employee','true'); localStorage.setItem('lg_tour_completed_pm','true');" + extra_init
     if set_api:
         init += f"localStorage.setItem('LGE_PORTAL_API_URL', '{API}');"
     ctx.add_init_script(init)
@@ -292,6 +292,35 @@ def main():
             login(page, 'VH88921', 'test123', settle_ms=4000)
             st = page.evaluate(STATE_JS)
             check(st['loggedIn'] and len(st['ui']) > 0, f'tài khoản demo vẫn đăng nhập và thấy danh mục demo ({len(st["ui"])} SP)')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('Scenario 8: trình duyệt còn dữ liệu bản demo (cùng tên miền) mở portal.html — CURRENT_STATE mục 14')
+            past = '2026-01-01T08:00'
+            timer = {'enabled': True, 'datetime': past, 'executed': False}
+            leftovers = (
+                "localStorage.setItem('lg_demo_registrations', " + json.dumps(json.dumps([{
+                    'id': 'REG-PHANTOM', 'programId': PID, 'slotId': PID + '-AYA-009', 'empCode': ME,
+                    'empName': 'Demo', 'model': 'PHANTOM-DEMO', 'status': 'Đã duyệt thanh toán'}])) + ");"
+                "localStorage.setItem('lg_program_timers_v1', " + json.dumps(json.dumps({PID: {
+                    'open': timer, 'close': timer, 'payment': timer}})) + ");")
+            s = MockServer(my_status=None)   # máy chủ: nhân viên CHƯA có đơn nào
+            ctx, page = open_page(browser, port, s, page_name=PROD_PAGE, set_api=False, extra_init=leftovers)
+            login(page, ME)
+            page.wait_for_timeout(11000)       # qua 1 nhịp đồng bộ 10 giây
+            check(page.evaluate("DEMO_REGISTRATIONS.length") == 0, 'portal.html không nạp đơn demo còn trong trình duyệt')
+            page.evaluate("handleLookup()")
+            page.wait_for_timeout(2500)
+            check('PHANTOM-DEMO' not in page.inner_text('#lookup-result'), 'tra cứu Tab 3 KHÔNG hiện đơn ảo của bản demo')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            s = MockServer()
+            ctx, page = open_page(browser, port, s, page_name=PROD_PAGE, set_api=False, extra_init=leftovers)
+            login(page, PM)
+            page.wait_for_timeout(4000)
+            reads = {'auth', 'programs', 'products', 'lookup', 'pm_dashboard', 'email_setting', 'GET taken'}
+            writes = sorted({c[0] for c in s.calls if c[0] not in reads})
+            check(not writes, f'hẹn giờ cũ của bản demo KHÔNG chạy thao tác thật trên máy chủ ({writes})')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

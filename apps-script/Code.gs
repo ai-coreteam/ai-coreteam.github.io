@@ -990,6 +990,10 @@ function pm_dashboard_(d) {
     }
   }
 
+  // v1-hardening (V1-16): PM gọi không kèm mã chương trình → chỉ trả đơn của chương trình PM đó phụ trách
+  // (trước đây trả đơn của MỌI chương trình). ADMIN vẫn xem được tất cả.
+  var owned = (!programId && !isAdminPayload_(authCheck.payload)) ? ownedPrograms_(callerId, false) : null;
+
   var regSheet = book_().getSheetByName(SHEET_REG);
   var out = [];
 
@@ -1014,6 +1018,7 @@ function pm_dashboard_(d) {
       for (var r = 0; r < n; r++) {
         var pId = String(v[r][C.CAMPAIGN - 1]).trim();
         if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
+        if (owned && !ownsProgram_(owned, pId)) continue;
 
         var curSlot = str_(v[r][C.SLOT - 1]);
         var curAmt = Number(v[r][C.AMOUNT - 1]) || prodPrices[curSlot] || 0;
