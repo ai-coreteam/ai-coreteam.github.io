@@ -121,6 +121,7 @@
 | Bạn thấy | Nghĩa là | Làm gì | Gọi ai |
 |---|---|---|---|
 | Nhân viên báo "Đang kết nối máy chủ…" | Máy chủ Google đang chậm (hay gặp vài phút đầu) | Bảo nhân viên chờ, trang tự thử lại sau 15 giây hoặc bấm **"Thử lại ngay"**. Mạng công ty chặn → dùng 4G/5G | — |
+| Màn hình đăng nhập báo "Kết nối máy chủ Google Sheet quá thời gian chờ (12s)" | Máy chủ vừa "ngủ", lần đầu thức dậy mất 15–40 giây (lâu hơn 12 giây trang chờ) | Bấm **Đăng nhập** lại sau 10–20 giây — lần sau nhanh (đo 05/10: 6 giây). Phòng tránh: ADMIN khởi động máy chủ lúc 9:45 (Phần 2-B) | — |
 | Ô 02 ghi "Đang tải…" | Danh sách sản phẩm chưa về | Chờ 15–40 giây. **Không phải** hết hàng | — |
 | Nhân viên báo "đã có người đăng ký trước" | Người khác bấm nhanh hơn vài giây | Bình thường. Chọn máy khác | — |
 | "Phiên đăng nhập không khớp / không hợp lệ" | Phiên cũ | Đăng xuất → đăng nhập lại | — |

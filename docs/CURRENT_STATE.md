@@ -144,6 +144,7 @@ Tên trạng thái trong Sheet: `Đã đăng ký - Chờ mở thanh toán` · `C
 | 27 | ✅ Trigger quét quá hạn 24h: dự án chính thức có **0 trigger** tới 05/10 15:46 (Runbook §3 thiếu bước). Chủ dự án đã chạy `setupWatchdogTrigger`; **đã chạy thật 16:15:39, Error rate 0%**. Runbook thêm bước 5b + mục 3b | — |
 | 28 | 🟠 Thư mục biên lai "Bien lai nop tien" đang **"Anyone with the link – Viewer"** (kiểm chứng quyền Drive 05/10): ai có link thư mục / link file đều xem được biên lai (tên, số tiền, thông tin ngân hàng). Link chỉ đi tới PM / ADMIN (nhân viên chỉ nhận cờ có/không), nhưng link chuyển tiếp được. Phương án: **Restricted + thêm email Google của từng PM (Viewer)** — cần PM có tài khoản Google. Kèm: staging đang ghi biên lai test vào cùng thư mục (Runbook §3b) | Chủ dự án (Jeong-Do) chốt |
 | 29 | ✅ **Đã sửa ở v1.3**: Hướng dẫn tự mở lần đầu — khung đỏ bước 1 lệch khỏi thanh chương trình (dữ liệu máy chủ về sau khi đo). Nay đo lại khi bố cục đổi. Kịch bản 12 | — |
+| 30 | 🟡 Đăng nhập chỉ chờ máy chủ **12 giây**; máy chủ sau thời gian nghỉ cần 15–40 giây → lần đăng nhập đầu báo "quá thời gian chờ (12s)", bấm lại thì vào được (thấy trên link thật 05/10: lần 1 lỗi, lần 2 vào sau 6,4 giây). Tạm thời: khởi động máy chủ 9:45 (Sổ tay B) + hướng dẫn bấm lại (Sổ tay Phần 3). Đề xuất: tăng thời gian chờ hoặc tự thử lại 1 lần | Chờ duyệt |
 
 ## 10. Kiểm thử
 
