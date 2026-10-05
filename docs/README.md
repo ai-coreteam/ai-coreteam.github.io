@@ -6,8 +6,11 @@ Thư mục `docs/` được tổ chức khoa học theo 3 nhóm chuyên mục ph
 docs/
 ├── 01-setup-and-deployment/        # Hướng dẫn cài đặt, triển khai GitHub & Backend Cloud
 ├── 02-user-and-pm-guide/           # Cẩm nang quy trình & sơ đồ hướng dẫn cho Nhân viên và PM
-└── 03-architecture-and-analysis/   # Báo cáo kiến trúc bảo mật, kiểm toán thương hiệu & phân tích
+├── 03-architecture-and-analysis/   # Báo cáo kiến trúc bảo mật, kiểm toán thương hiệu & phân tích
+└── 04-v1-hardening/                # Gia cố bản v1: đề xuất thay đổi, nhật ký thay đổi, tiêu chí go-live
 ```
+
+> **Mới (05/10/2026):** [`04-v1-hardening/V1_HARDENING_CHANGE_PROPOSAL.md`](04-v1-hardening/V1_HARDENING_CHANGE_PROPOSAL.md) — đề xuất gia cố trước go-live 14/10/2026, đã duyệt và thực hiện trên nhánh `v1-hardening`. Triển khai, khôi phục, công tắc email: [`04-v1-hardening/V1_RELEASE_RUNBOOK.md`](04-v1-hardening/V1_RELEASE_RUNBOOK.md). Mọi thay đổi luồng Admin / PM / Nhân viên từ nay được ghi tại [`04-v1-hardening/README.md`](04-v1-hardening/README.md).
 
 ---
 

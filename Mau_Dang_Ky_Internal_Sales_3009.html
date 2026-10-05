@@ -1047,6 +1047,24 @@
       background: #F0ECE4; color: #262626; border: 1px solid #CBC8C2;
     }
     .btn-pm-export:hover { background: #E6E1D6; border-color: #716F6A; }
+    /* v1-hardening (K2): công tắc email tự động — chỉ dùng token màu LG có sẵn */
+    .email-switch-state {
+      font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: var(--lg-panel-2); color: var(--lg-text-2); border: 1px solid var(--lg-border-strong);
+    }
+    .btn-email-switch[aria-checked="true"] .email-switch-state { background: var(--lg-ok); color: #FFFFFF; border-color: var(--lg-ok); }
+    .btn-email-switch[aria-busy="true"] { opacity: .6; cursor: progress; }
+    /* v1-hardening (V1-03): máy chủ chậm → báo rõ + nút Thử lại, không hiện dữ liệu demo */
+    .lg-server-retry {
+      margin: 12px 0; padding: 20px; background: var(--lg-card-bg); color: var(--lg-text);
+      border: 1px solid var(--lg-border); border-left: 4px solid var(--lg-heritage); border-radius: 8px;
+      display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      font-size: 14px; line-height: 1.5;
+    }
+    .lg-server-retry strong { font-family: var(--font-heading); }
+    .lg-server-retry .btn-pm-action { background: var(--lg-heritage); color: #FFFFFF; border: 1px solid var(--lg-heritage); }
+    /* v1-hardening (Gói P): bản production ẩn mọi thành phần chỉ dành cho demo */
+    html.portal-production .demo-only { display: none !important; }
 
     /* Program banner within Dashboard */
     .pm-program-banner {
@@ -3110,8 +3128,8 @@
         <button type="submit" class="btn-login" id="login-btn">Đăng nhập</button>
       </form>
 
-      <!-- Quick Demo Login Selection -->
-      <div class="demo-accounts">
+      <!-- @@DEMO_UI_BEGIN Quick Demo Login Selection (bản production gỡ bỏ) -->
+      <div class="demo-accounts demo-only">
         <div class="demo-title">
           <span>Tài khoản kiểm tra mẫu (Demo)</span>
           <span style="font-weight:400; font-size:10px; color:#A50034;">Bấm để đăng nhập ngay</span>
@@ -3131,9 +3149,10 @@
           </button>
         </div>
       </div>
+      <!-- @@DEMO_UI_END -->
 
       <p class="login-info">Liên hệ Ban Quản Trị (internalsales.support@lge.com) nếu cần hỗ trợ tài khoản.</p>
-      <p class="login-info" style="margin-top:6px;">
+      <p class="login-info demo-only" style="margin-top:6px;">
         <a href="javascript:void(0)" onclick="openApiConfigModal()" style="color:#716F6A; font-size:11.5px; text-decoration:underline; display:inline-flex; align-items:center; gap:5px;">
           <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A; width:13px; height:13px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Cấu hình API Google Sheet (Dành cho PM/PIC)</span>
@@ -3375,7 +3394,8 @@
 
       function openSupportModal() {
         if (typeof showToast === 'function') {
-          showToast('Hỗ trợ nội bộ: PIC Nguyễn Thị Quỳnh Như (HS PM Support) · Hotline: 0912 345 678 · Email: quynhnhu@lge.com', 'info', 6000);
+          // v1-hardening: dùng bí danh hỗ trợ chung (như màn hình đăng nhập), không hiện tên/hotline/email cá nhân mẫu
+          showToast('Hỗ trợ nội bộ: Ban Quản Trị Bán Hàng Nội Bộ (HS PM Support) · Email: internalsales.support@lge.com', 'info', 6000);
         }
       }
     </script>
@@ -4228,7 +4248,7 @@
 
         <div class="pay-lock" id="pay-lock">
           <div style="font-weight:700; font-size:14px; margin-bottom:6px; color:var(--lg-ink);">Mẫu nộp tiền đang khoá</div>
-          <div>Để đảm bảo kiểm duyệt công bằng và đối soát chính xác, chức năng nộp tiền sẽ mở khi <strong>PM duyệt mở cổng thanh toán</strong> (hoặc tự động sau <span class="pay-delay-text">2 giờ</span>).</div>
+          <div>Để đảm bảo kiểm duyệt công bằng và đối soát chính xác, chức năng nộp tiền sẽ mở khi <strong>PM duyệt mở cổng thanh toán</strong>. Từ lúc cổng mở, bạn có 24 giờ để nộp tiền.</div>
           <div style="margin-top:6px;">Cách mở: (1) Nhập <strong>Mã NV + 4 số cuối SĐT</strong> ở ô <strong>Tra cứu đơn của tôi</strong> phía trên → (2) Bấm nút <strong>Nộp tiền</strong> ở dòng đơn của bạn. Hệ thống tự điền Slot, Mã NV và số tiền cần nộp.</div>
           <div style="margin-top:6px; color:var(--lg-text-2); font-size:12px;">Nếu PM chưa mở cổng thanh toán, dòng đơn sẽ hiện trạng thái tương ứng. Vui lòng <strong>chưa chuyển khoản</strong> trước khi cổng mở.</div>
         </div>
@@ -4450,6 +4470,12 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A50034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <span>Hẹn Giờ (Timer)</span>
             </button>
+            <!-- v1-hardening (K2): công tắc bật/tắt email tự động — hướng dẫn: docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md -->
+            <button type="button" class="btn-pm-action btn-pm-outline btn-email-switch" id="btn-email-switch" role="switch" aria-checked="false" onclick="toggleAutoEmailSetting()" title="Bật/tắt gửi email tự động cho nhân viên (Config: ENABLE_AUTO_EMAIL)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span>Email tự động</span>
+              <span class="email-switch-state" id="email-switch-state">…</span>
+            </button>
             <button class="btn-pm-action btn-pm-outline" onclick="openImportExcelModal()" style="border-color:#1E8449; color:#1E8449; font-weight:600;" title="Nạp danh mục sản phẩm từ file Excel (.xlsx)">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
               Nạp Excel SP
@@ -4466,7 +4492,7 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
               Tải lại
             </button>
-            <button class="btn-pm-action btn-pm-outline" onclick="openApiConfigModal()" style="border-color:#2980B9; color:#2980B9; font-weight:700; background:#FFF;" title="Cấu hình Google Apps Script Web App URL & Google Sheet Database">
+            <button class="btn-pm-action btn-pm-outline demo-only" onclick="openApiConfigModal()" style="border-color:#2980B9; color:#2980B9; font-weight:700; background:#FFF;" title="Cấu hình Google Apps Script Web App URL & Google Sheet Database">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               <span>Cấu hình API</span>
             </button>
@@ -5635,14 +5661,13 @@
     }
 
     // ===== P1: PM Batch Payment Approval (GAP-OPS-02) =====
-    function pmBatchApprovePayments() {
+    // v1-hardening (V1-09): chế độ máy chủ → CHỜ máy chủ xác nhận rồi mới báo kết quả. Chế độ Demo: như cũ.
+    async function pmBatchApprovePayments() {
       if (typeof isCurrentPMAssigned === 'function' && !isCurrentPMAssigned(activeProgram)) {
         alert('TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):\n\nBạn không phải là PM phụ trách đợt bán này (' + activeProgram + ')! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền duyệt đơn.');
         return;
       }
-      const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
-        ? pmRegistrations
-        : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+      const allRegs = getViewRegistrations();
       const progRegs = allRegs.filter(r => (!activeProgram || r.programId === activeProgram));
       const pendingRegs = progRegs.filter(r => r.status === 'Đã khai nộp - chờ đối soát');
 
@@ -5656,59 +5681,71 @@
 
       const approver = currentUser ? currentUser.name : 'Nguyễn Thị Quỳnh Như';
       const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
-
-      let count = 0;
-      pendingRegs.forEach(reg => {
+      const applyLocal = regs => regs.forEach(reg => {
         reg.status = 'Đã duyệt thanh toán';
         reg.pmBy = approver;
         reg.pmDate = nowStr;
-        count++;
         const match = DEMO_REGISTRATIONS.find(d => d.id === reg.id || d.slotId === reg.slotId);
-        if (match) {
-          match.status = 'Đã duyệt thanh toán';
-          match.pmBy = approver;
-          match.pmDate = nowStr;
-        }
+        if (match) { match.status = 'Đã duyệt thanh toán'; match.pmBy = approver; match.pmDate = nowStr; }
       });
-      persistDemoRegistrations();
 
-      if (SHEET_API_URL && (!currentUser || !DEMO_USERS.some(u => u.id === currentUser.id))) {
-        fetch(SHEET_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'pm_batch_approve_payment',
-            token: currentUser ? currentUser.token : '',
-            role: currentUser ? currentUser.role : 'PM',
-            userId: currentUser ? currentUser.id : 'PM01',
-            userName: currentUser ? currentUser.name : 'PM',
-            programId: activeProgram,
-            regIds: pendingRegs.map(r => r.id)
-          })
-        }).catch(err => console.warn('pm_batch_approve_payment sync failed:', err));
+      if (isServerUser()) {
+        showWait('Đang duyệt hàng loạt…', 'Vui lòng không tắt trang trong lúc máy chủ ghi dữ liệu.');
+        const data = await postToSheet({
+          action: 'pm_batch_approve_payment',
+          programId: activeProgram,
+          regIds: pendingRegs.map(r => r.id),
+          userName: currentUser.name
+        });
+        hideWait();
+        if (!data || !data.ok) {
+          showToast((data && data.message) || 'Máy chủ chưa xác nhận duyệt hàng loạt. Chưa có đơn nào được duyệt — vui lòng thử lại.', 'error', 7000);
+          return;
+        }
+        showToast(`Máy chủ đã duyệt thanh toán ${data.count} / ${pendingRegs.length} đơn hàng.`, 'success');
+        if (typeof loadPMDashboardData === 'function') loadPMDashboardData(true); // đồng bộ lại đúng số liệu máy chủ
+        return;
       }
 
-      showToast(`Đã duyệt thanh toán thành công ${count} đơn hàng hàng loạt!`, 'success');
+      applyLocal(pendingRegs);
+      persistDemoRegistrations();
+      showToast(`Đã duyệt thanh toán thành công ${pendingRegs.length} đơn hàng hàng loạt!`, 'success');
       calculatePMStats(activeProgram);
       renderBriefTopDashboard(activeProgram);
       if (typeof filterPMRegistrations === 'function') filterPMRegistrations();
     }
 
     // ===== P1: User Self-Service Slot Cancellation (GAP-EDGE-02) =====
-    function cancelUserRegistration(regId) {
-      const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
-        ? pmRegistrations
-        : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+    // v1-hardening (V1-08) — quy tắc đã duyệt 05/10/2026: chỉ hủy khi đơn "Đã đăng ký - Chờ mở thanh toán" hoặc
+    // "Chờ nộp tiền" và CHƯA khai nộp tiền. Chế độ máy chủ: chờ máy chủ xác nhận rồi mới cập nhật màn hình.
+    const USER_CANCELLABLE = ['Đã đăng ký - Chờ mở thanh toán', 'Chờ nộp tiền', 'Mới đăng ký'];
+    async function cancelUserRegistration(regId) {
+      const allRegs = getViewRegistrations();
       const reg = allRegs.find(r => r.id === regId || r.slotId === regId);
       if (!reg) return;
 
-      if (reg.status === 'Đã duyệt thanh toán') {
-        showToast('Đơn hàng đã được PM duyệt thanh toán, không thể tự hủy!', 'error');
+      if (USER_CANCELLABLE.indexOf(reg.status) < 0 || reg.bankTxn || reg.paid) {
+        showToast('Đơn hàng đã khai nộp tiền hoặc đã được PM xử lý nên không thể tự hủy. Vui lòng liên hệ PM phụ trách.', 'error', 6000);
         return;
       }
 
       const ok = confirm(`Bạn có chắc muốn HỦY giữ chỗ cho đơn này?\n\nSản phẩm: ${reg.model} (${reg.slotId})\nGiá: ${formatVND(reg.internalPrice || 0)}\n\nSau khi hủy, slot sẽ được hoàn lại kho cho đồng nghiệp khác đăng ký.`);
       if (!ok) return;
+
+      if (isServerUser()) {
+        showWait('Đang hủy giữ chỗ…', 'Vui lòng chờ máy chủ xác nhận.');
+        const data = await postToSheet({ action: 'user_cancel_registration', userId: currentUser.id, slotId: reg.slotId, regId: reg.id });
+        hideWait();
+        if (!data || !data.ok) {
+          showToast((data && data.message) || 'Chưa hủy được giữ chỗ. Vui lòng thử lại.', 'error', 6000);
+          return;
+        }
+        showToast(data.message, 'success');
+        invalidateSwrCache('products_' + activeProgram);
+        await refreshMyServerOrders();
+        loadProducts(activeProgram);
+        return;
+      }
 
       reg.status = 'Đã hủy bởi nhân viên';
       reg.note = 'Nhân viên chủ động hủy giữ chỗ';
@@ -5734,20 +5771,6 @@
         persistDemoRegistrations();
       }
 
-      const isDemo = currentUser && DEMO_USERS.some(u => u.id === currentUser.id);
-      if (!isDemo && SHEET_API_URL) {
-        fetch(SHEET_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'user_cancel_registration',
-            userId: currentUser ? currentUser.id : reg.empCode,
-            slotId: reg.slotId,
-            regId: reg.id
-          })
-        }).catch(err => console.warn('user_cancel_registration sync failed:', err));
-      }
-
       showToast(`Đã hủy giữ chỗ đơn ${reg.slotId} (${reg.model}) thành công. Slot đã được mở lại!`, 'success');
       calculatePMStats(activeProgram);
       renderBriefTopDashboard(activeProgram);
@@ -5758,13 +5781,152 @@
     // Tự động đọc Web App URL từ bộ nhớ cục bộ (localStorage).
     // Nếu chưa cấu hình, hệ thống sẽ chạy 100% tự động ở Chế độ Demo Cục Bộ (Local Storage)
     // giúp cách ly dữ liệu cá nhân của từng lập trình viên/Agent tải từ GitHub về.
+    // ===== v1-hardening (Gói P): CHẾ ĐỘ CHẠY =====
+    // 'demo'       : bản đào tạo / thử nghiệm — file nguồn này. Có tài khoản & dữ liệu demo, cấu hình API thủ công.
+    // 'production' : bản nhân viên dùng thật — do scripts/build_production.py sinh ra (portal.html). KHÔNG sửa tay 2 dòng này.
+    var PORTAL_MODE = 'demo';
+    var PRODUCTION_API_URL = '';
+    if (PORTAL_MODE === 'production') document.documentElement.classList.add('portal-production');
+
     let SHEET_API_URL = (function() {
+      if (PORTAL_MODE === 'production') return PRODUCTION_API_URL; // nhân viên mở link là nối máy chủ ngay (V1-00)
       try {
         return localStorage.getItem('LGE_PORTAL_API_URL') || '';
       } catch (e) {
         return '';
       }
     })();
+
+    // ===== v1-hardening (Gói A): dữ liệu của nhân viên thật lấy từ máy chủ, không lấy từ dữ liệu demo =====
+    var myServerOrders = [];   // đơn của chính nhân viên (action 'lookup'), dùng cho ô "03 Đơn Hàng Của Bạn"
+    var takenProgramId = '';   // chương trình mà danh sách slot đã hết (takenSet, từ máy chủ) đang đại diện
+    var TAKEN_POLL_MS = 10000; // nhịp polling kho: 10 giây + ngẫu nhiên 0–2 giây (đo & lý do: docs/04-v1-hardening §4)
+
+    function isDemoAccount(user) {
+      return !!(user && typeof DEMO_USERS !== 'undefined' && DEMO_USERS.some(u => u.id === user.id));
+    }
+    // Đúng khi đang nối máy chủ thật bằng tài khoản thật (không phải tài khoản demo)
+    function isServerUser() {
+      return !!(SHEET_API_URL && currentUser && !isDemoAccount(currentUser));
+    }
+    // Nguồn danh sách đơn cho giao diện: PM → đơn của chương trình; nhân viên thật → đơn của chính mình; demo → dữ liệu demo
+    function getViewRegistrations() {
+      if (typeof pmRegistrations !== 'undefined' && pmRegistrations.length) return pmRegistrations;
+      if (isServerUser()) return myServerOrders;
+      return (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+    }
+    function lookupOrderToReg(o) {
+      return {
+        id: o.slot, slotId: o.slot, programId: o.programId || '', kho: o.kho || '', model: o.model || '',
+        internalPrice: Number(o.price || o.amount) || 0, empCode: String(o.empCode || '').toUpperCase(),
+        empName: o.empName || o.name || '', status: o.status || '', timestamp: o.time || '', paid: !!o.paid
+      };
+    }
+    async function refreshMyServerOrders() {
+      if (!isServerUser() || currentUser.role === 'PM') return;
+      try {
+        const res = await fetchWithBackoff(SHEET_API_URL, {
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'lookup', empCode: currentUser.id, token: currentUser.token || '' })
+        }, 1, 1000, 8000);
+        const data = await res.json();
+        if (data && data.ok && Array.isArray(data.orders)) {
+          myServerOrders = data.orders.map(lookupOrderToReg);
+          if (activeProgram) renderBriefTopDashboard(activeProgram);
+        }
+      } catch (e) { /* mạng lỗi: giữ dữ liệu cũ, lượt sau thử lại */ }
+    }
+    // Đơn đang chờ PM mở cổng / chờ nộp tiền → làm mới mỗi 60 giây để nhân viên thấy "CỔNG TT ĐÃ MỞ" mà không cần F5.
+    // Chỉ chạy khi có đơn đang chờ, nên không cộng tải cho người chưa giữ chỗ.
+    setInterval(function() {
+      if (document.hidden || !isServerUser() || currentUser.role === 'PM') return;
+      const waiting = myServerOrders.some(r => r.status === 'Đã đăng ký - Chờ mở thanh toán' || r.status === 'Chờ nộp tiền');
+      if (waiting) refreshMyServerOrders();
+    }, 60000);
+
+    // Áp danh sách slot đã hết do MÁY CHỦ trả về (polling, hoặc kèm phản hồi "đã có người đăng ký") lên màn hình ngay
+    function applyServerTaken(list, programId) {
+      if (typeof takenSet === 'undefined' || !Array.isArray(list)) return;
+      takenSet.clear();
+      list.forEach(x => takenSet.add(x));
+      takenProgramId = programId || activeProgram;
+      takenLoadedAt = Date.now();
+      syncProductRegistrationStatus(activeProgram, currentProducts);
+      if (currentProducts && currentProducts.length) {
+        renderProductTable(currentProducts);
+        if (typeof renderTab4ProductTable === 'function') renderTab4ProductTable(currentProducts);
+      }
+      if (typeof updateKhoCounts === 'function') updateKhoCounts();
+      if (activeProgram) renderBriefTopDashboard(activeProgram);
+    }
+
+    // Máy chủ chậm / lỗi mạng: báo rõ + nút Thử lại (không bao giờ hiện dữ liệu demo cho nhân viên thật)
+    function renderServerRetryPanel(what, retryFn) {
+      let container = document.getElementById('product-container');
+      if (!container && typeof renderProductTable === 'function') { renderProductTable([]); container = document.getElementById('product-container'); }
+      if (!container) return;
+      window.__lgRetryFn = retryFn;
+      container.innerHTML = `
+        <div class="lg-server-retry" role="alert">
+          <div><strong>Đang kết nối máy chủ…</strong><br>
+            Chưa tải được ${esc(what)}. Máy chủ Google thường phản hồi chậm trong vài phút đầu mở bán; hệ thống sẽ tự thử lại sau 15 giây.</div>
+          <button type="button" class="btn-pm-action" onclick="clearTimeout(window.__lgRetryTimer); window.__lgRetryFn && window.__lgRetryFn();">Thử lại ngay</button>
+        </div>`;
+      clearTimeout(window.__lgRetryTimer);
+      window.__lgRetryTimer = setTimeout(() => { if (window.__lgRetryFn) window.__lgRetryFn(); }, 15000);
+    }
+
+    // ===== v1-hardening (K2): công tắc bật/tắt email tự động =====
+    function renderEmailSwitch(enabled, remaining) {
+      const btn = document.getElementById('btn-email-switch');
+      const st = document.getElementById('email-switch-state');
+      if (!btn || !st) return;
+      btn.setAttribute('aria-checked', enabled ? 'true' : 'false');
+      btn.removeAttribute('aria-busy');
+      st.textContent = enabled ? 'BẬT' : 'TẮT';
+      btn.title = (enabled ? 'Email tự động đang BẬT' : 'Email tự động đang TẮT (chỉ ghi nhật ký AutoEmail)') +
+        (remaining !== null && remaining !== undefined ? ` · Hạn mức email còn lại hôm nay: ${remaining}` : '') + ' · Bấm để đổi';
+    }
+    async function loadAutoEmailSetting() {
+      if (!currentUser || currentUser.role !== 'PM') return;
+      if (!isServerUser()) {
+        let on = false; try { on = localStorage.getItem('lg_demo_auto_email') === 'true'; } catch (e) {}
+        renderEmailSwitch(on, null);
+        return;
+      }
+      try {
+        const res = await fetchWithBackoff(SHEET_API_URL, {
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'email_setting', token: currentUser.token || '' })
+        }, 1, 1000, 8000);
+        const data = await res.json();
+        if (data && data.ok) renderEmailSwitch(!!data.enabled, data.remainingDailyQuota);
+      } catch (e) { /* giữ trạng thái "…" */ }
+    }
+    async function toggleAutoEmailSetting() {
+      const btn = document.getElementById('btn-email-switch');
+      if (!btn || btn.getAttribute('aria-busy') === 'true') return;
+      const next = btn.getAttribute('aria-checked') !== 'true';
+      const msg = next
+        ? 'BẬT gửi email tự động tới nhân viên?\n\nLưu ý: tài khoản Gmail cá nhân chỉ gửi được tối đa 100 email/ngày. Khi chạm hạn mức, hệ thống tự ngừng gửi trong 1 giờ; đơn hàng vẫn xử lý bình thường.'
+        : 'TẮT gửi email tự động?\n\nNhân viên sẽ KHÔNG nhận email thông báo. Hệ thống vẫn ghi nhật ký vào sheet AutoEmail. Hãy thông báo cho nhân viên qua kênh khác (Teams/Zalo).';
+      if (!confirm(msg)) return;
+      if (!isServerUser()) {
+        try { localStorage.setItem('lg_demo_auto_email', next ? 'true' : 'false'); } catch (e) {}
+        renderEmailSwitch(next, null);
+        showToast('Chế độ Demo: chỉ mô phỏng, không có email nào được gửi.', 'info');
+        return;
+      }
+      btn.setAttribute('aria-busy', 'true');
+      const data = await postToSheet({ action: 'email_setting', enabled: next });
+      if (data && data.ok) {
+        renderEmailSwitch(!!data.enabled, data.remainingDailyQuota);
+        showToast(data.message, 'success');
+      } else {
+        btn.removeAttribute('aria-busy');
+        showToast((data && data.message) || 'Không đổi được cài đặt email. Vui lòng thử lại.', 'error');
+      }
+    }
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -5782,6 +5944,10 @@
     window.togglePasswordVisibility = togglePasswordVisibility;
 
     function openApiConfigModal() {
+      if (PORTAL_MODE === 'production') { // bản chính thức: địa chỉ máy chủ cố định, không cho đổi trên trình duyệt
+        showToast('Bản chính thức đã kết nối sẵn máy chủ. Liên hệ PIC nếu cần thay đổi.', 'info');
+        return;
+      }
       const modal = document.getElementById('api-config-modal');
       const input = document.getElementById('api-config-url-input');
       const statusEl = document.getElementById('api-config-status-badge');
@@ -5883,6 +6049,7 @@
     const AUTH_SESSION_HOURS = 8;
     let currentUser = null; // {id, name, dept, phone, role}
 
+    /* @@DEMO_DATA_BEGIN — scripts/build_production.py thay toàn bộ khối này bằng mảng rỗng trong bản production */
     // Demo Data (Fallback when Google Apps Script is offline or returning 404)
     // Matches docs/USERS_SHEET_TEMPLATE.md
     const DEMO_USERS = [
@@ -6250,6 +6417,7 @@
         }
       }
     } catch (e) {}
+    /* @@DEMO_DATA_END */
 
     function persistDemoRegistrations() {
       try {
@@ -6396,6 +6564,8 @@
       document.getElementById('login-overlay').classList.add('hidden');
       // P1: Load programs after login
       loadPrograms();
+      // v1-hardening: PM → trạng thái công tắc email (K2); nhân viên thật → đơn của mình cho ô 03 (V1-02)
+      if (user.role === 'PM') loadAutoEmailSetting(); else refreshMyServerOrders();
       // Onboarding Tour check for first-time login
       if (typeof checkAndAutoLaunchTour === 'function') {
         setTimeout(() => checkAndAutoLaunchTour(user.role), 800);
@@ -6414,7 +6584,8 @@
 
       let authenticated = false;
       let authUser = null;
-      const demoMatch = DEMO_USERS.find(u => u.id.toUpperCase() === id);
+      // v1-hardening (V1-15): bản production không bao giờ đăng nhập bằng tài khoản demo (kể cả nếu dữ liệu demo còn sót)
+      const demoMatch = PORTAL_MODE === 'production' ? null : DEMO_USERS.find(u => u.id.toUpperCase() === id);
 
       // Fast-track demo accounts for instant zero-latency test logins
       if (demoMatch) {
@@ -6837,14 +7008,11 @@
       const isDemo = DEMO_USERS.some(u => u.id === currentUser.id);
       if (!fetched && !isDemo && SHEET_API_URL) {
         try {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 3000);
-          const res = await fetch(SHEET_API_URL, {
+          // v1-hardening (V1-03): chờ tối đa 8 giây, tự thử lại 2 lần (máy chủ Google hay chậm lúc mở bán)
+          const res = await fetchWithBackoff(SHEET_API_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'programs', role: currentUser.role, userId: currentUser.id }),
-            signal: controller.signal
-          });
-          clearTimeout(timer);
+            body: JSON.stringify({ action: 'programs', role: currentUser.role, userId: currentUser.id })
+          }, 2, 1000, 8000);
           if (res.ok) {
             const data = await res.json();
             if (data.ok && Array.isArray(data.programs)) {
@@ -6866,7 +7034,12 @@
             }
           }
         } catch (err) {
-          console.warn('loadPrograms using demo fallback:', err);
+          console.warn('loadPrograms: máy chủ chưa phản hồi:', err);
+        }
+        // v1-hardening (V1-03): tài khoản thật KHÔNG bao giờ rơi về chương trình demo
+        if (!fetched) {
+          renderServerRetryPanel('danh sách chương trình', () => loadPrograms());
+          return;
         }
       }
 
@@ -7781,11 +7954,20 @@
             : [];
       if (!prods || !prods.length) return prods;
 
+      // v1-hardening (V1-01): nhân viên thật không có danh sách đơn của cả chương trình → MÁY CHỦ là nguồn sự thật.
+      // Giữ trạng thái máy chủ trả về; nếu đã có danh sách slot đã hết (polling) của đúng chương trình này thì áp theo nó.
+      if (isServerUser() && !(typeof pmRegistrations !== 'undefined' && pmRegistrations.length)) {
+        if (takenProgramId && takenProgramId === pid && typeof takenSet !== 'undefined') {
+          prods.forEach(p => { p.status = takenSet.has(p.uniqueCode || p.slotId) ? 'Registered' : 'Available'; });
+        }
+        return prods;
+      }
+
       const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
         ? pmRegistrations
         : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
 
-      const activeRegs = allRegs.filter(r => 
+      const activeRegs = allRegs.filter(r =>
         (r.programId === pid || !r.programId) && 
         r.status !== 'Từ chối' && 
         r.status !== 'Hủy' && 
@@ -7810,6 +7992,9 @@
     }
     window.syncProductRegistrationStatus = syncProductRegistrationStatus;
 
+    // v1-hardening: '—' = số liệu chỉ PM xem được (nhân viên không có danh sách đơn của người khác)
+    function pct(v) { return v === '—' ? '—' : `${v}%`; }
+
     function getProgramProducts(programId) {
       const pid = programId || activeProgram;
       if (currentProducts && currentProducts.length && currentProducts[0].programId === pid) {
@@ -7826,10 +8011,27 @@
 
       syncProductRegistrationStatus(pid, prods);
 
-      const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
-        ? pmRegistrations
-        : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
-      
+      // v1-hardening (V1-01): nhân viên thật chỉ biết đơn của chính mình → đếm "đã đăng ký" theo trạng thái
+      // sản phẩm do máy chủ trả về; tỷ lệ thanh toán của cả chương trình chỉ PM xem được (payKnown = false).
+      if (isServerUser() && currentUser.role !== 'PM') {
+        const countTaken = list => list.filter(p => p.status && p.status !== 'Available').length;
+        const rate = (a, b) => (b > 0 ? ((a / b) * 100).toFixed(1) : '0.0');
+        const regions = {};
+        ['AYA', 'AYB', 'AYC'].forEach(k => {
+          const kp = prods.filter(p => (p.kho || '').toUpperCase() === k);
+          const kr = countTaken(kp);
+          regions[k] = { listed: kp.length, registered: kr, paid: '—', available: Math.max(0, kp.length - kr), regRate: rate(kr, kp.length), payRate: '—' };
+        });
+        const reg = countTaken(prods);
+        return {
+          nationwide: { totalListed: prods.length, registeredCount: reg, validRegs: reg, paidCount: '—', availCount: Math.max(0, prods.length - reg),
+                        regRate: rate(reg, prods.length), payRate: '—', payKnown: false },
+          regions: regions
+        };
+      }
+
+      const allRegs = getViewRegistrations(); // v1-hardening: PM thật chưa có đơn → rỗng, không lấy dữ liệu demo
+
       const progRegs = allRegs.filter(r => (r.programId === pid || !r.programId) && r.status !== 'Từ chối' && r.status !== 'Hủy' && r.status !== 'Đã hủy bởi nhân viên' && r.status !== 'Đã hủy bởi PM');
 
       // Nationwide metrics
@@ -7904,9 +8106,9 @@
       const nwPayRateEl = document.getElementById('modal-nw-pay-rate');
       const nwPayRatioEl = document.getElementById('modal-nw-pay-ratio');
       const nwPayBarEl = document.getElementById('modal-nw-pay-bar');
-      if (nwPayRateEl) nwPayRateEl.textContent = `${stats.nationwide.payRate}%`;
+      if (nwPayRateEl) nwPayRateEl.textContent = pct(stats.nationwide.payRate);
       if (nwPayRatioEl) nwPayRatioEl.textContent = `(${stats.nationwide.paidCount} / ${stats.nationwide.validRegs} Đơn)`;
-      if (nwPayBarEl) nwPayBarEl.style.width = `${Math.min(100, stats.nationwide.payRate)}%`;
+      if (nwPayBarEl) nwPayBarEl.style.width = `${Math.min(100, Number(stats.nationwide.payRate) || 0)}%`;
 
       const nwAvailEl = document.getElementById('modal-nw-avail-units');
       if (nwAvailEl) nwAvailEl.textContent = stats.nationwide.availCount;
@@ -7949,11 +8151,11 @@
               <div class="reg-stat-metric-row">
                 <span class="reg-stat-metric-label">Tỉ Lệ Thanh Toán (#TT/#ĐK):</span>
                 <span class="reg-stat-metric-val" style="color:#1B5E20;">
-                  <strong>${r.payRate}%</strong> <span style="font-size:11.5px; font-weight:500; color:#716F6A;">(${r.paid}/${r.registered})</span>
+                  <strong>${pct(r.payRate)}</strong> <span style="font-size:11.5px; font-weight:500; color:#716F6A;">(${r.paid}/${r.registered})</span>
                 </span>
               </div>
               <div class="reg-stat-bar-bg">
-                <div class="reg-stat-bar-fill reg-stat-bar-green" style="width:${Math.min(100, r.payRate)}%;"></div>
+                <div class="reg-stat-bar-fill reg-stat-bar-green" style="width:${Math.min(100, Number(r.payRate) || 0)}%;"></div>
               </div>
             </div>
           `;
@@ -7980,7 +8182,7 @@
               <td style="text-align:right; font-weight:700; color:#A50034;">${r.regRate}%</td>
               <td style="text-align:right; color:#4A4946;">${r.registered}</td>
               <td style="text-align:right; color:#1B5E20; font-weight:700;">${r.paid}</td>
-              <td style="text-align:right; font-weight:700; color:#1B5E20;">${r.payRate}%</td>
+              <td style="text-align:right; font-weight:700; color:#1B5E20;">${pct(r.payRate)}</td>
               <td style="text-align:right; font-weight:600; color:#262626;">${r.available}</td>
               <td style="text-align:center;">${statusText}</td>
             </tr>
@@ -7996,9 +8198,9 @@
             <td style="text-align:right; color:#A50034;">${stats.nationwide.regRate}%</td>
             <td style="text-align:right;">${stats.nationwide.validRegs}</td>
             <td style="text-align:right; color:#1B5E20;">${stats.nationwide.paidCount}</td>
-            <td style="text-align:right; color:#1B5E20;">${stats.nationwide.payRate}%</td>
+            <td style="text-align:right; color:#1B5E20;">${pct(stats.nationwide.payRate)}</td>
             <td style="text-align:right;">${stats.nationwide.availCount}</td>
-            <td style="text-align:center;"><span style="color:#A50034; font-weight:800;">Tỉ lệ nộp tiền: ${stats.nationwide.payRate}%</span></td>
+            <td style="text-align:center;"><span style="color:#A50034; font-weight:800;">Tỉ lệ nộp tiền: ${pct(stats.nationwide.payRate)}</span></td>
           </tr>
         `;
         tableBody.innerHTML = rowsHtml;
@@ -8074,17 +8276,17 @@
       if (barEl) barEl.style.width = `${Math.min(100, stats.nationwide.regRate)}%`;
 
       if (payRatioEl) payRatioEl.textContent = `${stats.nationwide.paidCount} / ${stats.nationwide.validRegs} Đơn`;
-      if (payPctEl) payPctEl.textContent = `${stats.nationwide.payRate}%`;
-      if (payBarEl) payBarEl.style.width = `${Math.min(100, stats.nationwide.payRate)}%`;
+      if (payPctEl) payPctEl.textContent = pct(stats.nationwide.payRate);
+      if (payBarEl) payBarEl.style.width = `${Math.min(100, Number(stats.nationwide.payRate) || 0)}%`;
 
       // Warehouse summary
       if (whEl) {
         whEl.innerHTML = `
-          <span>Kho AYA: <strong>${stats.regions.AYA.regRate}%</strong> ĐK (${stats.regions.AYA.payRate}% TT)</span>
+          <span>Kho AYA: <strong>${stats.regions.AYA.regRate}%</strong> ĐK (${pct(stats.regions.AYA.payRate)} TT)</span>
           <span>·</span>
           <span>Kho AYB: <strong>${stats.regions.AYB.regRate}%</strong> ĐK</span>
           <span>·</span>
-          <span>Kho AYC: <strong>${stats.regions.AYC.regRate}%</strong> ĐK (${stats.regions.AYC.payRate}% TT)</span>
+          <span>Kho AYC: <strong>${stats.regions.AYC.regRate}%</strong> ĐK (${pct(stats.regions.AYC.payRate)} TT)</span>
         `;
       }
 
@@ -8103,9 +8305,7 @@
       const card3Body = document.getElementById('grap-card3-body');
       const card3Footer = document.getElementById('grap-card3-footer');
 
-      const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
-        ? pmRegistrations
-        : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+      const allRegs = getViewRegistrations(); // v1-hardening (V1-02): nhân viên thật → đơn của chính mình từ máy chủ
 
       if (currentUser && currentUser.role === 'PM') {
         if (card3Title) card3Title.textContent = 'Giám Sát Bán Hàng (PM View)';
@@ -8225,9 +8425,7 @@
 
     function openQuickPaymentModalForReg(regId) {
       if (!currentUser) return;
-      const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
-        ? pmRegistrations
-        : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+      const allRegs = getViewRegistrations(); // v1-hardening (V1-02)
 
       let reg = allRegs.slice().reverse().find(r => r.id === regId || r.slotId === regId);
       if (!reg && currentProducts && currentProducts.length) {
@@ -8369,9 +8567,7 @@
           receiptBase64 = await compressImageFile(fileInput.files[0], 1280, 0.75);
         }
 
-        const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
-          ? pmRegistrations
-          : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
+        const allRegs = getViewRegistrations(); // v1-hardening (V1-02)
         const reg = allRegs.find(r => r.id === regId || r.slotId === regId);
         if (reg) {
           if (reg.status === 'Đã đăng ký - Chờ mở thanh toán') {
@@ -8411,6 +8607,7 @@
                 clearQuickPaymentDraft(regId);
                 showToast('Xác nhận nộp tiền thành công!\nĐơn hàng đã được chuyển sang "Đã khai nộp - chờ đối soát". PM sẽ đối soát và duyệt giao hàng.', 'success', 5000);
                 closeQuickPaymentModal();
+                refreshMyServerOrders(); // v1-hardening: ô 03 hiện ngay trạng thái mới từ máy chủ
                 renderBriefTopDashboard(activeProgram);
                 if (typeof calculatePMStats === 'function') calculatePMStats(activeProgram);
                 if (typeof renderPMDashboard === 'function') renderPMDashboard();
@@ -8501,33 +8698,37 @@
         renderTab4ProductTable(cached);
         renderBriefTopDashboard(programId);
         fetched = true;
+        if (isServerUser() && typeof refreshTaken === 'function') refreshTaken(true); // bản cache ≤25 giây: đối chiếu ngay với máy chủ
       }
 
       const isDemo = DEMO_USERS.some(u => u.id === currentUser.id);
       if (!fetched && !isDemo && SHEET_API_URL) {
         try {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 3000);
-          const res = await fetch(SHEET_API_URL, {
+          // v1-hardening (V1-03): chờ tối đa 8 giây, tự thử lại 2 lần thay vì bỏ cuộc sau 3 giây
+          const res = await fetchWithBackoff(SHEET_API_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'products', programId: programId }),
-            signal: controller.signal
-          });
-          clearTimeout(timer);
+            body: JSON.stringify({ action: 'products', programId: programId })
+          }, 2, 1000, 8000);
           if (res.ok) {
             const data = await res.json();
-            if (data.ok && Array.isArray(data.products) && data.products.length > 0) {
+            if (data.ok && Array.isArray(data.products)) {
               currentProducts = data.products;
-              setSwrCache('products_' + programId, data.products);
+              if (data.products.length > 0) setSwrCache('products_' + programId, data.products);
               syncProductRegistrationStatus(programId, currentProducts);
               renderProductTable(data.products);
               renderTab4ProductTable(data.products);
               renderBriefTopDashboard(programId);
               fetched = true;
+              if (typeof refreshTaken === 'function') refreshTaken(true); // lấy ngay danh sách slot đã hết của chương trình này
             }
           }
         } catch (err) {
-          console.warn('loadProducts using demo fallback:', err);
+          console.warn('loadProducts: máy chủ chưa phản hồi:', err);
+        }
+        // v1-hardening (V1-03): tài khoản thật KHÔNG bao giờ thấy sản phẩm demo
+        if (!fetched) {
+          renderServerRetryPanel('danh mục sản phẩm', () => loadProducts(programId));
+          return;
         }
       }
 
@@ -8929,8 +9130,10 @@
               invalidateSwrCache('products_' + activeProgram);
               loadProducts(activeProgram);
               renderBriefTopDashboard(activeProgram);
+              refreshMyServerOrders(); // v1-hardening (V1-02, bổ sung): ô 03 hiện đơn vừa giữ
             } else {
               showToast((data.message || 'Không thể đăng ký.'), 'error', 5000);
+              if (Array.isArray(data.taken)) applyServerTaken(data.taken, activeProgram); // v1-hardening (C6, bổ sung): cập nhật slot đã hết ngay
             }
           } else {
             showToast('Máy chủ phản hồi lỗi HTTP ' + res.status, 'error', 5000);
@@ -9016,6 +9219,7 @@
     async function postToSheet(payload, onRetry) {
       if (!SHEET_API_URL) return { ok: false, offline: true };
       payload.userAgent = navigator.userAgent;
+      if (!payload.token && currentUser && currentUser.token) payload.token = currentUser.token; // v1-hardening (B3): máy chủ bắt buộc token
       const waits = [0, 2000, 4000, 7000, 12000, 20000];
       let last = null;
       for (let i = 0; i < waits.length; i++) {
@@ -11305,12 +11509,15 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     async function refreshTaken(force) {
       if (!SHEET_API_URL || takenBusy) return;
       if (!force && Date.now() - takenLoadedAt < 5000) return;
+      const pid = activeProgram; // v1-hardening (V1-04): máy chủ trả danh sách theo từng chương trình
+      if (!pid) return;
       takenBusy = true;
       try {
-        const r = await fetch(SHEET_API_URL + '?action=taken&t=' + Date.now());
+        const r = await fetch(SHEET_API_URL + '?action=taken&programId=' + encodeURIComponent(pid) + '&t=' + Date.now());
         const j = await r.json();
-        if (j && j.ok && Array.isArray(j.taken)) {
+        if (j && j.ok && Array.isArray(j.taken) && pid === activeProgram) {
           takenSet.clear(); j.taken.forEach(x => takenSet.add(x));
+          takenProgramId = pid;
           takenLoadedAt = Date.now();
           applyTaken(false);
           // P8: Real-time dynamic sync to Unified Single Catalog
@@ -11342,7 +11549,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     // P8: Adaptive Background Polling (6–8 giây khi xem Kho để chống tranh chấp slot)
     (function pollTaken() {
-      const interval = takenTabActive() ? (6000 + Math.floor(Math.random() * 2000)) : (45000 + Math.floor(Math.random() * 15000));
+      const interval = takenTabActive() ? (TAKEN_POLL_MS + Math.floor(Math.random() * 2000)) : (45000 + Math.floor(Math.random() * 15000)); // v1-hardening: 10–12 giây (docs/04-v1-hardening §4)
       setTimeout(() => {
         if (!document.hidden && takenTabActive()) refreshTaken(true);
         pollTaken();
@@ -11933,7 +12140,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           userBadge.textContent = `Tài khoản: ${currentUser.id} · ${currentUser.name || ''}`;
         }
         if (desc) {
-          desc.innerHTML = `Hệ thống tự động tra cứu lịch sử đơn hàng của tài khoản <strong>${esc(currentUser.id)}</strong> (${esc(currentUser.name || '')}). Mặc định hiển thị 1 năm gần nhất. Nút <strong>Nộp tiền</strong> mở khi PM duyệt mở cổng thanh toán (hoặc sau <strong class="pay-delay-text">${PAY_OPEN_DELAY_HOURS} giờ</strong>).`;
+          desc.innerHTML = `Hệ thống tự động tra cứu lịch sử đơn hàng của tài khoản <strong>${esc(currentUser.id)}</strong> (${esc(currentUser.name || '')}). Mặc định hiển thị 1 năm gần nhất. Nút <strong>Nộp tiền</strong> mở khi PM duyệt mở cổng thanh toán; từ lúc đó bạn có 24 giờ để nộp tiền.`;
         }
         if (btnLabel) btnLabel.textContent = 'Làm mới / Tra cứu';
       } else {
@@ -11943,7 +12150,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (phoneInput) phoneInput.setAttribute('required', 'required');
         if (userBadge) userBadge.style.display = 'none';
         if (desc) {
-          desc.innerHTML = `Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn và <strong>số tiền cần nộp</strong>. Nút <strong>Nộp tiền</strong> mở sau <strong class="pay-delay-text">${PAY_OPEN_DELAY_HOURS} giờ</strong> kể từ lúc đăng ký thành công (hoặc khi PM mở cổng thanh toán).`;
+          desc.innerHTML = `Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn và <strong>số tiền cần nộp</strong>. Nút <strong>Nộp tiền</strong> mở khi PM duyệt mở cổng thanh toán; từ lúc đó bạn có 24 giờ để nộp tiền.`;
         }
         if (btnLabel) btnLabel.textContent = 'Tra cứu';
       }
@@ -12583,7 +12790,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           kicker: 'CHUYỂN KHOẢN VCB PHÁP NHÂN',
           motionIcon: 'assets/images/quick-links-ani/cat_vcb_security.svg',
           title: 'Quét VietQR & Nộp Biên Lai Khi Cổng Mở',
-          body: 'Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với cú pháp [MãNV]_[MãSlot]. Lưu ý: Cổng nộp tiền mở sau 2 giờ để đối soát đơn; khi mở bạn chỉ cần tải ảnh chụp biên lai lên.',
+          body: 'Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với cú pháp [MãNV]_[MãSlot]. Lưu ý: Cổng nộp tiền mở khi PM duyệt danh sách đăng ký; từ lúc mở bạn có 24 giờ để chuyển khoản và tải ảnh biên lai lên.',
           tip: 'Có sẵn mã VietQR tự điền số tiền và cú pháp chuẩn, quét bằng app ngân hàng trong 5 giây siêu an toàn.',
           nextBtnText: 'Tiếp →'
         },

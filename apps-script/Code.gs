@@ -37,7 +37,8 @@ var CACHE_SLOTS_SEC = 600;
 var STATUS_WAIT_GATE = 'Đã đăng ký - Chờ mở thanh toán';
 var STATUS_NEW = 'Chờ nộp tiền';
 var STATUS_PAID = 'Đã khai nộp - chờ đối soát';
-var STATUS_FREE = ['Hủy', 'Từ chối', 'Hết hạn giữ chỗ']; // đơn ở trạng thái này không giữ slot
+var STATUS_USER_CANCEL = 'Đã hủy bởi nhân viên';
+var STATUS_FREE = ['Hủy', 'Từ chối', 'Hết hạn giữ chỗ', STATUS_USER_CANCEL]; // đơn ở trạng thái này không giữ slot
 
 // Cột trong Registrations (1-based)
 var C = {
@@ -51,14 +52,34 @@ var _book = null;
 function book_() {
   if (_book) return _book;
   try { var a = SpreadsheetApp.getActiveSpreadsheet(); if (a) return (_book = a); } catch (e) {}
-  if (SPREADSHEET_ID && SPREADSHEET_ID.trim() !== '' && SPREADSHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE') {
-    return (_book = SpreadsheetApp.openById(SPREADSHEET_ID));
+  // v1-hardening: Script Property SPREADSHEET_ID (nếu có) được ưu tiên, để bản STAGING dùng chung Code.gs mà không sửa code
+  var propId = '';
+  try { propId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || ''; } catch (e) {}
+  var id = propId || SPREADSHEET_ID;
+  if (id && id.trim() !== '' && id !== 'YOUR_SPREADSHEET_ID_HERE') {
+    return (_book = SpreadsheetApp.openById(id));
   }
   throw new Error('Chưa cấu hình SPREADSHEET_ID! Hãy chạy hàm setupNewDatabase() trong trình soạn thảo Apps Script để tự động tạo cơ sở dữ liệu trên Drive của bạn.');
 }
 
-function doGet() {
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.3.1', time: new Date().toISOString() });
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  if (p.action === 'taken') return json_(taken_(p));
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '8.3-v1-hardening', time: new Date().toISOString() });
+}
+
+// v1-hardening (V1-04): danh sách slot đã có người giữ của 1 chương trình, cho polling kho phía nhân viên.
+// Dùng lại products_() — cache 'prod_<ID>' của nó bị xoá mỗi khi đăng ký / hủy / từ chối / hết hạn, nên luôn mới.
+function taken_(p) {
+  var programId = str_(p.programId);
+  if (!programId) return { ok: false, message: 'Thiếu programId.', taken: [] };
+  var res = products_({ programId: programId });
+  if (!res.ok) return { ok: false, message: res.message, taken: [] };
+  var taken = [];
+  for (var i = 0; i < res.products.length; i++) {
+    if (res.products[i].status !== 'Available') taken.push(res.products[i].uniqueCode);
+  }
+  return { ok: true, programId: programId, taken: taken, time: new Date().toISOString() };
 }
 
 function doPost(e) {
@@ -82,6 +103,8 @@ function doPost(e) {
     if (data.action === 'register') return json_(register_(data));
     if (data.action === 'payment' || data.action === 'submit_payment') return json_(payment_(data));
     if (data.action === 'lookup') return json_(lookup_(data));
+    if (data.action === 'user_cancel_registration') return json_(user_cancel_registration_(data));
+    if (data.action === 'email_setting') return json_(email_setting_(data));
     return json_({ ok: false, message: 'Yêu cầu không hợp lệ.' });
   } catch (err) {
     try { log_('ERROR', '', '', '', String(err)); } catch (e2) {}
@@ -144,18 +167,37 @@ function verifyPassword_(inputPw, storedPw) {
 }
 
 /* ---------- P6.1: Zero-Trust HMAC-SHA256 Tokenization (SEC-01) ---------- */
+// v1-hardening (V1-06): khóa bí mật ngẫu nhiên, không suy ra từ SPREADSHEET_ID (ID này đã công khai trên GitHub).
+// Không có fallback cố định: nếu không đọc được Script Properties thì báo lỗi thay vì dùng khóa đoán được.
 function getServerSecret_() {
-  try {
-    var props = PropertiesService.getScriptProperties();
-    var secret = props.getProperty('SESSION_SECRET_KEY');
-    if (!secret) {
-      secret = 'LG_HMAC_SECRET_' + SPREADSHEET_ID.slice(0, 16) + '_SECURE_GOLIVE_2026';
-      try { props.setProperty('SESSION_SECRET_KEY', secret); } catch (e) {}
-    }
-    return secret;
-  } catch (err) {
-    return 'LG_HMAC_SECRET_' + SPREADSHEET_ID.slice(0, 16) + '_SECURE_GOLIVE_2026';
+  var props = PropertiesService.getScriptProperties();
+  var secret = props.getProperty('SESSION_SECRET_KEY');
+  if (!secret) {
+    secret = newRandomSecret_();
+    props.setProperty('SESSION_SECRET_KEY', secret);
   }
+  return secret;
+}
+
+function newRandomSecret_() {
+  return Utilities.getUuid() + '-' + Utilities.getUuid() + '-' + new Date().getTime();
+}
+
+/**
+ * ADMIN chạy tay 1 lần trước go-live (và bất cứ khi nào nghi ngờ lộ khóa):
+ * thay khóa ký phiên đăng nhập → mọi phiên cũ hết hiệu lực, mọi người đăng nhập lại 1 lần.
+ * Xem docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md
+ */
+function rotateSessionSecret() {
+  PropertiesService.getScriptProperties().setProperty('SESSION_SECRET_KEY', newRandomSecret_());
+  try { log_('ROTATE_SESSION_SECRET', 'ADMIN', '', '', 'Đã thay khóa ký phiên; mọi phiên cũ hết hiệu lực'); } catch (e) {}
+  Logger.log('Đã thay khóa ký phiên đăng nhập. Mọi người cần đăng nhập lại 1 lần.');
+  return { ok: true };
+}
+
+// Chữ ký demo chỉ được chấp nhận khi Config có ALLOW_DEMO_TOKENS = true (dùng cho STAGING). Mặc định: tắt.
+function demoTokensAllowed_() {
+  try { return String(config_()['ALLOW_DEMO_TOKENS'] || '').toLowerCase() === 'true'; } catch (e) { return false; }
 }
 
 function generateSessionToken_(user) {
@@ -189,14 +231,11 @@ function verifySessionToken_(tokenStr, requiredRole) {
   var expectedSig = Utilities.base64EncodeWebSafe(expectedSigBytes);
   
   if (clientSig !== expectedSig) {
-    if (clientSig === 'demo_local_signature') {
-      try {
-        var jsonStr = Utilities.newBlob(Utilities.base64DecodeWebSafe(payloadStr)).getDataAsString();
-        var payload = JSON.parse(jsonStr);
-        return { valid: true, payload: payload };
-      } catch (e) {}
+    // v1-hardening (V1-05): chữ ký demo KHÔNG còn được chấp nhận mặc định, và nếu được bật thì vẫn
+    // phải qua kiểm tra hạn dùng + quyền như token thật (không còn bỏ qua requiredRole).
+    if (!(clientSig === 'demo_local_signature' && demoTokensAllowed_())) {
+      return { valid: false, message: 'Chữ ký phiên làm việc không hợp lệ (Phát hiện can thiệp dữ liệu).' };
     }
-    return { valid: false, message: 'Chữ ký phiên làm việc không hợp lệ (Phát hiện can thiệp dữ liệu).' };
   }
   
   try {
@@ -461,6 +500,13 @@ function programs_(d) {
   return { ok: true, programs: result };
 }
 
+// Khóa cache do programs_() tạo: 'prog_USER_all' (nhân viên) và 'prog_PM_<ID>' (từng PM, kể cả ADMIN)
+function invalidateProgramCaches_(ownerPmId) {
+  invalidateCache_('prog_USER_all');
+  invalidateCache_('prog_PM_ADMIN');
+  if (ownerPmId) invalidateCache_('prog_PM_' + String(ownerPmId).toUpperCase());
+}
+
 // PM creates a new program
 function program_create_(d) {
   var authCheck = verifySessionToken_(d.token, 'PM');
@@ -499,7 +545,7 @@ function program_create_(d) {
     new Date().toISOString()
   ];
   sheet.appendRow(row);
-  invalidateCache_('prog_all');
+  invalidateProgramCaches_(pmId); // v1-hardening (V1-13): đúng khóa cache mà programs_() tạo
   try { log_('PROGRAM_CREATE', pmId, pmName, '', 'program=' + d.programId + ' status=' + initStatus); } catch (e2) {}
   return { ok: true, message: 'Đã tạo chương trình ' + d.programId + ' (' + initStatus + ').' };
 }
@@ -534,7 +580,7 @@ function program_update_(d) {
         return { ok: false, message: 'Chỉ có thể kết sổ chương trình đang Open.' };
       }
       sheet.getRange(r + 2, PROG_COL.STATUS).setValue(newStatus);
-      invalidateCache_('prog_all');
+      invalidateProgramCaches_(pmOwnerId); // v1-hardening (V1-13)
       try { log_('PROGRAM_' + newStatus.toUpperCase(), authCheck.payload.uid, authCheck.payload.name, '', 'program=' + progId); } catch (e2) {}
       return { ok: true, message: 'Đã chuyển chương trình ' + progId + ' sang ' + newStatus + '.' };
     }
@@ -721,6 +767,46 @@ function product_upload_(d) {
   return { ok: true, message: 'Đã upload ' + rows.length + ' sản phẩm vào chương trình ' + programId + '.' };
 }
 
+/* ---------- v1-hardening helpers ---------- */
+// Token hợp lệ VÀ mã NV trong token trùng mã NV của thao tác (không thao tác hộ người khác).
+function requireSelf_(token, empCode) {
+  var auth = verifySessionToken_(token);
+  if (!auth.valid) return { ok: false, authError: true, message: auth.message };
+  if (String(auth.payload.uid || '').toUpperCase() !== String(empCode || '').toUpperCase()) {
+    return { ok: false, authError: true, message: 'Phiên đăng nhập không khớp mã nhân viên của thao tác này. Vui lòng đăng nhập lại.' };
+  }
+  return { ok: true, payload: auth.payload };
+}
+
+// Mã các slot không còn Available của 1 chương trình, từ mảng Products đã đọc sẵn (12 cột)
+function takenCodesFrom_(prodData, programId) {
+  var out = [];
+  var pid = String(programId || '').toUpperCase();
+  for (var r = 0; r < prodData.length; r++) {
+    if (String(prodData[r][PROD_COL.PROG - 1]).trim().toUpperCase() !== pid) continue;
+    if (String(prodData[r][PROD_COL.STATUS - 1]).trim() !== 'Available') out.push(String(prodData[r][PROD_COL.CODE - 1]).trim());
+  }
+  return out;
+}
+
+// Đọc sheet Programs 1 lần: các chương trình PM này sở hữu (ADMIN: tất cả).
+// Dùng thay isProgramOwnedByPM_() trong vòng lặp để không đọc sheet nhiều lần khi đang giữ khóa.
+function ownedPrograms_(pmId) {
+  var uid = String(pmId || '').toUpperCase();
+  var out = { all: uid === 'ADMIN', ids: {} };
+  var sh = book_().getSheetByName(SHEET_PROGRAMS);
+  if (!sh || sh.getLastRow() < 2) return out;
+  var v = sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues();
+  for (var i = 0; i < v.length; i++) {
+    if (String(v[i][2]).trim().toUpperCase() === uid) out.ids[String(v[i][0]).trim().toUpperCase()] = true;
+  }
+  return out;
+}
+
+function ownsProgram_(owned, programId) {
+  return owned.all || !!owned.ids[String(programId || '').trim().toUpperCase()];
+}
+
 /* ---------- P3: Product Registration (Liberated Lock < 250ms, FCFS peak safe) ---------- */
 function register_product_(d) {
   // Validate required fields
@@ -731,6 +817,9 @@ function register_product_(d) {
   if (!uniqueCode || !empCode || !empName || !programId) {
     return { ok: false, message: 'Thiếu thông tin đăng ký.' };
   }
+  // v1-hardening (V1-07): chỉ chính người đã đăng nhập mới giữ chỗ được cho mình
+  var regAuth = requireSelf_(d.token, empCode);
+  if (!regAuth.ok) return regAuth;
 
   // Pre-check program status and quota from Programs sheet before acquiring lock
   var progSheet = book_().getSheetByName(SHEET_PROGRAMS);
@@ -786,7 +875,9 @@ function register_product_(d) {
           if (emp === empCode) {
             return { ok: true, message: 'Bạn đã đăng ký sản phẩm này rồi.', repeat: true };
           }
-          return { ok: false, message: 'Sản phẩm ' + uniqueCode + ' đã có người đăng ký trước. Vui lòng chọn sản phẩm khác.' };
+          // v1-hardening (C6): trả kèm danh sách slot đã hết để màn hình cập nhật ngay, không tốn thêm request
+          return { ok: false, slotTaken: true, taken: takenCodesFrom_(data, programId),
+                   message: 'Sản phẩm ' + uniqueCode + ' đã có người đăng ký trước. Vui lòng chọn sản phẩm khác.' };
         }
         targetRow = r;
       }
@@ -947,6 +1038,8 @@ function pm_dashboard_(d) {
   return { ok: true, registrations: out };
 }
 
+// v1-hardening (V1-10): mọi thao tác đọc-sửa-ghi sheet Registrations của PM / watchdog chạy trong cùng
+// LockService với đăng ký & nộp tiền, để không ghi đè lẫn nhau. Email và nhật ký chạy SAU khi nhả khóa.
 function pm_approve_payment_(d) {
   var authCheck = verifySessionToken_(d.token, 'PM');
   if (!authCheck.valid) return { ok: false, message: authCheck.message };
@@ -958,45 +1051,53 @@ function pm_approve_payment_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var n = regSheet.getLastRow() - 1;
-  if (n <= 0) return { ok: false, message: 'Không tìm thấy đơn đăng ký.' };
+  var owned = ownedPrograms_(authCheck.payload.uid);
+  var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
+  var nowStr = fmt_(new Date());
+  var hit = null;
 
-  var data = regSheet.getRange(2, 1, n, 22).getValues();
-  for (var r = 0; r < n; r++) {
-    var curSlot = String(data[r][C.SLOT - 1]).trim();
-    var curId = 'REG-' + (r + 1);
-    if ((slotId && curSlot === slotId) || (regId && curId === regId)) {
-      var pId = String(data[r][C.CAMPAIGN - 1]).trim();
-      if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) {
-        return { ok: false, message: 'Từ chối: Bạn không có quyền phê duyệt đơn hàng thuộc chương trình của PM khác.' };
-      }
-      var rowNum = r + 2;
-      var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
-      var nowStr = fmt_(new Date());
-
-      regSheet.getRange(rowNum, C.STATUS).setValue('Đã duyệt thanh toán');
-      regSheet.getRange(rowNum, C.PM_BY).setValue(pmName);
-      regSheet.getRange(rowNum, C.PM_DATE).setValue(nowStr);
-
-      // Trigger P7 Email Notification: PAYMENT_APPROVED
-      var empCode = String(data[r][C.EMP_CODE - 1]).trim();
-      var empName = String(data[r][C.EMP_NAME - 1]).trim();
-      var empEmail = findUserEmail_(empCode);
-      try {
-        sendEmailNotification_('PAYMENT_APPROVED', empName, empCode, empEmail, {
-          slotId: curSlot,
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var n = regSheet.getLastRow() - 1;
+    if (n <= 0) return { ok: false, message: 'Không tìm thấy đơn đăng ký.' };
+    var data = regSheet.getRange(2, 1, n, 22).getValues();
+    for (var r = 0; r < n; r++) {
+      var curSlot = String(data[r][C.SLOT - 1]).trim();
+      var curId = 'REG-' + (r + 1);
+      if ((slotId && curSlot === slotId) || (regId && curId === regId)) {
+        var pId = String(data[r][C.CAMPAIGN - 1]).trim();
+        if (!ownsProgram_(owned, pId)) {
+          return { ok: false, message: 'Từ chối: Bạn không có quyền phê duyệt đơn hàng thuộc chương trình của PM khác.' };
+        }
+        var rowNum = r + 2;
+        regSheet.getRange(rowNum, C.STATUS).setValue('Đã duyệt thanh toán');
+        regSheet.getRange(rowNum, C.PM_BY).setValue(pmName);
+        regSheet.getRange(rowNum, C.PM_DATE).setValue(nowStr);
+        SpreadsheetApp.flush();
+        hit = {
+          slot: curSlot,
+          empCode: String(data[r][C.EMP_CODE - 1]).trim(),
+          empName: String(data[r][C.EMP_NAME - 1]).trim(),
           model: String(data[r][C.MODEL - 1]).trim(),
-          kho: String(data[r][C.KHO - 1]).trim(),
-          pmName: pmName
-        });
-      } catch (eEmail) {}
-
-      try { log_('PM_PAYMENT_APPROVE', authCheck.payload.uid, curSlot, '', 'pm=' + pmName); } catch (e) {}
-      return { ok: true, message: 'Đã phê duyệt thanh toán cho đơn ' + curSlot + '.' };
+          kho: String(data[r][C.KHO - 1]).trim()
+        };
+        break;
+      }
     }
+  } finally {
+    lock.releaseLock();
   }
+  if (!hit) return { ok: false, message: 'Không tìm thấy đơn đăng ký cần duyệt.' };
 
-  return { ok: false, message: 'Không tìm thấy đơn đăng ký cần duyệt.' };
+  // Trigger P7 Email Notification: PAYMENT_APPROVED
+  try {
+    sendEmailNotification_('PAYMENT_APPROVED', hit.empName, hit.empCode, findUserEmail_(hit.empCode), {
+      slotId: hit.slot, model: hit.model, kho: hit.kho, pmName: pmName
+    });
+  } catch (eEmail) {}
+  try { log_('PM_PAYMENT_APPROVE', authCheck.payload.uid, hit.slot, '', 'pm=' + pmName); } catch (e) {}
+  return { ok: true, message: 'Đã phê duyệt thanh toán cho đơn ' + hit.slot + '.' };
 }
 
 // PM Batch Approve Payments (CONC-02 Single Range Batch Update)
@@ -1006,64 +1107,63 @@ function pm_batch_approve_payment_(d) {
 
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
-  var n = regSheet.getLastRow() - 1;
-  if (n <= 0) return { ok: true, count: 0, message: 'Không có đơn nào cần duyệt.' };
 
   var regIds = d.regIds || []; // array of 'REG-X' or slotIds
   var programId = str_(d.programId);
   var pmName = authCheck.payload.name || str_(d.userName) || 'PM Quản trị';
   var nowStr = fmt_(new Date());
-
-  var data = regSheet.getRange(2, 1, n, 22).getValues();
+  var owned = ownedPrograms_(authCheck.payload.uid);
   var updated = 0;
   var rowsToEmail = [];
 
-  for (var r = 0; r < n; r++) {
-    var pId = String(data[r][C.CAMPAIGN - 1]).trim();
-    if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
-    if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) continue;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var n = regSheet.getLastRow() - 1;
+    if (n <= 0) return { ok: true, count: 0, message: 'Không có đơn nào cần duyệt.' };
+    var data = regSheet.getRange(2, 1, n, 22).getValues();
 
-    var curSlot = String(data[r][C.SLOT - 1]).trim();
-    var curId = 'REG-' + (r + 1);
+    for (var r = 0; r < n; r++) {
+      var pId = String(data[r][C.CAMPAIGN - 1]).trim();
+      if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
+      if (!ownsProgram_(owned, pId)) continue;
 
-    if (regIds.length > 0 && regIds.indexOf(curId) === -1 && regIds.indexOf(curSlot) === -1) {
-      continue;
-    }
+      var curSlot = String(data[r][C.SLOT - 1]).trim();
+      var curId = 'REG-' + (r + 1);
+      if (regIds.length > 0 && regIds.indexOf(curId) === -1 && regIds.indexOf(curSlot) === -1) continue;
 
-    var curStatus = String(data[r][C.STATUS - 1]).trim();
-    if (curStatus === STATUS_PAID || curStatus === 'Đã khai nộp - chờ đối soát') {
-      data[r][C.STATUS - 1] = 'Đã duyệt thanh toán';
-      data[r][C.PM_BY - 1] = pmName;
-      data[r][C.PM_DATE - 1] = nowStr;
-      updated++;
-
-      rowsToEmail.push({
-        empCode: String(data[r][C.EMP_CODE - 1]).trim(),
-        empName: String(data[r][C.EMP_NAME - 1]).trim(),
-        slotId: curSlot,
-        model: String(data[r][C.MODEL - 1]).trim(),
-        kho: String(data[r][C.KHO - 1]).trim()
-      });
-    }
-  }
-
-  if (updated > 0) {
-    // Single atomic batch write to Google Sheet
-    regSheet.getRange(2, 1, n, 22).setValues(data);
-    SpreadsheetApp.flush();
-
-    // Send emails after sheet write
-    for (var i = 0; i < rowsToEmail.length; i++) {
-      var it = rowsToEmail[i];
-      try {
-        var empEmail = findUserEmail_(it.empCode);
-        sendEmailNotification_('PAYMENT_APPROVED', it.empName, it.empCode, empEmail, {
-          slotId: it.slotId, model: it.model, kho: it.kho, pmName: pmName
+      var curStatus = String(data[r][C.STATUS - 1]).trim();
+      if (curStatus === STATUS_PAID || curStatus === 'Đã khai nộp - chờ đối soát') {
+        data[r][C.STATUS - 1] = 'Đã duyệt thanh toán';
+        data[r][C.PM_BY - 1] = pmName;
+        data[r][C.PM_DATE - 1] = nowStr;
+        updated++;
+        rowsToEmail.push({
+          empCode: String(data[r][C.EMP_CODE - 1]).trim(),
+          empName: String(data[r][C.EMP_NAME - 1]).trim(),
+          slotId: curSlot,
+          model: String(data[r][C.MODEL - 1]).trim(),
+          kho: String(data[r][C.KHO - 1]).trim()
         });
-      } catch (eEmail) {}
+      }
     }
-    try { log_('PM_BATCH_APPROVE', authCheck.payload.uid, '', '', 'count=' + updated + ' pm=' + pmName); } catch (e) {}
+    if (updated > 0) {
+      regSheet.getRange(2, 1, n, 22).setValues(data); // ghi 1 lần, trong khóa
+      SpreadsheetApp.flush();
+    }
+  } finally {
+    lock.releaseLock();
   }
+
+  for (var i = 0; i < rowsToEmail.length; i++) {
+    var it = rowsToEmail[i];
+    try {
+      sendEmailNotification_('PAYMENT_APPROVED', it.empName, it.empCode, findUserEmail_(it.empCode), {
+        slotId: it.slotId, model: it.model, kho: it.kho, pmName: pmName
+      });
+    } catch (eEmail) {}
+  }
+  if (updated > 0) { try { log_('PM_BATCH_APPROVE', authCheck.payload.uid, '', '', 'count=' + updated + ' pm=' + pmName); } catch (e) {} }
 
   return { ok: true, count: updated, message: 'Đã duyệt thanh toán hàng loạt thành công cho ' + updated + ' đơn hàng.' };
 }
@@ -1080,66 +1180,75 @@ function pm_reject_payment_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var n = regSheet.getLastRow() - 1;
-  if (n <= 0) return { ok: false, message: 'Không tìm thấy đơn đăng ký.' };
+  var owned = ownedPrograms_(authCheck.payload.uid);
+  var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
+  var nowStr = fmt_(new Date());
+  var hit = null;
+  var denied = false;
 
-  var data = regSheet.getRange(2, 1, n, 22).getValues();
-  var targetSlot = slotId;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var n = regSheet.getLastRow() - 1;
+    if (n <= 0) return { ok: false, message: 'Không tìm thấy đơn đăng ký.' };
+    var data = regSheet.getRange(2, 1, n, 22).getValues();
 
-  for (var r = 0; r < n; r++) {
-    var curSlot = String(data[r][C.SLOT - 1]).trim();
-    var curId = 'REG-' + (r + 1);
-    if ((slotId && curSlot === slotId) || (regId && curId === regId)) {
-      var pId = String(data[r][C.CAMPAIGN - 1]).trim();
-      if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) {
-        return { ok: false, message: 'Từ chối: Bạn không có quyền từ chối đơn hàng thuộc chương trình của PM khác.' };
+    for (var r = 0; r < n; r++) {
+      var curSlot = String(data[r][C.SLOT - 1]).trim();
+      var curId = 'REG-' + (r + 1);
+      if ((slotId && curSlot === slotId) || (regId && curId === regId)) {
+        var pId = String(data[r][C.CAMPAIGN - 1]).trim();
+        if (!ownsProgram_(owned, pId)) { denied = true; break; }
+        var rowNum = r + 2;
+        regSheet.getRange(rowNum, C.STATUS).setValue('Từ chối');
+        regSheet.getRange(rowNum, C.PM_BY).setValue(pmName);
+        regSheet.getRange(rowNum, C.PM_DATE).setValue(nowStr);
+        regSheet.getRange(rowNum, C.NOTE).setValue(reason);
+        hit = {
+          slot: curSlot,
+          programId: pId,
+          empCode: String(data[r][C.EMP_CODE - 1]).trim(),
+          empName: String(data[r][C.EMP_NAME - 1]).trim()
+        };
+        break;
       }
-      var rowNum = r + 2;
-      targetSlot = curSlot;
-      var pmName = authCheck.payload.name || str_(d.userName) || 'PM';
-      var nowStr = fmt_(new Date());
-
-      regSheet.getRange(rowNum, C.STATUS).setValue('Từ chối');
-      regSheet.getRange(rowNum, C.PM_BY).setValue(pmName);
-      regSheet.getRange(rowNum, C.PM_DATE).setValue(nowStr);
-      regSheet.getRange(rowNum, C.NOTE).setValue(reason);
-
-      // Trigger P7 Email Notification: PAYMENT_REJECTED
-      var empCode = String(data[r][C.EMP_CODE - 1]).trim();
-      var empName = String(data[r][C.EMP_NAME - 1]).trim();
-      var empEmail = findUserEmail_(empCode);
-      try {
-        sendEmailNotification_('PAYMENT_REJECTED', empName, empCode, empEmail, {
-          slotId: curSlot,
-          reason: reason
-        });
-      } catch (eEmail) {}
-      break;
     }
-  }
 
-  // Free the product in Products sheet
-  if (targetSlot) {
-    var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
-    if (prodSheet) {
-      var pn = prodSheet.getLastRow() - 1;
-      if (pn > 0) {
-        var pData = prodSheet.getRange(2, 1, pn, 12).getValues();
-        for (var pr = 0; pr < pn; pr++) {
-          if (String(pData[pr][PROD_COL.CODE - 1]).trim() === targetSlot) {
+    // v1-hardening (V1-11): chỉ mở lại slot của ĐÚNG đơn vừa từ chối (cùng chương trình, cùng người giữ)
+    if (hit) {
+      var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+      if (prodSheet && prodSheet.getLastRow() > 1) {
+        var pData = prodSheet.getRange(2, 1, prodSheet.getLastRow() - 1, 12).getValues();
+        for (var pr = 0; pr < pData.length; pr++) {
+          var pCode = String(pData[pr][PROD_COL.CODE - 1]).trim();
+          var pProg = String(pData[pr][PROD_COL.PROG - 1]).trim().toUpperCase();
+          var pEmp = String(pData[pr][PROD_COL.EMP - 1]).trim().toUpperCase();
+          if (pCode === hit.slot && pProg === hit.programId.toUpperCase() && pEmp === hit.empCode.toUpperCase()) {
             prodSheet.getRange(pr + 2, PROD_COL.STATUS).setValue('Available');
             prodSheet.getRange(pr + 2, PROD_COL.EMP).setValue('');
-            var pProg = String(pData[pr][PROD_COL.PROG - 1]).trim();
-            if (pProg) invalidateCache_('prod_' + pProg.toUpperCase());
             break;
           }
         }
       }
+      SpreadsheetApp.flush();
     }
+  } finally {
+    lock.releaseLock();
   }
 
-  try { log_('PM_PAYMENT_REJECT', authCheck.payload.uid, targetSlot, '', 'reason=' + reason); } catch (e) {}
-  return { ok: true, message: 'Đã từ chối đơn và mở lại slot ' + targetSlot + '.' };
+  if (denied) return { ok: false, message: 'Từ chối: Bạn không có quyền từ chối đơn hàng thuộc chương trình của PM khác.' };
+  if (!hit) return { ok: false, message: 'Không tìm thấy đơn đăng ký cần từ chối.' };
+
+  invalidateCache_('prod_' + hit.programId.toUpperCase());
+  // Trigger P7 Email Notification: PAYMENT_REJECTED
+  try {
+    sendEmailNotification_('PAYMENT_REJECTED', hit.empName, hit.empCode, findUserEmail_(hit.empCode), {
+      slotId: hit.slot,
+      reason: reason
+    });
+  } catch (eEmail) {}
+  try { log_('PM_PAYMENT_REJECT', authCheck.payload.uid, hit.slot, '', 'reason=' + reason); } catch (e) {}
+  return { ok: true, message: 'Đã từ chối đơn và mở lại slot ' + hit.slot + '.' };
 }
 
 /* ---------- PM: Allow Payment (Batch Range Update CONC-02) ---------- */
@@ -1152,61 +1261,60 @@ function pm_allow_payment_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var n = regSheet.getLastRow() - 1;
-  if (n <= 0) return { ok: true, count: 0, message: 'Không có đơn đăng ký nào.' };
-
-  var data = regSheet.getRange(2, 1, n, 22).getValues();
+  var owned = ownedPrograms_(authCheck.payload.uid);
   var pmName = authCheck.payload.name || str_(d.userName) || 'PM Quản trị';
   var nowStr = fmt_(new Date());
   var count = 0;
   var allowedOrders = [];
 
-  for (var r = 0; r < n; r++) {
-    var pId = String(data[r][C.CAMPAIGN - 1]).trim();
-    if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
-    if (!isProgramOwnedByPM_(pId, authCheck.payload.uid)) continue;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var n = regSheet.getLastRow() - 1;
+    if (n <= 0) return { ok: true, count: 0, message: 'Không có đơn đăng ký nào.' };
+    var data = regSheet.getRange(2, 1, n, 22).getValues();
+    var gateOpenIso = new Date().toISOString();
 
-    var curSlot = String(data[r][C.SLOT - 1]).trim();
-    var curRegId = 'REG-' + (r + 1);
-    if (regId && curRegId !== regId && curSlot !== regId) continue;
+    for (var r = 0; r < n; r++) {
+      var pId = String(data[r][C.CAMPAIGN - 1]).trim();
+      if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
+      if (!ownsProgram_(owned, pId)) continue;
 
-    var curStatus = String(data[r][C.STATUS - 1]).trim();
-    // Match orders awaiting payment gate
-    if (curStatus === STATUS_WAIT_GATE || curStatus === 'Đã đăng ký - Chờ mở thanh toán' || curStatus === 'Mới đăng ký') {
-      data[r][C.STATUS - 1] = STATUS_NEW; // 'Chờ nộp tiền'
-      var oldNote = String(data[r][C.NOTE - 1]).trim();
-      var gateOpenIso = new Date().toISOString();
-      data[r][C.NOTE - 1] = (oldNote ? oldNote + ' | ' : '') + 'GATE_OPEN:' + gateOpenIso + ' (PM ' + pmName + ' mở cổng thanh toán lúc ' + nowStr + ')';
+      var curSlot = String(data[r][C.SLOT - 1]).trim();
+      var curRegId = 'REG-' + (r + 1);
+      if (regId && curRegId !== regId && curSlot !== regId) continue;
 
-      var empCode = String(data[r][C.EMP_CODE - 1]).trim();
-      var empName = String(data[r][C.EMP_NAME - 1]).trim();
-      var empEmail = findUserEmail_(empCode);
-      var model = String(data[r][C.MODEL - 1]).trim();
-      var kho = String(data[r][C.KHO - 1]).trim();
-
-      allowedOrders.push({
-        slotId: curSlot,
-        empCode: empCode,
-        empName: empName,
-        email: empEmail,
-        model: model,
-        kho: kho
-      });
-      count++;
+      var curStatus = String(data[r][C.STATUS - 1]).trim();
+      // Match orders awaiting payment gate
+      if (curStatus === STATUS_WAIT_GATE || curStatus === 'Đã đăng ký - Chờ mở thanh toán' || curStatus === 'Mới đăng ký') {
+        data[r][C.STATUS - 1] = STATUS_NEW; // 'Chờ nộp tiền'
+        var oldNote = String(data[r][C.NOTE - 1]).trim();
+        data[r][C.NOTE - 1] = (oldNote ? oldNote + ' | ' : '') + 'GATE_OPEN:' + gateOpenIso + ' (PM ' + pmName + ' mở cổng thanh toán lúc ' + nowStr + ')';
+        allowedOrders.push({
+          slotId: curSlot,
+          empCode: String(data[r][C.EMP_CODE - 1]).trim(),
+          empName: String(data[r][C.EMP_NAME - 1]).trim(),
+          model: String(data[r][C.MODEL - 1]).trim(),
+          kho: String(data[r][C.KHO - 1]).trim()
+        });
+        count++;
+      }
     }
+
+    // Single batch range write back to sheet (trong khóa)
+    if (count > 0) {
+      regSheet.getRange(2, 1, n, 22).setValues(data);
+      SpreadsheetApp.flush();
+    }
+  } finally {
+    lock.releaseLock();
   }
 
-  // Single batch range write back to sheet
-  if (count > 0) {
-    regSheet.getRange(2, 1, n, 22).setValues(data);
-    SpreadsheetApp.flush();
-  }
-
-  // Send PAYMENT_GATE_OPENED email to each employee outside sheet write
+  // Send PAYMENT_GATE_OPENED email to each employee outside the lock
   for (var i = 0; i < allowedOrders.length; i++) {
     var ord = allowedOrders[i];
     try {
-      sendEmailNotification_('PAYMENT_GATE_OPENED', ord.empName, ord.empCode, ord.email, {
+      sendEmailNotification_('PAYMENT_GATE_OPENED', ord.empName, ord.empCode, findUserEmail_(ord.empCode), {
         slotId: ord.slotId,
         model: ord.model,
         kho: ord.kho,
@@ -1237,10 +1345,6 @@ function check_expired_slots_(d) {
   var regSheet = book_().getSheetByName(SHEET_REG);
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
-  var n = regSheet.getLastRow() - 1;
-  if (n <= 0) return { ok: true, releasedCount: 0, warnedCount: 0, message: 'Không có đơn đăng ký nào.' };
-
-  var data = regSheet.getRange(2, 1, n, 22).getValues();
   var now = new Date().getTime();
   var TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
   var TWENTY_TWO_HOURS_MS = 22 * 60 * 60 * 1000;
@@ -1248,99 +1352,106 @@ function check_expired_slots_(d) {
   var releasedCount = 0;
   var warnedCount = 0;
   var releasedSlots = [];
+  var releasedKeys = {};      // 'PROG|SLOT|EMP' -> true: chỉ trả đúng slot của đơn hết hạn
   var affectedPrograms = {};
+  var notices = [];           // email + nhật ký, gửi sau khi nhả khóa
 
-  for (var r = 0; r < n; r++) {
-    var status = String(data[r][C.STATUS - 1]).trim();
-    // Only check orders where PM has opened payment gate (Chờ nộp tiền)
-    if (status !== STATUS_NEW && status !== 'Chờ nộp tiền') continue;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) {
+    return { ok: false, busy: true, message: 'Hệ thống đang bận, lượt quét sẽ chạy lại ở lần kích hoạt sau.' };
+  }
+  try {
+    var n = regSheet.getLastRow() - 1;
+    if (n <= 0) return { ok: true, releasedCount: 0, warnedCount: 0, message: 'Không có đơn đăng ký nào.' };
+    // Đọc trong khóa: nếu nhân viên vừa khai nộp tiền, trạng thái đã đổi và đơn không bị hủy nhầm
+    var data = regSheet.getRange(2, 1, n, 22).getValues();
 
-    var rawTs = data[r][0];
-    var regDate = rawTs instanceof Date ? rawTs : new Date(rawTs);
-    var curNote = String(data[r][C.NOTE - 1]).trim();
+    for (var r = 0; r < n; r++) {
+      var status = String(data[r][C.STATUS - 1]).trim();
+      // Only check orders where PM has opened payment gate (Chờ nộp tiền)
+      if (status !== STATUS_NEW && status !== 'Chờ nộp tiền') continue;
 
-    // SPRINT P8: Bắt buộc đếm 24h từ thời điểm PM mở cổng thanh toán (GATE_OPEN) thay vì lúc đăng ký ban đầu
-    var gateMatch = curNote.match(/GATE_OPEN:([^\s|\)]+)/);
-    var baseDate = regDate;
-    if (gateMatch && gateMatch[1]) {
-      var parsedGate = new Date(gateMatch[1]);
-      if (!isNaN(parsedGate.getTime())) baseDate = parsedGate;
-    } else {
-      var vnMatch = curNote.match(/mở cổng thanh toán lúc (\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
-      if (vnMatch) {
-        var parsedVn = new Date(vnMatch[3] + '-' + vnMatch[2] + '-' + vnMatch[1] + 'T' + vnMatch[4] + ':' + vnMatch[5] + ':' + vnMatch[6]);
-        if (!isNaN(parsedVn.getTime())) baseDate = parsedVn;
+      var rawTs = data[r][0];
+      var regDate = rawTs instanceof Date ? rawTs : new Date(rawTs);
+      var curNote = String(data[r][C.NOTE - 1]).trim();
+
+      // SPRINT P8: Bắt buộc đếm 24h từ thời điểm PM mở cổng thanh toán (GATE_OPEN) thay vì lúc đăng ký ban đầu
+      var gateMatch = curNote.match(/GATE_OPEN:([^\s|\)]+)/);
+      var baseDate = regDate;
+      if (gateMatch && gateMatch[1]) {
+        var parsedGate = new Date(gateMatch[1]);
+        if (!isNaN(parsedGate.getTime())) baseDate = parsedGate;
+      } else {
+        var vnMatch = curNote.match(/mở cổng thanh toán lúc (\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
+        if (vnMatch) {
+          var parsedVn = new Date(vnMatch[3] + '-' + vnMatch[2] + '-' + vnMatch[1] + 'T' + vnMatch[4] + ':' + vnMatch[5] + ':' + vnMatch[6]);
+          if (!isNaN(parsedVn.getTime())) baseDate = parsedVn;
+        }
+      }
+      if (isNaN(baseDate.getTime())) continue;
+
+      var diffMs = now - baseDate.getTime();
+      var curSlot = String(data[r][C.SLOT - 1]).trim();
+      var empCode = String(data[r][C.EMP_CODE - 1]).trim();
+      var empName = String(data[r][C.EMP_NAME - 1]).trim();
+      var pProg = String(data[r][C.CAMPAIGN - 1]).trim();
+      var model = String(data[r][C.MODEL - 1]).trim();
+      var rowNum = r + 2;
+
+      if (diffMs >= TWENTY_FOUR_HOURS_MS) {
+        // 1. Release expired slot (>24h)
+        regSheet.getRange(rowNum, C.STATUS).setValue('Hết hạn giữ chỗ');
+        regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'Tự động giải phóng quá hạn 24h');
+        releasedSlots.push(curSlot);
+        releasedKeys[pProg.toUpperCase() + '|' + curSlot + '|' + empCode.toUpperCase()] = true;
+        if (pProg) affectedPrograms[pProg.toUpperCase()] = true;
+        releasedCount++;
+        notices.push({ type: 'EXPIRATION_ALERT', empName: empName, empCode: empCode, slot: curSlot, model: model,
+                       log: ['AUTO_RELEASE_EXPIRED', 'Quá hạn 24h (' + Math.round(diffMs / 3600000) + 'h)'] });
+      } else if (diffMs >= TWENTY_TWO_HOURS_MS && curNote.indexOf('WARNED_22H') === -1) {
+        // 2. Warn employee if 22h - 24h
+        regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'WARNED_22H');
+        warnedCount++;
+        notices.push({ type: 'EXPIRATION_WARNING', empName: empName, empCode: empCode, slot: curSlot, model: model,
+                       regTime: fmt_(regDate), log: ['WARN_EXPIRE_22H', 'Cảnh báo 22h (' + Math.round(diffMs / 3600000) + 'h)'] });
       }
     }
-    if (isNaN(baseDate.getTime())) continue;
 
-    var diffMs = now - baseDate.getTime();
-    var curSlot = String(data[r][C.SLOT - 1]).trim();
-    var empCode = String(data[r][C.EMP_CODE - 1]).trim();
-    var empName = String(data[r][C.EMP_NAME - 1]).trim();
-    var empEmail = findUserEmail_(empCode);
-    var pProg = String(data[r][C.CAMPAIGN - 1]).trim();
-    var model = String(data[r][C.MODEL - 1]).trim();
-
-    if (diffMs >= TWENTY_FOUR_HOURS_MS) {
-      // 1. Release expired slot (>24h)
-      var rowNum = r + 2;
-      regSheet.getRange(rowNum, C.STATUS).setValue('Hết hạn giữ chỗ');
-      regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'Tự động giải phóng quá hạn 24h');
-      
-      releasedSlots.push(curSlot);
-      if (pProg) affectedPrograms[pProg.toUpperCase()] = true;
-      releasedCount++;
-
-      // Send EXPIRATION_ALERT email
-      try {
-        sendEmailNotification_('EXPIRATION_ALERT', empName, empCode, empEmail, {
-          slotId: curSlot,
-          model: model
-        });
-      } catch (eEmail) {}
-
-      try { log_('AUTO_RELEASE_EXPIRED', empCode, curSlot, '', 'Quá hạn 24h (' + Math.round(diffMs / 3600000) + 'h)'); } catch (e) {}
-    } else if (diffMs >= TWENTY_TWO_HOURS_MS && curNote.indexOf('WARNED_22H') === -1) {
-      // 2. Warn employee if 22h - 24h
-      var rowNum = r + 2;
-      regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'WARNED_22H');
-      warnedCount++;
-
-      // Send EXPIRATION_WARNING email
-      try {
-        sendEmailNotification_('EXPIRATION_WARNING', empName, empCode, empEmail, {
-          slotId: curSlot,
-          model: model,
-          regTime: fmt_(regDate)
-        });
-      } catch (eWarn) {}
-
-      try { log_('WARN_EXPIRE_22H', empCode, curSlot, '', 'Cảnh báo 22h (' + Math.round(diffMs / 3600000) + 'h)'); } catch (e) {}
-    }
-  }
-
-  // Release slots in Products sheet
-  if (releasedSlots.length > 0) {
-    var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
-    if (prodSheet) {
-      var pn = prodSheet.getLastRow() - 1;
-      if (pn > 0) {
-        var pData = prodSheet.getRange(2, 1, pn, 12).getValues();
-        for (var pr = 0; pr < pn; pr++) {
-          var pCode = String(pData[pr][PROD_COL.CODE - 1]).trim();
-          if (releasedSlots.indexOf(pCode) >= 0) {
+    // Release slots in Products sheet — chỉ dòng khớp cả chương trình, mã slot và người giữ
+    if (releasedSlots.length > 0) {
+      var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+      if (prodSheet && prodSheet.getLastRow() > 1) {
+        var pData = prodSheet.getRange(2, 1, prodSheet.getLastRow() - 1, 12).getValues();
+        for (var pr = 0; pr < pData.length; pr++) {
+          var key = String(pData[pr][PROD_COL.PROG - 1]).trim().toUpperCase() + '|' +
+                    String(pData[pr][PROD_COL.CODE - 1]).trim() + '|' +
+                    String(pData[pr][PROD_COL.EMP - 1]).trim().toUpperCase();
+          if (releasedKeys[key]) {
             prodSheet.getRange(pr + 2, PROD_COL.STATUS).setValue('Available');
             prodSheet.getRange(pr + 2, PROD_COL.EMP).setValue('');
           }
         }
       }
     }
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
 
-    // Invalidate caches for affected programs
-    for (var progKey in affectedPrograms) {
-      invalidateCache_('prod_' + progKey);
-    }
+  // Invalidate caches for affected programs
+  for (var progKey in affectedPrograms) {
+    invalidateCache_('prod_' + progKey);
+  }
+
+  // Email + nhật ký sau khi nhả khóa
+  for (var k = 0; k < notices.length; k++) {
+    var nt = notices[k];
+    try {
+      var details = { slotId: nt.slot, model: nt.model };
+      if (nt.regTime) details.regTime = nt.regTime;
+      sendEmailNotification_(nt.type, nt.empName, nt.empCode, findUserEmail_(nt.empCode), details);
+    } catch (eEmail) {}
+    try { log_(nt.log[0], nt.empCode, nt.slot, '', nt.log[1]); } catch (e) {}
   }
 
   return {
@@ -1480,6 +1591,9 @@ function register_(d) {
   if (d.agree !== true) return { ok: false, message: 'Chưa xác nhận cam kết Jeong-Do.' };
 
   var slotId = str_(d.slotId), empCode = str_(d.empCode).toUpperCase();
+  // v1-hardening (V1-07): form đăng ký cũ cũng phải là chính người đăng nhập
+  var legacyAuth = requireSelf_(d.token, empCode);
+  if (!legacyAuth.ok) return legacyAuth;
   var cfg = config_();
   var warnings = [], notes = [];
 
@@ -1567,6 +1681,9 @@ function payment_(d) {
   if (!slotId || !empCode || !payerName || !bankTxn) {
     return { ok: false, message: 'Thiếu thông tin nộp tiền bắt buộc (Mã Slot, Mã NV, Tên người nộp, Mã GD).' };
   }
+  // v1-hardening (V1-07): chỉ chủ đơn (đã đăng nhập) mới khai nộp tiền cho đơn của mình
+  var payAuth = requireSelf_(d.token, empCode);
+  if (!payAuth.ok) return payAuth;
 
   var reg = book_().getSheetByName(SHEET_REG);
   if (!reg) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
@@ -1701,6 +1818,7 @@ function lookup_(d) {
     var empName = str_(v[r][C.EMP_NAME - 1]);
     out.push({
       time: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0]),
+      programId: str_(v[r][C.CAMPAIGN - 1]), // v1-hardening (V1-02): ô "03 Đơn hàng của bạn" lọc theo chương trình
       slot: curSlot, kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
       empCode: empCode,
       empName: empName,
@@ -1718,6 +1836,97 @@ function lookup_(d) {
     return { ok: false, message: 'Không tìm thấy đơn khớp Mã NV và 4 số cuối điện thoại này.' };
   }
   return { ok: true, orders: out };
+}
+
+/* ---------- v1-hardening (V1-08): Nhân viên tự hủy giữ chỗ ----------
+ * Quy tắc đã duyệt 05/10/2026: chỉ hủy được khi đơn đang "Đã đăng ký - Chờ mở thanh toán" hoặc
+ * "Chờ nộp tiền" và CHƯA khai nộp tiền. Đã khai nộp → liên hệ PM (tránh phát sinh hoàn tiền).
+ */
+function user_cancel_registration_(d) {
+  var auth = verifySessionToken_(d.token);
+  if (!auth.valid) return { ok: false, authError: true, message: auth.message };
+  var empCode = String(auth.payload.uid || '').toUpperCase();
+  if (str_(d.userId) && str_(d.userId).toUpperCase() !== empCode) {
+    return { ok: false, authError: true, message: 'Không thể hủy đơn của nhân viên khác.' };
+  }
+  var slotId = str_(d.slotId || d.regId);
+  if (!slotId) return { ok: false, message: 'Thiếu mã slot cần hủy.' };
+
+  var reg = book_().getSheetByName(SHEET_REG);
+  if (!reg) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
+
+  var programId = '';
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var found = findOrder_(reg, slotId, empCode);
+    if (!found) return { ok: false, message: 'Không tìm thấy đơn giữ chỗ ' + slotId + ' của bạn.' };
+    var cancellable = (found.status === STATUS_WAIT_GATE || found.status === STATUS_NEW) && !found.paid;
+    if (!cancellable) {
+      return { ok: false, message: 'Đơn ' + slotId + ' đang ở trạng thái "' + found.status + '" nên không thể tự hủy. Nếu bạn đã khai nộp tiền, vui lòng liên hệ PM phụ trách.' };
+    }
+    programId = str_(reg.getRange(found.rowNo, C.CAMPAIGN).getValue());
+    var oldNote = str_(reg.getRange(found.rowNo, C.NOTE).getValue());
+    reg.getRange(found.rowNo, C.STATUS).setValue(STATUS_USER_CANCEL);
+    reg.getRange(found.rowNo, C.NOTE).setValue((oldNote ? oldNote + ' | ' : '') + 'Nhân viên tự hủy giữ chỗ lúc ' + fmt_(new Date()));
+
+    // Trả slot về kho: đúng chương trình, đúng mã slot, đúng người đang giữ
+    var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+    if (prodSheet && prodSheet.getLastRow() > 1) {
+      var pData = prodSheet.getRange(2, 1, prodSheet.getLastRow() - 1, 12).getValues();
+      for (var i = 0; i < pData.length; i++) {
+        if (String(pData[i][PROD_COL.CODE - 1]).trim() === slotId &&
+            String(pData[i][PROD_COL.PROG - 1]).trim().toUpperCase() === programId.toUpperCase() &&
+            String(pData[i][PROD_COL.EMP - 1]).trim().toUpperCase() === empCode) {
+          prodSheet.getRange(i + 2, PROD_COL.STATUS, 1, 3).setValues([['Available', '', new Date().toISOString()]]);
+          break;
+        }
+      }
+    }
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
+
+  if (programId) invalidateCache_('prod_' + programId.toUpperCase());
+  try { log_('USER_CANCEL', empCode, slotId, d.userAgent, 'program=' + programId); } catch (e) {}
+  return { ok: true, message: 'Đã hủy giữ chỗ ' + slotId + '. Slot đã được trả về kho cho đồng nghiệp khác.' };
+}
+
+/* ---------- v1-hardening (K2): Công tắc bật/tắt email tự động ----------
+ * PM xem / đổi Config!ENABLE_AUTO_EMAIL ngay trên Bảng điều khiển PM, không cần mở Sheet.
+ * Gọi không kèm "enabled" = chỉ đọc. Mọi lần đổi đều ghi ActivityLog (ai, lúc nào, bật hay tắt).
+ */
+function email_setting_(d) {
+  var auth = verifySessionToken_(d.token, 'PM');
+  if (!auth.valid) return { ok: false, authError: true, message: auth.message };
+
+  var remaining = null;
+  try { remaining = MailApp.getRemainingDailyQuota(); } catch (eQ) {}
+
+  if (d.enabled === undefined || d.enabled === null || d.enabled === '') {
+    var cur = String(config_()['ENABLE_AUTO_EMAIL'] || '').toLowerCase() === 'true';
+    return { ok: true, enabled: cur, remainingDailyQuota: remaining };
+  }
+
+  var val = d.enabled === true || String(d.enabled).toLowerCase() === 'true';
+  var sh = book_().getSheetByName(SHEET_CONFIG);
+  if (!sh) return { ok: false, message: 'Sheet Config không tồn tại.' };
+  var n = sh.getLastRow();
+  var keys = n > 0 ? sh.getRange(1, 1, n, 1).getValues() : [];
+  var row = -1;
+  for (var i = 0; i < keys.length; i++) {
+    if (String(keys[i][0]).trim() === 'ENABLE_AUTO_EMAIL') { row = i + 1; break; }
+  }
+  if (row > 0) sh.getRange(row, 2).setValue(val ? 'true' : 'false');
+  else sh.appendRow(['ENABLE_AUTO_EMAIL', val ? 'true' : 'false', 'Bật/tắt gửi email tự động qua MailApp (true / false)']);
+  try { CacheService.getScriptCache().remove('cfg'); } catch (eC) {} // có hiệu lực ngay, không chờ cache 5 phút
+
+  try { log_('EMAIL_SETTING', auth.payload.uid, '', d.userAgent, 'ENABLE_AUTO_EMAIL=' + val + ' bởi ' + (auth.payload.name || auth.payload.uid)); } catch (e) {}
+  return {
+    ok: true, enabled: val, remainingDailyQuota: remaining,
+    message: val ? 'Đã BẬT gửi email tự động.' : 'Đã TẮT gửi email tự động. Hệ thống chỉ ghi nhật ký vào sheet AutoEmail.'
+  };
 }
 
 /* ---------- Bộ nhớ đệm Config / Slots ---------- */
@@ -1864,6 +2073,19 @@ function setupNewDatabase() {
   } catch (e) {}
   
   var isNew = false;
+  // v1-hardening (V1-12): KHÔNG BAO GIỜ chạy đè lên Sheet đang có dữ liệu (hàm formatHeader bên dưới gọi sheet.clear()).
+  if (ss) {
+    var guarded = [SHEET_REG, SHEET_USERS, SHEET_PROGRAMS, SHEET_PRODUCTS];
+    for (var g = 0; g < guarded.length; g++) {
+      var gs = ss.getSheetByName(guarded[g]);
+      if (gs && gs.getLastRow() > 1) {
+        var stopMsg = 'DỪNG: Sheet "' + guarded[g] + '" đã có dữ liệu. setupNewDatabase() chỉ dùng để tạo CSDL MỚI, ' +
+          'chạy tiếp sẽ xóa sạch dữ liệu. Không có gì bị thay đổi. Xem docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md';
+        Logger.log(stopMsg);
+        return { ok: false, message: stopMsg };
+      }
+    }
+  }
   if (!ss) {
     var todayStr = Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd');
     ss = SpreadsheetApp.create('LG Internal Sales Database - ' + todayStr);
@@ -1921,7 +2143,8 @@ function setupNewDatabase() {
     configSheet.appendRow(['BANK_ACC', '0991000012525', 'Số tài khoản công ty']);
     configSheet.appendRow(['BANK_HOLDER', 'CONG TY TNHH LG ELECTRONICS VIET NAM HAI PHONG', 'Tên chủ tài khoản']);
     configSheet.appendRow(['SYS_STATUS', 'OPEN', 'Trạng thái toàn hệ thống']);
-    configSheet.appendRow(['ENABLE_AUTO_EMAIL', 'true', 'Bật/tắt gửi email tự động qua MailApp (true / false)']);
+    configSheet.appendRow(['ENABLE_AUTO_EMAIL', 'false', 'Bật/tắt gửi email tự động qua MailApp (true / false). Đổi nhanh bằng công tắc trên Bảng điều khiển PM']);
+    configSheet.appendRow(['ALLOW_DEMO_TOKENS', 'false', 'Chỉ bật (true) trên bản STAGING để thử bằng tài khoản demo. Bản chính thức: false']);
   }
   
   // 4. Sheet: ActivityLog
@@ -1982,7 +2205,7 @@ function setupNewDatabase() {
   Logger.log('----------------------------------------------------------------');
   Logger.log('👉 CÁC BƯỚC TIẾP THEO:');
   Logger.log('1. Copy mã SPREADSHEET_ID ở trên.');
-  Logger.log('2. Dán vào dòng 20 file Code.gs: var SPREADSHEET_ID = \'' + newId + '\';');
+  Logger.log('2. Project Settings > Script Properties: SPREADSHEET_ID = ' + newId + '  (hoặc dán vào dòng 21 file Code.gs)');
   Logger.log('3. Chọn "Deploy" (Triển khai) > "New deployment" > chọn "Web app".');
   Logger.log('   - Execute as: Me');
   Logger.log('   - Who has access: Anyone');

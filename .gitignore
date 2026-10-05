@@ -33,3 +33,9 @@ test-reports/
 # Dependencies
 node_modules/
 
+
+# Python bytecode (tests / scripts)
+__pycache__/
+
+# Bản production sinh tự động khi chạy test
+.portal_regression_test.html

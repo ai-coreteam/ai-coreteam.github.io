@@ -1,0 +1,42 @@
+# 04 — V1 Hardening (Gia cố bản v1 chính thức)
+
+Thư mục này lưu mọi thay đổi trong giai đoạn chuẩn bị go-live bản v1 (14/10/2026) và sau đó.
+
+## Quy tắc
+
+1. **Đề xuất trước, sửa sau.** Thay đổi chạm luồng Admin / PM / Nhân viên, hoặc chạm hàm trong Vùng Bất Khả Xâm Phạm (`03-architecture-and-analysis/IMPROVEMENT_PLAN_PROPOSAL.md` §3B), phải được chủ dự án duyệt.
+2. **Mỗi thay đổi đã làm** cập nhật: bảng *Nhật ký thay đổi* bên dưới, và hướng dẫn sử dụng liên quan trong `02-user-and-pm-guide/`.
+3. **Có test chạy code thật** cho mỗi lỗi được sửa (`tests/cloud_mode_regression.py` hoặc test staging).
+
+## Tài liệu
+
+| File | Nội dung | Dành cho |
+|---|---|---|
+| [`V1_HARDENING_CHANGE_PROPOSAL.md`](V1_HARDENING_CHANGE_PROPOSAL.md) | 22 phát hiện có bằng chứng, đo rủi ro polling, 5 gói thay đổi, tiêu chí go-live | Chủ dự án, kỹ sư |
+| [`V1_RELEASE_RUNBOOK.md`](V1_RELEASE_RUNBOOK.md) | Điểm khôi phục & cách quay lại, staging, trình tự triển khai, **công tắc email**, xử lý sự cố, lệnh kiểm thử | Admin / PIC, PM (mục 4) |
+| [`../02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](../02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) — Phần C | Những gì nhân viên & PM thấy khác đi trong bản v1 | Nhân viên, PM |
+
+## Vùng Bất Khả Xâm Phạm — ngoại lệ đã dùng (ghi minh bạch)
+
+| Hàm (No-Touch #) | Thay đổi | Lý do | Duyệt |
+|---|---|---|---|
+| `loadProducts` (#8) | Chờ 8 giây + thử lại 2 lần; tài khoản thật không rơi về dữ liệu demo | V1-03 | Gói A — 05/10 |
+| `handleRegisterProduct` (#1) | **Chỉ thêm 2 dòng gọi hàm**: làm mới ô 03 khi giữ chỗ thành công; áp danh sách slot đã hết khi bị từ chối. Logic giữ chỗ không đổi | V1-02, C6 | Gói A + C — 05/10 (phần này chưa ghi rõ trong bảng đề xuất, bổ sung tại đây) |
+
+## Nhật ký thay đổi
+
+| Ngày | ID | Thay đổi | Ảnh hưởng luồng | Trạng thái | Tài liệu đã cập nhật |
+|---|---|---|---|---|---|
+| 05/10/2026 | — | Lập đề xuất V1 Hardening | — | Chờ duyệt | Thư mục này |
+| 05/10/2026 | D | Thêm `tests/cloud_mode_regression.py` (baseline 3/7) | Không | Đã thêm | Thư mục này |
+| 05/10/2026 | C2 | Quy tắc hủy giữ chỗ: chỉ trước khi khai nộp tiền | Nhân viên | **Đã duyệt** (chưa code) | Đề xuất §5, §8 |
+| 05/10/2026 | D | Thêm `tests/polling_race_simulation.py` | Không | Đã thêm | Đề xuất §4 |
+| 05/10/2026 | — | Đề xuất bản 2: thêm V1-00 (nhân viên không có URL máy chủ), V1-19 (Sheet ai có link cũng sửa được), đo polling, Gói P | — | **Đã duyệt cả 5 gói** | Đề xuất |
+| 05/10/2026 | K1 | Sheet chính chuyển sang Restricted (chủ dự án tự làm) | Admin | Xong — đã xác minh quyền Drive | Runbook §1 |
+| 05/10/2026 | — | Điểm khôi phục: git tag `checkpoint-pre-v1-hardening-20261005`, nhánh `backup/pre-v1-hardening-20261005`, bản sao Sheet BACKUP + STAGING (riêng tư) | Không | Xong | Runbook §1–2 |
+| 05/10/2026 | B1–B4 | Máy chủ: bỏ chấp nhận token demo, khóa phiên ngẫu nhiên + `rotateSessionSecret()`, giữ chỗ/nộp tiền/hủy bắt buộc phiên chính chủ, từ chối đơn chỉ mở đúng slot | Admin (1 lệnh), mọi người đăng nhập lại 1 lần | Code xong, test 52/52 | Runbook §3; SETUP_APPS_SCRIPT |
+| 05/10/2026 | C1–C7 | Khóa khi ghi sheet; route hủy giữ chỗ; `setupNewDatabase` an toàn; cache chương trình; seed email TẮT; endpoint polling `taken`; duyệt hàng loạt chờ máy chủ | Nhân viên (hủy), PM (duyệt hàng loạt) | Code xong, test 52/52 + 25/25 | Guide Phần C |
+| 05/10/2026 | K2 | **Công tắc Email tự động BẬT/TẮT** trên Bảng điều khiển PM + action `email_setting` | PM, Admin | Code xong, test | Runbook §4; Guide C.2; SETUP_APPS_SCRIPT |
+| 05/10/2026 | A1–A4 | Danh mục, ô 02, ô 03 đúng dữ liệu máy chủ; không rơi về demo; panel "Đang kết nối máy chủ… / Thử lại"; sửa chữ "sau 2 giờ"; polling 10–12 giây | Nhân viên | Code xong, test 25/25 | Guide C.1 |
+| 05/10/2026 | P | `PORTAL_MODE` + `scripts/build_production.py` → `portal.html` không có dữ liệu demo; nút Hỗ trợ dùng bí danh chung thay tên/hotline mẫu | Nhân viên (link mới) | Code xong, test | Runbook §3 |
+| 05/10/2026 | D | `tests/backend_gas_harness.js`, `tests/staging_smoke_test.py`; mở rộng `cloud_mode_regression.py` (7 kịch bản) | Không | Xong (staging chờ deploy) | Runbook §6 |

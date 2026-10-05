@@ -115,7 +115,7 @@ sequenceDiagram
 * **Hủy giữ chỗ:** Nếu bạn đổi ý hoặc muốn chọn model khác:
   * Vào Thẻ 03 (*Đơn Hàng Của Bạn*).
   * Bấm nút **"Hủy giữ chỗ"**. Suất máy sẽ lập tức được trả về kho khả dụng cho đồng nghiệp khác và hạn mức 1 SP của bạn được hoàn lại.
-  * *(Lưu ý: Chỉ được hủy khi đơn hàng chưa được PM phê duyệt thanh toán).*
+  * *(Lưu ý — **cập nhật v1, 05/10/2026**: chỉ tự hủy được khi đơn đang **"Đã đăng ký - Chờ mở thanh toán"** hoặc **"Chờ nộp tiền"** và **chưa khai nộp tiền**. Đã khai nộp tiền thì liên hệ PM phụ trách để xử lý — tránh phát sinh hoàn tiền. Quy tắc cũ "chưa được PM phê duyệt" không còn áp dụng.)*
 
 ---
 
@@ -192,6 +192,31 @@ flowchart TD
    * File xuất ra chứa đầy đủ 22 trường thông tin: Mã đợt, Mã NV, Họ tên, Phòng ban, Model, Kho, Số tiền, Mã GD ngân hàng, Giờ nộp, Người phê duyệt, sẵn sàng nộp cho Giám đốc Tài chính và Kế toán kho LGEVH.
 
 ---
+
+## PHẦN C: CẬP NHẬT BẢN V1 CHÍNH THỨC (05/10/2026)
+
+> Chi tiết kỹ thuật và lý do: [`docs/04-v1-hardening/`](../04-v1-hardening/README.md). Phần này chỉ mô tả những gì người dùng **thấy và làm khác đi**.
+
+### C.1. Nhân viên
+
+| Tình huống | Bản v1 hoạt động thế nào |
+|---|---|
+| Vào hệ thống | Dùng **link chính thức** do PM/Admin gửi (`…/portal.html`). Đăng nhập bằng Mã NV + mật khẩu được cấp — **không cần cấu hình gì**. Bản chính thức không có tài khoản demo. |
+| Xem danh mục | Trạng thái "Còn trống / Đã có người giữ" lấy trực tiếp từ máy chủ và tự cập nhật khoảng **10–12 giây** một lần khi bạn đang ở Tab Danh mục. |
+| Bấm giữ chỗ nhưng vừa có người nhanh hơn | Hệ thống báo *"đã có người đăng ký trước"* và **cập nhật ngay** các slot đã hết trên màn hình. Không bao giờ có 2 người cùng giữ 1 slot — chọn sản phẩm khác. |
+| Ô "03 Đơn Hàng Của Bạn" | Hiện **đơn thật** của bạn từ máy chủ. Khi đơn đang chờ PM mở cổng, ô này tự kiểm tra lại mỗi 60 giây — khi PM mở cổng sẽ hiện **"CỔNG TT ĐÃ MỞ"** và nút **"Nộp tiền ngay"**. |
+| Hủy giữ chỗ | Có hiệu lực thật trên máy chủ, slot trả về kho cho đồng nghiệp ngay. Chỉ hủy được **trước khi khai nộp tiền** (xem Bước 4). |
+| Thấy "Đang kết nối máy chủ…" | Máy chủ Google đang chậm (thường vài phút đầu mở bán). Trang tự thử lại sau 15 giây, hoặc bấm **Thử lại ngay**. Nếu mạng công ty chặn, chuyển sang 4G/5G. Dữ liệu của bạn không bị mất. |
+| Báo "phiên đăng nhập không khớp / không hợp lệ" | Đăng xuất rồi đăng nhập lại. |
+
+### C.2. PM
+
+| Tình huống | Bản v1 hoạt động thế nào |
+|---|---|
+| Bật/tắt email tự động | Nút **"Email tự động [BẬT/TẮT]"** trên thanh nút Bảng Điều Khiển PM. Rê chuột để xem số email còn gửi được hôm nay (tài khoản hiện tại: tối đa 100/ngày). Hướng dẫn đầy đủ: [`V1_RELEASE_RUNBOOK.md` mục 4](../04-v1-hardening/V1_RELEASE_RUNBOOK.md). |
+| Duyệt hàng loạt | Hệ thống chờ máy chủ xác nhận rồi mới báo **"Máy chủ đã duyệt X / Y đơn"**, sau đó tự tải lại bảng. Nếu máy chủ lỗi: không đơn nào bị đánh dấu duyệt nhầm — bấm lại. |
+| Đơn nhân viên tự hủy | Hiện trạng thái **"Đã hủy bởi nhân viên"**, slot đã trả về kho. |
+| Tài khoản demo | Chỉ dùng trong **bản demo** để đào tạo. Không thao tác được trên máy chủ chính thức. |
 
 ## BẢNG TRA CỨU MÃ MÀU TRẠNG THÁI CHUẨN THƯƠNG HIỆU LG
 
