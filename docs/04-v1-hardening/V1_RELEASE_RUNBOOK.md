@@ -116,7 +116,9 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | Dữ liệu test | ✅ 4 chương trình test → `CLOSED`; nhân viên thấy 0 chương trình | Kiểm tra máy chủ |
 | Kiểm tra máy chủ chính thức (Claude, chỉ đọc) | ✅ **10/10**: 4/4 token giả bị từ chối (chứng minh Version 7 = code v1) · `VH12345/test123` bị từ chối · ADMIN đọc công tắc email (BẬT, còn 94 email) · PM bị chặn · PM không chọn chương trình chỉ thấy chương trình của mình | Không tạo đơn, không gửi email; mỗi lượt đăng nhập ghi 1 dòng `AUTH_LOGIN` vào ActivityLog |
 | 7 | ✅ `portal.html` build với URL chính thức; mở bằng trình duyệt thật, đăng nhập 1 nhân viên: thấy 3 chương trình + danh mục, không lỗi JS, chỉ gọi lệnh đọc | Lượt đầu tải danh mục **> 15 giây** (máy chủ nguội) |
-| 8 | ✅ Chủ dự án duyệt 05/10 (biết rủi ro bước 0): gộp `main`, tag `v1.1`, đẩy 2 remote | `git log` / GitHub Pages |
+| 8 | ✅ Chủ dự án duyệt 05/10 (biết rủi ro bước 0): gộp `main` (`49c7630`), tag `v1.1`, đẩy 2 remote; GitHub Pages cập nhật sau ~10 giây | `git ls-remote` cả 2 remote |
+| 10 | ✅ **8/8 trên link thật** (trình duyệt mới, như cửa sổ ẩn danh): chế độ production · không có nút demo · `VH12345/test123` bị từ chối · nhân viên thật đăng nhập được · ô 02 "Chưa có đợt bán" · không lỗi JS · chỉ gọi lệnh đọc · link demo `index.html` không đổi | Kiểm tra tự động 05/10 |
+| 11 | ⏳ Làm vào **sáng 14/10**, 10 phút trước 10:00 | — |
 
 Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet tự đổi chuỗi `0991000012525` thành số khi `setupNewDatabase()` ghi). Code **không đọc** các ô `BANK_*`; nhân viên thấy số **đầy đủ `0991000012525`** ở ô 01, cửa sổ nộp tiền, mã VietQR (`970436-0991000012525`) và email — đã kiểm chứng trên `portal.html` 05/10. Muốn ô trong Sheet cũng đúng: gõ lại `'0991000012525` (có dấu nháy đơn ở đầu).
 

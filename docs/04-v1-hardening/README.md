@@ -87,3 +87,4 @@ graph LR
 | 05/10/2026 | §3 | Chủ dự án: gỡ `test123`, đóng 4 chương trình test, TẮT email. Máy chủ xác nhận cả 3. Số tài khoản hiện đầy đủ ở web / VietQR / email. Còn: mật khẩu dạng chuỗi số đơn giản (giá trị không ghi vào repo) | Admin | Chờ đổi mật khẩu → bước 8 | Runbook §3 |
 | 05/10/2026 | — | Ô 02 ghi **"Chưa có đợt bán"** khi không có chương trình nào (trước: kẹt "Đang tải...") | Nhân viên | Code xong; Kịch bản 10 → 43/43 (bản cũ FAIL) | CURRENT_STATE §9 |
 | 05/10/2026 | **v1.1** | **Phát hành v1.1**: gộp `v1-hardening` vào `main` (fast-forward), tag `v1.1`, đẩy lên 2 remote → `portal.html` lên GitHub Pages. Kế hoạch nâng cấp sau go-live đổi tên thành **v1.2** | Tất cả | Chủ dự án duyệt | Mục "Phiên bản chuẩn v1.1"; CURRENT_STATE; Runbook §1, §3 |
+| 05/10/2026 | §3-10 | Kiểm tra cuối trên link thật `…/portal.html`: **8/8 ĐẠT** | Không | Xong | Runbook §3 |
