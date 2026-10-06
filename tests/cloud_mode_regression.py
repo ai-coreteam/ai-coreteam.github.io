@@ -464,6 +464,15 @@ def main():
                 on = page.evaluate("document.documentElement.classList.contains('ui-v2')")
                 login_bg = page.evaluate("getComputedStyle(document.getElementById('login-overlay')).backgroundImage")
                 if q == '':
+                    fav = page.evaluate('''async () => {
+                        const l = document.querySelector('link[rel="icon"]'); const img = new Image(); img.src = l.href; await img.decode();
+                        const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+                        const d = x.getImageData(4, 16, 1, 1).data;   // mép trái hình tròn
+                        return { type: l.type, w: img.width, h: img.height, edge: [d[0], d[1], d[2]], svgFake: !!document.querySelector('link[rel="icon"][type="image/svg+xml"]') }; }''')
+                    check(fav['type'] == 'image/png' and fav['w'] == 32 and fav['h'] == 32 and not fav['svgFake'],
+                          f"favicon = PNG 32×32 cắt từ logo chính thức, không còn SVG tự vẽ ({fav})")
+                    check(abs(fav['edge'][0] - 165) < 30 and fav['edge'][1] < 40, f"favicon màu Heritage Red #A50034 ({fav['edge']})")
+                if q == '':
                     check(on, 'mặc định → giao diện v2 (bật cho mọi người 06/10/2026)')
                     check('LGE_Electronics_Gradient_04_RGB.jpg' in login_bg, 'mặc định → màn đăng nhập v2')
                 elif q == '?ui=v2':
