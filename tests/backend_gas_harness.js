@@ -57,6 +57,9 @@ class Sheet {
     if (LOCK_CHECKED.has(this.name) && !state.lockHeld) state.unlockedWrites.push(`${this.name}: ${what} (${state.currentAction})`);
   }
   getLastRow() { return this.rows.length; }
+  getLastColumn() { return this.rows.reduce((m, r) => Math.max(m, r.length), 0); }
+  getMaxColumns() { return this.maxCols || 26; }
+  insertColumnsAfter(after, n) { this.maxCols = this.getMaxColumns() + n; this.insertedCols = (this.insertedCols || 0) + n; return this; }
   getRange(r, c, nr = 1, nc = 1) { return new Range(this, r, c, nr, nc); }
   appendRow(arr) { this.noteWrite('appendRow'); this.rows.push(arr.slice()); }
   deleteRow(i) { this.noteWrite('deleteRow'); this.rows.splice(i - 1, 1); }
@@ -272,6 +275,37 @@ console.log('--- Ngày giờ ghi dạng CHỮ (06/10/2026: Google Sheet tự đ�
   const b = post({ action: 'pm_batch_approve_payment', token: pm.token, programId: PID, regIds: [c1] });
   const row = regRows(book)[0];
   check(b.ok === true && typeof row[19] === 'string' && row[19].length > 1 && row[19][0] === "'", 'PM duyệt hàng loạt → Ngày PM duyệt dạng chữ');
+}
+
+console.log('--- Serial Number (06/10/2026): cột M Products, lấy theo Mã Slot, sheet cũ 12 cột vẫn chạy ---');
+{
+  const book = freshBook(); const { post, get } = load(book);
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const old = post({ action: 'products', programId: PID });
+  check(old.ok && old.products.length === 3 && old.products.every(p => p.serial === ''), 'sheet cũ 12 cột: danh mục vẫn đọc được, serial rỗng (web ẩn đi)');
+  const prod = book.getSheetByName('Products'); prod.maxCols = 12;
+  const up = post({ action: 'product_upload', token: pm.token, programId: PID, items: [
+    { kho: 'AYB', category: 'TV', model: 'OLED65G3PSA', description: 'x', rrp: 1, internalPrice: 1, serial: '0123123178943' },
+    { kho: 'AYB', category: 'TV', model: 'OLED65G3PSA', description: 'y', rrp: 1, internalPrice: 1 }] });
+  check(up.ok && prod.insertedCols === 1 && prod.rows[0][12] === 'Serial', 'nạp SP vào sheet 12 cột → tự thêm cột M "Serial"');
+  const r1 = prod.rows.find(r => r[1] === PID + '-AYB-001'), r2 = prod.rows.find(r => r[1] === PID + '-AYB-002');
+  check(r1[12] === "'0123123178943" && r2[12] === '', 'serial ghi dạng chữ (giữ số 0 đầu); dòng không có serial để trống');
+  check(r1.length === 13 && r1[9] === 'Available' && r1[7] === 1, '12 cột cũ giữ nguyên vị trí (Trạng thái cột J, Giá cột H)');
+  const list = post({ action: 'products', programId: PID }).products;
+  const sn = c => String((list.find(p => p.uniqueCode === c) || {}).serial || '').replace(/^'/, '');
+  check(sn(PID + '-AYB-001') === '0123123178943' && sn(PID + '-AYA-001') === '', 'danh mục trả serial đúng từng slot (2 máy cùng model, khác serial)');
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  state.mails.length = 0;
+  const reg = post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYB-001', programId: PID, empCode: 'VH70001', empName: 'NV1' });
+  check(reg.ok === true, 'đăng ký slot có serial → OK (luồng đăng ký không đổi)');
+  const mail = state.mails.find(m => /giữ chỗ/.test(m.subject || '')) || {};
+  check(/S\/N '?0123123178943/.test(mail.htmlBody || ''), 'email xác nhận giữ chỗ có S/N cạnh Model');
+  const dash = post({ action: 'pm_dashboard', token: pm.token, programId: PID });
+  const dr = (dash.registrations || []).find(r => r.slotId === PID + '-AYB-001') || {};
+  check(/^'?0123123178943$/.test(dr.serial || ''), 'Dashboard PM (file giao hàng) có serial theo Mã Slot');
+  const lk = post({ action: 'lookup', token: u1.token, empCode: 'VH70001' });
+  check(/^'?0123123178943$/.test(((lk.orders || [])[0] || {}).serial || ''), 'Tra cứu đơn (Tab 3, ô 03) có serial');
+  check(get({ action: 'taken', programId: PID }).taken.includes(PID + '-AYB-001'), 'polling slot đã giữ vẫn đúng');
 }
 
 console.log('--- B4 / C1: Từ chối, mở cổng, watchdog ---');

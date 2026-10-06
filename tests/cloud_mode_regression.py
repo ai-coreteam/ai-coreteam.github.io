@@ -655,12 +655,12 @@ def main():
             z = zipfile.ZipFile(io.BytesIO(data)) if data[:2] == b'PK' else None
             strings = ''.join(z.read(n).decode('utf-8') for n in z.namelist() if n in ('xl/sharedStrings.xml', 'xl/worksheets/sheet1.xml')) if z else ''
             check(dl.value.suggested_filename.endswith('.xlsx') and z is not None, f'PM bấm Xuất Excel → file Excel thật ({dl.value.suggested_filename})')
-            check(all(h in strings for h in ['Mã Slot', 'Số điện thoại', 'Mã GD ngân hàng', 'Ghi chú']), 'đủ tiêu đề tiếng Việt của 22 trường')
+            check(all(h in strings for h in ['Mã Slot', 'Serial Number', 'Số điện thoại', 'Mã GD ngân hàng', 'Ghi chú']), 'đủ tiêu đề tiếng Việt, có Serial Number')
             page.evaluate("window.XLSX = undefined")
             with page.expect_download() as dl:
                 page.click('#btn-pm-export-csv')
             rows = open(dl.value.path(), encoding='utf-8-sig').read().splitlines()
-            check(dl.value.suggested_filename.endswith('.csv') and rows and rows[0].count(',') == 21, 'thư viện Excel không tải được → vẫn tải CSV 22 cột như trước')
+            check(dl.value.suggested_filename.endswith('.csv') and rows and rows[0].count(',') == 22, 'thư viện Excel không tải được → vẫn tải CSV 23 cột (22 + Serial Number)')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
@@ -681,8 +681,55 @@ def main():
             page.evaluate("() => { window.XLSX.writeFile = (wb, name) => { window.__rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); }; }")
             page.evaluate("exportRegistrationsCSV()"); page.wait_for_timeout(300)
             rows = page.evaluate("window.__rows") or []
-            check(len(rows) == 2 and rows[1][12] == '06/10/2026 14:52:01' and rows[1][18] == '06/10/2026 15:00:00',
-                  f"file Excel: Thời gian ĐK giờ VN, Thời gian nộp giữ nguyên ({rows[1][12] if len(rows) > 1 else rows})")
+            check(len(rows) == 2 and rows[1][13] == '06/10/2026 14:52:01' and rows[1][19] == '06/10/2026 15:00:00',
+                  f"file Excel: Thời gian ĐK giờ VN, Thời gian nộp giữ nguyên ({rows[1][13] if len(rows) > 1 else rows})")
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('Scenario 20: Serial Number — file mẫu mới đọc đúng cột, S/N hiện cạnh Model (chữ nhỏ, mờ), có trong file giao hàng')
+            V2 = os.environ.get('UI_QUERY') != '?ui=v1'
+            s = MockServer(my_status=NEW)
+            for x, sn in zip(s.products, ['0123123178943', '7328194371830', '4632784283431']):
+                x['serial'] = sn
+            s.pm_regs = [{'id': 'REG-1', 'programId': PID, 'slotId': f'{PID}-AYA-003', 'kho': 'AYA', 'model': 'MODEL-TAKEN-BY-ME',
+                          'empCode': ME, 'empName': 'Nhan Vien That', 'status': NEW, 'internalPrice': 5000000, 'amount': 0,
+                          'timestamp': '06/10/2026 09:00:00', 'serial': '4632784283431'}]
+            ctx, page = open_page(browser, port, s)
+            page.context.set_default_timeout(15000)
+            login(page, ME)
+            parsed = page.evaluate("""() => fetch('data/Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx').then(r => r.blob()).then(b => new Promise(ok =>
+                       parseExcelCatalog(new File([b], 'mau.xlsx'), (err, res) => ok(err ? String(err) : res.products))))""")
+            p0 = parsed[0] if isinstance(parsed, list) and parsed else {}
+            he = next((x for x in parsed if isinstance(parsed, list) and x.get('slotId') == 'HE-001'), {})
+            check(p0.get('model') == 'GR-X257BG' and p0.get('serial') == '7328194371830' and p0.get('category') == 'REF'
+                  and p0.get('internalPrice') == 24900000 and p0.get('rrp') == 42990000 and p0.get('kho') == 'AYC',
+                  f"file mẫu có cột SERIAL NUMBER ở D: các cột sau không lệch (Ngành hàng, Giá bán, Giá niêm yết đúng) ({p0.get('model')}, {p0.get('category')}, {p0.get('internalPrice')})")
+            check(he.get('serial') == '0123123178943' and 'Serial' not in (p0.get('description') or ''), 'serial giữ số 0 đầu; không chép lặp vào Mô tả')
+            card = page.evaluate("(document.querySelector('.lg-card-model .sn') || {}).textContent || ''")
+            cs = page.evaluate("(() => { const e = document.querySelector('.lg-card-model .sn'); if (!e) return {}; const c = getComputedStyle(e); return { fs: c.fontSize, fw: c.fontWeight, op: c.opacity }; })()")
+            check(card.startswith('S/N ') and cs.get('fw') == '400' and float(cs.get('op') or 1) < 1 and cs.get('fs') == ('14px' if V2 else '12px'),
+                  f"thẻ sản phẩm: S/N cạnh Model, chữ thường {cs.get('fs')}, mờ ({card} {cs})")
+            c3 = page.evaluate("document.getElementById('grap-brief-dashboard').innerText")
+            check('S/N 4632784283431' in c3, 'ô 03 Đơn hàng của bạn: S/N cạnh Model')
+            page.evaluate(f"openQuickPaymentModalForReg('{my_code}')"); page.wait_for_timeout(300)
+            check('S/N 4632784283431' in page.inner_text('#quick-model-name'), 'cửa sổ Nộp tiền ngay: S/N cạnh Model'); page.evaluate('closeQuickPaymentModal()')
+            page.evaluate("switchTab('tab4', document.getElementById('tab4-btn'))"); page.wait_for_timeout(600)
+            check('0123123178943' in page.inner_text('#tab4'), 'Tab 4: cột Serial có số thật (trước đây luôn "—" với dữ liệu máy chủ)')
+            with page.expect_download() as dl:
+                page.evaluate('downloadExcelTemplate()')
+            import zipfile, io
+            zx = zipfile.ZipFile(io.BytesIO(open(dl.value.path(), 'rb').read()))
+            check('SERIAL NUMBER' in ''.join(zx.read(n).decode('utf-8', 'ignore') for n in zx.namelist() if n.endswith('.xml')), 'nút Tải file mẫu: file có cột SERIAL NUMBER')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            ctx, page = open_page(browser, port, s)
+            login(page, PM)
+            page.evaluate("loadPMDashboardData && loadPMDashboardData()"); page.wait_for_timeout(2500)
+            check('S/N 4632784283431' in page.evaluate("document.getElementById('tab-pm').innerText"), 'bảng PM: S/N cạnh Model')
+            page.evaluate("() => { window.XLSX.writeFile = (wb) => { window.__rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); }; }")
+            page.evaluate("exportRegistrationsCSV()"); page.wait_for_timeout(300)
+            rows = page.evaluate("window.__rows") or [[]]
+            check(rows[0][4:6] == ['Model', 'Serial Number'] and len(rows) > 1 and rows[1][5] == '4632784283431', f'file giao hàng: cột Serial Number ngay sau Model ({rows[0][4:6]}, {rows[1][5] if len(rows) > 1 else ""})')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

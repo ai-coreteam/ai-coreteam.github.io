@@ -292,6 +292,9 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
 
   var subject = '';
   var bodyHtml = '';
+  details = details || {};
+  if (!details.serial && details.slotId) details.serial = prodSerials_()[details.slotId] || '';
+  var snHtml = details.serial ? ' <span style="color:#716F6A; font-size:12px;">· S/N ' + details.serial + '</span>' : '';
 
   var brandHeader = '<div style="background:#A50034; color:#FFFFFF; padding:18px 24px; border-radius:8px 8px 0 0; font-family:Arial,sans-serif;">' +
     '<h2 style="margin:0; font-size:18px; letter-spacing:0.02em;">LG ELECTRONICS VIETNAM — CỔNG BÁN HÀNG NỘI BỘ</h2>' +
@@ -312,7 +315,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<p>Bạn đã đăng ký giữ chỗ thành công sản phẩm trong chương trình bán hàng nội bộ:</p>' +
       '<div style="background:#F6F3EB; padding:14px 18px; border-radius:6px; border-left:4px solid #A50034; margin:16px 0;">' +
       '<div>• Mã Slot: <strong style="color:#A50034;">' + (details.slotId || '') + '</strong> (Kho: ' + (details.kho || '') + ')</div>' +
-      '<div>• Model: <strong>' + (details.model || '') + '</strong></div>' +
+      '<div>• Model: <strong>' + (details.model || '') + '</strong>' + snHtml + '</div>' +
       '<div>• Số tiền thanh toán: <strong style="color:#A50034; font-size:15px;">' + (details.priceText || '') + '</strong></div>' +
       '<div>• Trạng thái: <strong style="color:#B7950B;">Đã đăng ký (Chờ PM duyệt mở cổng thanh toán)</strong></div>' +
       '</div>' +
@@ -331,7 +334,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<p style="color:#0E6251; font-weight:bold; font-size:15px;">✓ Đơn hàng ' + (details.slotId || '') + ' đã được PM kiểm duyệt và CHÍNH THỨC MỞ CỔNG THANH TOÁN!</p>' +
       '<div style="background:#E8F8F5; padding:14px 18px; border-radius:6px; border-left:4px solid #117A65; margin:16px 0;">' +
       '<div>• Mã Slot: <strong style="color:#A50034;">' + (details.slotId || '') + '</strong> (Kho: ' + (details.kho || '') + ')</div>' +
-      '<div>• Model: <strong>' + (details.model || '') + '</strong></div>' +
+      '<div>• Model: <strong>' + (details.model || '') + '</strong>' + snHtml + '</div>' +
       '<div>• Thời hạn nộp tiền: <strong>24 giờ</strong> kể từ thời điểm mở cổng (' + (details.openTime || '') + ').</div>' +
       '</div>' +
       '<p><strong>Hướng dẫn chuyển khoản VietQR:</strong></p>' +
@@ -353,7 +356,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<p>Xin chào <strong>' + empName + '</strong>,</p>' +
       '<p style="color:#1B5E20; font-weight:bold; font-size:15px;">✓ Đơn hàng ' + (details.slotId || '') + ' của bạn đã được PM kiểm tra và PHÊ DUYỆT hoàn tất!</p>' +
       '<div style="background:#E8F5E9; padding:14px 18px; border-radius:6px; border:1px solid #A5D6A7; margin:16px 0;">' +
-      '<div>• Sản phẩm: <strong>' + (details.model || '') + '</strong></div>' +
+      '<div>• Sản phẩm: <strong>' + (details.model || '') + '</strong>' + snHtml + '</div>' +
       '<div>• Địa điểm nhận hàng: <strong>' + (details.kho || '') + '</strong></div>' +
       '<div>• Người phê duyệt: <strong>' + (details.pmName || 'PM Quản trị') + '</strong> (' + nowStr + ')</div>' +
       '</div>' +
@@ -384,7 +387,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<p>Xin chào <strong>' + empName + '</strong> (Mã NV: <strong>' + empCode + '</strong>),</p>' +
       '<p style="color:#D35400; font-weight:bold;">⚠️ Cảnh báo thời hạn nộp tiền giữ chỗ:</p>' +
       '<div style="background:#FEF9E7; padding:14px 18px; border-radius:6px; border-left:4px solid #F39C12; margin:16px 0;">' +
-      '<div>• Mã Slot: <strong>' + (details.slotId || '') + '</strong> (Model: ' + (details.model || '') + ')</div>' +
+      '<div>• Mã Slot: <strong>' + (details.slotId || '') + '</strong> (Model: ' + (details.model || '') + ')' + snHtml + '</div>' +
       '<div>• Thời gian đăng ký: <strong>' + (details.regTime || '') + '</strong></div>' +
       '<div>• Thời hạn còn lại: <strong style="color:#C0392B;">Khoảng 2 giờ</strong> trước khi slot bị tự động giải phóng.</div>' +
       '</div>' +
@@ -400,7 +403,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<p>Xin chào <strong>' + empName + '</strong> (Mã NV: <strong>' + empCode + '</strong>),</p>' +
       '<p style="color:#78281F; font-weight:bold;">Đơn hàng ' + (details.slotId || '') + ' đã hết thời hạn nộp tiền (24 giờ):</p>' +
       '<div style="background:#F2D7D5; padding:14px 18px; border-radius:6px; border-left:4px solid #922B21; margin:16px 0;">' +
-      '<div>• Mã Slot: <strong>' + (details.slotId || '') + '</strong> (Model: ' + (details.model || '') + ')</div>' +
+      '<div>• Mã Slot: <strong>' + (details.slotId || '') + '</strong> (Model: ' + (details.model || '') + ')' + snHtml + '</div>' +
       '<div>• Trạng thái hiện tại: <strong style="color:#922B21;">Đã hủy giữ chỗ & mở lại kho công khai.</strong></div>' +
       '</div>' +
       '<p>Theo chính sách FCFS của chương trình bán hàng nội bộ, các suất chưa nộp tiền sau 24h được tự động mở lại cho các nhân viên khác.</p>' +
@@ -682,7 +685,26 @@ function program_delete_(d) {
 }
 
 /* ---------- P2: Products ---------- */
-var PROD_COL = { PROG: 1, CODE: 2, KHO: 3, CAT: 4, MODEL: 5, DESC: 6, RRP: 7, PRICE: 8, QTY: 9, STATUS: 10, EMP: 11, TS: 12 };
+var PROD_COL = { PROG: 1, CODE: 2, KHO: 3, CAT: 4, MODEL: 5, DESC: 6, RRP: 7, PRICE: 8, QTY: 9, STATUS: 10, EMP: 11, TS: 12, SERIAL: 13 };
+
+// 06/10/2026: Serial Number (số định danh từng máy do LG cấp) ở cột M của Products — thêm vào CUỐI nên mọi chỗ đọc 12 cột cũ
+// không đổi. Sheet cũ chưa có cột M → serial rỗng, web ẩn đi. Registrations không thêm cột: serial lấy theo Mã Slot.
+var _prodSerials = null;
+function prodSerials_() {
+  if (_prodSerials) return _prodSerials;
+  _prodSerials = {};
+  try {
+    var sh = book_().getSheetByName(SHEET_PRODUCTS);
+    if (sh && sh.getLastRow() > 1 && sh.getLastColumn() >= PROD_COL.SERIAL) {
+      var v = sh.getRange(2, PROD_COL.CODE, sh.getLastRow() - 1, PROD_COL.SERIAL - PROD_COL.CODE + 1).getValues();
+      for (var i = 0; i < v.length; i++) {
+        var code = String(v[i][0]).trim(), sn = String(v[i][PROD_COL.SERIAL - PROD_COL.CODE]).trim();
+        if (code && sn) _prodSerials[code] = sn;
+      }
+    }
+  } catch (e) {}
+  return _prodSerials;
+}
 
 // List products for a program (with P5 Caching)
 function products_(d) {
@@ -698,7 +720,8 @@ function products_(d) {
   var n = sheet.getLastRow() - 1;
   if (n <= 0) return { ok: true, products: [] };
 
-  var data = sheet.getRange(2, 1, n, 12).getValues();
+  var w = sheet.getLastColumn() >= PROD_COL.SERIAL ? PROD_COL.SERIAL : 12;
+  var data = sheet.getRange(2, 1, n, w).getValues();
   var result = [];
   for (var r = 0; r < n; r++) {
     var pId = String(data[r][0]).trim();
@@ -715,7 +738,8 @@ function products_(d) {
       qty: Number(data[r][8]) || 1,
       status: String(data[r][9]).trim() || 'Available',
       empCode: String(data[r][10]).trim(),
-      timestamp: String(data[r][11]).trim()
+      timestamp: String(data[r][11]).trim(),
+      serial: w >= PROD_COL.SERIAL ? String(data[r][PROD_COL.SERIAL - 1]).trim() : ''
     });
   }
   putCachedJson_(cacheKey, result, 45);
@@ -731,7 +755,7 @@ function product_upload_(d) {
   if (!isAdminPayload_(authCheck.payload) && !isProgramOwnedByPM_(programId, authCheck.payload.uid)) {
     return { ok: false, message: 'Từ chối thẩm quyền: Bạn không có quyền nạp sản phẩm vào chương trình của PM khác.' };
   }
-  var items = d.items || d.products; // array of {kho, category, model, description, rrp, internalPrice, qty}
+  var items = d.items || d.products; // array of {kho, category, model, description, rrp, internalPrice, qty, serial}
   if (!items || !items.length) return { ok: false, message: 'Danh sách sản phẩm trống.' };
 
   var sheet = book_().getSheetByName(SHEET_PRODUCTS);
@@ -763,17 +787,21 @@ function product_upload_(d) {
       programId, uniqueCode, kho,
       str_(it.category), str_(it.model), str_(it.description),
       Number(it.rrp) || 0, Number(it.internalPrice) || 0,
-      Number(it.qty) || 1, 'Available', '', ts
+      Number(it.qty) || 1, 'Available', '', ts,
+      asText_(it.serial) // chữ: "0123…" không mất số 0 đầu, số dài không bị đổi thành 1,2E+12
     ]);
   }
 
   if (rows.length > 0) {
+    if (sheet.getMaxColumns() < PROD_COL.SERIAL) sheet.insertColumnsAfter(sheet.getMaxColumns(), PROD_COL.SERIAL - sheet.getMaxColumns());
+    if (!str_(sheet.getRange(1, PROD_COL.SERIAL).getValue())) sheet.getRange(1, PROD_COL.SERIAL).setValue('Serial');
     var startRow = sheet.getLastRow() + 1;
-    sheet.getRange(startRow, 1, rows.length, 12).setValues(rows);
+    sheet.getRange(startRow, 1, rows.length, PROD_COL.SERIAL).setValues(rows);
     SpreadsheetApp.flush();
   }
 
   invalidateCache_('prod_' + programId.toUpperCase());
+  _prodSerials = null;
   try { log_('PRODUCT_UPLOAD', authCheck.payload.uid, authCheck.payload.name, '', 'program=' + programId + ' count=' + rows.length); } catch (e2) {}
   return { ok: true, message: 'Đã upload ' + rows.length + ' sản phẩm vào chương trình ' + programId + '.' };
 }
@@ -1045,6 +1073,7 @@ function pm_dashboard_(d) {
           pmBy: str_(v[r][C.PM_BY - 1]),
           pmDate: str_(v[r][C.PM_DATE - 1]),
           note: str_(v[r][C.NOTE - 1]),
+          serial: prodSerials_()[curSlot] || '',
           timestamp: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0])
         });
       }
@@ -1836,6 +1865,7 @@ function lookup_(d) {
       time: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0]),
       programId: str_(v[r][C.CAMPAIGN - 1]), // v1-hardening (V1-02): ô "03 Đơn hàng của bạn" lọc theo chương trình
       slot: curSlot, kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
+      serial: prodSerials_()[curSlot] || '',
       empCode: empCode,
       empName: empName,
       name: empName,
@@ -2196,7 +2226,7 @@ function setupNewDatabase() {
   
   // 7. Sheet: Products (Chuẩn 12 cột khớp 100% PROD_COL)
   var prodSheet = ss.getSheetByName(SHEET_PRODUCTS) || ss.insertSheet(SHEET_PRODUCTS);
-  formatHeader(prodSheet, ['ProgramID', 'UniqueCode', 'Kho', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Qty', 'Status', 'EmpCode', 'Timestamp']);
+  formatHeader(prodSheet, ['ProgramID', 'UniqueCode', 'Kho', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Qty', 'Status', 'EmpCode', 'Timestamp', 'Serial']);
   if (prodSheet.getLastRow() <= 1) {
     var nowIso = new Date().toISOString();
     prodSheet.appendRow(['IS2026Q3-HE', 'HE-001', 'AYA', 'Tivi OLED', 'OLED65G3PSA', 'Smart Tivi OLED evo 4K 65 inch Gallery Edition', 68900000, 38900000, 1, 'Available', '', nowIso]);

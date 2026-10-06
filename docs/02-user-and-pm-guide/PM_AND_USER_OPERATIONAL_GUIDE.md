@@ -139,7 +139,9 @@ flowchart TD
    * **Hạn mức:** Mặc định `1 SP / Nhân viên`.
 4. **Tải và sử dụng file Excel mẫu chuẩn:**
    * Bấm nút **"Tải file mẫu Excel (.xlsx)"** ở góc trên khung nạp hoặc bấm link nhắc nhở bên trong khung.
-   * Mở file mẫu vừa tải về (`Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx`), điền danh sách máy của bạn theo 7 cột chuẩn.
+   * Mở file mẫu vừa tải về (`Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx`), điền danh sách máy của bạn theo **8 cột chuẩn**: WH (Kho) · Slot ID · Model · **SERIAL NUMBER** · Ngành hàng · Giá bán · Giá niêm yết · Mô tả chi tiết.
+   * **SERIAL NUMBER** (từ 06/10/2026): số định danh từng máy do LG cấp. 2 máy cùng Model có thể khác tình trạng — serial giúp kho giao **đúng máy**. Để ô dạng **Text** (file mẫu đã đặt sẵn) để không mất số 0 đầu. Hệ thống tìm cột theo **tên tiêu đề**, nên thứ tự cột có thể khác. Serial hiện cạnh Model ở mọi nơi (chữ nhỏ, mờ "S/N …"), trong email và trong file **Xuất Excel** (cột "Serial Number" ngay sau "Model").
+   * ⚠️ Chỉ nạp danh mục có serial **sau khi** Apps Script **Version 8** đã deploy (Runbook §1) — Version 7 không lưu serial.
 5. **Kéo thả file Excel vào hệ thống:**
    * Thả file vào khung nét đứt.
    * Hệ thống tự động phân tích cấu trúc, nhận diện sheet và hiển thị bảng xem trước (Số lượng SP, Model, Giá).

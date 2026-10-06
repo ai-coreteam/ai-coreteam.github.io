@@ -3440,6 +3440,10 @@
     html.ui-v2[data-theme="dark"] [style*="color:var(--lg-ok)"],
     html.ui-v2[data-theme="dark"] .sec-card strong[style*="var(--lg-red"],
     html.ui-v2[data-theme="dark"] .sec-card .req { color: #F6F3EB !important; }
+
+    /* Serial Number cạnh Model (06/10/2026): phụ, không nổi bật — chữ thường, nhỏ, mờ theo màu chữ bên cạnh (đúng cả nền sáng lẫn tối) */
+    .sn { font-weight: 400; font-size: 12px; line-height: inherit; opacity: .72; letter-spacing: .02em; white-space: nowrap; font-family: inherit; }
+    html.ui-v2 .sn { font-size: 14px; }
   </style>
   <!-- P0: SheetJS for Client-Side Excel Import (.xlsx) -->
   <script src="data/xlsx.mini.min.js"></script>
@@ -5957,6 +5961,22 @@
       return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
+    // Serial Number (06/10/2026): số định danh từng máy do LG cấp — 2 máy cùng Model có thể khác tình trạng.
+    // Lấy từ dữ liệu (x.serial); thiếu thì tra theo Mã Slot trong danh mục đang mở. Hiển thị phụ: chữ nhỏ, mờ (.sn).
+    function snOf(x) {
+      if (!x) return '';
+      const clean = v => { const t = String(v == null ? '' : v).trim().replace(/^'+/, ''); return (t === '—' || t === '-') ? '' : t; };
+      let sn = clean(x.serial);
+      if (!sn) {
+        const slot = x.slotId || x.uniqueCode || x.slot;
+        const p = slot && typeof currentProducts !== 'undefined' && currentProducts ? currentProducts.find(q => q.uniqueCode === slot) : null;
+        sn = p ? clean(p.serial) : '';
+      }
+      return sn;
+    }
+    function snHtml(x) { const sn = snOf(x); return sn ? ` <span class="sn">S/N ${esc(sn)}</span>` : ''; }
+    function snTxt(x) { const sn = snOf(x); return sn ? ` · S/N ${sn}` : ''; }
+
     // CHỈ ĐỂ HIỂN THỊ / XUẤT FILE: thời gian dạng ISO (vd. "2026-10-06T07:52:01.259Z" = giờ quốc tế, do đăng ký từ thẻ sản phẩm ghi)
     // → giờ Việt Nam "06/10/2026 14:52:01", cùng dạng máy chủ dùng cho các dòng khác. Giá trị khác giữ nguyên.
     // Không dùng hàm này cho dữ liệu đem đi tính toán (hạn 24 giờ, giờ mở nộp tiền đọc giá trị gốc).
@@ -6108,7 +6128,7 @@
         return;
       }
 
-      const ok = confirm(`Bạn có chắc muốn HỦY giữ chỗ cho đơn này?\n\nSản phẩm: ${reg.model} (${reg.slotId})\nGiá: ${formatVND(reg.internalPrice || 0)}\n\nSau khi hủy, slot sẽ được hoàn lại kho cho đồng nghiệp khác đăng ký.`);
+      const ok = confirm(`Bạn có chắc muốn HỦY giữ chỗ cho đơn này?\n\nSản phẩm: ${reg.model}${snTxt(reg)} (${reg.slotId})\nGiá: ${formatVND(reg.internalPrice || 0)}\n\nSau khi hủy, slot sẽ được hoàn lại kho cho đồng nghiệp khác đăng ký.`);
       if (!ok) return;
 
       if (isServerUser()) {
@@ -6150,7 +6170,7 @@
         persistDemoRegistrations();
       }
 
-      showToast(`Đã hủy giữ chỗ đơn ${reg.slotId} (${reg.model}) thành công. Slot đã được mở lại!`, 'success');
+      showToast(`Đã hủy giữ chỗ đơn ${reg.slotId} (${reg.model}${snTxt(reg)}) thành công. Slot đã được mở lại!`, 'success');
       calculatePMStats(activeProgram);
       renderBriefTopDashboard(activeProgram);
       if (typeof filterPMRegistrations === 'function') filterPMRegistrations();
@@ -6196,7 +6216,7 @@
     }
     function lookupOrderToReg(o) {
       return {
-        id: o.slot, slotId: o.slot, programId: o.programId || '', kho: o.kho || '', model: o.model || '',
+        id: o.slot, slotId: o.slot, programId: o.programId || '', kho: o.kho || '', model: o.model || '', serial: o.serial || '',
         internalPrice: Number(o.price || o.amount) || 0, empCode: String(o.empCode || '').toUpperCase(),
         empName: o.empName || o.name || '', status: o.status || '', timestamp: o.time || '', paid: !!o.paid
       };
@@ -7849,7 +7869,7 @@
         e.stopPropagation();
       }
       try {
-        const b64Data = "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";
+        const b64Data = "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";
         const byteCharacters = atob(b64Data);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -7972,7 +7992,6 @@
             // Rich description composed from yellow-highlighted fields
             const descParts = [];
             if (gradeVal) descParts.push(`Loại ${gradeVal}`);
-            if (serialVal) descParts.push(`Serial: ${serialVal}`);
             if (noteVal) descParts.push(noteVal);
             const descVal = descParts.length > 0 ? descParts.join(' · ') : `${modelVal} - ${catVal}`;
 
@@ -8049,7 +8068,7 @@
 
         const sampleRows = res.products.slice(0, 4).map(p => `
           <div style="display:flex; justify-content:space-between; padding:4px 8px; border-bottom:1px solid #F0ECE4;">
-            <span><strong>${esc(p.slotId)}</strong> · ${esc(p.model)} (${esc(p.kho)})</span>
+            <span><strong>${esc(p.slotId)}</strong> · ${esc(p.model)}${snHtml(p)} (${esc(p.kho)})</span>
             <strong style="color:#A50034;">${formatVND(p.internalPrice)}</strong>
           </div>
         `).join('');
@@ -8278,7 +8297,7 @@
 
         const sampleRows = res.products.slice(0, 4).map(p => `
           <div style="display:flex; justify-content:space-between; padding:4px 8px; border-bottom:1px solid #F0ECE4;">
-            <span><strong>${esc(p.slotId)}</strong> · ${esc(p.model)} (${esc(p.kho)})</span>
+            <span><strong>${esc(p.slotId)}</strong> · ${esc(p.model)}${snHtml(p)} (${esc(p.kho)})</span>
             <strong style="color:#1E8449;">${formatVND(p.internalPrice)}</strong>
           </div>
         `).join('');
@@ -8754,7 +8773,7 @@
               <div style="font-size:12px; line-height:1.5;">
                 <div style="color:#FFFFFF; font-weight:700; margin-bottom:4px; font-size:13px; display:flex; align-items:center; gap:6px;">
                   <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FD312E;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                  ${esc(myReg.model)}
+                  <span style="min-width:0;">${esc(myReg.model)}${snHtml(myReg)}</span>
                   <span style="font-size:11px; color:#CBC8C2; font-weight:normal;">(${esc(myReg.slotId)})</span>
                 </div>
                 <div style="background:rgba(255,255,255,0.06); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); margin-bottom:6px;">
@@ -8847,14 +8866,14 @@
       if (!reg) return;
 
       if (reg.status === 'Đã đăng ký - Chờ mở thanh toán') {
-        alert(`Đơn hàng ${reg.slotId} (${reg.model}) đang ở trạng thái:\n"ĐÃ ĐĂNG KÝ (Chờ PM mở cổng thanh toán)"\n\nQuản lý (PM) đang kiểm soát danh sách để chống lỗi trùng lặp trước khi cho phép nộp tiền. Vui lòng đợi PM duyệt và bấm "Mở cổng thanh toán" cho đợt này!`);
+        alert(`Đơn hàng ${reg.slotId} (${reg.model}${snTxt(reg)}) đang ở trạng thái:\n"ĐÃ ĐĂNG KÝ (Chờ PM mở cổng thanh toán)"\n\nQuản lý (PM) đang kiểm soát danh sách để chống lỗi trùng lặp trước khi cho phép nộp tiền. Vui lòng đợi PM duyệt và bấm "Mở cổng thanh toán" cho đợt này!`);
         return;
       }
 
       document.getElementById('quick-reg-id').value = reg.id || reg.slotId;
       document.getElementById('quick-slot-code').textContent = reg.slotId;
       document.getElementById('quick-kho-name').textContent = 'Kho ' + (reg.kho || 'Hải Phòng');
-      document.getElementById('quick-model-name').textContent = reg.model || '';
+      document.getElementById('quick-model-name').innerHTML = esc(reg.model || '') + snHtml(reg);
       document.getElementById('quick-amount-text').textContent = formatVND(reg.internalPrice || 0);
 
       // Pre-fill user data (Zero-typing)
@@ -9388,7 +9407,7 @@
                   ${catIcon}
                 </div>
                 <div class="lg-card-meta">Kho ${esc(p.kho)} · Slot: <strong>${esc(p.uniqueCode)}</strong></div>
-                <div class="lg-card-model">${esc(p.model)}</div>
+                <div class="lg-card-model">${esc(p.model)}${snHtml(p)}</div>
                 <div class="lg-card-desc">${esc(p.description)}</div>
                 ${productInfoLink(p.model)}
               </div>
@@ -9425,7 +9444,7 @@
             html += `<tr class="${p.status !== 'Available' ? 'row-taken' : ''}">`;
             html += `<td class="code-cell">${esc(p.uniqueCode)}</td>`;
             html += `<td>${esc(p.category)}</td>`;
-            html += `<td><strong>${esc(p.model)}</strong>${productInfoLink(p.model) ? '<br>' + productInfoLink(p.model) : ''}</td>`;
+            html += `<td><strong>${esc(p.model)}</strong>${snHtml(p)}${productInfoLink(p.model) ? '<br>' + productInfoLink(p.model) : ''}</td>`;
             html += `<td>${esc(p.description)}</td>`;
             html += `<td class="price-cell">${formatVND(p.rrp)}</td>`;
             html += `<td class="price-cell price-internal">${formatVND(p.internalPrice)}</td>`;
@@ -9577,12 +9596,12 @@
         : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
       const activeUserReg = allRegs.find(r => (r.programId === activeProgram || !r.programId) && r.empCode === currentUser.id && r.status !== 'Đã hủy bởi nhân viên' && r.status !== 'Từ chối' && r.status !== 'Hủy');
       if (activeUserReg) {
-        showToast(`Bạn đã đăng ký sản phẩm ${activeUserReg.model} (${activeUserReg.slotId}) rồi!\n\nHạn mức: 1 SP / NV. Nếu muốn đổi sang sản phẩm này, vui lòng bấm "Hủy giữ chỗ" ở ô Đơn Hàng Của Bạn trước.`, 'warning', 6000);
+        showToast(`Bạn đã đăng ký sản phẩm ${activeUserReg.model}${snTxt(activeUserReg)} (${activeUserReg.slotId}) rồi!\n\nHạn mức: 1 SP / NV. Nếu muốn đổi sang sản phẩm này, vui lòng bấm "Hủy giữ chỗ" ở ô Đơn Hàng Của Bạn trước.`, 'warning', 6000);
         return;
       }
 
       const msg = `Xác nhận đăng ký:\n\n` +
-        `Sản phẩm: ${prod.model} — ${prod.description}\n` +
+        `Sản phẩm: ${prod.model}${snTxt(prod)} — ${prod.description}\n` +
         `Giá nội bộ: ${formatVND(prod.internalPrice)}\n` +
         `Kho: ${prod.kho}\n\n` +
         `Bạn có chắc muốn đăng ký sản phẩm này?`;
@@ -9651,6 +9670,7 @@
         kho: prod.kho,
         category: prod.category || '',
         model: prod.model,
+        serial: snOf(prod),
         description: prod.description || '',
         internalPrice: prod.internalPrice || 0,
         empCode: currentUser.id,
@@ -9678,7 +9698,7 @@
         pmRegistrations.push(newReg);
       }
 
-      showToast(`Đăng ký thành công sản phẩm ${prod.model} (${prod.uniqueCode})!\nTrạng thái: "Đã đăng ký - Chờ mở cổng thanh toán". Quản lý sẽ mở cổng nộp tiền sau.`, 'success', 5000);
+      showToast(`Đăng ký thành công sản phẩm ${prod.model}${snTxt(prod)} (${prod.uniqueCode})!\nTrạng thái: "Đã đăng ký - Chờ mở cổng thanh toán". Quản lý sẽ mở cổng nộp tiền sau.`, 'success', 5000);
       renderProductTable(currentProducts);
       if (typeof renderTab4ProductTable === 'function') renderTab4ProductTable(currentProducts);
       renderBriefTopDashboard(activeProgram);
@@ -9950,7 +9970,7 @@
             <td><span class="badge-ordinal">${esc(p.kho)}</span></td>
             <td><span class="pk-tag" style="background:#F6F3EB; color:#262626;">${esc(p.category || 'Điện tử')}</span></td>
             <td>
-              <div style="font-weight:600; color:#262626;">${esc(p.model)}</div>
+              <div style="font-weight:600; color:#262626;">${esc(p.model)}${snHtml(p)}</div>
               <div style="font-size:11px; color:#716F6A;">${esc(p.description || '')}</div>
             </td>
             <td><span class="pk-tag g-${esc(p.grade || 'GoodSet')}">${esc(p.grade === 'GoodSet' ? 'GoodSet' : 'Loại ' + (p.grade || 'A'))}</span> <span style="font-size:11px; color:#716F6A;">${esc(p.cond || '')}</span></td>
@@ -10059,7 +10079,7 @@
             <td><span class="badge-code">${esc(r.slotId)}</span></td>
             <td><span class="badge-ordinal">${esc(r.kho)}</span></td>
             <td>
-              <div style="font-weight:600; color:#262626;">${esc(r.model)}</div>
+              <div style="font-weight:600; color:#262626;">${esc(r.model)}${snHtml(r)}</div>
               <div style="font-size:11px; color:#716F6A;">${esc(r.description || r.category || '')}</div>
             </td>
             <td style="text-align:right;"><span class="price-internal">${formatVND(r.internalPrice || 0)}</span></td>
@@ -10094,7 +10114,7 @@
       const ok = confirm(`XÁC NHẬN HỦY GIỮ CHỖ (PM OVERRIDE)?
  
 Nhân viên: ${reg.empName} (${reg.empCode})
-Sản phẩm: ${reg.model} (${reg.slotId})
+Sản phẩm: ${reg.model}${snTxt(reg)} (${reg.slotId})
 Kho: ${reg.kho}
 
 Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồng nghiệp khác có thể đăng ký.`);
@@ -10417,7 +10437,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
             <td><span class="badge-code">${esc(r.slotId)}</span></td>
             <td><span class="badge-ordinal">${esc(r.kho)}</span></td>
             <td>
-              <div style="font-weight:600;color:#262626;">${esc(r.model)}</div>
+              <div style="font-weight:600;color:#262626;">${esc(r.model)}${snHtml(r)}</div>
               <div style="font-size:11px;color:#716F6A;">${esc(r.description || r.category || '')}</div>
             </td>
             <td style="text-align:right;"><span class="price-internal">${fmtVND(r.internalPrice || 0)}</span></td>
@@ -10452,7 +10472,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       const msg = `Xác nhận phê duyệt thanh toán cho đơn của nhân viên:\n\n` +
         `${reg.empName} (${reg.empCode})\n` +
-        `Sản phẩm: ${reg.model} (Slot: ${reg.slotId})\n` +
+        `Sản phẩm: ${reg.model}${snTxt(reg)} (Slot: ${reg.slotId})\n` +
         `Số tiền: ${fmtVND(reg.amount || reg.internalPrice)}\n` +
         `Mã GD: ${reg.bankTxn || 'N/A'}\n\n` +
         `Sau khi duyệt, hồ sơ sẽ đủ điều kiện xuất danh sách giao hàng cho Logistics.`;
@@ -10646,7 +10666,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const confirmMsg = `XÁC NHẬN MỞ CỔNG THANH TOÁN CHO ĐƠN LẺ\n\n` +
         `• Mã Slot: ${reg.slotId}\n` +
         `• Nhân viên: ${reg.empName} (${reg.empCode})\n` +
-        `• Model: ${reg.model}\n` +
+        `• Model: ${reg.model}${snTxt(reg)}\n` +
         `• Giá nội bộ: ${fmtVND(reg.internalPrice || 0)}\n\n` +
         `Chuyển đơn này sang "Chờ nộp tiền" để nhân viên có thể nộp tiền ngay?`;
 
@@ -10838,7 +10858,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const modalRejectBtn = document.getElementById('modal-btn-reject');
 
       if (modalTitle) modalTitle.textContent = `CHỨNG TỪ THANH TOÁN — ${reg.slotId}`;
-      if (modalSubtitle) modalSubtitle.textContent = `Model: ${reg.model} · Đăng ký bởi: ${reg.empName} (${reg.empCode})`;
+      if (modalSubtitle) modalSubtitle.textContent = `Model: ${reg.model}${snTxt(reg)} · Đăng ký bởi: ${reg.empName} (${reg.empCode})`;
       if (modalAmount) modalAmount.textContent = fmtVND(reg.amount || reg.internalPrice);
       if (modalPayer) modalPayer.textContent = `${reg.payerName || reg.empName} (${reg.payerCode || reg.empCode})`;
       if (modalTxn) modalTxn.textContent = reg.bankTxn || 'Chưa có mã GD';
@@ -10883,7 +10903,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       // Headers matching Module 6 (Danh sách đăng ký chi tiết)
       const headers = [
-        'STT', 'Mã Slot', 'Kho', 'Ngành hàng', 'Model', 'Mô tả sản phẩm',
+        'STT', 'Mã Slot', 'Kho', 'Ngành hàng', 'Model', 'Serial Number', 'Mô tả sản phẩm',
         'Giá nội bộ (VND)', 'Mã NV đăng ký', 'Họ tên NV', 'Bộ phận', 'Số điện thoại',
         'Địa chỉ giao hàng', 'Thời gian ĐK', 'Trạng thái đơn', 'Người nộp tiền',
         'Mã NV nộp', 'Số tiền đã nộp', 'Mã GD ngân hàng', 'Thời gian nộp',
@@ -10899,6 +10919,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           r.kho,
           r.category || '',
           r.model,
+          snOf(r),
           r.description || '',
           r.internalPrice || 0,
           r.empCode,
@@ -10920,7 +10941,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       });
 
       const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      downloadTableFile(rows, `${activeProgram}_Danh_Sach_Dang_Ky_${dateStr}`, { moneyCols: [6, 16], sheetName: 'Danh sach dang ky' });
+      downloadTableFile(rows, `${activeProgram}_Danh_Sach_Dang_Ky_${dateStr}`, { moneyCols: [7, 17], sheetName: 'Danh sach dang ky' });
     }
 
     // Tải bảng (mảng 2 chiều, dòng 0 = tiêu đề) thành file Excel .xlsx.
@@ -11531,6 +11552,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         name: empNameVal,
         price: finalPrice,
         model: order.model || '',
+        serial: snOf(order),
         kho: order.kho || '',
         division: order.division || (currentUser && (currentUser.dept || currentUser.division)) || ''
       };
@@ -11543,7 +11565,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (slotSelect) slotSelect.value = order.slot;
       const slotDisplay = document.getElementById('pay-slot-display');
       if (slotDisplay) {
-        slotDisplay.value = `${order.slot} · Kho ${order.kho || ''} · ${order.model || ''}`;
+        slotDisplay.value = `${order.slot} · Kho ${order.kho || ''} · ${order.model || ''}${snTxt(order)}`;
       }
 
       // Field 2: EMP Code (Read-only)
@@ -11567,7 +11589,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       checkAmount();
 
       document.getElementById('pay-unlocked-info').innerHTML =
-        `Đang khai nộp tiền cho <strong>Slot ${order.slot}</strong> · Kho ${order.kho || ''} · ${order.model || ''}` +
+        `Đang khai nộp tiền cho <strong>Slot ${order.slot}</strong> · Kho ${order.kho || ''} · ${order.model || ''}${snHtml(order)}` +
         (payCtx.price ? ` · Số tiền cần nộp: <strong style="color:var(--lg-red);">${fmtVND(payCtx.price)}</strong>` : '');
       document.getElementById('pay-lock').hidden = true;
       form.hidden = false;
@@ -11935,7 +11957,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         const t = isTaken(it.slot), sel = it.slot === selected;
         return `<button type="button" class="pk-card${sel ? ' is-sel' : ''}${t ? ' is-taken' : ''}" data-slot="${e(it.slot)}" role="option" aria-selected="${sel}"${t ? ' aria-disabled="true"' : ''} title="${e(it.model + ' — ' + it.cond)}">
           <div class="pk-top"><span class="pk-no">${e(it.slot)}</span><span class="pk-tag">Kho ${e(it.kho)}</span><span class="pk-tag g-${e(it.grade)}">${it.grade === 'GoodSet' ? 'GoodSet' : 'Loại ' + e(it.grade)}</span></div>
-          <div class="pk-model">${e(it.model)}</div>
+          <div class="pk-model">${e(it.model)}${snHtml({ serial: it.serial, slot: it.slot })}</div>
           <div class="pk-cond">${e(it.cond)}</div>
           <div class="pk-price"><span class="pk-now">${pkMoney(it.price)}</span><span class="pk-off">-${e(it.off)}</span></div>
           <div class="pk-mrp">Giá MRP <s>${pkMoney(it.mrp)}</s></div>
@@ -12595,12 +12617,12 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       let modelText = '';
       if (payCtx && payCtx.model) {
-        modelText = esc(payCtx.model) + (payCtx.kho ? `<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${esc(payCtx.kho)}</strong></span>` : '');
+        modelText = esc(payCtx.model) + snHtml(payCtx) + (payCtx.kho ? `<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${esc(payCtx.kho)}</strong></span>` : '');
       } else {
         const prod = (typeof currentProducts !== 'undefined' && currentProducts.find(p => p.uniqueCode === slotId)) ||
                      (typeof DEMO_PRODUCTS !== 'undefined' && DEMO_PRODUCTS[activeProgram] && DEMO_PRODUCTS[activeProgram].find(p => p.uniqueCode === slotId));
         if (prod) {
-          modelText = esc(prod.model) + (prod.kho ? `<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${esc(prod.kho)}</strong></span>` : '');
+          modelText = esc(prod.model) + snHtml(prod) + (prod.kho ? `<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${esc(prod.kho)}</strong></span>` : '');
         } else {
           modelText = 'Thiết bị LG';
         }
@@ -12922,7 +12944,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           } else {
             act = `<button type="button" class="btn-pay-open" onclick="openPaymentFromLookup(${i})">Nộp tiền</button>`;
           }
-          return `<tr><td>${esc(fmtVNTime(o.time))}</td><td><span class="badge-ordinal">${esc(o.slot)}</span></td><td>${esc(o.kho)}</td><td>${esc(o.model)}</td><td style="text-align:right; white-space:nowrap;"><strong>${price ? fmtVND(price) : '—'}</strong></td><td><strong>${esc(o.status)}</strong></td><td>${o.paid ? 'Đã khai' : 'Chưa khai'}</td><td>${o.receipt ? 'Đã tải lên' : 'Chưa có'}</td><td>${act}</td></tr>`;
+          return `<tr><td>${esc(fmtVNTime(o.time))}</td><td><span class="badge-ordinal">${esc(o.slot)}</span></td><td>${esc(o.kho)}</td><td>${esc(o.model)}${snHtml(o)}</td><td style="text-align:right; white-space:nowrap;"><strong>${price ? fmtVND(price) : '—'}</strong></td><td><strong>${esc(o.status)}</strong></td><td>${o.paid ? 'Đã khai' : 'Chưa khai'}</td><td>${o.receipt ? 'Đã tải lên' : 'Chưa có'}</td><td>${act}</td></tr>`;
         }).join('') +
         `</tbody></table></div>`;
     }
@@ -13377,7 +13399,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           kicker: 'BÁO CÁO & QUYẾT TOÁN',
           motionIcon: 'assets/images/quick-links-ani/ico_vertical3_44.svg',
           title: 'Kết Sổ Chương Trình & Xuất Quyết Toán',
-          body: 'Khi hết đợt bán, bấm "Kết Sổ" để khóa cổng đăng ký. Sau đó bấm "Xuất Excel" để tải file đầy đủ 22 trường nộp Giám đốc Tài chính và Kế toán kho LGEVH.',
+          body: 'Khi hết đợt bán, bấm "Kết Sổ" để khóa cổng đăng ký. Sau đó bấm "Xuất Excel" để tải file đầy đủ 23 trường nộp Giám đốc Tài chính và Kế toán kho LGEVH.',
           tip: 'Toàn bộ dữ liệu sau khi kết sổ sẽ được niêm phong chống sửa đổi trái phép.',
           nextBtnText: 'Hoàn tất quản trị ✓'
         }

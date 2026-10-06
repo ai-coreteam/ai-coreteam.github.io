@@ -354,7 +354,7 @@ console.log('\n--- SUITE 6: Database Schema & API Contract ---');
 
   // Validate Products 12-column schema
   assert(codeContent.includes("PROD_COL = {") && codeContent.includes("TS: 12"), 'PROD_COL has full 12 columns defined (PROG to TS: 12)');
-  assert(codeContent.includes("['ProgramID', 'UniqueCode', 'Kho', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Qty', 'Status', 'EmpCode', 'Timestamp']"), 'setupNewDatabase creates matching 12-column Products table');
+  assert(codeContent.includes("SERIAL: 13") && codeContent.includes("['ProgramID', 'UniqueCode', 'Kho', 'Category', 'Model', 'Description', 'RRP', 'InternalPrice', 'Qty', 'Status', 'EmpCode', 'Timestamp', 'Serial']"), 'setupNewDatabase creates matching 13-column (12 + Serial) Products table');
 
   // Validate Programs 10-column schema
   assert(codeContent.includes("PROG_COL = {") && codeContent.includes("CREATED: 10"), 'PROG_COL has 10 columns defined (ID to CREATED: 10)');
