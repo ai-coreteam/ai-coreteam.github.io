@@ -44,8 +44,12 @@ var STATUS_FREE = ['Hủy', 'Từ chối', 'Hết hạn giữ chỗ', STATUS_USE
 var C = {
   TS: 1, CAMPAIGN: 2, DIVISION: 3, EMP_CODE: 4, EMP_NAME: 5, KHO: 6, MODEL: 7, SLOT: 8,
   PHONE: 9, ADDRESS: 10, AGREE: 11, STATUS: 12, PAYER_NAME: 13, PAYER_CODE: 14,
-  AMOUNT: 15, BANK_TXN: 16, PAY_TIME: 17, RECEIPT: 18, PM_BY: 19, PM_DATE: 20, NOTE: 21, UA: 22
+  AMOUNT: 15, BANK_TXN: 16, PAY_TIME: 17, RECEIPT: 18, PM_BY: 19, PM_DATE: 20, NOTE: 21, UA: 22,
+  SERIAL: 23 // 06/10/2026: Serial Number của máy đã đăng ký (bản chụp lúc đăng ký) — cột W, thêm vào CUỐI để 22 cột cũ không đổi
 };
+
+// Số cột ghi được vào Registrations: 23 nếu sheet đủ cột (mặc định 26), nếu không thì 22 như cũ — không bao giờ làm hỏng lượt đăng ký
+function regWidth_(sheet) { return sheet.getMaxColumns() >= C.SERIAL ? C.SERIAL : C.UA; }
 
 /* ---------- Mở sheet (1 lần mỗi lượt chạy) ---------- */
 var _book = null;
@@ -897,7 +901,7 @@ function register_product_(d) {
     var n = prodSheet.getLastRow() - 1;
     if (n <= 0) return { ok: false, message: 'Không tìm thấy sản phẩm.' };
 
-    var data = prodSheet.getRange(2, 1, n, 12).getValues();
+    var data = prodSheet.getRange(2, 1, n, prodSheet.getLastColumn() >= PROD_COL.SERIAL ? PROD_COL.SERIAL : 12).getValues();
     var empCount = 0;
 
     for (var r = 0; r < n; r++) {
@@ -940,7 +944,8 @@ function register_product_(d) {
     var regSheet = book_().getSheetByName(SHEET_REG);
     if (regSheet) {
       prodDataTarget = data[targetRow];
-      var regRow = new Array(22).fill('');
+      var rw = regWidth_(regSheet);
+      var regRow = new Array(rw).fill('');
       regRow[0] = ts;                          // Timestamp
       regRow[1] = programId;                   // Campaign/Program
       regRow[2] = str_(d.division);            // Division
@@ -954,7 +959,8 @@ function register_product_(d) {
       regRow[10] = 'Đồng ý';                    // Agree
       regRow[11] = STATUS_WAIT_GATE;           // Status: 'Đã đăng ký - Chờ mở thanh toán'
       regRow[C.AMOUNT - 1] = Number(prodDataTarget[PROD_COL.PRICE - 1]) || 0; // Amount
-      regSheet.getRange(regSheet.getLastRow() + 1, 1, 1, 22).setValues([regRow]);
+      if (rw >= C.SERIAL) regRow[C.SERIAL - 1] = asText_(prodDataTarget[PROD_COL.SERIAL - 1]); // Serial (rỗng nếu SP chưa có)
+      regSheet.getRange(regSheet.getLastRow() + 1, 1, 1, rw).setValues([regRow]);
     }
 
     SpreadsheetApp.flush();
@@ -1042,7 +1048,8 @@ function pm_dashboard_(d) {
   if (regSheet) {
     var n = regSheet.getLastRow() - 1;
     if (n > 0) {
-      var v = regSheet.getRange(2, 1, n, 22).getValues();
+      var vw = regSheet.getLastColumn() >= C.SERIAL ? C.SERIAL : 22;
+      var v = regSheet.getRange(2, 1, n, vw).getValues();
       for (var r = 0; r < n; r++) {
         var pId = String(v[r][C.CAMPAIGN - 1]).trim();
         if (programId && pId.toUpperCase() !== programId.toUpperCase()) continue;
@@ -1073,7 +1080,7 @@ function pm_dashboard_(d) {
           pmBy: str_(v[r][C.PM_BY - 1]),
           pmDate: str_(v[r][C.PM_DATE - 1]),
           note: str_(v[r][C.NOTE - 1]),
-          serial: prodSerials_()[curSlot] || '',
+          serial: (vw >= C.SERIAL ? str_(v[r][C.SERIAL - 1]) : '') || prodSerials_()[curSlot] || '',
           timestamp: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0])
         });
       }
@@ -1676,7 +1683,8 @@ function register_(d) {
       if (byEmp >= maxPer) warnings.push('Mã NV ' + empCode + ' đã đăng ký ' + byEmp + ' lần, vượt hạn mức ' + maxPer + ' sản phẩm/NV.');
       if (warnings.length) notes = notes.concat(warnings);
       ts = new Date();
-      var row = new Array(22).fill('');
+      var rw = regWidth_(reg);
+      var row = new Array(rw).fill('');
       row[C.TS - 1] = ts;
       row[C.CAMPAIGN - 1] = campaign;
       row[C.DIVISION - 1] = safe_(d.division);
@@ -1691,8 +1699,9 @@ function register_(d) {
       row[C.STATUS - 1] = STATUS_WAIT_GATE;
       row[C.NOTE - 1] = safe_(notes.join(' | '));
       row[C.UA - 1] = safe_(str_(d.userAgent).slice(0, 300));
+      if (rw >= C.SERIAL) row[C.SERIAL - 1] = asText_(prodSerials_()[slotId]);
       rowNo = n + 2;
-      reg.getRange(rowNo, 1, 1, 22).setValues([row]);
+      reg.getRange(rowNo, 1, 1, rw).setValues([row]);
       SpreadsheetApp.flush();
     }
   } finally {
@@ -1836,7 +1845,8 @@ function lookup_(d) {
 
   var reg = book_().getSheetByName(SHEET_REG);
   var n = reg.getLastRow() - 1;
-  var v = n > 0 ? reg.getRange(2, 1, n, C.RECEIPT).getValues() : [];
+  var lw = reg.getLastColumn() >= C.SERIAL ? C.SERIAL : C.RECEIPT;
+  var v = n > 0 ? reg.getRange(2, 1, n, lw).getValues() : [];
   var out = [];
 
   var prodPrices = {};
@@ -1865,7 +1875,7 @@ function lookup_(d) {
       time: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0]),
       programId: str_(v[r][C.CAMPAIGN - 1]), // v1-hardening (V1-02): ô "03 Đơn hàng của bạn" lọc theo chương trình
       slot: curSlot, kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
-      serial: prodSerials_()[curSlot] || '',
+      serial: (lw >= C.SERIAL ? str_(v[r][C.SERIAL - 1]) : '') || prodSerials_()[curSlot] || '',
       empCode: empCode,
       empName: empName,
       name: empName,
@@ -2080,6 +2090,30 @@ function safe_(v) {
 
 function fmt_(d) { return Utilities.formatDate(d, 'Asia/Ho_Chi_Minh', 'dd/MM/yyyy HH:mm:ss'); }
 
+// 06/10/2026 — chạy tay trong trình soạn thảo Apps Script (Run → syncSerialsToRegistrations) sau khi nhập / sửa serial ở
+// cột M của Products: điền cột W "Serial" của Registrations cho các dòng đang TRỐNG, theo Mã Slot. Không ghi đè ô đã có.
+function syncSerialsToRegistrations() {
+  var reg = book_().getSheetByName(SHEET_REG);
+  if (!reg || reg.getMaxColumns() < C.SERIAL) return { ok: false, message: 'Registrations chưa có cột W.' };
+  _prodSerials = null;
+  var map = prodSerials_(), n = reg.getLastRow() - 1, filled = 0;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, chạy lại sau ít giây.' };
+  try {
+    if (!str_(reg.getRange(1, C.SERIAL).getValue())) reg.getRange(1, C.SERIAL).setValue('Serial');
+    if (n < 1) return { ok: true, filled: 0 };
+    var slots = reg.getRange(2, C.SLOT, n, 1).getValues();
+    var cur = reg.getRange(2, C.SERIAL, n, 1).getValues();
+    for (var r = 0; r < n; r++) {
+      var sn = map[str_(slots[r][0]).replace(/^'+/, '')];
+      if (sn && !str_(cur[r][0])) { cur[r][0] = asText_(sn); filled++; }
+    }
+    if (filled) reg.getRange(2, C.SERIAL, n, 1).setValues(cur);
+  } finally { lock.releaseLock(); }
+  Logger.log('syncSerialsToRegistrations: điền ' + filled + ' dòng');
+  return { ok: true, filled: filled };
+}
+
 // Ghi ngày giờ "dd/MM/yyyy HH:mm:ss" vào ô dạng CHỮ. Không có dấu ' đầu, Google Sheet tự đổi chuỗi thành ngày theo
 // vùng của bảng tính (kiểu Mỹ: tháng/ngày) → "06/10/2026" thành 10/06/2026 (06/10/2026: "Thời gian nộp" ra tháng 6).
 // Dấu ' không hiện trong ô và không có trong giá trị đọc ra; nó cũng chặn chèn công thức như safe_().
@@ -2170,14 +2204,14 @@ function setupNewDatabase() {
     'Timestamp', 'Campaign', 'Division', 'Employee Code', 'Employee Name', 'Warehouse', 
     'Model', 'Slot ID', 'Phone', 'Address', 'Agree Jeong-Do', 'Status', 'Payer Name', 
     'Payer Code', 'Amount', 'Bank Txn', 'Pay Time', 'Receipt Link', 'PM Approved By', 
-    'PM Approved Date', 'Note', 'User Agent'
+    'PM Approved Date', 'Note', 'User Agent', 'Serial'
   ]);
   
   // 2. Sheet: Slots
   var slotSheet = ss.getSheetByName(SHEET_SLOTS) || ss.insertSheet(SHEET_SLOTS);
   formatHeader(slotSheet, [
     'Slot ID', 'Warehouse', 'Model', 'MRP', 'Internal Price', 'Discount %', 
-    'Status', 'Reserved By', 'Expire At', 'Note', 'Program ID'
+    'Status', 'Reserved By', 'Expire At', 'Note', 'Program ID', 'Serial'
   ]);
   if (slotSheet.getLastRow() <= 1) {
     slotSheet.appendRow(['#001', 'AYA', 'OLED65G3PSA', 68900000, 38900000, '44%', 'Available', '', '', 'GoodSet', 'IS2026Q3-HE']);

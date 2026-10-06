@@ -308,6 +308,39 @@ console.log('--- Serial Number (06/10/2026): cột M Products, lấy theo Mã Sl
   check(get({ action: 'taken', programId: PID }).taken.includes(PID + '-AYB-001'), 'polling slot đã giữ vẫn đúng');
 }
 
+console.log('--- Serial trong Registrations (cột W) + Slots: bên giao hàng mở sheet là thấy serial ---');
+{
+  const book = freshBook(); const { post, ctx } = load(book);
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  const u2 = post({ action: 'auth', id: 'VH70002', password: 'pw2' });
+  post({ action: 'product_upload', token: pm.token, programId: PID, items: [
+    { kho: 'AYB', category: 'TV', model: 'OLED65G3PSA', description: 'x', rrp: 1, internalPrice: 1, serial: '0123123178943' }] });
+  const reg = book.getSheetByName('Registrations');
+  check(post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYB-001', programId: PID, empCode: 'VH70001', empName: 'NV1' }).ok, 'đăng ký slot có serial → OK');
+  const r1 = reg.rows[reg.rows.length - 1];
+  check(r1.length === 23 && r1[22] === "'0123123178943" && r1[6] === 'OLED65G3PSA' && r1[11] === 'Đã đăng ký - Chờ mở thanh toán',
+        'Registrations cột W = serial (dạng chữ); Model cột G, Trạng thái cột L không đổi');
+  check(post({ action: 'register_product', token: u2.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70002', empName: 'NV2' }).ok, 'đăng ký slot CHƯA có serial → vẫn OK');
+  const r2 = reg.rows[reg.rows.length - 1];
+  check(r2[22] === '', 'slot chưa có serial → cột W trống (không bịa)');
+  const dash = post({ action: 'pm_dashboard', token: pm.token, programId: PID });
+  check(((dash.registrations || []).find(r => r.slotId === PID + '-AYB-001') || {}).serial === "'0123123178943", 'Dashboard PM đọc serial từ cột W');
+  const prod = book.getSheetByName('Products');
+  const pr = prod.rows.find(r => r[1] === PID + '-AYA-001'); while (pr.length < 13) pr.push(''); pr[12] = "'5550001112223";
+  reg.rows[reg.rows.length - 1 - 0][22] = '';
+  r1[22] = "'GIU-NGUYEN";
+  const sync = ctx.syncSerialsToRegistrations();
+  check(sync.ok && sync.filled === 1 && r2[22] === "'5550001112223" && r1[22] === "'GIU-NGUYEN", 'syncSerialsToRegistrations: điền ô trống theo Mã Slot, KHÔNG ghi đè ô đã có');
+}
+{
+  const book = freshBook(); const { post } = load(book);
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  book.getSheetByName('Registrations').maxCols = 22;
+  check(post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'NV1' }).ok
+        && regRows(book)[0].length === 22, 'Registrations chỉ có 22 cột → đăng ký vẫn thành công (không ghi serial, không lỗi)');
+}
+
 console.log('--- B4 / C1: Từ chối, mở cổng, watchdog ---');
 {
   const book = freshBook(); const { post, ctx } = load(book);
