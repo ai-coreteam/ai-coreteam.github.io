@@ -4,6 +4,10 @@ Hệ thống số hóa toàn diện quy trình đăng ký, giữ chỗ theo nguy
 
 > 📌 **THÔNG TIN MỚI NHẤT (05/10/2026): đọc [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md) trước.** Bản v1 đã gia cố trên nhánh `v1-hardening` và đạt kiểm thử trên máy chủ staging; **chưa** triển khai bản chính thức. Mở bán: **10:00 14/10/2026**.
 
+> ✅ **LINK CHÍNH THỨC CHO NHÂN VIÊN (06/10/2026):**  
+> 🔗 **[https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html](https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html)**  
+> *Gửi link này, **không kèm `?ui=v2`**: giao diện v2 đã là mặc định. `?ui=v2` ép v2 kể cả khi phải quay lại v1.4 (`UI_V2_DEFAULT = false`), nên người giữ link có tham số sẽ không nhận bản quay lại. `?ui=v1` chỉ dùng để xem giao diện cũ khi xử lý sự cố.*
+
 > 🚀 **BẢN DEMO TRỰC TUYẾN (đào tạo / thử nghiệm):**  
 > 🔗 **[https://gobitangocbao.github.io/lg-internal-sales-portal/](https://gobitangocbao.github.io/lg-internal-sales-portal/)**  
 > *Đây là **bản demo**: mặc định chạy Demo Offline với tài khoản mẫu. Bản chính thức cho nhân viên là `portal.html`, sinh bằng `scripts/build_production.py` (không có tài khoản/dữ liệu demo) — xem [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md).*
