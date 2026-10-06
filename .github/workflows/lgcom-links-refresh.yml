@@ -1,0 +1,49 @@
+# Bảng link "Xem trên LG.com" tự cập nhật hằng tuần (chủ dự án chọn 07/10/2026).
+# Thứ Hai 08:00 giờ VN: tải sitemap LG.com/vn → scripts/build_product_links.py → CHỈ khi link thay đổi mới commit
+# assets/content/lgcom_product_links.json lên main và yêu cầu GitHub Pages build lại.
+# An toàn: script DỪNG (job báo lỗi, GitHub gửi email) nếu sitemap bị chặn / không phải sitemap / số trang giảm > 30%
+# → web giữ nguyên bảng gần nhất, không bao giờ ghi bảng hỏng. Chỉ chạy trên repo Gobitangocbao (repo bản sao bỏ qua).
+# Sau khi bot commit: máy cục bộ phải `git pull --ff-only gobita main` trước khi phát hành (Runbook §1).
+name: LG.com product links – weekly refresh
+on:
+  schedule:
+    - cron: '0 1 * * 1'          # 01:00 UTC thứ Hai = 08:00 giờ Việt Nam
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+concurrency:
+  group: lgcom-links-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    if: github.repository == 'Gobitangocbao/lg-internal-sales-portal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tải sitemap LG.com/vn
+        run: |
+          code=$(curl -s -L -o "$RUNNER_TEMP/sitemap.xml" -w '%{http_code}' --max-time 60 \
+            -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36' \
+            https://www.lg.com/vn/sitemap.xml)
+          echo "HTTP $code · $(wc -c < "$RUNNER_TEMP/sitemap.xml") bytes"
+          if ! grep -q '<urlset' "$RUNNER_TEMP/sitemap.xml"; then
+            echo "::error::LG.com trả HTTP $code, không phải sitemap (có thể bị chặn). Web giữ bảng cũ; tạo bảng bằng tay theo Runbook."
+            head -c 300 "$RUNNER_TEMP/sitemap.xml"; exit 1
+          fi
+      - name: Tạo lại bảng (dừng nếu bất thường)
+        run: python3 scripts/build_product_links.py --sitemap-file "$RUNNER_TEMP/sitemap.xml" | tee "$RUNNER_TEMP/report.txt"
+      - name: Commit nếu link thay đổi + build lại GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- assets/content/lgcom_product_links.json; then
+            echo "Không có thay đổi — không commit."; exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/content/lgcom_product_links.json
+          git commit -m "chore(links): bảng link LG.com tự cập nhật $(date -u +%F)" -m "$(grep -E '^(Sitemap|  [+−·]|  Bị gỡ|  Đổi|  Mới)' "$RUNNER_TEMP/report.txt" | head -20)"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --jq '.status' || echo "::warning::Không yêu cầu được Pages build — lần push sau sẽ build."

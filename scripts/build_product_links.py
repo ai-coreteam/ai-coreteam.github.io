@@ -74,6 +74,8 @@ def main():
                  'Không ghi file. Kiểm tra lại, chắc chắn thì chạy thêm --force.')
     if a.dry_run:
         print('--dry-run: không ghi file.'); return
+    if old and not (added or removed or moved):
+        print('Không có thay đổi link → giữ nguyên file (ngày "generated" = lần thay đổi gần nhất).'); return
     OUT.write_text(json.dumps({'source': URL, 'generated': date.today().isoformat(), 'count': len(links),
                                'links': dict(sorted(links.items()))}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'Đã ghi {OUT.relative_to(ROOT)}: {len(links)} trang sản phẩm ({OUT.stat().st_size // 1024} KB)')
