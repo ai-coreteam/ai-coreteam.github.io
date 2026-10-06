@@ -357,3 +357,19 @@ graph LR
 Sửa trong lúc làm (đều phát hiện bằng đo / ảnh): quy tắc giá tiền vô tình đổi màu bộ đếm PM "Đã ĐK" (đã giới hạn lại); 25 lỗi tương phản chế độ Đêm do ô KPI / ô 02 (v1.4 giữ 2 thẻ này sáng ở chế độ Đêm — đã giữ nguyên); khai báo font Light sai cú pháp lần đầu (font không nạp — đã sửa và kiểm `document.fonts`).
 
 ![GĐ3: desktop & mobile](v2/phase3_cards_desktop_mobile.png)
+
+
+### 11.6. Giai đoạn 4 — danh mục, thẻ sản phẩm, Bảng điều khiển PM (06/10/2026)
+
+| Hạng mục | Kết quả [ĐO] |
+|---|---|
+| Lọc kho, chọn Thẻ / Bảng → segmented; ô tìm kiếm bo tròn 44 px; tiêu đề kho 20 px | ✅ |
+| Thẻ sản phẩm: viền mảnh trong thẻ trắng; model 20 px; mô tả / giá 14 px; **giá nhân viên 24 px dòng riêng (không bẻ chữ "đ")**; cờ "Ưu đãi nội bộ" Active Red (cờ khuyến mãi trên nền trắng — web-system); nút giữ chỗ 48 px | ✅ |
+| Bảng PM chữ 14 px, không bẻ dòng nút / giá / mã GD; **vừa khung ở 1440 và 1280 px như v1.4** | ✅ |
+| Nút theo vai trò: Active Red = Mở cổng TT, Duyệt hàng loạt, Duyệt, Mở TT; viền đen = Từ chối, Kết sổ, Tải lại, Hẹn giờ, Xuất Excel… → mỗi dòng chỉ còn 1 nút đỏ | ✅ |
+| 0 lỗi tương phản 12 màn hình; không cắt chữ / cuộn ngang 1440 · 1280 · 390; Hướng dẫn 9/9 bước khớp 0 px | ✅ |
+| Test giao diện tắt / bật v2 · e2e · máy chủ | 82/82 · 82/82 · 165 · 67 |
+
+Sửa trong lúc làm: 28 lỗi tương phản chế độ Đêm — thẻ sản phẩm, bảng PM, khung chương trình **vẫn sáng ở chế độ Đêm như v1.4** nên phải dùng màu cố định thay cho biến tự đổi; 1 quy tắc khớp nhầm huy hiệu "Demo Mode" (đã thu hẹp); giá và nút bị bẻ dòng do chữ to hơn (phát hiện bằng ảnh, đã sửa).
+
+![GĐ4: thẻ sản phẩm và bảng PM](v2/phase4_card_pm_table.png)

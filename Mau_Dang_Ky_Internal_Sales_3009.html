@@ -3276,6 +3276,78 @@
     html.ui-v2 .pm-kpi-card #kpi-est-revenue { font-size: 28px !important; line-height: 48px; }
     html.ui-v2 #kpi-avail-units { color: #287D00 !important; }                                      /* #4A7B4A ngoài bảng màu */
 
+    /* =====================================================================================
+       UI v2 — GIAI ĐOẠN 4 (06/10/2026): danh mục, thẻ sản phẩm, Bảng điều khiển PM.
+       Chỉ CSS. Nút giữ nguyên onclick / ID; màu theo vai trò: Active Red = hành động chính
+       (Đăng ký giữ chỗ, Mở cổng TT, Duyệt), viền đen = phụ (Từ chối, Kết sổ, Tải lại…).
+       ===================================================================================== */
+    /* --- Thanh công cụ danh mục --- */
+    html.ui-v2 .unified-catalog-toolbar { background: transparent !important; border: 0 !important; padding: 0 !important; }
+    html.ui-v2 .unified-catalog-toolbar * { font-size: 14px !important; }
+    html.ui-v2 .kho-filter-pills { background: var(--lg-panel-2); border-radius: 999px; padding: 4px; gap: 4px !important; flex-wrap: wrap; }
+    html.ui-v2 .kho-filter-pills > span { padding: 0 8px 0 12px; color: var(--lg-text-2) !important; }
+    html.ui-v2 .kho-filter-pills button { height: 40px; padding: 0 16px !important; border: 0 !important; border-radius: 999px !important;
+                                          background: transparent !important; color: var(--lg-text-2) !important; font-weight: 400 !important; box-shadow: none !important; }
+    html.ui-v2 .kho-filter-pills button span { color: inherit !important; }
+    html.ui-v2 .kho-filter-pills button[style*="background:#A50034"] { background: var(--lg-card-bg) !important; color: var(--lg-ink) !important; font-weight: 600 !important; box-shadow: var(--v2-shadow) !important; }
+    html.ui-v2 .view-mode-toggle { background: var(--lg-panel-2) !important; border: 0 !important; border-radius: 999px !important; padding: 4px; }
+    html.ui-v2 .btn-view-mode { height: 40px; padding: 0 16px !important; border-radius: 999px !important; background: transparent !important; color: var(--lg-text-2) !important; }
+    html.ui-v2 .btn-view-mode.active { background: var(--lg-card-bg) !important; color: var(--lg-ink) !important; box-shadow: var(--v2-shadow); }
+    html.ui-v2 .btn-view-mode svg { stroke: currentColor !important; }
+    html.ui-v2 .unified-catalog-toolbar input[type="search"] { height: 44px; border-radius: 999px !important; border: 1px solid var(--lg-border-strong) !important; padding-left: 40px !important; }
+    html.ui-v2 .kho-header { background: transparent; border: 0; border-bottom: 1px solid var(--lg-border); border-radius: 0; padding: 12px 0; font-size: 20px; font-family: var(--font-heading); font-weight: 600; }
+    html.ui-v2 .kho-header { color: var(--lg-ink); }
+    html.ui-v2 .kho-header .kho-count { font-family: var(--font-main); font-size: 14px; font-weight: 400; color: var(--lg-text-2); }
+    /* Đêm: thanh công cụ nay trong suốt trên vùng làm việc tối → chữ đếm / mô tả sáng (ô nhập vẫn nền trắng) */
+    html.ui-v2[data-theme="dark"] .unified-catalog-toolbar > div > div:not(.kho-filter-pills):not(.view-mode-toggle),
+    html.ui-v2[data-theme="dark"] .unified-catalog-toolbar > div > div:not(.kho-filter-pills):not(.view-mode-toggle) *:not(input) { color: #CBC8C2 !important; }
+
+    /* --- Thẻ sản phẩm (nằm trong thẻ trắng lớn → thẻ con viền mảnh) --- */
+    html.ui-v2 .lg-product-card { border: 1px solid var(--lg-border); border-radius: 16px; box-shadow: none; padding: 20px; }
+    html.ui-v2 .lg-product-card:hover { box-shadow: var(--v2-shadow); transform: none; }
+    html.ui-v2 .lg-tag-exclusive { font-size: 14px; letter-spacing: 0; text-transform: none; background: #EA1917; padding: 2px 10px; }   /* cờ khuyến mãi trên nền trắng = Active Red (web-system) */
+    html.ui-v2 .lg-tag-stock { font-size: 14px; }
+    html.ui-v2 .lg-card-meta, html.ui-v2 .lg-card-meta strong { font-size: 14px; }
+    html.ui-v2 .lg-card-model { font-family: var(--font-heading); font-size: 20px; line-height: 24px; font-weight: 600; margin-top: 4px; }
+    html.ui-v2 .lg-card-desc { font-size: 14px; line-height: 20px; color: #4A4946; }   /* thẻ SP luôn trắng (cả chế độ Đêm) → màu cố định */
+    html.ui-v2 .lg-price-box * { font-size: 14px; }
+    html.ui-v2 .lg-discount-pill { padding: 0 8px; }
+    html.ui-v2 .lg-internal-label { font-weight: 400; text-transform: none; letter-spacing: 0; }
+    html.ui-v2 .lg-internal-row { flex-direction: column; align-items: flex-start; gap: 2px; }   /* giá 24 px xuống dòng riêng, không bẻ chữ "đ" */
+    html.ui-v2 .lg-internal-price, html.ui-v2 .lg-rrp-value { white-space: nowrap; }
+    html.ui-v2 .lg-price-box .lg-internal-price { font-family: var(--font-main); font-size: 24px; line-height: 28px; font-weight: 600; }
+    html.ui-v2 .lg-btn-buy { height: 48px; font-size: 16px; font-weight: 600; background: #EA1917; }
+    html.ui-v2 .lg-btn-buy:hover:not(:disabled) { background: #C41512; }
+    html.ui-v2 .product-table th, html.ui-v2 .product-table td { font-size: 14px; }
+    html.ui-v2 .btn-register { font-size: 14px; background: #EA1917; border-color: #EA1917; color: #FFFFFF; border-radius: 999px; }
+
+    /* --- Bảng điều khiển PM: nút --- */
+    html.ui-v2 .btn-pm-action { height: 40px; font-size: 14px !important; border-radius: 999px; box-shadow: none !important; }
+    html.ui-v2 .btn-pm-action span, html.ui-v2 .btn-pm-action strong { font-size: 14px !important; }
+    html.ui-v2 #btn-allow-payment-header,
+    html.ui-v2 #btn-batch-approve-header { background: #EA1917 !important; border-color: #EA1917 !important; color: #FFFFFF !important; }
+    html.ui-v2 .btn-pm-outline, html.ui-v2 .btn-pm-export { background: transparent !important; border: 1px solid var(--lg-ink) !important; color: var(--lg-ink) !important; }
+    html.ui-v2 .btn-pm-outline svg, html.ui-v2 .btn-pm-export svg { stroke: currentColor !important; }
+    html.ui-v2 #pm-banner .btn-pm-outline { color: #262626 !important; border-color: #262626 !important; }   /* khung chương trình luôn sáng */
+    html.ui-v2[data-theme="dark"] .btn-pm-action[onclick="openApiConfigModal()"] { color: #F6F3EB !important; border-color: #F6F3EB !important; }
+    html.ui-v2 .pm-subnav-btn { font-size: 14px; height: 40px; border-radius: 999px; }
+    html.ui-v2 .pm-subnav-btn.active { background: var(--lg-ink); border-color: var(--lg-ink); color: var(--lg-card-bg); }
+    html.ui-v2 .pm-select, html.ui-v2 .pm-search-input { font-size: 14px; height: 44px; border-radius: 12px; }
+
+    /* --- Bảng đơn PM: chữ 14 px, thao tác theo vai trò --- */
+    html.ui-v2 .pm-table, html.ui-v2 .pm-table th, html.ui-v2 .pm-table td, html.ui-v2 .pm-table td * { font-size: 14px !important; }
+    html.ui-v2 .pm-table th { font-weight: 600; color: #4A4946; }   /* bảng PM luôn sáng */
+    html.ui-v2 .btn-table-action { min-height: 36px; padding: 0 12px; border-radius: 999px; }
+    html.ui-v2 .btn-table-action.btn-approve { background: #EA1917; border-color: #EA1917; color: #FFFFFF; }
+    html.ui-v2 .btn-table-action.btn-reject { background: transparent; border: 1px solid #262626; color: #262626; }
+    html.ui-v2 .btn-table-action.btn-slip { background: #F0ECE4; color: #262626; }
+    /* Không bẻ dòng nút, giá, mã GD, thời gian — bảng đã có khung cuộn ngang (.pm-table-wrapper overflow-x:auto) */
+    html.ui-v2 .btn-table-action, html.ui-v2 .pm-table .price-internal, html.ui-v2 .pm-table code,
+    html.ui-v2 .pm-table .badge-code, html.ui-v2 .pm-table td:nth-child(5) { white-space: nowrap; }
+    html.ui-v2 .pm-table td, html.ui-v2 .pm-table th { padding-left: 10px; padding-right: 10px; }
+    /* "Mở TT" từng dòng = cùng hành động chính với "Mở cổng thanh toán" trên đầu → Active Red */
+    html.ui-v2 .btn-table-action[onclick^="pmAllowPaymentSingle"] { background: #EA1917 !important; border-color: #EA1917 !important; color: #FFFFFF !important; }
+
     /* Mobile: quy tắc cũ dùng !important ở 13 px → v2 nâng lên 14 px; thanh chọn vuốt ngang như LG.com */
     @media (max-width: 768px) {
       html.ui-v2 .program-tab,

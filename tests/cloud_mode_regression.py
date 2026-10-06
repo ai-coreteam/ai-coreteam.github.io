@@ -487,6 +487,15 @@ def main():
                     check(p3['light'], 'v2 GĐ3: font LG EI Headline Light (số lớn) đã nạp')
                     check(p3['c1'] == 'rgb(255, 255, 255)', f"v2 GĐ3: ô 01 là thẻ trắng ({p3['c1']})")
                     check(p3['distinctCounterColors'] == 4, 'v2 GĐ3: 4 bộ đếm PM giữ 4 màu trạng thái')
+                    p4 = page.evaluate('''() => {
+                        const small = [...document.querySelectorAll('.pm-table *, .btn-pm-action *, .btn-pm-action')].filter(e => e.getBoundingClientRect().width &&
+                              [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 14).length;
+                        const w = document.querySelector('.pm-table-wrapper'), t = document.querySelector('.pm-table');
+                        return { small, scroll: t.scrollWidth > w.clientWidth + 1,
+                                 approveRed: [...document.querySelectorAll('.btn-approve')].every(b => getComputedStyle(b).backgroundColor === 'rgb(234, 25, 23)') }; }''')
+                    check(p4['small'] == 0, f"v2 GĐ4: bảng & nút PM ≥ 14 px ({p4['small']} chỗ nhỏ hơn)")
+                    check(not p4['scroll'], 'v2 GĐ4: bảng PM vừa khung ở 1440 px (không cuộn ngang)')
+                    check(p4['approveRed'], 'v2 GĐ4: nút Duyệt = Active Red (hành động chính)')
                     check(not page.errors, f'v2: không có lỗi JS ({page.errors[:2]})')
                 else:
                     check(not on, f'{label} → giao diện v1.4 (không có class ui-v2)')
