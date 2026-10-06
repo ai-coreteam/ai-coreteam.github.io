@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <script>
     // UI v2 (design/UI_V2_DIRECTION_PROPOSAL.md): lớp giao diện mới, chỉ đổi CSS, bật/tắt bằng class `ui-v2` trên <html>.
-    // UI_V2_DEFAULT = false → mọi người vẫn thấy giao diện v1.4. Xem trước: thêm ?ui=v2 vào link. Tắt hẳn: ?ui=v1.
-    var UI_V2_DEFAULT = false;
+    // UI_V2_DEFAULT = true (bật cho mọi người 06/10/2026, chủ dự án duyệt). Xem giao diện cũ v1.4: thêm ?ui=v1 vào link.
+    // Quay lại v1.4 cho tất cả: đổi thành false → chạy test → build portal.html → push.
+    var UI_V2_DEFAULT = true;
     (function () {
       try {
         var q = new URLSearchParams(location.search).get('ui');
@@ -3341,6 +3342,8 @@
     html.ui-v2 .btn-table-action.btn-approve { background: #EA1917; border-color: #EA1917; color: #FFFFFF; }
     html.ui-v2 .btn-table-action.btn-reject { background: transparent; border: 1px solid #262626; color: #262626; }
     html.ui-v2 .btn-table-action.btn-slip { background: #F0ECE4; color: #262626; }
+    /* Cửa sổ biên lai: "Duyệt Thanh Toán Này" cùng vai trò với nút Duyệt ở bảng → Active Red (trước: xanh #0E6251) */
+    html.ui-v2 #modal-btn-approve { background: #EA1917 !important; border-color: #EA1917 !important; color: #FFFFFF !important; }
     /* Không bẻ dòng nút, giá, mã GD, thời gian — bảng đã có khung cuộn ngang (.pm-table-wrapper overflow-x:auto) */
     html.ui-v2 .btn-table-action, html.ui-v2 .pm-table .price-internal, html.ui-v2 .pm-table code,
     html.ui-v2 .pm-table .badge-code, html.ui-v2 .pm-table td:nth-child(5) { white-space: nowrap; }

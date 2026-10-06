@@ -29,7 +29,8 @@
 |---|---|---|
 | Mã nguồn (web + Code.gs) | Git tag **`checkpoint-pre-v1-hardening-20261005`** (commit `5404e1a`) và nhánh **`backup/pre-v1-hardening-20261005`** | `git checkout checkpoint-pre-v1-hardening-20261005 -- Mau_Dang_Ky_Internal_Sales_3009.html apps-script/Code.gs` rồi commit; hoặc quay hẳn: `git switch main` (main chưa bị sửa) |
 | Dữ liệu Google Sheet | Bản sao **"LG Internal Sales Database - BACKUP 2026-10-05 (pre-v1-hardening) - KHONG SUA"** (ID `1WIUrSzTYxqKKtt5RbJ2bF2xZiZRVpXC_pxFdpQQ9lL4`, riêng tư) | Sao chép dữ liệu từ bản backup sang Sheet chính (không xóa Sheet chính) |
-| **Bản mới nhất v1.4** (05/10/2026) | Git tag **`v1.4`** · Apps Script chính thức **Version 7** (không đổi) | Lùi web: build `portal.html` từ tag trước (`v1.3` … `v1.1`) |
+| **Bản mới nhất v2.0** (06/10/2026) — giao diện v2 bật mặc định | Git tag **`v2.0`** · Apps Script chính thức **Version 7** (không đổi từ v1.1) | **Từng người:** thêm `?ui=v1` vào link (tức thì). **Tất cả:** đổi `var UI_V2_DEFAULT = true;` → `false` trong `Mau_Dang_Ky_Internal_Sales_3009.html`, chạy 3 bộ test, build `portal.html`, push. **Bỏ hẳn code v2:** build `portal.html` từ tag `v1.4` |
+| Bản v1.4 (05/10/2026) | Git tag **`v1.4`** | Lùi web: build `portal.html` từ tag trước (`v1.3` … `v1.1`) |
 | **Bản chuẩn v1.1** (05/10/2026) | Git tag **`v1.1`** · Apps Script chính thức **Version 7** | Lùi về trước v1.1: dòng dưới + Apps Script **Version 6** |
 | Apps Script đang chạy | Phiên bản (Version) hiện tại trong **Deploy → Manage deployments** | Trước khi deploy: **ghi lại số Version đang chạy**. Muốn quay lại: Manage deployments → ✏️ Edit → chọn Version cũ → Deploy (URL giữ nguyên) |
 

@@ -172,7 +172,7 @@ flowchart TD
      * **Xoay ảnh (Rotate):** Xoay 90°, 180° đối với các ảnh chụp ngang/ngược từ điện thoại.
      * **Đối chiếu thông tin:** Hiển thị song song Mã NV, Tên NV, Số tiền cần nộp, Số tiền thực nộp và Mã GD ngân hàng.
 4. **Phê duyệt:**
-   * Bấm nút màu xanh **`Duyệt Thanh Toán Này`** ngay bên trong Lightbox để hoàn tất xác nhận đơn.
+   * Bấm nút đỏ **`Duyệt Thanh Toán Này`** ngay bên trong Lightbox để hoàn tất xác nhận đơn *(giao diện v2; v1.4 là nút xanh)*.
    * Hoặc bấm **`Từ Chối Đơn`** (kèm lý do) để hủy giao dịch và hoàn trả slot về kho khả dụng.
 
 ---
@@ -180,16 +180,33 @@ flowchart TD
 ### Bước 4: Duyệt thanh toán hàng loạt 1-Click (Batch Approve)
 * Khi đợt bán có hàng trăm đơn nộp tiền cùng lúc:
   1. Kiểm tra tài khoản ngân hàng của công ty qua sao kê kế toán.
-  2. Bấm nút xanh lá **`Duyệt hàng loạt (N)`** trên thanh nút Bảng Điều Khiển PM.
+  2. Bấm nút đỏ **`Duyệt hàng loạt (N)`** trên thanh nút Bảng Điều Khiển PM *(giao diện v2; v1.4 là nút xanh lá)*.
   3. Xác nhận số lượng đơn cần duyệt. Hệ thống chuyển các đơn `Đã khai nộp - chờ đối soát` sang `Đã duyệt thanh toán`, **chờ máy chủ xác nhận** rồi báo *"Máy chủ đã duyệt X / Y đơn"* và tự tải lại bảng. Duyệt hàng loạt **không** tự so khớp sao kê — PM chịu trách nhiệm đối chiếu ở bước 1.
 
 ---
 
 ### Bước 5: Kết sổ đợt bán & Xuất báo cáo
-1. Khi hết thời hạn đăng ký, bấm nút màu đỏ **"Kết sổ chương trình"**.
+1. Khi hết thời hạn đăng ký, bấm nút **"Kết sổ chương trình"** (viền đen, trong khung chương trình — giao diện v2; v1.4 là nút viền đỏ).
 2. **Xuất dữ liệu quyết toán:**
    * Bấm nút **`Xuất Excel (CSV)`** tại Bảng Điều Khiển PM (file gồm **mọi đơn** của chương trình đang chọn; lọc theo cột Trạng thái nếu chỉ cần đơn đã duyệt).
    * File xuất ra chứa đầy đủ 22 trường thông tin: Mã đợt, Mã NV, Họ tên, Phòng ban, Model, Kho, Số tiền, Mã GD ngân hàng, Giờ nộp, Người phê duyệt, sẵn sàng nộp cho Giám đốc Tài chính và Kế toán kho LGEVH.
+
+---
+
+## PHẦN D: GIAO DIỆN MỚI v2 (bật cho mọi người từ 06/10/2026)
+
+Chức năng và các bước **không đổi** — chỉ đổi giao diện. Cách nhận biết:
+
+| Trước (v1.4) | Bây giờ (v2) |
+|---|---|
+| Chữ nhỏ 11–13 px | Chữ tối thiểu 14 px, dễ đọc hơn |
+| Thanh chọn chương trình / tab: viên viền đỏ, tab đang chọn đỏ đặc | Thanh nền xám, mục đang chọn là **viên trắng** |
+| Ô 01 Thể lệ & chuyển khoản: khối đỏ | Thẻ trắng, **số tài khoản to** |
+| Nút "Duyệt", "Duyệt hàng loạt", "Mở cổng thanh toán": xanh | **Đỏ** = hành động chính. "Từ chối", "Kết sổ", "Tải lại"…: **viền đen** |
+| Thẻ sản phẩm | Giá nhân viên to, có link **"Xem trên LG.com ↗"** (hoặc "Tìm thông tin model ↗") để xem tính năng — giá & quà tặng trên LG.com **không** áp dụng cho bán nội bộ |
+| Màn đăng nhập trên nền mờ | Màn đăng nhập trên nền đỏ–đen của LG |
+
+**Gặp lỗi hiển thị?** Thêm `?ui=v1` vào cuối link (ví dụ `…/portal.html?ui=v1`) để dùng giao diện cũ v1.4 ngay, rồi báo ADMIN.
 
 ---
 

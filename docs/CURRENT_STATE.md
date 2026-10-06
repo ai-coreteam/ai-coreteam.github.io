@@ -7,7 +7,7 @@
 | Phiên bản | **v1.4** — git tag `v1.4` trên `main` (05/10/2026; v1.1 + cửa sổ biên lai (v1.2) + khung Hướng dẫn bước 1 (v1.3) + chờ đăng nhập 45 giây (v1.4)). Web: nguồn `Mau_Dang_Ky_Internal_Sales_3009.html` → bản nhân viên `portal.html` · Apps Script: `apps-script/Code.gs` (nhãn trong code `8.3-v1-hardening`) = **Version 7** bản chính thức, **Version 3** staging |
 | Trạng thái | **v1.4 đã phát hành 05/10/2026** (v1.1–v1.3 cùng ngày): máy chủ chính thức Version 7 (kiểm tra 10/10), `portal.html` trên GitHub Pages, `v1-hardening` đã gộp vào `main`. Mọi thay đổi sau này bắt đầu từ tag `v1.1` ([quy trình](04-v1-hardening/README.md#phiên-bản-chuẩn-v11)) |
 | Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
-| Giao diện v2 | **Đã làm xong 5 giai đoạn** (06/10/2026), chờ chủ dự án chọn ngày bật — checklist §13 ([`design/UI_V2_DIRECTION_PROPOSAL.md`](../design/UI_V2_DIRECTION_PROPOSAL.md)). Bật/tắt bằng `UI_V2_DEFAULT` (mặc định **tắt**); xem trước bằng `?ui=v2`. Quay lại v1.4: tắt công tắc, hoặc build `portal.html` từ tag `v1.4` |
+| Giao diện v2 | **Bật cho mọi người từ 06/10/2026 (tag `v2.0`)** — chủ dự án duyệt để toàn bộ người dùng test. Chức năng như v1.4. Xem giao diện cũ: thêm `?ui=v1` vào link. Quay lại v1.4 cho tất cả: `UI_V2_DEFAULT = false` → test → build `portal.html` → push ([Runbook §1](04-v1-hardening/V1_RELEASE_RUNBOOK.md)). Thiết kế: [`design/UI_V2_DIRECTION_PROPOSAL.md`](../design/UI_V2_DIRECTION_PROPOSAL.md) |
 | Mở bán | **10:00, 14/10/2026** → hạn chót **17:00, 16/10/2026** (theo Tab 1 của trang) |
 | Khi tài liệu khác mâu thuẫn với trang này | Trang này đúng. Tài liệu trong `03-architecture-and-analysis/` là **lịch sử phân tích**, mỗi file có khung "Trạng thái" ở đầu |
 

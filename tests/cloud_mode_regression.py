@@ -455,6 +455,7 @@ def main():
                         [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()))'''
             arial = RUNS + ".filter(e => getComputedStyle(e).fontFamily.startsWith('Arial')).length"
             faux = RUNS + ".filter(e => { const s = getComputedStyle(e); return s.fontFamily.includes('Headline') && +s.fontWeight > 600 && s.fontSynthesisWeight !== 'none'; }).length"
+            # Từ 06/10/2026 v2 bật mặc định → '' và '?ui=v2' là v2; '?ui=v1' là đường lùi về giao diện v1.4
             for q, label in (('', 'mặc định'), ('?ui=v2', '?ui=v2'), ('?ui=v1', '?ui=v1')):
                 ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
                 ctx.add_init_script("localStorage.setItem('lg_tour_completed_employee','true');localStorage.setItem('lg_tour_completed_pm','true');")
@@ -462,7 +463,10 @@ def main():
                 page.goto(f'http://127.0.0.1:{port}/{PAGE}{q}'); page.wait_for_timeout(800)
                 on = page.evaluate("document.documentElement.classList.contains('ui-v2')")
                 login_bg = page.evaluate("getComputedStyle(document.getElementById('login-overlay')).backgroundImage")
-                if q == '?ui=v2':
+                if q == '':
+                    check(on, 'mặc định → giao diện v2 (bật cho mọi người 06/10/2026)')
+                    check('LGE_Electronics_Gradient_04_RGB.jpg' in login_bg, 'mặc định → màn đăng nhập v2')
+                elif q == '?ui=v2':
                     login_small = page.evaluate('''() => [...document.querySelectorAll('.login-card *')].filter(e => e.getBoundingClientRect().width &&
                         [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 14).length''')
                     check('LGE_Electronics_Gradient_04_RGB.jpg' in login_bg, 'v2 GĐ5: màn đăng nhập dùng đúng file LG Master Gradient 04')
@@ -541,8 +545,8 @@ def main():
             ctx, page, s, links, note = links_view('?ui=v2', 'table')
             check(len(links) == 2, f'dạng Bảng cũng có link ({len(links)})')
             ctx.close()
-            ctx, page, s, links, note = links_view('')
-            check(not links and not note, 'tắt v2 → không có link / lưu ý (giữ nguyên v1.4)')
+            ctx, page, s, links, note = links_view('?ui=v1')
+            check(not links and not note, '?ui=v1 → không có link / lưu ý (giữ nguyên v1.4)')
             ctx.close()
 
             ctx = browser.new_context(viewport={'width': 390, 'height': 844})

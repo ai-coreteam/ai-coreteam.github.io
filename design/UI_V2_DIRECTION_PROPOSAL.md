@@ -400,6 +400,8 @@ Sửa trong lúc làm: 28 lỗi tương phản chế độ Đêm — thẻ sản
 
 ## 13. Checklist bật v2 cho toàn bộ nhân viên
 
+> **06/10/2026: chủ dự án quyết định bật luôn để mọi người cùng test** (bỏ qua bước 1–3 bên dưới; người dùng phát hiện lỗi thì dùng `?ui=v1` và báo lại). Bật ở tag `v2.0`. Cùng lúc: nút "Duyệt Thanh Toán Này" trong cửa sổ biên lai đổi sang Active Red cho thống nhất với nút Duyệt ở bảng; hướng dẫn sử dụng thêm Phần D.
+
 | # | Việc | Ai | ☐ |
 |---|---|---|---|
 | 1 | Xem trước `…/portal.html?ui=v2` trên **máy tính và điện thoại**: đăng nhập, xem danh mục, bấm 2–3 link "Xem trên LG.com", (PM) xem bảng điều khiển, mở cửa sổ biên lai | Chủ dự án + 1 PM | ☐ |

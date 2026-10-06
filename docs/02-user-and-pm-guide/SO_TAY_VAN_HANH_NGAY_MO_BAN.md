@@ -3,7 +3,7 @@
 
 | | |
 |---|---|
-| Áp dụng cho | Bản **v1.4** (phát hành 05/10/2026) |
+| Áp dụng cho | Bản **v2.0** — giao diện mới bật cho mọi người 06/10/2026 (chức năng như v1.4). Tên nút / màu: [`PM_AND_USER_OPERATIONAL_GUIDE.md`](PM_AND_USER_OPERATIONAL_GUIDE.md) Phần D |
 | Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` |
 | Đợt bán | Mở **10:00 ngày 14/10/2026** → kết thúc **17:00 ngày 16/10/2026** |
 | Đối chiếu | Mọi bước dưới đây đã được kiểm tra với mã nguồn ngày 05/10/2026 |
@@ -120,6 +120,7 @@
 
 | Bạn thấy | Nghĩa là | Làm gì | Gọi ai |
 |---|---|---|---|
+| Giao diện hiển thị lạ / lệch / nút không bấm được trên máy của ai đó | Lỗi hiển thị giao diện v2 trên trình duyệt đó | Mở link có thêm **`?ui=v1`** (giao diện cũ v1.4, cùng chức năng) và báo kỹ thuật kèm ảnh chụp | Kỹ thuật |
 | Nhân viên báo "Đang kết nối máy chủ…" | Máy chủ Google đang chậm (hay gặp vài phút đầu) | Bảo nhân viên chờ, trang tự thử lại sau 15 giây hoặc bấm **"Thử lại ngay"**. Mạng công ty chặn → dùng 4G/5G | — |
 | Nút đăng nhập ghi "Máy chủ đang khởi động… vui lòng chờ (tối đa 45 giây)" | Máy chủ vừa "ngủ", lần đầu thức dậy mất 15–40 giây | **Chờ, không bấm lại.** Phòng tránh: ADMIN khởi động máy chủ lúc 9:45 (Phần 2-B) | — |
 | Báo "quá thời gian chờ (45s)" (hoặc "(12s)" nếu đang mở bản cũ) | Máy chủ quá tải / mạng chặn | Tải lại trang (Cmd/Ctrl+Shift+R) rồi đăng nhập lại sau 1–2 phút; vẫn lỗi → dùng 4G/5G, báo ADMIN | ADMIN |
