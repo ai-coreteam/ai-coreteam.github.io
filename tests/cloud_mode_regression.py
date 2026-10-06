@@ -733,6 +733,19 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 21: Tab 2 dạng Bảng ở chế độ tối — nền bảng luôn trắng nên chữ phải tối (trước: chữ sáng #F0ECE4 trên nền trắng)')
+            s = MockServer()
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            page.evaluate("document.documentElement.setAttribute('data-theme','dark')")
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(700)
+            page.evaluate("setUnifiedViewMode('table')"); page.wait_for_timeout(700); page.mouse.move(5, 5); page.wait_for_timeout(300)
+            m = page.evaluate("""() => { const t = document.querySelector('.product-table'); const td = t.querySelector('tbody tr td:nth-child(2)');
+                     return { bg: getComputedStyle(t).backgroundColor, color: getComputedStyle(td).color }; }""")
+            check(m['bg'] == 'rgb(255, 255, 255)' and m['color'] == 'rgb(38, 38, 38)', f'chế độ tối: chữ #262626 trên nền trắng của bảng ({m})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()
