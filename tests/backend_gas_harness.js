@@ -76,7 +76,24 @@ class Book {
   getId() { return 'MOCK_BOOK'; } getUrl() { return 'https://mock'; } getName() { return 'Mock'; }
 }
 
+// Drive giả lập: thư mục / file có cha, đủ cho lưu biên lai và chia thư mục theo chương trình
+function makeDrive() {
+  const folders = {}, files = {}; let seq = 0;
+  const iter = arr => { let i = 0; return { hasNext: () => i < arr.length, next: () => arr[i++] }; };
+  const fileApi = id => ({ getId: () => id, getName: () => files[id].name, getUrl: () => `https://drive.google.com/file/d/${id}/view?usp=drivesdk`,
+    moveTo: f => { files[id].parentId = f.getId(); return fileApi(id); } });
+  const api = id => ({ getId: () => id, getName: () => folders[id].name, setName: n => { folders[id].name = n; }, isTrashed: () => !!folders[id].trashed,
+    createFolder: n => mk(n, id),
+    createFile: b => { const fid = 'FILE' + (++seq) + 'abcdefghijklmnopqrstuvwxyz0123'; files[fid] = { id: fid, name: b.getName(), parentId: id }; return fileApi(fid); },
+    getFolders: () => iter(Object.values(folders).filter(f => f.parentId === id).map(f => api(f.id))),
+    getFiles: () => iter(Object.values(files).filter(f => f.parentId === id).map(f => fileApi(f.id))) });
+  const mk = (name, parentId) => { const id = 'FOLDER' + (++seq) + 'abcdefghijklmnopqrstuvwxyz01'; folders[id] = { id, name, parentId }; return api(id); };
+  const root = mk('Bien lai nop tien', null);
+  return { folders, files, root, DriveApp: { getFolderById: id => { if (!folders[id]) throw new Error('no folder ' + id); return api(id); } } };
+}
+
 function makeServices(book, props, cache) {
+  state.drive = makeDrive();
   return {
     SpreadsheetApp: { getActiveSpreadsheet: () => book, openById: () => book, create: () => book, flush() {} },
     LockService: {
@@ -101,14 +118,14 @@ function makeServices(book, props, cache) {
       base64EncodeWebSafe: v => toBuf(v).toString('base64').replace(/\+/g, '-').replace(/\//g, '_'),
       base64DecodeWebSafe: s => signed(Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64')),
       base64Decode: s => signed(Buffer.from(s, 'base64')),
-      newBlob: bytes => ({ getDataAsString: () => unsigned(bytes).toString('utf8') }),
+      newBlob: (bytes, mime, name) => ({ getDataAsString: () => unsigned(bytes).toString('utf8'), getName: () => name }),
       getUuid: () => crypto.randomUUID(),
       formatDate: d => d.toISOString().replace('T', ' ').slice(0, 19)
     },
     MailApp: { sendEmail: m => state.mails.push({ ...m, duringLock: state.lockHeld }), getRemainingDailyQuota: () => 100 },
     Logger: { log: m => state.logs.push(String(m)) },
     ContentService: { MimeType: { JSON: 'json' }, createTextOutput: s => ({ content: s, setMimeType() { return this; } }) },
-    DriveApp: {}
+    DriveApp: state.drive.DriveApp
   };
 }
 
@@ -339,6 +356,39 @@ console.log('--- Serial trong Registrations (cột W) + Slots: bên giao hàng m
   book.getSheetByName('Registrations').maxCols = 22;
   check(post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'NV1' }).ok
         && regRows(book)[0].length === 22, 'Registrations chỉ có 22 cột → đăng ký vẫn thành công (không ghi serial, không lỗi)');
+}
+
+console.log('--- Biên lai chia thư mục theo chương trình (06/10/2026) ---');
+{
+  const book = freshBook(); const { post, ctx, props } = load(book);
+  const D = state.drive; props.RECEIPT_FOLDER_ID = D.root.getId();
+  const subOf = id => Object.values(D.folders).filter(f => f.parentId === id);
+  const filesIn = id => Object.values(D.files).filter(f => f.parentId === id);
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  const u2 = post({ action: 'auth', id: 'VH70002', password: 'pw2' });
+  const c1 = PID + '-AYA-001', c2 = PID + '-AYA-002', IMG = 'data:image/png;base64,iVBORw0KGgo=';
+  post({ action: 'register_product', token: u1.token, uniqueCode: c1, programId: PID, empCode: 'VH70001', empName: 'NV1' });
+  post({ action: 'register_product', token: u2.token, uniqueCode: c2, programId: PID, empCode: 'VH70002', empName: 'NV2' });
+  post({ action: 'pm_allow_payment', token: pm.token, programId: PID });
+  const p1 = post({ action: 'payment', token: u1.token, slotId: c1, empCode: 'VH70001', payerName: 'NV1', bankTxn: 'FT1', fileBase64: IMG, fileName: 'a.png' });
+  const sub = subOf(D.root.getId());
+  check(p1.ok && p1.receipt && sub.length === 1 && sub[0].name === PID + ' - Dot test', `nộp tiền lần đầu → tạo thư mục "${PID} - Dot test" trong "Bien lai nop tien" (${sub.map(f => f.name)})`);
+  check(filesIn(sub[0].id).length === 1 && filesIn(D.root.getId()).length === 0, 'biên lai nằm trong thư mục chương trình, không nằm ở thư mục gốc');
+  const row1 = regRows(book).find(r => r[7] === c1);
+  check(/drive\.google\.com\/file\/d\/FILE/.test(row1[17]), 'cột Receipt Link vẫn là link Drive của file (web mở được như cũ)');
+  sub[0].name = PID + ' - doi ten bang tay'; props['RECEIPT_FOLDER_' + PID] = undefined; delete props['RECEIPT_FOLDER_' + PID]; ctx.CacheService.getScriptCache().remove('RECEIPT_FOLDER_' + PID);
+  const p2 = post({ action: 'payment', token: u2.token, slotId: c2, empCode: 'VH70002', payerName: 'NV2', bankTxn: 'FT2', fileBase64: IMG, fileName: 'b.jpg' });
+  check(p2.ok && subOf(D.root.getId()).length === 1 && filesIn(sub[0].id).length === 2, 'đơn thứ 2 cùng chương trình → dùng lại đúng thư mục (kể cả khi thư mục bị đổi tên, tìm theo Mã chương trình)');
+  const loose = D.root.createFile({ getName: () => 'BL_cu.png' }); const stray = D.root.createFile({ getName: () => 'khong_khop.png' });
+  book.getSheetByName('Registrations').rows[1][17] = loose.getUrl();
+  const org = ctx.organizeReceiptsByProgram();
+  check(org.moved === 1 && D.files[loose.getId()].parentId === sub[0].id && D.files[stray.getId()].parentId === D.root.getId(),
+        'organizeReceiptsByProgram: chuyển file cũ theo Receipt Link của đơn; file không khớp đơn nào giữ nguyên');
+  check(loose.getUrl() === book.getSheetByName('Registrations').rows[1][17], 'chuyển thư mục KHÔNG đổi link file');
+  const orphan = ctx.saveReceipt_(IMG, 'x.png', 'X-1', 'VH70001', '');
+  check(D.files[/FILE\w+/.exec(orphan)[0]].parentId === D.root.getId(), 'không xác định được chương trình → lưu ở thư mục gốc như cũ');
+  check(!state.unlockedWrites.some(w => /payment/.test(w)), 'không phát sinh lệnh ghi Registrations ngoài khóa');
 }
 
 console.log('--- B4 / C1: Từ chối, mở cổng, watchdog ---');

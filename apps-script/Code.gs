@@ -1777,10 +1777,12 @@ function payment_(d) {
     }
   }
 
-  // Lưu biên lai (việc chậm) trước khi khoá
+  // Lưu biên lai (việc chậm) trước khi khoá — vào thư mục con của chương trình (06/10/2026)
   var link = '';
   if (fileData) {
-    try { link = saveReceipt_(fileData, fileName, slotId, empCode); }
+    var payProgram = '';
+    try { payProgram = str_(reg.getRange(pre.rowNo, C.CAMPAIGN).getValue()); } catch (eP) {}
+    try { link = saveReceipt_(fileData, fileName, slotId, empCode, payProgram); }
     catch (err) { log_('RECEIPT_ERROR', empCode, slotId, d.userAgent, String(err)); return { ok: false, message: 'Không lưu được file biên lai: ' + err }; }
   }
 
@@ -2019,7 +2021,7 @@ function clearCache() {
 /* ---------- Tiện ích ---------- */
 var _receiptFolderCached = null;
 
-function saveReceipt_(dataUrl, fileName, slotId, empCode) {
+function saveReceipt_(dataUrl, fileName, slotId, empCode, programId) {
   var m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
   if (!m) throw 'File không đúng định dạng';
   var mime = m[1];
@@ -2029,8 +2031,88 @@ function saveReceipt_(dataUrl, fileName, slotId, empCode) {
   var ext = (String(fileName || '').match(/\.[A-Za-z0-9]{1,5}$/) || [''])[0];
   var name = 'BL_' + slotId.replace('#', '') + '_' + empCode + '_' +
     Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyyMMdd-HHmmss') + ext;
-  var file = receiptFolder_().createFile(Utilities.newBlob(bytes, mime, name));
+  var file = receiptFolderFor_(programId).createFile(Utilities.newBlob(bytes, mime, name));
   return file.getUrl();
+}
+
+/* ---------- 06/10/2026: biên lai chia thư mục theo chương trình ----------
+ * "Bien lai nop tien" / "<ProgramID> - <Tên chương trình>" / BL_…  → PM tải nguyên thư mục chương trình gửi kế toán.
+ * Tìm thư mục con theo TIỀN TỐ ProgramID (đổi tên chương trình / đổi tên thư mục bằng tay vẫn khớp).
+ * Thư mục con kế thừa quyền của thư mục gốc (đang Restricted). Không tìm được chương trình → lưu ở thư mục gốc như cũ.
+ */
+function receiptFolderFor_(programId) {
+  var root = receiptFolder_();
+  var pid = str_(programId);
+  if (!pid) return root;
+  var key = 'RECEIPT_FOLDER_' + pid.toUpperCase();
+  try {
+    var cachedId = CacheService.getScriptCache().get(key) || PropertiesService.getScriptProperties().getProperty(key);
+    if (cachedId) {
+      var f = DriveApp.getFolderById(cachedId);
+      if (!f.isTrashed()) return f;
+    }
+  } catch (e) {}
+  var found = findProgramFolder_(root, pid);
+  if (!found) {
+    // Lần đầu của chương trình: khoá ngắn để 2 người nộp cùng lúc không tạo 2 thư mục trùng
+    var lock = LockService.getScriptLock();
+    var locked = lock.tryLock(10000);
+    try {
+      found = findProgramFolder_(root, pid);
+      if (!found) found = root.createFolder(programFolderName_(pid));
+    } finally { if (locked) lock.releaseLock(); }
+  }
+  try {
+    PropertiesService.getScriptProperties().setProperty(key, found.getId());
+    CacheService.getScriptCache().put(key, found.getId(), 21600);
+  } catch (e2) {}
+  return found;
+}
+
+function findProgramFolder_(root, pid) {
+  var up = pid.toUpperCase(), it = root.getFolders();
+  while (it.hasNext()) {
+    var f = it.next(), nm = String(f.getName()).toUpperCase();
+    if (nm === up || nm.indexOf(up + ' - ') === 0) return f;
+  }
+  return null;
+}
+
+function programFolderName_(pid) {
+  var name = '';
+  try {
+    var sh = book_().getSheetByName(SHEET_PROGRAMS);
+    if (sh && sh.getLastRow() > 1) {
+      var v = sh.getRange(2, PROG_COL.ID, sh.getLastRow() - 1, 2).getValues();
+      for (var i = 0; i < v.length; i++) if (String(v[i][0]).trim().toUpperCase() === pid.toUpperCase()) { name = String(v[i][1]).trim(); break; }
+    }
+  } catch (e) {}
+  return name ? pid + ' - ' + name.replace(/[\\/:*?"<>|]/g, ' ').trim() : pid;
+}
+
+/**
+ * Chạy tay 1 lần (Run → organizeReceiptsByProgram): chuyển các file BL_… đang nằm thẳng trong "Bien lai nop tien"
+ * vào thư mục chương trình. Chương trình lấy theo cột Receipt Link của Registrations (chính xác), không đoán theo tên file.
+ * Di chuyển KHÔNG đổi ID / link của file → link trong sheet và nút "Xem biên lai" trên web vẫn mở đúng.
+ */
+function organizeReceiptsByProgram() {
+  var reg = book_().getSheetByName(SHEET_REG);
+  var byFileId = {};
+  if (reg && reg.getLastRow() > 1) {
+    var v = reg.getRange(2, 1, reg.getLastRow() - 1, C.RECEIPT).getValues();
+    for (var r = 0; r < v.length; r++) {
+      var m = /[-\w]{25,}/.exec(String(v[r][C.RECEIPT - 1]));
+      if (m) byFileId[m[0]] = str_(v[r][C.CAMPAIGN - 1]);
+    }
+  }
+  var root = receiptFolder_(), files = root.getFiles(), moved = 0, left = [];
+  while (files.hasNext()) {
+    var f = files.next(), pid = byFileId[f.getId()];
+    if (pid) { f.moveTo(receiptFolderFor_(pid)); moved++; } else left.push(f.getName());
+  }
+  try { log_('RECEIPT_ORGANIZE', 'ADMIN', '', '', 'Chuyển ' + moved + ' file; giữ lại ' + left.length + ' file không khớp đơn nào'); } catch (e) {}
+  Logger.log('organizeReceiptsByProgram: chuyển ' + moved + ' file. Giữ nguyên (không khớp đơn nào): ' + (left.join(', ') || 'không có'));
+  return { ok: true, moved: moved, left: left };
 }
 
 // T3.1: Cached Drive Folder ID (PERF-01) - Slashes folder lookup from 2.5s to < 100ms
