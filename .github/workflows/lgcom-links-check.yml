@@ -1,0 +1,25 @@
+# Bước thử (07/10/2026): máy chủ GitHub có tải được sitemap LG.com không (máy cục bộ bị Akamai chặn HTTP 403).
+# Chỉ BÁO CÁO, không ghi / không commit gì. Đạt (HTTP 200 + đúng sitemap) → mới bật lịch chạy hằng tuần.
+# Chạy tay: GitHub → Actions → "LG.com product links – check" → Run workflow   (hoặc: gh workflow run lgcom-links-check.yml)
+name: LG.com product links – check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tải sitemap LG.com/vn
+        run: |
+          code=$(curl -s -L -o sitemap.xml -w '%{http_code}' --max-time 60 \
+            -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36' \
+            https://www.lg.com/vn/sitemap.xml)
+          echo "HTTP $code · $(wc -c < sitemap.xml) bytes"
+          if ! grep -q '<urlset' sitemap.xml; then
+            echo "::error::LG.com trả HTTP $code, không phải sitemap (có thể bị chặn)"; head -c 300 sitemap.xml; exit 1
+          fi
+      - name: Báo cáo thay đổi so với bảng đang dùng (không ghi file)
+        run: python3 scripts/build_product_links.py --sitemap-file sitemap.xml --dry-run
