@@ -340,3 +340,20 @@ graph LR
 ⚠️ Giới hạn kiểm chứng: LG.com (Akamai) chặn trình duyệt tự động và sau đó chặn cả máy kiểm thử (HTTP 403) → **chưa mở được link bằng trình duyệt thật của người dùng**; trước đó cùng các trang này trả HTTP 200 với nội dung đúng model. Cần chủ dự án bấm thử 2–3 link trên link xem trước.
 
 ![GĐ2: PM (Sáng) và Nhân viên (Đêm)](v2/phase2_pm_light_employee_dark.png)
+
+
+### 11.5. Giai đoạn 3 — 3 thẻ tổng quan + ô số liệu PM (06/10/2026)
+
+| Hạng mục | Kết quả [ĐO] |
+|---|---|
+| Ô 01: khối đỏ đặc → thẻ trắng; số tài khoản `0991000012525` cỡ 24 px để đọc / chép | ✅ |
+| Ô 02: tỉ lệ "4 / 4 SP", "3 / 4 Đơn" và % cỡ 24 px; xanh `#1B5E20` (ngoài bảng màu) → `#287D00` | ✅ |
+| Ô 03 (thẻ Focus tối): giá nội bộ 40 px nét mảnh xuống dòng riêng; 4 bộ đếm PM 32 px **giữ 4 màu trạng thái** | ✅ |
+| Ô số liệu PM: thẻ trắng bo 16 px, bỏ vạch màu; số 40 px nét mảnh (doanh thu 28 px để không tràn) | ✅ |
+| Chữ trong thẻ ≥ 14 px; 0 lỗi tương phản 12 màn hình; không cắt chữ / cuộn ngang 1440 · 1280 · 390 | ✅ |
+| Font **LG EI Headline Light** nhúng thêm (+63 KB) dưới **tên riêng** "LG EI Headline Light" → không làm đổi chữ nào khi tắt v2 | ✅ tắt v2 vẫn = v1.4 (216 / 266 / 136) |
+| Test giao diện tắt / bật v2 · e2e · máy chủ | 79/79 · 79/79 · 165 · 67 |
+
+Sửa trong lúc làm (đều phát hiện bằng đo / ảnh): quy tắc giá tiền vô tình đổi màu bộ đếm PM "Đã ĐK" (đã giới hạn lại); 25 lỗi tương phản chế độ Đêm do ô KPI / ô 02 (v1.4 giữ 2 thẻ này sáng ở chế độ Đêm — đã giữ nguyên); khai báo font Light sai cú pháp lần đầu (font không nạp — đã sửa và kiểm `document.fonts`).
+
+![GĐ3: desktop & mobile](v2/phase3_cards_desktop_mobile.png)

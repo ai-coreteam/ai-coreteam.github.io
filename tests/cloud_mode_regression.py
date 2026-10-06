@@ -476,6 +476,17 @@ def main():
                     check(p2['trackVisible'], 'v2 GĐ2: thanh chọn chương trình phân biệt được với nền trang')
                     check(not p2['navHidden'] and not p2['barHidden'], 'v2 GĐ2: desktop không giấu tab / chương trình nào')
                     check(p2['small'] == 0, f"v2 GĐ2: chữ header / thanh chọn ≥ 14 px ({p2['small']} chỗ nhỏ hơn)")
+                    p3 = page.evaluate('''() => {
+                        const small = [...document.querySelectorAll('.grap-card *, .pm-kpi-card *')].filter(e => e.getBoundingClientRect().width &&
+                              [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 14).length;
+                        const light = [...document.fonts].some(f => f.family.includes('Headline Light') && f.status === 'loaded');
+                        const c1 = getComputedStyle(document.querySelector('.grap-card-red')).backgroundColor;
+                        const counters = [...document.querySelectorAll('#grap-card3-body .lgm-counter')].map(e => getComputedStyle(e).color);
+                        return { small, light, c1, distinctCounterColors: new Set(counters).size }; }''')
+                    check(p3['small'] == 0, f"v2 GĐ3: chữ trong thẻ tổng quan & ô KPI ≥ 14 px ({p3['small']} chỗ nhỏ hơn)")
+                    check(p3['light'], 'v2 GĐ3: font LG EI Headline Light (số lớn) đã nạp')
+                    check(p3['c1'] == 'rgb(255, 255, 255)', f"v2 GĐ3: ô 01 là thẻ trắng ({p3['c1']})")
+                    check(p3['distinctCounterColors'] == 4, 'v2 GĐ3: 4 bộ đếm PM giữ 4 màu trạng thái')
                     check(not page.errors, f'v2: không có lỗi JS ({page.errors[:2]})')
                 else:
                     check(not on, f'{label} → giao diện v1.4 (không có class ui-v2)')
