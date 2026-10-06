@@ -3232,40 +3232,58 @@
        Ô 01: thẻ trắng (bỏ khối đỏ đặc — lg-brand: tránh đỏ thừa). Ô 02: tỉ lệ lớn. Ô 03: thẻ "Focus" tối, số lớn nét mảnh.
        Nội dung ô 03 do JS dựng (renderBriefTopDashboard) → chỉ đổi bằng CSS, không đụng JS / ID.
        ===================================================================================== */
-    html.ui-v2 .grap-card { border: 0; border-radius: 24px; padding: 24px; box-shadow: var(--v2-shadow); min-height: 300px; }
-    html.ui-v2 .grap-card:hover { transform: none; box-shadow: var(--v2-shadow); }
+    /* 06/10/2026 (chủ dự án): 3 thẻ theo mẫu GRAP_11.html — Heritage Red / Warm Gray 05 / Warm Gray 01,
+       bo 16 px, đứng yên không bóng; di chuột: nhấc 2 px + bóng 0 12px 30px (giống GRAP, 0,15 s). */
+    html.ui-v2 .grap-card { border: 0; border-radius: 16px; padding: 28px; box-shadow: none; min-height: 300px;
+                            transition: transform .15s ease, box-shadow .15s ease; }
+    html.ui-v2 .grap-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(38,38,38,.16); }
+    html.ui-v2[data-theme="dark"] .grap-card:hover { box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+    @media (prefers-reduced-motion: reduce) { html.ui-v2 .grap-card { transition: none; } html.ui-v2 .grap-card:hover { transform: none; } }
     /* Sàn chữ 14 px trong thẻ (nhiều cỡ viết sẵn trong HTML/JS → cần !important); các số lớn đặt lại ngay bên dưới */
     html.ui-v2 .grap-card-body *, html.ui-v2 .grap-card-footer *, html.ui-v2 .grap-card-num,
     html.ui-v2 .pm-kpi-card * { font-size: 14px !important; }
     html.ui-v2 .grap-card-num { letter-spacing: .02em; font-weight: 400; }
-    html.ui-v2 .grap-card-title { font-size: 20px !important; line-height: 24px; font-weight: 600; margin-top: 4px; }
+    html.ui-v2 .grap-card-title { font-size: 24px !important; line-height: 32px; font-weight: 600; margin-top: 4px; }
     html.ui-v2 .grap-pill { padding: 4px 12px; border-radius: 999px; line-height: 20px; }
     html.ui-v2 .grap-card-link { text-decoration: underline; text-underline-offset: 3px; }
 
-    /* Ô 01 — thẻ trắng, số tài khoản lớn để đọc / chép */
-    html.ui-v2 .grap-card-red { background: var(--lg-card-bg); color: var(--lg-text); }
+    /* Ô 01 — Heritage Red #A50034 (GRAP c-red): chữ trắng 7,9:1 · chữ phụ #F6F3EB 7,2:1; số tài khoản lớn để đọc / chép */
+    html.ui-v2 .grap-card-red { background: #A50034; color: #FFFFFF; }
     html.ui-v2 .grap-card-red .grap-card-num,
-    html.ui-v2 .grap-card-red .fin-label { color: var(--lg-muted); font-weight: 400; }
+    html.ui-v2 .grap-card-red .fin-label { color: #F6F3EB; font-weight: 400; }
     html.ui-v2 .grap-card-red .grap-card-title,
     html.ui-v2 .grap-card-red .fin-value,
-    html.ui-v2 .grap-card-red .grap-card-link { color: var(--lg-ink); }
-    html.ui-v2 .grap-card-red .financial-row { padding: 10px 0; border-bottom: 1px solid var(--lg-border); }
+    html.ui-v2 .grap-card-red .grap-card-link { color: #FFFFFF; }
+    html.ui-v2 .grap-card-red .financial-row { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.25); }
     html.ui-v2 .grap-card-red .financial-row:last-child { border-bottom: 0; }
     html.ui-v2 .grap-card-red .fin-acc { background: transparent; padding: 0; font-family: var(--font-heading); font-size: 24px !important; line-height: 28px; font-weight: 600; letter-spacing: .02em; }
-    html.ui-v2 .grap-card-red .syntax-code { background: var(--lg-panel-2); color: var(--lg-ink); padding: 2px 8px; border-radius: 6px; }
-    html.ui-v2 .grap-card-red .btn-copy-acc { color: var(--lg-ink); }
+    html.ui-v2 .grap-card-red .syntax-code { background: rgba(255,255,255,.16); color: #FFFFFF; padding: 2px 8px; border-radius: 6px; }
+    html.ui-v2 .grap-card-red .btn-copy-acc { color: #FFFFFF; }
     html.ui-v2 .grap-card-red .btn-copy-acc svg { stroke: currentColor !important; }
-    html.ui-v2 .grap-card-red .grap-card-footer { border-top-color: var(--lg-border); }
-    html.ui-v2 .grap-card-red .grap-pill { background: var(--lg-panel-2); color: var(--lg-text-2); border: 0; }
+    html.ui-v2 .grap-card-red .grap-card-footer { border-top-color: rgba(255,255,255,.25); }
+    html.ui-v2 .grap-card-red .grap-pill { background: rgba(255,255,255,.16); color: #FFFFFF; border: 0; }
 
     /* Ô 02 — tỉ lệ đăng ký / thanh toán lớn */
+    /* Ô 02 — Warm Gray 05 #E6E1D6 (GRAP c-sand): chữ #262626 11,6:1, chữ phụ #4A4946 6,9:1 */
+    html.ui-v2 .grap-card-light, html.ui-v2:not([data-theme="dark"]) .grap-card-light { background: #E6E1D6; }
+    html.ui-v2 .grap-card-light .grap-card-num, html.ui-v2 #grap-wh-breakdown { color: #4A4946 !important; }
+    html.ui-v2 .grap-card-light .grap-card-footer { border-top-color: rgba(38,38,38,.15); }
+    html.ui-v2 .grap-card-light [style*="background:#E6E1D6"] { background: rgba(38,38,38,.12) !important; }   /* rãnh thanh tiến độ trùng màu thẻ → làm đậm */
     html.ui-v2 #grap-reg-ratio, html.ui-v2 #grap-pay-ratio,
     html.ui-v2 #grap-fill-pct, html.ui-v2 #grap-pay-pct { font-family: var(--font-heading); font-size: 24px !important; line-height: 28px; font-weight: 600; }
-    html.ui-v2 #grap-pay-ratio, html.ui-v2 #grap-pay-pct { color: #287D00 !important; }   /* #1B5E20 ngoài bảng màu → Green Validation */
-    html.ui-v2 #grap-pay-bar { background: #287D00 !important; }
+    html.ui-v2 #grap-pay-ratio, html.ui-v2 #grap-pay-pct { color: #316D15 !important; }   /* trên nền xám ấm: Tree Green (web-system) */
+    html.ui-v2 #grap-pay-bar { background: #316D15 !important; }
+
+    /* Tiêu đề dashboard — lớn hơn tiêu đề thẻ (trước: 20 px = bằng tiêu đề thẻ) */
+    html.ui-v2 .grap-kicker { font-size: 14px; font-weight: 600; letter-spacing: .08em; }
+    html.ui-v2 .grap-main-title, html.ui-v2 #grap-program-title { font-size: clamp(28px, 3vw, 40px); line-height: 1.25; font-weight: 600; letter-spacing: -.01em; }
+    html.ui-v2 .grap-main-title { margin: 8px 0 6px; }
+    html.ui-v2 #grap-status-pill { font-size: 14px; font-family: var(--font-main); font-weight: 600; padding: 4px 12px; vertical-align: middle; }
+    html.ui-v2 .grap-subtitle { font-size: 16px; line-height: 24px; color: var(--lg-text-2); }
+    html.ui-v2 .grap-section-header { margin-bottom: 24px; }
 
     /* Ô 03 — thẻ Focus: 1 con số chính */
-    html.ui-v2 .grap-card-dark { background: #1A1A1A; }
+    html.ui-v2 .grap-card-dark { background: #262626; }   /* GRAP c-dark: Warm Gray 01 */
     html.ui-v2 .grap-card-dark .grap-card-num { color: #CBC8C2; }
     html.ui-v2 #grap-card3-body strong:not(.lgm-counter)[style*="#FD312E"] { display: block; margin-top: 4px; color: #FFFFFF !important; font-family: "LG EI Headline Light", var(--font-heading); font-weight: 400; font-size: 40px !important; line-height: 44px; }
     html.ui-v2 #grap-card3-body .lgm-counter { display: block; margin-top: 4px; font-family: "LG EI Headline Light", var(--font-heading) !important; font-weight: 400 !important; font-size: 32px !important; line-height: 36px; }

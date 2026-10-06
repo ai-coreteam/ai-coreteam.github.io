@@ -503,7 +503,17 @@ def main():
                         return { small, light, c1, distinctCounterColors: new Set(counters).size }; }''')
                     check(p3['small'] == 0, f"v2 GĐ3: chữ trong thẻ tổng quan & ô KPI ≥ 14 px ({p3['small']} chỗ nhỏ hơn)")
                     check(p3['light'], 'v2 GĐ3: font LG EI Headline Light (số lớn) đã nạp')
-                    check(p3['c1'] == 'rgb(255, 255, 255)', f"v2 GĐ3: ô 01 là thẻ trắng ({p3['c1']})")
+                    check(p3['c1'] == 'rgb(165, 0, 52)', f"v2: ô 01 Heritage Red theo mẫu GRAP ({p3['c1']})")
+                    dash = page.evaluate('''() => ({ title: parseFloat(getComputedStyle(document.getElementById('grap-program-title')).fontSize),
+                                                     card: parseFloat(getComputedStyle(document.querySelector('.grap-card-title')).fontSize),
+                                                     bgs: [...document.querySelectorAll('.grap-card')].map(c => getComputedStyle(c).backgroundColor) })''')
+                    check(dash['title'] > dash['card'], f"v2: tiêu đề dashboard lớn hơn tiêu đề thẻ ({dash['title']} > {dash['card']} px)")
+                    check(dash['bgs'] == ['rgb(165, 0, 52)', 'rgb(230, 225, 214)', 'rgb(38, 38, 38)'], f"v2: 3 thẻ Heritage Red / Warm Gray 05 / Warm Gray 01 ({dash['bgs']})")
+                    page.mouse.move(2, 2); page.wait_for_timeout(250)
+                    page.locator('.grap-card').nth(1).hover(); page.wait_for_timeout(350)
+                    lift = page.evaluate("[getComputedStyle(document.querySelectorAll('.grap-card')[1]).transform, getComputedStyle(document.querySelectorAll('.grap-card')[1]).boxShadow]")
+                    check(lift[0] == 'matrix(1, 0, 0, 1, 0, -2)' and lift[1] != 'none', f'v2: di chuột → thẻ nhấc 2 px + bóng (GRAP) ({lift[0]})')
+                    page.mouse.move(2, 2); page.wait_for_timeout(250)
                     check(p3['distinctCounterColors'] == 4, 'v2 GĐ3: 4 bộ đếm PM giữ 4 màu trạng thái')
                     p4 = page.evaluate('''() => {
                         const small = [...document.querySelectorAll('.pm-table *, .btn-pm-action *, .btn-pm-action')].filter(e => e.getBoundingClientRect().width &&

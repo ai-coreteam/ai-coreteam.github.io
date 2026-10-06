@@ -410,3 +410,10 @@ Sửa trong lúc làm: 28 lỗi tương phản chế độ Đêm — thẻ sản
 | 4 | Kỹ thuật: đổi `var UI_V2_DEFAULT = false;` → `true` trong `Mau_Dang_Ky_Internal_Sales_3009.html`, chạy 3 bộ test, build `portal.html`, gộp `main`, tag, push | Kỹ thuật | ☐ |
 | 5 | Kiểm tra link thật sau khi GitHub Pages cập nhật | Kỹ thuật | ☐ |
 | 6 | **Quay lại nếu có vấn đề:** người dùng thêm `?ui=v1` (tức thì, từng máy) · hoặc đổi lại `false` + build + push (toàn bộ, ~1 phút sau khi GitHub cập nhật) · hoặc build `portal.html` từ tag `v1.4` | Kỹ thuật | — |
+
+
+### 11.8. Điều chỉnh sau khi bật (06/10/2026) — 3 thẻ tổng quan theo mẫu GRAP
+
+Theo yêu cầu chủ dự án (đối chiếu `GRAP_11.html`): ô 01 **Heritage Red**, ô 02 **Warm Gray 05**, ô 03 **Warm Gray 01**; bo 16 px, di chuột nhấc 2 px + bóng (GRAP không có hiệu ứng bám theo chuột → không thêm); tiêu đề dashboard 40 px > tiêu đề thẻ 24 px. Thay cho quyết định §11.5 "ô 01 thẻ trắng". Tương phản đo lại: 0 lỗi (chữ trắng trên Heritage Red 7,9:1; chữ phụ #F6F3EB 7,2:1; chữ trên Warm Gray 05: #262626 11,6:1, #4A4946 6,9:1).
+
+![Thẻ tổng quan kiểu GRAP](v2/dashboard_cards_grap_style.png)
