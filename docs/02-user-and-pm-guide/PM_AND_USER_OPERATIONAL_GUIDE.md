@@ -99,8 +99,8 @@ sequenceDiagram
    * **Cú pháp chuyển khoản:** dùng **mã VietQR** trong cửa sổ nộp tiền — mã đã điền sẵn số tiền và nội dung `MãNV MãSlot` (VD: `VH88921 HA-001`). *(Lưu ý: ô 01 trên trang ghi dạng `[MãNV]_[MãSlot]` có gạch dưới — chờ chủ dự án chốt 1 dạng.)*
 3. **Khai báo chứng từ lên hệ thống:**
    * Bấm **`Nộp tiền ngay (1-Chạm) →`** tại ô 03, hoặc nút **`Nộp tiền`** trên dòng đơn ở Tab 3 (khi đã đăng nhập, Tab 3 tự tra cứu đơn của bạn).
-   * Nhập **Mã giao dịch ngân hàng (Txn Ref / Mã tham chiếu)** từ app ngân hàng của bạn *(Có nút "Xem hướng dẫn tìm mã GD" cho từng ngân hàng VCB, TCB, MB, VietinBank)*.
-   * Kéo thả hoặc tải lên **Ảnh chụp màn hình biên lai chuyển khoản thành công** *(Hỗ trợ mọi định dạng JPG, PNG và tự động chuyển đổi ảnh HEIC từ iPhone)*.
+   * Tải lên **Ảnh chụp màn hình biên lai chuyển khoản thành công** (bắt buộc ở cả hai nơi) *(JPG, PNG, PDF; cửa sổ ở ô 03 nhận thêm ảnh HEIC từ iPhone và tự chuyển đổi)*. Với ảnh, hệ thống **tự quét và điền Mã giao dịch + Ngày giờ chuyển khoản** — giống nhau ở ô 03 và Tab 3 (từ 06/10/2026). Đối chiếu lại với ảnh.
+   * Không quét được (ảnh mờ, PDF) thì tự nhập **Mã giao dịch ngân hàng (Txn Ref / Mã tham chiếu)** *(nút "Xem vị trí trên App NH" cho từng ngân hàng VCB, TCB, MB, VietinBank)* và **Ngày giờ chuyển khoản** (VD: `14/10/2026 10:15:00`).
    * Bấm **"Xác Nhận Nộp Tiền"**.
 
 ---

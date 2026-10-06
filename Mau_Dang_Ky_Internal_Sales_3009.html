@@ -5423,15 +5423,23 @@
             <div style="font-size:11px; color:#716F6A; margin-top:3px;"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Nhập mã giao dịch/FT trên biên lai. Không nhập nội dung CK.</div>
           </div>
           <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Ngày giờ chuyển khoản *</label>
+            <input type="text" class="form-control" id="quick-pay-date" required placeholder="Ví dụ: 14/10/2026 10:15:00">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+          <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">Số điện thoại liên hệ</label>
             <input type="text" class="form-control" id="quick-phone" required placeholder="0901234567">
           </div>
         </div>
 
         <div class="form-group" style="margin-bottom:14px;">
-          <label class="form-label">Ảnh chụp biên lai chuyển khoản (Tự động chuyển đổi & nén tốc độ cao)</label>
-          <input type="file" class="form-control" id="quick-slip-file" accept="image/*,.heic,.heif,application/pdf" style="padding:6px;">
-          <div style="font-size:11px; color:#716F6A; margin-top:3px;">Chấp nhận file ảnh JPG, PNG, HEIC (iPhone) hoặc PDF (được tự động nén & chuyển đổi).</div>
+          <label class="form-label">Ảnh chụp biên lai chuyển khoản * (Tự động chuyển đổi & nén tốc độ cao)</label>
+          <input type="file" class="form-control" id="quick-slip-file" accept="image/*,.heic,.heif,application/pdf" style="padding:6px;" onchange="handleQuickSlipSelected(event)">
+          <div style="font-size:11px; color:#716F6A; margin-top:3px;">Chấp nhận file ảnh JPG, PNG, HEIC (iPhone) hoặc PDF (được tự động nén & chuyển đổi). Ảnh biên lai được quét để tự điền Mã giao dịch và Ngày giờ.</div>
+          <div id="quick-ocr-status-banner" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; font-size:12.5px; align-items:center; gap:8px;"></div>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #E6E1D6; padding-top:12px;">
@@ -7264,6 +7272,7 @@
           payerName: (document.getElementById('quick-payer-name') || {}).value || '',
           payerCode: (document.getElementById('quick-payer-code') || {}).value || '',
           bankTxn: (document.getElementById('quick-bank-txn') || {}).value || '',
+          payDate: (document.getElementById('quick-pay-date') || {}).value || '',
           phone: (document.getElementById('quick-phone') || {}).value || '',
           savedAt: Date.now()
         };
@@ -7280,6 +7289,7 @@
         if (draft && draft.regId === regId) {
           let hasContent = false;
           if (draft.bankTxn) { document.getElementById('quick-bank-txn').value = draft.bankTxn; hasContent = true; }
+          if (draft.payDate) { document.getElementById('quick-pay-date').value = draft.payDate; hasContent = true; }
           if (draft.phone) { document.getElementById('quick-phone').value = draft.phone; hasContent = true; }
           if (draft.payerName) { document.getElementById('quick-payer-name').value = draft.payerName; hasContent = true; }
           if (draft.payerCode) { document.getElementById('quick-payer-code').value = draft.payerCode; hasContent = true; }
@@ -8805,8 +8815,11 @@
       document.getElementById('quick-payer-code').value = currentUser.id || '';
       document.getElementById('quick-phone').value = currentUser.phone || '';
       document.getElementById('quick-bank-txn').value = '';
+      document.getElementById('quick-pay-date').value = '';
       const fileInput = document.getElementById('quick-slip-file');
       if (fileInput) fileInput.value = '';
+      const qOcr = document.getElementById('quick-ocr-status-banner');
+      if (qOcr) { qOcr.style.display = 'none'; qOcr.innerHTML = ''; }
 
       // T4.2: Mobile banking app-switching draft auto-restore
       const draftRestored = restoreQuickPaymentDraft(reg.id || reg.slotId);
@@ -8890,6 +8903,26 @@
       });
     }
 
+    // Biên lai ở cửa sổ "Nộp tiền ngay": quét OCR, tự điền như Tab 3
+    async function handleQuickSlipSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      const banner = document.getElementById('quick-ocr-status-banner');
+      if (banner) { banner.style.display = 'none'; banner.innerHTML = ''; }
+      if (!file) return;
+      const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+      if (isPdf) return; // Tab 3 cũng không quét PDF
+      const regId = document.getElementById('quick-reg-id').value;
+      let dataUrl = '';
+      try { dataUrl = await compressImageFile(file, 1280, 0.75); } catch (err) { return; }
+      if (!/^data:image\//.test(dataUrl)) return;
+      autoScanReceiptOCR(dataUrl, {
+        banner: 'quick-ocr-status-banner', txn: 'quick-bank-txn', date: 'quick-pay-date', amount: '',
+        txnLabel: 'Mã giao dịch', dateLabel: 'Ngày giờ', manualLabel: 'Mã giao dịch và Ngày giờ chuyển khoản',
+        isCurrent: () => document.getElementById('quick-reg-id').value === regId && document.getElementById('quick-slip-file').files[0] === file,
+        onFilled: () => saveQuickPaymentDraft(regId)
+      });
+    }
+
     async function handleQuickPaymentSubmit(e) {
       if (e) e.preventDefault();
       const regId = document.getElementById('quick-reg-id').value;
@@ -8897,11 +8930,20 @@
       const payerCode = document.getElementById('quick-payer-code').value.trim();
       const bankTxn = document.getElementById('quick-bank-txn').value.trim();
       const phone = document.getElementById('quick-phone').value.trim();
+      const payDate = document.getElementById('quick-pay-date').value.trim();
       const fileInput = document.getElementById('quick-slip-file');
       const submitBtn = document.getElementById('quick-submit-btn');
 
       if (!bankTxn) {
         showToast('Vui lòng nhập Mã giao dịch ngân hàng (Txn Ref)!', 'warning');
+        return;
+      }
+      if (!payDate) {
+        showToast('Vui lòng nhập Ngày giờ chuyển khoản!', 'warning');
+        return;
+      }
+      if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+        showToast('Vui lòng đính kèm ảnh/PDF biên lai chuyển khoản.', 'warning');
         return;
       }
 
@@ -8910,8 +8952,13 @@
 
       try {
         let receiptBase64 = '';
+        let receiptName = '';
         if (fileInput && fileInput.files && fileInput.files[0]) {
           receiptBase64 = await compressImageFile(fileInput.files[0], 1280, 0.75);
+          // Tên file theo định dạng sau khi nén (HEIC/PNG → .jpg) để máy chủ đặt đúng đuôi
+          const mt = (/^data:([^;]+);/.exec(receiptBase64) || [])[1] || '';
+          const ext = mt === 'application/pdf' ? '.pdf' : mt === 'image/png' ? '.png' : mt === 'image/jpeg' ? '.jpg' : '';
+          receiptName = fileInput.files[0].name.replace(/\.[A-Za-z0-9]{1,5}$/, '') + ext;
         }
 
         const allRegs = getViewRegistrations(); // v1-hardening (V1-02)
@@ -8939,8 +8986,10 @@
                 payerName: payerName,
                 payerCode: payerCode,
                 bankTxn: bankTxn,
+                payTime: payDate,
                 phone: phone,
                 amount: reg ? reg.internalPrice : 0,
+                fileName: receiptName,
                 receiptData: receiptBase64,
                 userId: currentUser.id,
                 empCode: currentUser.id,
@@ -8982,7 +9031,7 @@
           reg.bankTxn = bankTxn;
           reg.phone = phone;
           reg.amount = reg.internalPrice || 0;
-          reg.payTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          reg.payTime = payDate;
           if (receiptBase64) reg.receiptUrl = receiptBase64;
           const match = DEMO_REGISTRATIONS.find(d => d.id === reg.id || d.slotId === reg.slotId);
           if (match) {
@@ -12190,8 +12239,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     }
 
     // Auto OCR Scanner (100% Free Client-Side)
-    async function autoScanReceiptOCR(dataUrl) {
-      const banner = document.getElementById('ocr-status-banner');
+    // t (tuỳ chọn): ô đích khi quét ở nơi khác Tab 3 (cửa sổ "Nộp tiền ngay"). Bỏ trống = các ô của Tab 3 như cũ.
+    async function autoScanReceiptOCR(dataUrl, t) {
+      t = Object.assign({ banner: 'ocr-status-banner', txn: 'pay-txn-id', date: 'pay-date', amount: 'pay-amount',
+        txnLabel: 'Mục 7', dateLabel: 'Mục 8', manualLabel: 'mục 7 và 8', isCurrent: null, onFilled: null }, t || {});
+      const banner = document.getElementById(t.banner);
       if (!banner) return;
       banner.style.display = 'flex';
       banner.style.background = 'var(--lg-red-light)';
@@ -12207,7 +12259,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           banner.style.background = '#FFFBE6';
           banner.style.borderColor = '#FFE58F';
           banner.style.color = '#D48806';
-          banner.innerHTML = `<span>Thư viện OCR chưa tải kịp. Bạn vui lòng tự điền ô 7 và 8.</span>`;
+          banner.innerHTML = `<span>Thư viện OCR chưa tải kịp. Bạn vui lòng tự điền ${t.manualLabel === 'mục 7 và 8' ? 'ô 7 và 8' : t.manualLabel}.</span>`;
           setTimeout(() => { if (banner) banner.style.display = 'none'; }, 4000);
           return;
         }
@@ -12223,12 +12275,14 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         });
 
         const text = (res && res.data && res.data.text) ? res.data.text : '';
+        // Người dùng đã đổi file / đóng cửa sổ trong lúc quét → bỏ kết quả cũ
+        if (t.isCurrent && !t.isCurrent()) return;
         const parsed = parseReceiptText(text);
 
         let filledFields = [];
-        const txnInput = document.getElementById('pay-txn-id');
-        const dateInput = document.getElementById('pay-date');
-        const amountInput = document.getElementById('pay-amount');
+        const txnInput = document.getElementById(t.txn);
+        const dateInput = t.date ? document.getElementById(t.date) : null;
+        const amountInput = t.amount ? document.getElementById(t.amount) : null;
 
         // Điền Ngân hàng & Mã GD (Mục 7)
         if (parsed.bank || parsed.txnId) {
@@ -12238,7 +12292,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           if (txnInput) {
             txnInput.value = fullTxn;
             highlightAutoFilled(txnInput);
-            filledFields.push('Mục 7: ' + fullTxn);
+            filledFields.push(t.txnLabel + ': ' + fullTxn);
           }
         }
 
@@ -12246,7 +12300,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (parsed.date && dateInput) {
           dateInput.value = parsed.date;
           highlightAutoFilled(dateInput);
-          filledFields.push('Mục 8: ' + parsed.date);
+          filledFields.push(t.dateLabel + ': ' + parsed.date);
         }
 
         // Điền/Cập nhật Số tiền (Mục 6) nếu nhận diện được và ô chưa có
@@ -12258,6 +12312,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         }
 
         if (filledFields.length > 0) {
+          if (typeof t.onFilled === 'function') t.onFilled();
           banner.style.background = 'rgba(46,125,50,0.08)';
           banner.style.borderColor = 'rgba(46,125,50,0.3)';
           banner.style.color = '#1b5e20';
@@ -12269,7 +12324,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           banner.style.background = '#F5F5F5';
           banner.style.borderColor = '#E0E0E0';
           banner.style.color = '#616161';
-          banner.innerHTML = `<span>Đã tải ảnh biên lai. Không nhận diện được rõ mã giao dịch, vui lòng điền tay mục 7 và 8.</span>`;
+          banner.innerHTML = `<span>Đã tải ảnh biên lai. Không nhận diện được rõ mã giao dịch, vui lòng điền tay ${t.manualLabel}.</span>`;
           setTimeout(() => { if (banner) banner.style.display = 'none'; }, 4500);
         }
       } catch (err) {
@@ -12980,7 +13035,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     // ===== T4.2: Realtime Auto-Draft Event Listeners =====
     document.addEventListener('DOMContentLoaded', function() {
       // 1. Quick payment modal input listeners
-      ['quick-bank-txn', 'quick-payer-name', 'quick-phone'].forEach(id => {
+      ['quick-bank-txn', 'quick-pay-date', 'quick-payer-name', 'quick-phone'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('input', () => {

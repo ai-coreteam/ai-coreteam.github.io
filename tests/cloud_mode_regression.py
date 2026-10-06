@@ -138,6 +138,12 @@ class MockServer:
     def do_pm_dashboard(self, d):
         return {'ok': True, 'registrations': []}
 
+    def do_submit_payment(self, d):   # Code.gs: payment_() nhận cả action 'payment' (Tab 3) và 'submit_payment'
+        if d.get('token') != 'mock.sig':
+            return {'ok': False, 'authError': True, 'message': 'Thiếu token'}
+        self.my_status = 'Đã khai nộp - chờ đối soát'
+        return {'ok': True, 'status': self.my_status, 'receipt': bool(d.get('receiptData'))}
+
 
 STATE_JS = """() => ({
   ui: (currentProducts || []).map(p => ({ code: p.uniqueCode, status: p.status })),
@@ -574,6 +580,45 @@ def main():
             login(page, 'VH88921', 'test123', settle_ms=3000)
             m = page.evaluate("({pad: getComputedStyle(document.body).paddingLeft, h: document.documentElement.scrollWidth > innerWidth})")
             check(m['pad'] == '16px' and not m['h'], f"v2 GĐ5: mobile 390 px lề 16 px, không cuộn ngang ({m})")
+            ctx.close()
+
+            print('Scenario 16: "Nộp tiền ngay" (ô 03) tự điền từ biên lai giống Tab 3, gửi cùng thông tin')
+            # OCR thay bằng chữ biên lai Vietcombank mẫu (cùng mẫu với run_e2e_tests.js) → kết quả cố định, không cần mạng
+            VCB = 'B Digibank\\nGiao dịch thành công!\\n500,000 VND\\n11:53 Thứ Năm 01/10/2026\\nMã giao dịch 16312412911'
+            PNG = {'name': 'bien-lai.png', 'mimeType': 'image/png', 'buffer': bytes.fromhex(
+                '89504e470d0a1a0a0000000d4948445200000001000000010806000000'
+                '1f15c4890000000d49444154789c63f8cfc0f01f0005000201a5a1e0e60000000049454e44ae426082')}
+            s = MockServer(my_status=NEW)
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            page.evaluate("window.Tesseract = { recognize: async () => ({ data: { text: '%s' } }) }" % VCB)
+            page.evaluate(f"openQuickPaymentModalForReg('{my_code}')"); page.wait_for_timeout(500)
+            check(page.evaluate("document.getElementById('quick-payment-modal').classList.contains('active')"), 'cửa sổ Nộp tiền ngay mở')
+            page.fill('#quick-bank-txn', 'TAY-123'); page.fill('#quick-pay-date', '01/10/2026 11:53:00')
+            page.click('#quick-submit-btn'); page.wait_for_timeout(800)
+            check(not any(c[0] == 'submit_payment' for c in s.calls), 'chưa đính kèm biên lai → KHÔNG gửi (giống Tab 3: biên lai bắt buộc)')
+            page.fill('#quick-bank-txn', ''); page.fill('#quick-pay-date', '')
+            page.set_input_files('#quick-slip-file', PNG)
+            page.wait_for_function("document.getElementById('quick-pay-date').value !== ''", timeout=10000)
+            f = page.evaluate("""() => ({ txn: document.getElementById('quick-bank-txn').value, date: document.getElementById('quick-pay-date').value,
+                                  banner: document.getElementById('quick-ocr-status-banner').innerText,
+                                  tab3: document.getElementById('pay-txn-id').value })""")
+            check(f['txn'] == 'Vietcombank - 16312412911' and f['date'] == '01/10/2026 11:53:00',
+                  f"đính kèm ảnh → tự điền Mã giao dịch + Ngày giờ đúng định dạng Tab 3 ({f['txn']} | {f['date']})")
+            check('Tự động điền thành công' in f['banner'] and 'Mã giao dịch' in f['banner'], 'khung báo kết quả quét hiện trong cửa sổ')
+            check(f['tab3'] == '', 'quét ở cửa sổ KHÔNG ghi vào ô của Tab 3')
+            page.click('#quick-submit-btn'); page.wait_for_timeout(2500)
+            sent = next((c[1] for c in s.calls if c[0] == 'submit_payment'), {})
+            check(sent.get('bankTxn') == 'Vietcombank - 16312412911' and sent.get('payTime') == '01/10/2026 11:53:00',
+                  f"gửi máy chủ Mã GD + Ngày giờ chuyển khoản như Tab 3 (payTime={sent.get('payTime')})")
+            check(str(sent.get('receiptData', '')).startswith('data:image/jpeg') and sent.get('fileName') == 'bien-lai.jpg',
+                  f"gửi kèm biên lai, tên file đúng đuôi sau khi nén ({sent.get('fileName')})")
+            check(not page.evaluate("document.getElementById('quick-payment-modal').classList.contains('active')"), 'nộp xong → đóng cửa sổ')
+            page.evaluate("autoScanReceiptOCR('data:image/png;base64,AA==')"); page.wait_for_timeout(500)
+            t3 = page.evaluate("[document.getElementById('pay-txn-id').value, document.getElementById('pay-date').value, document.getElementById('ocr-status-banner').innerText]")
+            check(t3[0] == 'Vietcombank - 16312412911' and t3[1] == '01/10/2026 11:53:00' and 'Mục 7' in t3[2],
+                  'Tab 3 không đổi: quét vẫn điền ô 7, 8 và ghi "Mục 7/8"')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
             browser.close()
