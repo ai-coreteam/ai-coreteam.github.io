@@ -417,3 +417,9 @@ Sửa trong lúc làm: 28 lỗi tương phản chế độ Đêm — thẻ sản
 Theo yêu cầu chủ dự án (đối chiếu `GRAP_11.html`): ô 01 **Heritage Red**, ô 02 **Warm Gray 05**, ô 03 **Warm Gray 01**; bo 16 px, di chuột nhấc 2 px + bóng (GRAP không có hiệu ứng bám theo chuột → không thêm); tiêu đề dashboard 40 px > tiêu đề thẻ 24 px. Thay cho quyết định §11.5 "ô 01 thẻ trắng". Tương phản đo lại: 0 lỗi (chữ trắng trên Heritage Red 7,9:1; chữ phụ #F6F3EB 7,2:1; chữ trên Warm Gray 05: #262626 11,6:1, #4A4946 6,9:1).
 
 ![Thẻ tổng quan kiểu GRAP](v2/dashboard_cards_grap_style.png)
+
+### 11.9. Thanh tab chính 1–4 (06/10/2026)
+
+Chủ dự án báo tab xuống dòng không chỉn chu. Số đo: đủ nhãn 1.265 px (đệm 16) / ẩn nhãn trang trí 1.024 px / thêm chữ 14 px 891 px. Quy tắc theo khổ: ≥ 1.344 px đủ nhãn · 1.076–1.343 px ẩn nhãn trang trí · 961–1.075 px chữ 14 px · 720–960 px 1 hàng ô đều · < 720 px lưới 2×2. Nhãn có số liệu (`#tab3-count-badge`, `#pm-tab-badge`) luôn hiện. Thay quy tắc GĐ5 "desktop cho xuống dòng" cho riêng `.nav-tabs` (thanh chương trình giữ nguyên).
+
+![Thanh tab trước / sau](v2/main_tabs_one_row.png)

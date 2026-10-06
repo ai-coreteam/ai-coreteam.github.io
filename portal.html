@@ -3222,10 +3222,10 @@
     html.ui-v2 .app-footer { background: transparent; border: 0; border-top: 1px solid var(--lg-border); border-radius: 0; box-shadow: none; }
     /* Nhãn HOT / NEW trên biểu tượng danh mục: cờ nhỏ, theo LG.com Tag Small 12 px (8,5 px trước đây) */
     html.ui-v2 .c-quick-links__emphasis { font-size: 12px; line-height: 16px; }
-    /* Desktop: không giấu tab nào sau thanh cuộn → cho xuống dòng (track bo 28 px khi 2 hàng) */
+    /* Desktop: không giấu tab nào sau thanh cuộn → cho xuống dòng (track bo 28 px khi 2 hàng).
+       Thanh tab chính (.nav-tabs) không dùng quy tắc này nữa — xem khối "Thanh tab chính" (06/10/2026) cuối phần v2. */
     @media (min-width: 769px) {
-      html.ui-v2 .program-tab-bar,
-      html.ui-v2 .nav-tabs { flex-wrap: wrap; overflow-x: visible; border-radius: 28px; }
+      html.ui-v2 .program-tab-bar { flex-wrap: wrap; overflow-x: visible; border-radius: 28px; }
     }
     /* =====================================================================================
        UI v2 — GIAI ĐOẠN 3 (06/10/2026): 3 thẻ tổng quan + ô số liệu PM.
@@ -3402,6 +3402,39 @@
       html.ui-v2 .header-actions button,
       html.ui-v2 #user-bar .btn-logout { font-size: 14px !important; }
       html.ui-v2 .header-titles p { font-size: 14px !important; }
+    }
+
+    /* Thanh tab chính (06/10/2026, chủ dự án: tab 1–4 xuống dòng trông không chỉn chu).
+       Số đo (LG EI nhúng sẵn nên mọi máy như nhau): 4 tab của nhân viên/ADMIN đủ nhãn = 1.265 px, khung tối đa 1.280 px;
+       ẩn nhãn trang trí = 1.024 px; thêm chữ 14 px = 891 px. Nhãn trang trí = Rules / Catalog Live / Excel View / Tham Khảo;
+       GIỮ "0 Đơn" (#tab3-count-badge) và nhãn tab PM (#pm-tab-badge) vì JS ghi số liệu vào đó.
+       Không đổi display của nút: tab ẩn theo vai trò dùng style="display:none" ngay trên nút. */
+    @media (min-width: 961px) {
+      html.ui-v2 .nav-tabs { flex-wrap: nowrap; overflow-x: auto; }
+      html.ui-v2 .nav-tabs .tab-btn { padding: 0 16px; }
+    }
+    @media (min-width: 961px) and (max-width: 1343px) {
+      html.ui-v2 .nav-tabs .tab-badge:not(#tab3-count-badge):not(#pm-tab-badge) { display: none; }
+    }
+    @media (min-width: 961px) and (max-width: 1075px) {
+      html.ui-v2 .nav-tabs .tab-btn { font-size: 14px; padding: 0 12px; }
+    }
+    /* Máy tính bảng & điện thoại: lưới ô bằng nhau, thấy đủ mọi tab, không phải vuốt; chữ dài xuống dòng TRONG ô */
+    @media (max-width: 960px) {
+      html.ui-v2 .nav-tabs { display: grid !important; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+                             width: 100%; overflow: visible !important; gap: 4px !important; padding: 6px !important; border-radius: 24px; }
+      html.ui-v2 .nav-tabs .tab-btn { height: auto; min-height: 44px !important; padding: 8px 12px !important; font-size: 14px !important; line-height: 20px;
+                                      white-space: normal !important; flex-wrap: wrap; justify-content: center; text-align: center; column-gap: 6px; row-gap: 0; border-radius: 18px; }
+      html.ui-v2 .nav-tabs .tab-badge { white-space: nowrap; padding: 0 4px; }
+      html.ui-v2 .nav-tabs .tab-badge:not(#tab3-count-badge):not(#pm-tab-badge) { display: none; }
+      /* Chữ chia dòng cân (không rớt 1 chữ lẻ); "0 Đơn" chạy liền sau chữ. display:block không có !important →
+         style="display:none" theo vai trò vẫn thắng. Tab PM giữ flex (style inline-flex), bỏ biểu tượng trang trí cho gọn. */
+      html.ui-v2 .nav-tabs .tab-btn { text-wrap: balance; }
+      html.ui-v2 .nav-tabs .tab-btn:not(#tab-pm-btn) { display: block; align-content: center; }
+      html.ui-v2 .nav-tabs .tab-btn svg { display: none; }
+    }
+    @media (max-width: 719px) {
+      html.ui-v2 .nav-tabs { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     html.ui-v2[data-theme="dark"] .tab-content .grap-section-header p { color: #CBC8C2 !important; }
     html.ui-v2[data-theme="dark"] [style*="color:var(--lg-ok)"],

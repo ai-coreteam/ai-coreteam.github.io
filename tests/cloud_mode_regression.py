@@ -621,6 +621,27 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 17: thanh tab chính 1 hàng trên PC, lưới đều trên điện thoại (không xuống dòng lộn xộn, không phải vuốt)')
+            NAV = """() => { const n = document.getElementById('main-nav-tabs'); const bs = [...n.querySelectorAll('.tab-btn')].filter(b => b.offsetParent);
+                     const r = bs.map(b => b.getBoundingClientRect());
+                     return { n: bs.length, rows: new Set(r.map(x => Math.round(x.top))).size, cols: new Set(r.map(x => Math.round(x.left))).size,
+                              equal: new Set(r.map(x => Math.round(x.width))).size === 1, overflow: n.scrollWidth > n.clientWidth + 1,
+                              count: getComputedStyle(document.getElementById('tab3-count-badge')).display !== 'none' } }"""
+            for w, want in [(1440, 'row'), (1280, 'row'), (1024, 'row'), (820, 'row'), (390, 'grid')]:
+                ctx = browser.new_context(viewport={'width': w, 'height': 900})
+                ctx.add_init_script("localStorage.setItem('lg_tour_completed_employee','true');")
+                page = ctx.new_page(); page.goto(f'http://127.0.0.1:{port}/{PAGE}' + os.environ.get('UI_QUERY', '')); page.wait_for_timeout(500)
+                login(page, 'VH88921', 'test123', settle_ms=2000)
+                m = page.evaluate(NAV)
+                if os.environ.get('UI_QUERY') == '?ui=v1':
+                    check(m['n'] == 4, f'?ui=v1 {w} px: 4 tab vẫn hiện (giao diện v1.4 không đổi)')
+                elif want == 'row':
+                    check(m['n'] == 4 and m['rows'] == 1 and not m['overflow'] and m['count'], f'{w} px: 4 tab 1 hàng, không tràn, còn "0 Đơn" ({m})')
+                else:
+                    check(m['n'] == 4 and m['rows'] == 2 and m['cols'] == 2 and m['equal'] and not m['overflow'] and m['count'],
+                          f'{w} px: lưới 2×2 ô bằng nhau, thấy đủ 4 tab, không phải vuốt ({m})')
+                ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()
