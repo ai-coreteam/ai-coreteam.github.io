@@ -5957,6 +5957,20 @@
       return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
+    // CHỈ ĐỂ HIỂN THỊ / XUẤT FILE: thời gian dạng ISO (vd. "2026-10-06T07:52:01.259Z" = giờ quốc tế, do đăng ký từ thẻ sản phẩm ghi)
+    // → giờ Việt Nam "06/10/2026 14:52:01", cùng dạng máy chủ dùng cho các dòng khác. Giá trị khác giữ nguyên.
+    // Không dùng hàm này cho dữ liệu đem đi tính toán (hạn 24 giờ, giờ mở nộp tiền đọc giá trị gốc).
+    function fmtVNTime(v) {
+      const s = String(v == null ? '' : v).trim();
+      if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s)) return s;
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      const p = {};
+      new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(d).forEach(x => { p[x.type] = x.value; });
+      return `${p.day}/${p.month}/${p.year} ${p.hour}:${p.minute}:${p.second}`;
+    }
+
     // ===== P1: Toast Notification System (GAP-UX-02) =====
     function showToast(message, type = 'info', duration = 4000) {
       let container = document.getElementById('lg-toast-container');
@@ -8747,7 +8761,7 @@
                   <div style="color:#CBC8C2; font-size:11px;">Giá ưu đãi nội bộ: <strong style="color:#FD312E; font-size:13px;">${formatVND(myReg.internalPrice || 0)}</strong></div>
                   <div style="color:#CBC8C2; font-size:11px;">Kho bàn giao: <strong style="color:#FFFFFF;">${esc(myReg.kho || 'Hải Phòng')}</strong></div>
                 </div>
-                <div style="font-size:11px; color:#CBC8C2;">Đăng ký: ${esc(myReg.timestamp || '')}</div>
+                <div style="font-size:11px; color:#CBC8C2;">Đăng ký: ${esc(fmtVNTime(myReg.timestamp || ''))}</div>
               </div>`;
           }
           if (card3Footer) {
@@ -10056,7 +10070,7 @@
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
-            <td><span style="font-size:11.5px; color:#716F6A;">${esc(r.timestamp)}</span></td>
+            <td><span style="font-size:11.5px; color:#716F6A;">${esc(fmtVNTime(r.timestamp))}</span></td>
             <td>${deadlineBadge}</td>
             <td>${gateStatus}</td>
             <td>${quickAction}</td>
@@ -10414,7 +10428,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
-            <td><span style="font-size:11.5px;color:#716F6A;">${esc(r.timestamp)}</span></td>
+            <td><span style="font-size:11.5px;color:#716F6A;">${esc(fmtVNTime(r.timestamp))}</span></td>
             <td>${statusBadge}</td>
             <td>${paymentInfo}</td>
             <td>${actionCol}</td>
@@ -10892,7 +10906,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           r.division || '',
           r.phone || '',
           r.address || '',
-          r.timestamp || '',
+          fmtVNTime(r.timestamp || ''),
           r.status || '',
           r.payerName || '',
           r.payerCode || '',
@@ -12908,7 +12922,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           } else {
             act = `<button type="button" class="btn-pay-open" onclick="openPaymentFromLookup(${i})">Nộp tiền</button>`;
           }
-          return `<tr><td>${esc(o.time)}</td><td><span class="badge-ordinal">${esc(o.slot)}</span></td><td>${esc(o.kho)}</td><td>${esc(o.model)}</td><td style="text-align:right; white-space:nowrap;"><strong>${price ? fmtVND(price) : '—'}</strong></td><td><strong>${esc(o.status)}</strong></td><td>${o.paid ? 'Đã khai' : 'Chưa khai'}</td><td>${o.receipt ? 'Đã tải lên' : 'Chưa có'}</td><td>${act}</td></tr>`;
+          return `<tr><td>${esc(fmtVNTime(o.time))}</td><td><span class="badge-ordinal">${esc(o.slot)}</span></td><td>${esc(o.kho)}</td><td>${esc(o.model)}</td><td style="text-align:right; white-space:nowrap;"><strong>${price ? fmtVND(price) : '—'}</strong></td><td><strong>${esc(o.status)}</strong></td><td>${o.paid ? 'Đã khai' : 'Chưa khai'}</td><td>${o.receipt ? 'Đã tải lên' : 'Chưa có'}</td><td>${act}</td></tr>`;
         }).join('') +
         `</tbody></table></div>`;
     }

@@ -238,6 +238,42 @@ console.log('--- C2: Hủy giữ chỗ (quy tắc đã duyệt: chỉ trước k
   check(late.ok === false && /khai nộp/.test(late.message), 'đã khai nộp tiền → KHÔNG tự hủy được, hướng dẫn liên hệ PM');
 }
 
+console.log('--- Ngày giờ ghi dạng CHỮ (06/10/2026: Google Sheet tự đổi "06/10/2026" thành 10/06 theo kiểu tháng/ngày) ---');
+{
+  const book = freshBook(); const { post } = load(book);
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  const u2 = post({ action: 'auth', id: 'VH70002', password: 'pw2' });
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const c1 = PID + '-AYA-001', c2 = PID + '-AYA-002';
+  post({ action: 'register_product', token: u1.token, uniqueCode: c1, programId: PID, empCode: 'VH70001', empName: 'NV1' });
+  post({ action: 'register_product', token: u2.token, uniqueCode: c2, programId: PID, empCode: 'VH70002', empName: 'NV2' });
+  post({ action: 'pm_allow_payment', token: pm.token, programId: PID });
+  post({ action: 'payment', token: u1.token, slotId: c1, empCode: 'VH70001', payerName: 'NV1', bankTxn: 'FT1', payTime: '06/10/2026 15:00:00' });
+  post({ action: 'payment', token: u2.token, slotId: c2, empCode: 'VH70002', payerName: 'NV2', bankTxn: 'FT2' });
+  const rowOf = slot => regRows(book).find(r => String(r[7]).replace(/^'/, '') === slot);
+  // Dấu ' đầu = Sheet giữ nguyên chữ (mock formatDate trả yyyy-MM-dd; máy chủ thật trả dd/MM/yyyy)
+  const asText = v => typeof v === 'string' && v.length > 1 && v[0] === "'";
+  check(rowOf(c1)[16] === "'06/10/2026 15:00:00", 'Thời gian nộp người dùng khai được ghi dạng chữ, giữ đúng ngày/tháng');
+  check(asText(rowOf(c2)[16]), 'không khai giờ → giờ máy chủ cũng ghi dạng chữ');
+  check(post({ action: 'pm_approve_payment', token: pm.token, slotId: c1 }).ok === true && asText(rowOf(c1)[19]), 'PM duyệt từng đơn → Ngày PM duyệt dạng chữ');
+  check(post({ action: 'pm_reject_payment', token: pm.token, slotId: c2, reason: 'test' }).ok === true && asText(rowOf(c2)[19]), 'PM từ chối → Ngày PM duyệt dạng chữ');
+  const dash = post({ action: 'pm_dashboard', token: pm.token, programId: PID });
+  const r1 = (dash.registrations || []).find(r => r.slotId === c1) || {};
+  check(r1.payTime !== undefined && /^'?06\/10\/2026 15:00:00$/.test(r1.payTime), 'Dashboard PM đọc lại đúng Thời gian nộp (Sheet thật bỏ dấu \' khi đọc)');
+}
+{
+  const book = freshBook(); const { post } = load(book);
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const c1 = PID + '-AYA-001';
+  post({ action: 'register_product', token: u1.token, uniqueCode: c1, programId: PID, empCode: 'VH70001', empName: 'NV1' });
+  post({ action: 'pm_allow_payment', token: pm.token, programId: PID });
+  post({ action: 'payment', token: u1.token, slotId: c1, empCode: 'VH70001', payerName: 'NV1', bankTxn: 'FT1', payTime: '06/10/2026 15:00:00' });
+  const b = post({ action: 'pm_batch_approve_payment', token: pm.token, programId: PID, regIds: [c1] });
+  const row = regRows(book)[0];
+  check(b.ok === true && typeof row[19] === 'string' && row[19].length > 1 && row[19][0] === "'", 'PM duyệt hàng loạt → Ngày PM duyệt dạng chữ');
+}
+
 console.log('--- B4 / C1: Từ chối, mở cổng, watchdog ---');
 {
   const book = freshBook(); const { post, ctx } = load(book);

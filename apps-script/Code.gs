@@ -1089,7 +1089,7 @@ function pm_approve_payment_(d) {
         var rowNum = r + 2;
         regSheet.getRange(rowNum, C.STATUS).setValue('Đã duyệt thanh toán');
         regSheet.getRange(rowNum, C.PM_BY).setValue(pmName);
-        regSheet.getRange(rowNum, C.PM_DATE).setValue(nowStr);
+        regSheet.getRange(rowNum, C.PM_DATE).setValue(asText_(nowStr));
         SpreadsheetApp.flush();
         hit = {
           slot: curSlot,
@@ -1152,7 +1152,7 @@ function pm_batch_approve_payment_(d) {
       if (curStatus === STATUS_PAID || curStatus === 'Đã khai nộp - chờ đối soát') {
         data[r][C.STATUS - 1] = 'Đã duyệt thanh toán';
         data[r][C.PM_BY - 1] = pmName;
-        data[r][C.PM_DATE - 1] = nowStr;
+        data[r][C.PM_DATE - 1] = asText_(nowStr);
         updated++;
         rowsToEmail.push({
           empCode: String(data[r][C.EMP_CODE - 1]).trim(),
@@ -1218,7 +1218,7 @@ function pm_reject_payment_(d) {
         var rowNum = r + 2;
         regSheet.getRange(rowNum, C.STATUS).setValue('Từ chối');
         regSheet.getRange(rowNum, C.PM_BY).setValue(pmName);
-        regSheet.getRange(rowNum, C.PM_DATE).setValue(nowStr);
+        regSheet.getRange(rowNum, C.PM_DATE).setValue(asText_(nowStr));
         regSheet.getRange(rowNum, C.NOTE).setValue(reason);
         hit = {
           slot: curSlot,
@@ -1757,7 +1757,7 @@ function payment_(d) {
     else if (found) {
       reg.getRange(found.rowNo, C.PAYER_NAME, 1, 6).setValues([[
         safe_(payerName), safe_(str_(payerCode).toUpperCase()), "'" + finalAmount,
-        safe_(bankTxn), safe_(payTime), link
+        safe_(bankTxn), asText_(payTime), link
       ]]);
       reg.getRange(found.rowNo, C.STATUS).setValue(STATUS_PAID);
       SpreadsheetApp.flush();
@@ -2049,6 +2049,14 @@ function safe_(v) {
 }
 
 function fmt_(d) { return Utilities.formatDate(d, 'Asia/Ho_Chi_Minh', 'dd/MM/yyyy HH:mm:ss'); }
+
+// Ghi ngày giờ "dd/MM/yyyy HH:mm:ss" vào ô dạng CHỮ. Không có dấu ' đầu, Google Sheet tự đổi chuỗi thành ngày theo
+// vùng của bảng tính (kiểu Mỹ: tháng/ngày) → "06/10/2026" thành 10/06/2026 (06/10/2026: "Thời gian nộp" ra tháng 6).
+// Dấu ' không hiện trong ô và không có trong giá trị đọc ra; nó cũng chặn chèn công thức như safe_().
+function asText_(v) {
+  var s = str_(v).replace(/^'+/, '');
+  return s ? "'" + s : '';
+}
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);

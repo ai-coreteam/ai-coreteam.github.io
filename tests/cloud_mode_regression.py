@@ -136,7 +136,7 @@ class MockServer:
         return {'ok': True, 'enabled': self.email_enabled, 'remainingDailyQuota': 97}
 
     def do_pm_dashboard(self, d):
-        return {'ok': True, 'registrations': []}
+        return {'ok': True, 'registrations': copy.deepcopy(getattr(self, 'pm_regs', []))}
 
     def do_submit_payment(self, d):   # Code.gs: payment_() nhận cả action 'payment' (Tab 3) và 'submit_payment'
         if d.get('token') != 'mock.sig':
@@ -661,6 +661,28 @@ def main():
                 page.click('#btn-pm-export-csv')
             rows = open(dl.value.path(), encoding='utf-8-sig').read().splitlines()
             check(dl.value.suggested_filename.endswith('.csv') and rows and rows[0].count(',') == 21, 'thư viện Excel không tải được → vẫn tải CSV 22 cột như trước')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('Scenario 19: thời gian đăng ký dạng ISO (giờ quốc tế) hiện thành giờ Việt Nam trên bảng PM và file Excel')
+            s = MockServer()
+            s.pm_regs = [{'id': 'REG-2', 'programId': PID, 'slotId': f'{PID}-AYA-003', 'kho': 'AYA', 'model': 'MODEL-TAKEN-BY-ME',
+                          'empCode': ME, 'empName': 'Nhan Vien That', 'division': 'QA', 'phone': '0900001234', 'address': '',
+                          'status': WAIT_GATE, 'internalPrice': 5000000, 'amount': 5000000, 'payerName': '', 'payerCode': '',
+                          'bankTxn': '', 'payTime': '06/10/2026 15:00:00', 'receipt': '', 'pmBy': '', 'pmDate': '', 'note': '',
+                          'timestamp': '2026-10-06T07:52:01.259Z'}]
+            ctx, page = open_page(browser, port, s)
+            login(page, PM)
+            page.evaluate("loadPMDashboardData && loadPMDashboardData()"); page.wait_for_timeout(2500)
+            txt = page.evaluate("document.getElementById('tab-pm').innerText")
+            check('06/10/2026 14:52:01' in txt and '2026-10-06T07:52' not in txt, 'bảng PM: "2026-10-06T07:52:01Z" → "06/10/2026 14:52:01" (giờ VN)')
+            raw = page.evaluate("pmRegistrations[0] && pmRegistrations[0].timestamp")
+            check(raw == '2026-10-06T07:52:01.259Z', 'dữ liệu gốc giữ nguyên cho logic hạn 24 giờ (chỉ đổi cách hiển thị)')
+            page.evaluate("() => { window.XLSX.writeFile = (wb, name) => { window.__rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); }; }")
+            page.evaluate("exportRegistrationsCSV()"); page.wait_for_timeout(300)
+            rows = page.evaluate("window.__rows") or []
+            check(len(rows) == 2 and rows[1][12] == '06/10/2026 14:52:01' and rows[1][18] == '06/10/2026 15:00:00',
+                  f"file Excel: Thời gian ĐK giờ VN, Thời gian nộp giữ nguyên ({rows[1][12] if len(rows) > 1 else rows})")
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
