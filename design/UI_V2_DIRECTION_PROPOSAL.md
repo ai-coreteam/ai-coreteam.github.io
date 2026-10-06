@@ -373,3 +373,38 @@ Sửa trong lúc làm (đều phát hiện bằng đo / ảnh): quy tắc giá t
 Sửa trong lúc làm: 28 lỗi tương phản chế độ Đêm — thẻ sản phẩm, bảng PM, khung chương trình **vẫn sáng ở chế độ Đêm như v1.4** nên phải dùng màu cố định thay cho biến tự đổi; 1 quy tắc khớp nhầm huy hiệu "Demo Mode" (đã thu hẹp); giá và nút bị bẻ dòng do chữ to hơn (phát hiện bằng ảnh, đã sửa).
 
 ![GĐ4: thẻ sản phẩm và bảng PM](v2/phase4_card_pm_table.png)
+
+
+### 11.7. Giai đoạn 5 — màn đăng nhập & mobile (06/10/2026)
+
+| Hạng mục | Kết quả [ĐO] |
+|---|---|
+| Màn đăng nhập trên **LG Master Gradient 04 — file gốc** (`assets/branding/LGE_Electronics_Gradient_04_RGB.jpg`, sao y bản skill lg-brand, 147 KB, không chỉnh sửa), phủ toàn màn (chỉ cắt khung), logo nằm trên thẻ trắng | ✅ |
+| Ảnh gradient **chỉ tải khi bật v2** (tắt v2: không có yêu cầu tải) | ✅ đo yêu cầu mạng |
+| Thẻ đăng nhập: bo 24 px, ô nhập 48 px, nút Active Red dạng viên 48 px (cao tự giãn khi hiện "Máy chủ đang khởi động…"); chữ ≥ 14 px | ✅ |
+| Mobile: lề trang 16 px (lưới LG.com cỡ S; v1.4 là 6 px), không cuộn ngang 390 px | ✅ |
+| Test giao diện tắt / bật v2 · e2e · máy chủ | 87/87 · 87/87 · 165 · 67 |
+
+**Kiểm tra độc lập bằng `verify.py` (lg-brand, chế độ web):** công cụ được thiết kế cho 1 ấn phẩm (slide / poster) nên áp vào cả ứng dụng sinh nhiều kết quả không áp dụng. Phân loại:
+
+| Nhóm | v1.4 | v2 | Ghi chú |
+|---|---|---|---|
+| Chữ không phải LG EI (`FONT_NOT_LG`) | 5 | **0** | ✅ cải thiện thật |
+| Tương phản lấy mẫu điểm ảnh | 20 lỗi + 34 cảnh báo | 45 + 4 | Toàn bộ lỗi v2 là chữ của trang **nằm sau màn đăng nhập** (gradient phủ kín) → không ai nhìn thấy. Sau đăng nhập: đo riêng 12 màn hình = 0 lỗi |
+| Màu ngoài bảng màu (cảnh báo) | 179 | 179 | Màu viết sẵn trong phần chưa làm lại (Tab 1 thư thông báo, cửa sổ phụ…) → đề xuất dọn ở v1.2 |
+| Lề / cỡ slogan / chồng lớp | như nhau | như nhau | Quy tắc lưới ấn phẩm in, không áp dụng cho web app |
+
+![GĐ5: đăng nhập](v2/phase5_login_gradient04.png)
+
+---
+
+## 13. Checklist bật v2 cho toàn bộ nhân viên
+
+| # | Việc | Ai | ☐ |
+|---|---|---|---|
+| 1 | Xem trước `…/portal.html?ui=v2` trên **máy tính và điện thoại**: đăng nhập, xem danh mục, bấm 2–3 link "Xem trên LG.com", (PM) xem bảng điều khiển, mở cửa sổ biên lai | Chủ dự án + 1 PM | ☐ |
+| 2 | Thử chế độ Đêm và In / Xuất PDF trên `?ui=v2` | Chủ dự án | ☐ |
+| 3 | Chọn ngày bật: **trước 14/10 ít nhất 2 ngày** (để nhân viên quen) hoặc **sau 16/10** (sau đợt bán) — không bật trong đợt bán | Chủ dự án | ☐ |
+| 4 | Kỹ thuật: đổi `var UI_V2_DEFAULT = false;` → `true` trong `Mau_Dang_Ky_Internal_Sales_3009.html`, chạy 3 bộ test, build `portal.html`, gộp `main`, tag, push | Kỹ thuật | ☐ |
+| 5 | Kiểm tra link thật sau khi GitHub Pages cập nhật | Kỹ thuật | ☐ |
+| 6 | **Quay lại nếu có vấn đề:** người dùng thêm `?ui=v1` (tức thì, từng máy) · hoặc đổi lại `false` + build + push (toàn bộ, ~1 phút sau khi GitHub cập nhật) · hoặc build `portal.html` từ tag `v1.4` | Kỹ thuật | — |

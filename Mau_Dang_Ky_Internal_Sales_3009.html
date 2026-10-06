@@ -3348,6 +3348,29 @@
     /* "Mở TT" từng dòng = cùng hành động chính với "Mở cổng thanh toán" trên đầu → Active Red */
     html.ui-v2 .btn-table-action[onclick^="pmAllowPaymentSingle"] { background: #EA1917 !important; border-color: #EA1917 !important; color: #FFFFFF !important; }
 
+    /* =====================================================================================
+       UI v2 — GIAI ĐOẠN 5 (06/10/2026): màn đăng nhập trên nền LG Master Gradient 04 (file gốc, không chỉnh sửa).
+       lg-brand: dùng đúng file gradient, chỉ cắt khung (cover), 1 gradient / trang, không đặt trong hình / chữ;
+       logo nằm trên thẻ trắng, không đặt trên gradient. Ảnh chỉ tải khi bật v2.
+       ===================================================================================== */
+    html.ui-v2 #login-overlay { background: #090303 url("assets/branding/LGE_Electronics_Gradient_04_RGB.jpg") center / cover no-repeat;
+                                backdrop-filter: none; -webkit-backdrop-filter: none; }
+    html.ui-v2 .login-card { border: 0; border-radius: 24px; padding: 40px; box-shadow: 0 24px 64px rgba(0,0,0,.35); max-height: calc(100vh - 32px); overflow-y: auto; }
+    html.ui-v2 .login-card h2 { font-size: 24px; line-height: 32px; font-weight: 600; margin-top: 20px; }
+    html.ui-v2 .login-card .login-sub { font-size: 16px; line-height: 24px; color: var(--lg-text-2); }
+    html.ui-v2 .login-card .form-label { font-size: 14px; color: var(--lg-text-2); }
+    html.ui-v2 .login-card .form-control { min-height: 48px; border-radius: 12px; font-size: 16px; }
+    html.ui-v2 .login-card .btn-login { min-height: 48px; height: auto; padding: 12px 20px; border-radius: 999px; background: #EA1917; border-color: #EA1917; font-size: 16px; font-weight: 600; }
+    html.ui-v2 .login-card .btn-login:hover:not(:disabled) { background: #C41512; }
+    html.ui-v2 .login-card .login-error { font-size: 14px; line-height: 20px; }
+    html.ui-v2 .login-card .login-info, html.ui-v2 .login-card .login-info * { font-size: 14px; line-height: 20px; }
+    html.ui-v2 .login-card .demo-title, html.ui-v2 .login-card .demo-title * { font-size: 14px !important; }
+    html.ui-v2 .login-card .btn-demo { min-height: 40px; border-radius: 12px; font-size: 14px; }
+    html.ui-v2 .login-card .btn-demo * { font-size: 14px; }
+    @media (max-width: 480px) { html.ui-v2 .login-card { padding: 24px; } }
+    /* Mobile: lề trang 16 px theo lưới LG.com cỡ S (v1.4: 6 px, thẻ gần dính mép). Chỉ đổi lề trái/phải; lề dưới giữ nguyên. */
+    @media (max-width: 768px) { html.ui-v2 body { padding-left: 16px !important; padding-right: 16px !important; } }
+
     /* Mobile: quy tắc cũ dùng !important ở 13 px → v2 nâng lên 14 px; thanh chọn vuốt ngang như LG.com */
     @media (max-width: 768px) {
       html.ui-v2 .program-tab,

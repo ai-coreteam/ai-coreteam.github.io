@@ -461,7 +461,12 @@ def main():
                 page = ctx.new_page(); page.errors = []; page.on('pageerror', lambda e: page.errors.append(str(e)[:200]))
                 page.goto(f'http://127.0.0.1:{port}/{PAGE}{q}'); page.wait_for_timeout(800)
                 on = page.evaluate("document.documentElement.classList.contains('ui-v2')")
+                login_bg = page.evaluate("getComputedStyle(document.getElementById('login-overlay')).backgroundImage")
                 if q == '?ui=v2':
+                    login_small = page.evaluate('''() => [...document.querySelectorAll('.login-card *')].filter(e => e.getBoundingClientRect().width &&
+                        [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 14).length''')
+                    check('LGE_Electronics_Gradient_04_RGB.jpg' in login_bg, 'v2 GĐ5: màn đăng nhập dùng đúng file LG Master Gradient 04')
+                    check(login_small == 0, f'v2 GĐ5: chữ màn đăng nhập ≥ 14 px ({login_small} chỗ nhỏ hơn)')
                     login(page, 'VH12345', 'test123', settle_ms=3000)
                     page.evaluate("document.getElementById('tab-pm-btn').click()"); page.wait_for_timeout(1000)
                     check(on, '?ui=v2 → bật lớp giao diện v2')
@@ -499,6 +504,7 @@ def main():
                     check(not page.errors, f'v2: không có lỗi JS ({page.errors[:2]})')
                 else:
                     check(not on, f'{label} → giao diện v1.4 (không có class ui-v2)')
+                    check(login_bg == 'none', f'{label} → màn đăng nhập v1.4 (không tải ảnh gradient)')
                 ctx.close()
 
             print('Scenario 15: link xem tính năng model (v2) — LG.com nếu có, Google nếu không; không ảnh hưởng đăng ký')
@@ -537,6 +543,14 @@ def main():
             ctx.close()
             ctx, page, s, links, note = links_view('')
             check(not links and not note, 'tắt v2 → không có link / lưu ý (giữ nguyên v1.4)')
+            ctx.close()
+
+            ctx = browser.new_context(viewport={'width': 390, 'height': 844})
+            ctx.add_init_script("localStorage.setItem('lg_tour_completed_employee','true');")
+            page = ctx.new_page(); page.goto(f'http://127.0.0.1:{port}/{PAGE}?ui=v2'); page.wait_for_timeout(800)
+            login(page, 'VH88921', 'test123', settle_ms=3000)
+            m = page.evaluate("({pad: getComputedStyle(document.body).paddingLeft, h: document.documentElement.scrollWidth > innerWidth})")
+            check(m['pad'] == '16px' and not m['h'], f"v2 GĐ5: mobile 390 px lề 16 px, không cuộn ngang ({m})")
             ctx.close()
 
             browser.close()
