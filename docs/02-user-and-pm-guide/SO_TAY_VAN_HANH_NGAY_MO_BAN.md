@@ -110,7 +110,7 @@
 |---|---|---|
 | Bấm **"Kết sổ chương trình"** → xác nhận. Từ lúc này **không ai giữ chỗ thêm được**. Nộp tiền, duyệt, quét quá hạn **vẫn hoạt động** cho các đơn còn lại | PM | ☐ |
 | Duyệt / từ chối hết các đơn còn "chờ đối soát" | PM | ☐ |
-| Bấm **"Xuất Excel (CSV)"** → lưu file (gồm **mọi** đơn; lọc cột Trạng thái = "Đã duyệt thanh toán" để ra danh sách giao hàng) | PM | ☐ |
+| Bấm **"Xuất Excel"** → lưu file `.xlsx` (gồm **mọi** đơn; lọc cột Trạng thái = "Đã duyệt thanh toán" để ra danh sách giao hàng) | PM | ☐ |
 | Gửi file cho Kế toán & Kho | PM | ☐ |
 | ADMIN: File → Make a copy Google Sheet làm bản lưu đợt bán | ADMIN | ☐ |
 

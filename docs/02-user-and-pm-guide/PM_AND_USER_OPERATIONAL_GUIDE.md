@@ -188,7 +188,7 @@ flowchart TD
 ### Bước 5: Kết sổ đợt bán & Xuất báo cáo
 1. Khi hết thời hạn đăng ký, bấm nút **"Kết sổ chương trình"** (viền đen, trong khung chương trình — giao diện v2; v1.4 là nút viền đỏ).
 2. **Xuất dữ liệu quyết toán:**
-   * Bấm nút **`Xuất Excel (CSV)`** tại Bảng Điều Khiển PM (file gồm **mọi đơn** của chương trình đang chọn; lọc theo cột Trạng thái nếu chỉ cần đơn đã duyệt).
+   * Bấm nút **`Xuất Excel`** tại Bảng Điều Khiển PM (file Excel `.xlsx`, mở đúng cột trên mọi máy; gồm **mọi đơn** của chương trình đang chọn; lọc theo cột Trạng thái nếu chỉ cần đơn đã duyệt).
    * File xuất ra chứa đầy đủ 22 trường thông tin: Mã đợt, Mã NV, Họ tên, Phòng ban, Model, Kho, Số tiền, Mã GD ngân hàng, Giờ nộp, Người phê duyệt, sẵn sàng nộp cho Giám đốc Tài chính và Kế toán kho LGEVH.
 
 ---

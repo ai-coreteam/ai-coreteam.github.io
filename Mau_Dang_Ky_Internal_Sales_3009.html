@@ -4839,7 +4839,7 @@
             </button>
             <button class="btn-pm-action btn-pm-export" id="btn-pm-export-csv" onclick="exportRegistrationsCSV()">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Xuất Excel (CSV)
+              Xuất Excel
             </button>
             <button class="btn-pm-action btn-pm-outline" id="btn-pm-expired-check" onclick="triggerExpiredCheck()" title="Quét giải phóng các slot giữ chỗ quá hạn 24h và gửi cảnh báo">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -10878,45 +10878,65 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       const rows = [headers];
 
-      const escapeCsvCol = (val) => {
-        if (val === null || val === undefined) return '""';
-        return `"${String(val).replace(/"/g, '""')}"`;
-      };
-
       progRegs.forEach((r, idx) => {
         rows.push([
           idx + 1,
-          escapeCsvCol(r.slotId),
-          escapeCsvCol(r.kho),
-          escapeCsvCol(r.category || ''),
-          escapeCsvCol(r.model),
-          escapeCsvCol(r.description || ''),
+          r.slotId,
+          r.kho,
+          r.category || '',
+          r.model,
+          r.description || '',
           r.internalPrice || 0,
-          escapeCsvCol(r.empCode),
-          escapeCsvCol(r.empName),
-          escapeCsvCol(r.division || ''),
-          escapeCsvCol(r.phone || ''),
-          escapeCsvCol(r.address || ''),
-          escapeCsvCol(r.timestamp || ''),
-          escapeCsvCol(r.status || ''),
-          escapeCsvCol(r.payerName || ''),
-          escapeCsvCol(r.payerCode || ''),
+          r.empCode,
+          r.empName,
+          r.division || '',
+          r.phone || '',
+          r.address || '',
+          r.timestamp || '',
+          r.status || '',
+          r.payerName || '',
+          r.payerCode || '',
           r.amount || 0,
-          escapeCsvCol(r.bankTxn || ''),
-          escapeCsvCol(r.payTime || ''),
-          escapeCsvCol(r.pmBy || ''),
-          escapeCsvCol(r.pmDate || ''),
-          escapeCsvCol(r.note || '')
+          r.bankTxn || '',
+          r.payTime || '',
+          r.pmBy || '',
+          r.pmDate || '',
+          r.note || ''
         ]);
       });
 
-      const csvContent = '\uFEFF' + rows.map(e => e.join(',')).join('\n');
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      downloadTableFile(rows, `${activeProgram}_Danh_Sach_Dang_Ky_${dateStr}`, { moneyCols: [6, 16], sheetName: 'Danh sach dang ky' });
+    }
+
+    // Tải bảng (mảng 2 chiều, dòng 0 = tiêu đề) thành file Excel .xlsx.
+    // Vì sao không dùng CSV: Excel đọc CSV theo "dấu phân cách danh sách" của máy — máy đặt vùng Việt Nam dùng dấu ";"
+    // nên CSV dấu "," bị dồn hết vào cột A. File .xlsx mở đúng cột trên mọi máy / Google Sheets / Numbers.
+    // Thư viện SheetJS (data/xlsx.mini.min.js) không tải được → tải CSV như trước để không mất chức năng.
+    function downloadTableFile(rows, baseName, opts) {
+      opts = opts || {};
+      if (typeof XLSX !== 'undefined' && XLSX.utils && typeof XLSX.writeFile === 'function') {
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = rows[0].map((_, c) => ({ wch: Math.min(50, Math.max(8, ...rows.map(r => String(r[c] == null ? '' : r[c]).length)) + 2) }));
+        if (rows.length > 1) ws['!autofilter'] = { ref: ws['!ref'] };
+        (opts.moneyCols || []).forEach(c => {
+          for (let r = 1; r < rows.length; r++) {
+            const cell = ws[XLSX.utils.encode_cell({ r, c })];
+            if (cell && cell.t === 'n') cell.z = '#,##0';
+          }
+        });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, opts.sheetName || 'Sheet1');
+        XLSX.writeFile(wb, baseName + '.xlsx');
+        return;
+      }
+      const esc = v => (typeof v === 'number') ? v : `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+      const csvContent = '\uFEFF' + rows.map(r => r.map(esc).join(',')).join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       link.setAttribute('href', url);
-      link.setAttribute('download', `${activeProgram}_Danh_Sach_Dang_Ky_${dateStr}.csv`);
+      link.setAttribute('download', baseName + '.csv');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -12989,22 +13009,9 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     // Export Table to CSV
     function exportToCSV() {
-      const rows = Array.from(document.querySelectorAll('#confirmation-table tr'));
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      
-      rows.forEach(row => {
-        const cols = Array.from(row.querySelectorAll('th, td'));
-        const rowData = cols.map(c => `"${c.innerText.replace(/\n/g, ' ').replace(/"/g, '""')}"`).join(",");
-        csvContent += rowData + "\r\n";
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "Xac_Nhan_Dang_Ky_Banh_Hang_Noi_Bo_LGEVH.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const rows = Array.from(document.querySelectorAll('#confirmation-table tr'))
+        .map(row => Array.from(row.querySelectorAll('th, td')).map(c => c.innerText.replace(/\n/g, ' ')));
+      downloadTableFile(rows, 'Xac_Nhan_Dang_Ky_Banh_Hang_Noi_Bo_LGEVH', { sheetName: 'Xac nhan dang ky' });
     }
     // ===== P0: Realtime Gate State Auto-Refresh & Synchronization =====
     window.addEventListener('storage', function(e) {

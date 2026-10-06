@@ -50,7 +50,7 @@ sequenceDiagram
     Note over PM: BƯỚC 6: ĐỐI SOÁT & XUẤT EXCEL GIAO HÀNG
     PM->>PM: 1. Xem ảnh biên lai, so khớp số tiền & mã GD
     PM->>PM: 2. Bấm "Duyệt thanh toán" (hoặc "Từ chối hoàn slot")
-    PM->>PM: 3. Kết sổ (Closed) & Xuất Excel (CSV)
+    PM->>PM: 3. Kết sổ (Closed) & Xuất Excel (.xlsx)
 ```
 
 ---
@@ -171,7 +171,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
    - **Xóa hoàn toàn (0 đơn):** Nếu đợt bán vừa tạo thử hoặc đang ở trạng thái Nháp/Mở nhưng **chưa có bất kỳ nhân viên nào đăng ký giữ chỗ (0 đơn)**, PM có thể bấm nút **`🗑️ Xóa đợt bán (0 đơn)`** để xóa sạch vĩnh viễn khỏi hệ thống và database Google Sheet.
    - **Khóa xóa khi đã có giao dịch ( $\ge 1$ đơn):** Nếu đợt bán đã phát sinh đơn đăng ký hoặc giao dịch chuyển khoản, hệ thống sẽ **khóa chặt tính năng xóa** nhằm bảo toàn tính liêm chính kiểm toán thuế và đối soát dòng tiền Vietcombank. PM chỉ được phép bấm **`🔒 Kết sổ chương trình (Closed)`**.
 3. **Xuất danh sách:**
-   - PM nhấn nút **`Xuất Excel (CSV)`** trên Bảng Điều Khiển PM.
+   - PM nhấn nút **`Xuất Excel`** (file `.xlsx`) trên Bảng Điều Khiển PM.
    - *(cập nhật 05/10, đối chiếu code)* File CSV gồm **22 cột** (STT, Mã Slot, Kho, Ngành hàng, Model, Mô tả, Giá nội bộ, Mã NV, Họ tên, Bộ phận, SĐT, Địa chỉ giao hàng, Thời gian ĐK, Trạng thái, Người nộp, Mã NV nộp, Số tiền, Mã GD, Thời gian nộp, PM duyệt bởi, Ngày duyệt, Ghi chú), chứa **mọi đơn** của chương trình đang chọn — lọc theo cột *Trạng thái* nếu chỉ cần đơn đã duyệt. File **không có cột Serial**; cột *Địa chỉ giao hàng* thường trống vì luồng giữ chỗ 1-chạm không hỏi địa chỉ (xem `CURRENT_STATE.md` mục 9).
 
 ---

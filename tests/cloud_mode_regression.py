@@ -642,6 +642,28 @@ def main():
                           f'{w} px: lưới 2×2 ô bằng nhau, thấy đủ 4 tab, không phải vuốt ({m})')
                 ctx.close()
 
+            print('Scenario 18: "Xuất Excel" tải file .xlsx (mở đúng cột trên máy đặt vùng Việt Nam), CSV chỉ là đường lùi')
+            import zipfile, io
+            ctx = browser.new_context(viewport={'width': 1440, 'height': 900}, accept_downloads=True)
+            ctx.add_init_script("localStorage.setItem('lg_tour_completed_pm','true');")
+            page = ctx.new_page(); page.errors = []; page.on('pageerror', lambda e: page.errors.append(str(e)[:200]))
+            page.goto(f'http://127.0.0.1:{port}/{PAGE}' + os.environ.get('UI_QUERY', '')); page.wait_for_timeout(500)
+            login(page, 'VH12345', 'test123', settle_ms=2500)
+            with page.expect_download() as dl:
+                page.click('#btn-pm-export-csv')
+            data = open(dl.value.path(), 'rb').read()
+            z = zipfile.ZipFile(io.BytesIO(data)) if data[:2] == b'PK' else None
+            strings = ''.join(z.read(n).decode('utf-8') for n in z.namelist() if n in ('xl/sharedStrings.xml', 'xl/worksheets/sheet1.xml')) if z else ''
+            check(dl.value.suggested_filename.endswith('.xlsx') and z is not None, f'PM bấm Xuất Excel → file Excel thật ({dl.value.suggested_filename})')
+            check(all(h in strings for h in ['Mã Slot', 'Số điện thoại', 'Mã GD ngân hàng', 'Ghi chú']), 'đủ tiêu đề tiếng Việt của 22 trường')
+            page.evaluate("window.XLSX = undefined")
+            with page.expect_download() as dl:
+                page.click('#btn-pm-export-csv')
+            rows = open(dl.value.path(), encoding='utf-8-sig').read().splitlines()
+            check(dl.value.suggested_filename.endswith('.csv') and rows and rows[0].count(',') == 21, 'thư viện Excel không tải được → vẫn tải CSV 22 cột như trước')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()
