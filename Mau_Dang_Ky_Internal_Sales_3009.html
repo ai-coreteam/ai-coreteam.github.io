@@ -3441,6 +3441,22 @@
     html.ui-v2[data-theme="dark"] .sec-card strong[style*="var(--lg-red"],
     html.ui-v2[data-theme="dark"] .sec-card .req { color: #F6F3EB !important; }
 
+    /* Tab 3: khung VietQR trong form khai nộp (07/10/2026) — bề mặt luôn sáng (màu cố định), xếp dọc trên điện thoại */
+    .pay-qr-box { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: #F0ECE4; border: 1px solid #CBC8C2;
+                  border-radius: 12px; padding: 14px; margin-bottom: 14px; color: #262626; }
+    .pay-qr-box[hidden] { display: none; }
+    .pay-qr-img { flex: 0 0 auto; text-align: center; }
+    .pay-qr-img img { display: block; width: 160px; height: 160px; object-fit: contain; border-radius: 8px; border: 1px solid #E6E1D6; background: #FFFFFF; padding: 4px; }
+    .pay-qr-hint { font-size: 12px; color: #4A4946; margin-top: 4px; }
+    .pay-qr-info { flex: 1 1 240px; min-width: 0; font-size: 13px; line-height: 1.6; }
+    .pay-qr-slot, .pay-qr-amt { color: #A50034; }
+    .pay-qr-amt { font-size: 16px; }
+    .pay-qr-bank { border-top: 1px dashed #CBC8C2; margin-top: 6px; padding-top: 6px; color: #4A4946; }
+    .pay-qr-syntax { background: #E6E1D6; color: #262626; padding: 1px 6px; border-radius: 4px; font-weight: 700; word-break: break-all; }
+    html.ui-v2 .pay-qr-box { border: 0; border-radius: 16px; }
+    html.ui-v2 .pay-qr-info, html.ui-v2 .pay-qr-hint { font-size: 14px; }
+    html.ui-v2 .pay-qr-amt { font-size: 18px; }
+
     /* Serial Number cạnh Model (06/10/2026): phụ, không nổi bật — chữ thường, nhỏ, mờ theo màu chữ bên cạnh (đúng cả nền sáng lẫn tối) */
     .sn { font-weight: 400; font-size: 12px; line-height: inherit; opacity: .72; letter-spacing: .02em; white-space: nowrap; font-family: inherit; }
     html.ui-v2 .sn { font-size: 14px; }
@@ -4616,6 +4632,14 @@
 
         <form id="payment-form" onsubmit="handlePaymentSubmit(event)" hidden>
           <div id="pay-unlocked-info" style="font-size:12.5px; margin-bottom:12px; padding:10px 12px; background:var(--lg-card-bg); border:1px solid var(--lg-border); border-radius:8px;"></div>
+          <!-- 07/10/2026: mã VietQR ngay trong form (cùng định dạng cửa sổ "Nộp tiền ngay") — chuyển khoản không cần cuộn lên -->
+          <div id="pay-qr-box" class="pay-qr-box" hidden>
+            <div class="pay-qr-img">
+              <img id="pay-qr-img" src="" alt="Mã VietQR chuyển khoản Vietcombank" width="160" height="160">
+              <div class="pay-qr-hint">Quét bằng mọi App Ngân hàng</div>
+            </div>
+            <div class="pay-qr-info" id="pay-qr-info"></div>
+          </div>
           <div class="form-grid">
             <!-- Order Slot Display & Hidden Sync Field -->
             <div class="form-group">
@@ -11530,6 +11554,8 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     function lockPayment() {
       payCtx = null;
+      const qrBox = document.getElementById('pay-qr-box');
+      if (qrBox) { qrBox.hidden = true; document.getElementById('pay-qr-img').removeAttribute('src'); }
       document.getElementById('payment-form').hidden = true;
       document.getElementById('pay-lock').hidden = false;
     }
@@ -11591,6 +11617,18 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       document.getElementById('pay-unlocked-info').innerHTML =
         `Đang khai nộp tiền cho <strong>Slot ${order.slot}</strong> · Kho ${order.kho || ''} · ${order.model || ''}${snHtml(order)}` +
         (payCtx.price ? ` · Số tiền cần nộp: <strong style="color:var(--lg-red);">${fmtVND(payCtx.price)}</strong>` : '');
+      // Mã VietQR: cùng tài khoản, số tiền và nội dung CK "<Mã NV> <Mã Slot>" như cửa sổ "Nộp tiền ngay"
+      const qrSyntax = `${empCode} ${order.slot}`;
+      document.getElementById('pay-qr-img').src = 'https://img.vietqr.io/image/970436-0991000012525-compact.png?amount=' +
+        (payCtx.price || 0) + '&addInfo=' + encodeURIComponent(qrSyntax) + '&accountName=LG%20ELECTRONICS%20VN%20HAI%20PHONG';
+      document.getElementById('pay-qr-info').innerHTML =
+        `<div>Mã Slot: <strong class="pay-qr-slot">${esc(order.slot)}</strong> (Kho ${esc(order.kho || '')})</div>` +
+        `<div>Model: <strong>${esc(order.model || '')}</strong>${snHtml(order)}</div>` +
+        `<div>Số tiền thanh toán: <strong class="pay-qr-amt">${payCtx.price ? fmtVND(payCtx.price) : '—'}</strong></div>` +
+        `<div class="pay-qr-bank"><div>STK thụ hưởng: <strong>0991000012525</strong> (Vietcombank Tay Ho)</div>` +
+        `<div>CTY TNHH LG ELECTRONICS VN HAI PHONG</div>` +
+        `<div>Nội dung CK: <code class="pay-qr-syntax">${esc(qrSyntax)}</code></div></div>`;
+      document.getElementById('pay-qr-box').hidden = false;
       document.getElementById('pay-lock').hidden = true;
       form.hidden = false;
       document.getElementById('payment-upload-card').scrollIntoView({ behavior: 'smooth' });

@@ -746,6 +746,26 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 22: Tab 3 — form khai nộp có mã VietQR giống cửa sổ "Nộp tiền ngay" (không phải cuộn lên)')
+            s = MockServer(my_status=NEW)
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(2500)
+            check(page.evaluate("document.getElementById('pay-qr-box').hidden"), 'chưa bấm Nộp tiền → chưa hiện mã QR')
+            page.click('.btn-pay-open'); page.wait_for_timeout(600)
+            q = page.evaluate("""() => ({ shown: !document.getElementById('pay-qr-box').hidden, src: document.getElementById('pay-qr-img').src,
+                                         info: document.getElementById('pay-qr-info').innerText })""")
+            page.evaluate(f"openQuickPaymentModalForReg('{my_code}')"); page.wait_for_timeout(300)
+            quick = page.evaluate("document.getElementById('quick-qr-img').src"); page.evaluate('closeQuickPaymentModal()')
+            check(q['shown'] and 'amount=5000000' in q['src'] and f'addInfo={ME}%20{my_code}' in q['src'],
+                  f"bấm Nộp tiền → hiện QR đúng số tiền + nội dung CK '{ME} {my_code}'")
+            check(q['src'] == quick, 'URL mã QR giống hệt cửa sổ "Nộp tiền ngay" cho cùng đơn')
+            check('0991000012525' in q['info'] and f'{ME} {my_code}' in q['info'] and '5,000,000' in q['info'], 'có STK, số tiền (cách ghi số của Tab 3), nội dung CK cạnh mã QR')
+            page.evaluate('lockPayment()')
+            check(page.evaluate("document.getElementById('pay-qr-box').hidden && !document.getElementById('pay-qr-img').getAttribute('src')"), 'khóa form → ẩn QR, xóa ảnh cũ')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()
