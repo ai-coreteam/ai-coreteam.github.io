@@ -1,0 +1,71 @@
+{
+ "login_prod_inputs": [
+  "login-id 15px",
+  "login-password 15px"
+ ],
+ "vh": 664,
+ "offset_screens": {
+  "card03_my_order": 2,
+  "main_tabs": 2.9,
+  "category_bar": 2.7,
+  "tab1_content": 3.2
+ },
+ "header_block_px": 357,
+ "fab": [
+  {
+   "id": "lg-digital-assistant",
+   "w": 52,
+   "right": 14,
+   "bottom": 16,
+   "onclick": ""
+  }
+ ],
+ "card03_actions": [
+  {
+   "t": "Nộp tiền ngay (1-Chạm) →",
+   "w": 128,
+   "h": 42,
+   "fs": "14px"
+  },
+  {
+   "t": "Hủy giữ chỗ",
+   "w": 72,
+   "h": 42,
+   "fs": "14px"
+  }
+ ],
+ "category_bar_clickable": [
+  " selectQuickCategory('all', this)",
+  " selectQuickCategory('tv', this)",
+  " selectQuickCategory('ref', this)"
+ ],
+ "product_card": {
+  "card_h": 515,
+  "card_screens": 0.78,
+  "visual_h": 120,
+  "cards": 50
+ },
+ "quickpay_inputs": [
+  "quick-payer-name 15px",
+  "quick-payer-code 15px",
+  "quick-bank-txn 15px",
+  "quick-pay-date 15px",
+  "quick-phone 15px",
+  "quick-slip-file 15px"
+ ],
+ "quickpay_card_screens": 1.6,
+ "fab_covers_submit": {
+  "overlap_px2": 1560,
+  "submit": [
+   199,
+   594,
+   171,
+   36
+  ],
+  "fab": [
+   324,
+   596,
+   52
+  ]
+ }
+}

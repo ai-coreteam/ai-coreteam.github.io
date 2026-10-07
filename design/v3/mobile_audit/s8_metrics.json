@@ -1,0 +1,737 @@
+{
+ "u01_login": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 6.7,
+  "pageHScroll": false,
+  "tapTotal": 29,
+  "tapSmall": 6,
+  "tapSmallInView": [
+   "Hiện mật khẩu 28×28",
+   "VH88921 · Trần Văn Nam Nhân viên 280×40",
+   "VH11111 · Nguyen Ngoc Bao Nhân viên 280×40"
+  ],
+  "textTiny": 28,
+  "textTinySample": [
+   "12px HOT",
+   "12px NEW",
+   "11px CHƯƠNG TRÌNH ĐẶC QUYỀN NỘI B"
+  ],
+  "inputsZoom": "2/2",
+  "inputsZoomSample": [
+   "login-id 15px",
+   "login-password 15px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#login-overlay 360×740",
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u01_login.png"
+ },
+ "u02_after_login_top": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8.8,
+  "pageHScroll": false,
+  "tapTotal": 30,
+  "tapSmall": 11,
+  "tapSmallInView": [
+   "Đổi MK 122×42",
+   "Đăng xuất 140×42",
+   "Dot test 104×40"
+  ],
+  "textTiny": 28,
+  "textTinySample": [],
+  "inputsZoom": "0/0",
+  "inputsZoomSample": [],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u02_after_login_top.png"
+ },
+ "u03_dashboard_cards": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8.8,
+  "pageHScroll": false,
+  "tapTotal": 30,
+  "tapSmall": 11,
+  "tapSmallInView": [
+   "Sao chép số tài khoản 18×44",
+   "Xem thể lệ chi tiết → 133×21"
+  ],
+  "textTiny": 28,
+  "textTinySample": [],
+  "inputsZoom": "0/0",
+  "inputsZoomSample": [],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u03_dashboard_cards.png"
+ },
+ "u04_card03_my_order": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8.8,
+  "pageHScroll": false,
+  "tapTotal": 30,
+  "tapSmall": 11,
+  "tapSmallInView": [
+   "Nộp tiền ngay (1-Chạm) → 114×42",
+   "Hủy giữ chỗ 65×42"
+  ],
+  "textTiny": 28,
+  "textTinySample": [
+   "12px HOT",
+   "12px NEW"
+  ],
+  "inputsZoom": "0/0",
+  "inputsZoomSample": [],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u04_card03_my_order.png"
+ },
+ "u05_tabs_tab1": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8.8,
+  "pageHScroll": false,
+  "tapTotal": 30,
+  "tapSmall": 11,
+  "tapSmallInView": [
+   "Xem Thể Lệ Chi Tiết 174×38"
+  ],
+  "textTiny": 28,
+  "textTinySample": [
+   "11px CHƯƠNG TRÌNH ĐẶC QUYỀN NỘI B",
+   "13px 90 sản phẩm (43 model) tại 3",
+   "11px 01",
+   "12px Chọn Slot Giữ Chỗ (24h)",
+   "11px 02",
+   "12px Chuyển Khoản Đối Soát",
+   "11px 03",
+   "12px Nhận Bàn Giao Logistics"
+  ],
+  "inputsZoom": "0/0",
+  "inputsZoomSample": [],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u05_tabs_tab1.png"
+ },
+ "u06_tab2_top": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 41.9,
+  "pageHScroll": false,
+  "tapTotal": 134,
+  "tapSmall": 66,
+  "tapSmallInView": [
+   "Xem Thể Lệ & Quy Định Mở Bán 219×30",
+   "Tất cả kho (44/50) 148×40",
+   "Kho AYA (15/17) 129×40",
+   "Kho AYB (15/17) 130×40",
+   "Kho AYC (14/16) 131×40",
+   "Dạng Thẻ 148×40",
+   "Dạng Bảng 148×40"
+  ],
+  "textTiny": 7,
+  "textTinySample": [
+   "13px Chọn sản phẩm trực tuyến the",
+   "12px Xem Thể Lệ & Quy Định Mở Bán"
+  ],
+  "inputsZoom": "1/1",
+  "inputsZoomSample": [
+   "INPUT 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u06_tab2_top.png"
+ },
+ "u07_tab2_product_cards": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 41.9,
+  "pageHScroll": false,
+  "tapTotal": 134,
+  "tapSmall": 66,
+  "tapSmallInView": [
+   "Xem trên LG.com ↗ 119×20"
+  ],
+  "textTiny": 7,
+  "textTinySample": [],
+  "inputsZoom": "1/1",
+  "inputsZoomSample": [
+   "INPUT 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u07_tab2_product_cards.png"
+ },
+ "u08_tab2_fullpage": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 41.9,
+  "pageHScroll": false,
+  "tapTotal": 134,
+  "tapSmall": 66,
+  "tapSmallInView": [
+   "Xem trên LG.com ↗ 119×20"
+  ],
+  "textTiny": 7,
+  "textTinySample": [],
+  "inputsZoom": "1/1",
+  "inputsZoomSample": [
+   "INPUT 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ]
+ },
+ "u09_tab2_table_view": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 20.8,
+  "pageHScroll": false,
+  "tapTotal": 128,
+  "tapSmall": 66,
+  "tapSmallInView": [
+   "Xem trên LG.com ↗ 119×20",
+   "Xem trên LG.com ↗ 119×20",
+   "Xem trên LG.com ↗ 119×20"
+  ],
+  "textTiny": 387,
+  "textTinySample": [
+   "12px Mã SP",
+   "12px Category",
+   "12px Model",
+   "12px Mô tả",
+   "12px Giá niêm yết",
+   "12px Giá nội bộ",
+   "12px Trạng thái",
+   "12px Thao tác"
+  ],
+  "inputsZoom": "1/1",
+  "inputsZoomSample": [
+   "INPUT 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "DIV 682>304",
+   "DIV 701>304",
+   "DIV 678>304"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u09_tab2_table_view.png"
+ },
+ "u10_quickpay_modal_top": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 41.9,
+  "pageHScroll": false,
+  "tapTotal": 144,
+  "tapSmall": 68,
+  "tapSmallInView": [
+   "Xem trên LG.com ↗ 119×20"
+  ],
+  "textTiny": 29,
+  "textTinySample": [
+   "11px VIETQR SMART PAYMENT · XÁC N",
+   "12px Quét mã VietQR chuyển khoản ",
+   "10px Quét bằng mọi App Ngân hàng",
+   "13px Mã Slot: IS-2026Q4-TV-01-AYA",
+   "13px Kho AYA",
+   "13px Model: OLED77G5PSA S/N 603IN",
+   "13px OLED77G5PSA S/N 603INPT01235",
+   "13px Số tiền thanh toán: 11.000.0"
+  ],
+  "inputsZoom": "6/6",
+  "inputsZoomSample": [
+   "INPUT 14px",
+   "quick-payer-name 15px",
+   "quick-payer-code 15px",
+   "quick-bank-txn 15px",
+   "quick-pay-date 15px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#quick-payment-modal 360×740",
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u10_quickpay_modal_top.png"
+ },
+ "u11_quickpay_modal_bottom": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 41.9,
+  "pageHScroll": false,
+  "tapTotal": 144,
+  "tapSmall": 68,
+  "tapSmallInView": [
+   "Xem trên LG.com ↗ 119×20",
+   "Để sau (Nộp trong 24h) 164×36",
+   "Xác Nhận Nộp Tiền 156×36"
+  ],
+  "textTiny": 29,
+  "textTinySample": [
+   "10px Quét bằng mọi App Ngân hàng",
+   "12px STK thụ hưởng: 0991000012525",
+   "12px CTY TNHH LG ELECTRONICS VN H",
+   "12px Nội dung CK: VH70001 IS-2026",
+   "12px VH70001 IS-2026Q4-TV-01-AYA-",
+   "13px Người nộp tiền (Họ tên)",
+   "13px Mã NV người nộp",
+   "13px Mã giao dịch ngân hàng (Txn "
+  ],
+  "inputsZoom": "6/6",
+  "inputsZoomSample": [
+   "INPUT 14px",
+   "quick-payer-name 15px",
+   "quick-payer-code 15px",
+   "quick-bank-txn 15px",
+   "quick-pay-date 15px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#quick-payment-modal 360×740",
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u11_quickpay_modal_bottom.png"
+ },
+ "u12_tab3_top": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 6,
+  "pageHScroll": false,
+  "tapTotal": 33,
+  "tapSmall": 13,
+  "tapSmallInView": [
+   "Điền Thông Tin & Upload File Nộp Tiền 215×36",
+   "Xuất Excel 81×36",
+   "Làm mới / Tra cứu 164×36",
+   "Nộp tiền 73×26"
+  ],
+  "textTiny": 58,
+  "textTinySample": [
+   "13px Nhân viên điền thông tin xác",
+   "13px Tải lên (Upload) file biên l",
+   "12px Tài khoản: VH70001 · Nhan Vi",
+   "13px Hệ thống tự động tra cứu lịc",
+   "13px VH70001",
+   "13px Nộp tiền",
+   "13px Khoảng thời gian tra cứu",
+   "13px Thời gian đăng ký"
+  ],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "lookup-time-filter 15px",
+   "table-search 14px",
+   "status-filter 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "DIV 724>258",
+   "DIV 611>304"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u12_tab3_top.png"
+ },
+ "u13_tab3_lookup_table": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 6,
+  "pageHScroll": false,
+  "tapTotal": 33,
+  "tapSmall": 13,
+  "tapSmallInView": [
+   "Làm mới / Tra cứu 164×36",
+   "Nộp tiền 73×26"
+  ],
+  "textTiny": 58,
+  "textTinySample": [
+   "13px Thời gian đăng ký",
+   "13px Slot",
+   "13px Kho",
+   "13px Model",
+   "13px Số tiền cần nộp",
+   "13px Trạng thái",
+   "13px Đã khai nộp tiền",
+   "13px Biên lai"
+  ],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "lookup-time-filter 15px",
+   "table-search 14px",
+   "status-filter 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "DIV 724>258",
+   "DIV 611>304"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u13_tab3_lookup_table.png"
+ },
+ "u14_tab3_form_qr": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8,
+  "pageHScroll": false,
+  "tapTotal": 45,
+  "tapSmall": 15,
+  "tapSmallInView": [],
+  "textTiny": 76,
+  "textTinySample": [
+   "13px Đang khai nộp tiền cho Slot ",
+   "13px Slot IS-2026Q4-TV-01-AYA-003",
+   "13px 11.000.000 đ",
+   "13px 1. Mã Slot ID Đã Đăng Ký *",
+   "13px *",
+   "13px 2. Mã NV Đăng Ký *"
+  ],
+  "inputsZoom": "11/11",
+  "inputsZoomSample": [
+   "lookup-time-filter 15px",
+   "pay-slot-display 15px",
+   "pay-emp-code 15px",
+   "pay-emp-name 15px",
+   "pay-payer-name 15px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "DIV 724>258",
+   "DIV 611>304"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u14_tab3_form_qr.png"
+ },
+ "u15_tab3_form_fields": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8,
+  "pageHScroll": false,
+  "tapTotal": 45,
+  "tapSmall": 15,
+  "tapSmallInView": [
+   "Hủy Bỏ 80×36"
+  ],
+  "textTiny": 76,
+  "textTinySample": [
+   "13px 6. Số Tiền Đã Chuyển Khoản (",
+   "13px *",
+   "13px Số tiền cần nộp cho slot IS-",
+   "13px 7. Ngân Hàng & Mã Giao Dịch ",
+   "13px 8. Ngày Giờ Nộp Tiền *",
+   "13px 9. Upload File Chứng Từ / Ản",
+   "13px Nhấn vào đây để chọn file, h",
+   "13px kéo thả"
+  ],
+  "inputsZoom": "11/11",
+  "inputsZoomSample": [
+   "lookup-time-filter 15px",
+   "pay-slot-display 15px",
+   "pay-emp-code 15px",
+   "pay-emp-name 15px",
+   "pay-payer-name 15px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "DIV 724>258",
+   "DIV 611>304"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_u15_tab3_form_fields.png"
+ },
+ "u16_tab4_table": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 5.3,
+  "pageHScroll": false,
+  "tapTotal": 71,
+  "tapSmall": 54,
+  "tapSmallInView": [
+   "on 18×18",
+   "Đặt hàng 50×19",
+   "Đặt hàng 50×19",
+   "Đặt hàng 50×19"
+  ],
+  "textTiny": 524,
+  "textTinySample": [
+   "12px Còn 44/50 slot",
+   "12px 44",
+   "12px Còn 15/17 slot",
+   "12px 15",
+   "12px Còn 14/16 slot",
+   "12px 14",
+   "13px Chỉ hiện slot còn đặt được",
+   "13px STT"
+  ],
+  "inputsZoom": "0/0",
+  "inputsZoomSample": [],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "DIV 1141>258"
+  ],
+  "fixed": [
+   "TH 192×39",
+   "TH 46×39",
+   "TH 113×39",
+   "TH 110×39",
+   "TH 70×39",
+   "TH 240×39"
+  ],
+  "file": "s8_u16_tab4_table.png"
+ },
+ "u17_first_visit_tour": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 8.8,
+  "pageHScroll": false,
+  "tapTotal": 33,
+  "tapSmall": 14,
+  "tapSmallInView": [
+   "Đổi MK 122×42",
+   "Đăng xuất 140×42",
+   "Dot test 104×40",
+   "× 28×28",
+   "Bỏ qua 57×27",
+   "Tiếp → 81×29"
+  ],
+  "textTiny": 34,
+  "textTinySample": [
+   "11px BƯỚC 1/4 · NHÂN VIÊN",
+   "10px CỬA NGÕ MUA SẮM",
+   "13px Bấm vào các thanh chương trì",
+   "12px Mỗi chương trình có hạn mức ",
+   "13px Bỏ qua",
+   "13px Tiếp →"
+  ],
+  "inputsZoom": "0/0",
+  "inputsZoomSample": [],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52",
+   "#lg-tour-overlay 360×740",
+   "#lg-tour-hole 140×72",
+   "#lg-tour-card 328×287"
+  ],
+  "file": "s8_u17_first_visit_tour.png"
+ },
+ "p01_pm_top": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 7.1,
+  "pageHScroll": false,
+  "tapTotal": 54,
+  "tapSmall": 36,
+  "tapSmallInView": [
+   "Đổi MK 122×42",
+   "Đăng xuất 140×42",
+   "Dot test 104×40",
+   "Tạo chương trình 154×40"
+  ],
+  "textTiny": 17,
+  "textTinySample": [],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "pm-filter-kho 14px",
+   "pm-filter-status 14px",
+   "pm-search-query 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "pm-table-wrapper 1293>302"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_p01_pm_top.png"
+ },
+ "p02_pm_actions": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 7.1,
+  "pageHScroll": false,
+  "tapTotal": 54,
+  "tapSmall": 36,
+  "tapSmallInView": [
+   "Mở cổng thanh toán (2) 202×40",
+   "Duyệt hàng loạt (2) 177×40",
+   "Hẹn Giờ (Timer) 156×40",
+   "Nạp Excel SP 135×40",
+   "Xuất Excel 120×40",
+   "Quét quá hạn 24h 164×40",
+   "Tải lại 90×40",
+   "Cấu hình API 136×40",
+   "Hẹn giờ: Chưa đặt 128×23",
+   "Kết sổ chương trình 176×40"
+  ],
+  "textTiny": 17,
+  "textTinySample": [
+   "13px Hệ thống giám sát số liệu th",
+   "12px Đang Mở Bán",
+   "13px Hạn mức: 1 SP/NV · PM: PM Th",
+   "11px AutoEmail & Quét giữ chỗ 24h",
+   "11px Hẹn giờ: Chưa đặt"
+  ],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "pm-filter-kho 14px",
+   "pm-filter-status 14px",
+   "pm-search-query 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "pm-table-wrapper 1293>302"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_p02_pm_actions.png"
+ },
+ "p03_pm_kpis": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 7.1,
+  "pageHScroll": false,
+  "tapTotal": 54,
+  "tapSmall": 36,
+  "tapSmallInView": [
+   "Kho AYA-AYB-AYC ↗ 133×16"
+  ],
+  "textTiny": 17,
+  "textTinySample": [],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "pm-filter-kho 14px",
+   "pm-filter-status 14px",
+   "pm-search-query 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "pm-table-wrapper 1293>302"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_p03_pm_kpis.png"
+ },
+ "p04_pm_orders_table": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 7.1,
+  "pageHScroll": false,
+  "tapTotal": 54,
+  "tapSmall": 36,
+  "tapSmallInView": [
+   "Xem biên lai 119×36",
+   "Duyệt 78×36",
+   "Từ chối 88×36",
+   "Hủy slot 77×36",
+   "Mở TT 81×36",
+   "Hủy slot 77×36",
+   "Xem biên lai 119×36",
+   "Duyệt 78×36",
+   "Từ chối 88×36",
+   "Hủy slot 77×36",
+   "Mở TT 81×36",
+   "Hủy slot 77×36"
+  ],
+  "textTiny": 17,
+  "textTinySample": [],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "pm-filter-kho 14px",
+   "pm-filter-status 14px",
+   "pm-search-query 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "pm-table-wrapper 1293>302"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ],
+  "file": "s8_p04_pm_orders_table.png"
+ },
+ "p05_pm_fullpage": {
+  "vw": 360,
+  "vh": 740,
+  "pageScreens": 7.1,
+  "pageHScroll": false,
+  "tapTotal": 54,
+  "tapSmall": 36,
+  "tapSmallInView": [
+   "Xem biên lai 119×36",
+   "Duyệt 78×36",
+   "Từ chối 88×36",
+   "Hủy slot 77×36",
+   "Mở TT 81×36",
+   "Hủy slot 77×36",
+   "Xem biên lai 119×36",
+   "Duyệt 78×36",
+   "Từ chối 88×36",
+   "Hủy slot 77×36",
+   "Mở TT 81×36",
+   "Hủy slot 77×36"
+  ],
+  "textTiny": 17,
+  "textTinySample": [],
+  "inputsZoom": "3/3",
+  "inputsZoomSample": [
+   "pm-filter-kho 14px",
+   "pm-filter-status 14px",
+   "pm-search-query 14px"
+  ],
+  "hScrollBoxes": [
+   "lg-quick-cat-scroll 860>328",
+   "pm-table-wrapper 1293>302"
+  ],
+  "fixed": [
+   "#lg-digital-assistant 52×52"
+  ]
+ }
+}
