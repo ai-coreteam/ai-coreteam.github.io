@@ -11094,7 +11094,9 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (!id || c.length < 9) return;
       SLOT_PRICE[id.textContent.trim()] = parseInt(c[8].textContent.replace(/[^0-9]/g, ''), 10) || 0;
     });
-    const fmtVND = n => n.toLocaleString('en-US') + ' đ';
+    // 07/10/2026: ghi tiền theo chuẩn Việt Nam (1.875.000 đ) — dùng chung formatVND, trước đây kiểu Mỹ 1,875,000 đ.
+    // Mọi chỗ đọc lại số tiền đã hiển thị chỉ lấy chữ số (replace(/[^0-9]/g, '')) nên không bị ảnh hưởng.
+    const fmtVND = n => formatVND(n);
 
     // ===== Tab 4: bấm dòng "Đặt hàng" -> sang Tab 2, điền sẵn Kho + Model + Slot =====
     function pickSlotFromList(slotId) {
@@ -11487,7 +11489,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     // ===== Bộ chọn sản phẩm dạng thẻ: dữ liệu lấy từ bảng Tab 4 =====
     var PK_CATALOG = null;
     function pkEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function pkMoney(n) { return (n || 0).toLocaleString('en-US') + ' đ'; }
+    function pkMoney(n) { return formatVND(n || 0); }   // 07/10/2026: chuẩn Việt Nam, như fmtVND
     function pkNum(t) { return parseInt(String(t).replace(/[^0-9]/g, ''), 10) || 0; }
     function getCatalog() {
       const prods = (currentProducts && currentProducts.length) ? currentProducts : (DEMO_PRODUCTS[activeProgram] || []);

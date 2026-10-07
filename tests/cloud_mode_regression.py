@@ -760,11 +760,37 @@ def main():
             check(q['shown'] and 'amount=5000000' in q['src'] and f'addInfo={ME}%20{my_code}' in q['src'],
                   f"bấm Nộp tiền → hiện QR đúng số tiền + nội dung CK '{ME} {my_code}'")
             check(q['src'] == quick, 'URL mã QR giống hệt cửa sổ "Nộp tiền ngay" cho cùng đơn')
-            check('0991000012525' in q['info'] and f'{ME} {my_code}' in q['info'] and '5,000,000' in q['info'], 'có STK, số tiền (cách ghi số của Tab 3), nội dung CK cạnh mã QR')
+            check('0991000012525' in q['info'] and f'{ME} {my_code}' in q['info'] and '5.000.000' in q['info'], 'có STK, số tiền (chuẩn VN), nội dung CK cạnh mã QR')
             page.evaluate('lockPayment()')
             check(page.evaluate("document.getElementById('pay-qr-box').hidden && !document.getElementById('pay-qr-img').getAttribute('src')"), 'khóa form → ẩn QR, xóa ảnh cũ')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
+
+            print('Scenario 23: số tiền ghi theo chuẩn Việt Nam (1.875.000 đ) ở mọi màn hình, không còn kiểu 1,875,000 đ')
+            import re as _re
+            US = _re.compile(r'\d{1,3}(?:,\d{3})+\s*đ'); VN = _re.compile(r'\d{1,3}(?:\.\d{3})+\s*đ')
+            s = MockServer(my_status=NEW)
+            s.pm_regs = [{'id': 'REG-1', 'programId': PID, 'slotId': my_code, 'kho': 'AYA', 'model': 'MODEL-TAKEN-BY-ME', 'empCode': ME,
+                          'empName': 'Nhan Vien That', 'status': NEW, 'internalPrice': 5000000, 'amount': 5000000, 'timestamp': '06/10/2026 09:00:00'}]
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            seen = {}
+            for tab in ['tab2', 'tab3', 'tab4']:
+                page.evaluate(f"switchTab('{tab}', document.getElementById('{tab}-btn'))"); page.wait_for_timeout(1500)
+                if tab == 'tab3':
+                    page.click('.btn-pay-open'); page.wait_for_timeout(500)
+                seen[tab] = page.evaluate("document.body.innerText")
+            amt = page.evaluate("[document.getElementById('pay-amount').value, document.getElementById('pay-amount-due').innerText]")
+            ctx.close()
+            ctx, page = open_page(browser, port, s)
+            login(page, PM)
+            page.evaluate("loadPMDashboardData()"); page.wait_for_timeout(2500)
+            seen['pm'] = page.evaluate("document.body.innerText")
+            ctx.close()
+            bad = {k: US.findall(v)[:3] for k, v in seen.items() if US.search(v)}
+            check(not bad, f'không còn số tiền kiểu 1,875,000 đ ({bad})')
+            check(all(VN.search(v) for v in seen.values()), 'Tab 2 / Tab 3 / Tab 4 / bảng PM đều hiện số tiền kiểu 5.000.000 đ')
+            check(amt[0] == '5.000.000' and 'khác số tiền' not in amt[1], f'Tab 3: ô số tiền điền sẵn 5.000.000, không báo lệch ({amt})')
 
             browser.close()
     finally:
