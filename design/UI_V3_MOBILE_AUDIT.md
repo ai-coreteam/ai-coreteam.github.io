@@ -8,6 +8,15 @@
 
 ## 0. Kết luận
 
+> **Cập nhật 07/10/2026 sau khi xem 22 ảnh chụp thật trên Android (§7):**
+> - Ảnh thật xác nhận 9/11 phát hiện của giả lập. Có **1 phát hiện cần sửa lại**: lỗi tự phóng to khi chạm ô nhập **chỉ xảy ra trên iPhone**, không xảy ra trên Android.
+> - Ảnh thật lộ thêm **3 lỗi số liệu** mà giả lập không thấy:
+>   - Badge tab 3 ghi "0 Đơn" dù nhân viên đang có đơn.
+>   - KPI của PM ghi "Tổng SP 0 · 0.0%" dù đã có 6 đơn.
+>   - Dòng "Tổng tiền thanh toán **đã nộp**" cộng cả đơn chưa nộp tiền.
+> - Ngoài ra có **5 điểm mù giao diện mới**.
+> - **Thứ tự ưu tiên thay đổi:** sửa 3 lỗi số liệu trước, rồi mới tới giao diện, vì PM và kế toán đang ra quyết định dựa trên các con số này.
+
 Trên điện thoại, web **dùng được nhưng tốn công**. Có 3 vấn đề lớn nhất:
 
 1. **Màn hình đầu tiên không có việc gì để làm.** Sau khi đăng nhập, màn hình đầu chỉ có logo và 6 nút tiện ích. Ô "Đơn hàng của bạn", nơi nhân viên cần nhất, nằm ở màn hình thứ 3 (E1).
@@ -138,3 +147,58 @@ flowchart LR
 4. **Thử trên máy thật:** 1 iPhone (Safari) và 1 Android (Chrome). Đăng nhập → giữ chỗ → nộp tiền (có chụp biên lai bằng camera) → PM duyệt.
 
 **Khi nào đề xuất này sai:** nếu đa số nhân viên giữ chỗ bằng **máy tính** chứ không phải điện thoại, lợi ích của v3 giảm, và đợt 2–3 nên dời lại. Hiện **chưa có số liệu** về tỷ lệ thiết bị truy cập. Có thể đo nhanh bằng cột "User Agent" của sheet Registrations sau đợt test.
+
+---
+
+## 7. Kiểm chứng bằng ảnh chụp thật trên Android (07/10/2026)
+
+**Nguồn:** 22 ảnh do chủ dự án chụp trên điện thoại Android (Chrome, ảnh 1200×2640, tỷ lệ 20:9).
+- Thư mục `Phone test (Android)/`: User view 11 ảnh, Admin & PM view 11 ảnh, trong đó 2 ảnh trùng nhau ở cả 2 thư mục.
+- Dữ liệu thật: 2 chương trình, chương trình đang xem có 6 slot **đã hết hàng**, tài khoản ADMIN "PM Quản trị".
+- **Ảnh có tên người, số điện thoại và dữ liệu thật, nên không commit lên repo công khai.** Ảnh ghép bằng chứng nằm ở `Phone test (Android)/_evidence/` (chỉ có trên máy).
+
+### 7.1 Đối chiếu phát hiện của giả lập với máy thật
+| Phát hiện (§3) | Trên Android thật | Ảnh |
+|---|---|---|
+| N1 Đầu trang 6 nút, ô 03 nằm xa | ✅ Xác nhận | U7, A6 |
+| N2 "Nộp tiền ngay" là link chữ vàng | ✅ Xác nhận | U6 |
+| N4 Nút trợ lý ảo đè nội dung | ✅ Xác nhận ở **cả 22 ảnh** (đè chữ trong thẻ, cột bảng, số KPI) | tất cả |
+| N5 Ô nhập < 16px gây tự phóng to | ⚠️ **Sửa lại:** Chrome trên Android **không** tự phóng to. Lỗi này **chỉ có trên iPhone (Safari)** và **chưa kiểm trên iPhone thật**. Vẫn giữ A5 (rất rẻ), nhưng hạ mức thành "Cao trên iPhone" | — |
+| N3 Danh mục dài | ✅ Xác nhận về bố cục (thẻ cao, bộ lọc kho bị biến dạng). Độ dài phụ thuộc số sản phẩm: chương trình thật có 6, file test có 50. **Chưa biết số sản phẩm của đợt 14/10** | U2, U3 |
+| N7 Bảng nhiều cột | ✅ Xác nhận: tab 4 chỉ thấy 2 cột STT, Kho; bảng PM phải vuốt ngang | U5, A7, A9, A10 |
+| N8 Thanh HOT/NEW không lọc | ✅ Xác nhận vẫn hiện, ngay dưới ô 03 | U6, A5 |
+| N9 Nhãn "Dành cho Nhân viên" bị ép thành hình tròn | ✅ Xác nhận | U4 |
+| N6 Form 2 cột (cửa sổ Nộp tiền ngay) | ⚪ Chưa có ảnh thật | — |
+| P1/P3 PM: nhiều nút, bảng rộng | ✅ Xác nhận | A2, A9, A10 |
+
+### 7.2 Điểm mù mới, giả lập không thấy
+| # | Loại | Phát hiện | Bằng chứng | Nguyên nhân | Mức |
+|---|---|---|---|---|---|
+| R1 | **Số liệu** | Badge tab 3 ghi **"0 Đơn"** trong khi ô 03 cho thấy nhân viên đang có đơn 34WP65C chờ nộp tiền | U2, U6, U10 · `_evidence/R1_tab3_badge.png` | [VERIFIED code] Badge **chỉ đếm dòng trong bảng "đơn gửi từ máy này"**, chỉ tăng khi đăng ký bằng form tab 2 trên chính máy đó. **Không đọc đơn từ máy chủ** | **Cao**: nhân viên tưởng mình chưa có đơn |
+| R2 | **Số liệu** | KPI PM ghi **"Tổng Sản Phẩm 0 · Đã ĐK 6 · Toàn quốc 0.0% · Còn khả dụng 0"**, trong khi ô "Giám sát bán hàng" trên cùng trang ghi **"Tổng SP 6 · Đã ĐK 100%"** | A3, A4 · `_evidence/R2_pm_kpi_mismatch.png` | [VERIFIED code] KPI lấy danh mục **đang nạp trên trình duyệt**, và chỉ khi danh mục đó thuộc đúng chương trình đang xem; nếu không thì lấy dữ liệu demo (rỗng). `loadProducts` **không tính lại KPI** khi danh mục tải xong. [INFERRED] Trên máy thật, KPI được tính trước khi danh mục tải xong, hoặc tính khi đang trỏ chương trình khác (ADMIN có 2 chương trình) | **Cao**: PM ra quyết định dựa trên số sai |
+| R3 | **Số liệu** | Thẻ KPI "Thanh toán / Đối soát **0 / 6 · 0.0%**", nhưng cuối bảng ghi **"Tổng tiền thanh toán đã nộp: 68.649.500 đ"** | A8, A10 · `_evidence/R3_paid_total.png` | [VERIFIED code] Dòng tổng **cộng giá của mọi đơn đang hiện**, kể cả đơn chưa nộp và đơn bị từ chối, vì máy chủ luôn trả số tiền bằng giá sản phẩm. Thực chất đây là **tổng giá trị đơn**, không phải **tiền đã nộp** | **Cao**: dễ gửi sai số cho kế toán |
+| R4 | Giao diện | Thanh chương trình: **đợt thứ 2 bị cắt** ("Đợt Bán Hà…"), không có dấu hiệu là còn đợt khác để vuốt sang | U7, A6 · `_evidence/R4_programs_soldout.png` | Giả lập chỉ có 1 chương trình | Trung bình |
+| R5 | Giao diện | **Đợt hết hàng:** danh mục vẫn hiện từng thẻ to với nút xám "Đã có người giữ chỗ". Nhãn "Hết hàng (100% slot đã đăng ký)" ở ô 02 bị xuống dòng. Không có thông báo "đợt này đã hết, xem đợt khác" | U1, U2, U3 | Giả lập có đa số slot còn trống | Trung bình |
+| R6 | Giao diện / nội dung | Tab 3 có **2 danh sách "đơn của tôi"**: (1) tra cứu từ máy chủ, có đơn; (2) bảng "đơn gửi từ máy này", trống. Câu thông báo trống của bảng (2) **bị cắt** vì nằm trong bảng phải vuốt ngang ("…Muốn xem đơ… trên") | U4, U9 · `_evidence/R6_tab3_noise.png` | Giả lập chỉ chụp phần tra cứu | Trung bình |
+| R7 | Nội dung | Các khối giải thích dành cho PM/kế toán hiện cả với nhân viên: "Ghi chú về trường Nhân viên nộp tiền…", "Bảo mật dữ liệu cá nhân & chống tranh chấp timestamp". Mỗi khối dài khoảng 1–1,5 màn hình | U5, U9, A7 | — | Thấp–Trung bình |
+| R8 | Giao diện | Ô 02: dấu "·" rơi lẻ ở đầu dòng; mũi tên "↗" của "Xem báo cáo kho" rơi xuống dòng riêng | U1, A4 | Chữ dài hơn khi dùng dữ liệu thật | Thấp |
+| R9 | Phản hồi | Mạng thật chậm vài giây. Nút tra cứu ghi **"Đang gửi…"** (sai nghĩa, vì đây là tải dữ liệu) và không có khung chờ | U10 | Giả lập phản hồi tức thì | Thấp |
+| R10 | Vùng nhìn | Trên Chrome Android, thanh trạng thái + thanh địa chỉ chiếm **khoảng 14%**, thanh điều hướng hệ thống khoảng 5%. **Nội dung chỉ còn khoảng 81% màn hình**, và nút trợ lý ảo nằm sát ngay trên thanh điều hướng | mọi ảnh | Đo trên ảnh 2640px | Ghi nhận |
+
+### 7.3 Ưu tiên sau khi có ảnh thật
+```mermaid
+flowchart LR
+  Z["Đợt 0 · sửa số liệu<br/>R1 · R2 · R3<br/>(sửa hàm hiển thị, cần duyệt)"] --> A["Đợt 1 · CSS trước 14/10<br/>A1–A5 + R4 + R8"] --> B["Đợt 2<br/>B1–B4 + R5 + R6/R7 + R9"] --> C["Đợt 3 · PM"]
+```
+
+| Đợt | Nội dung thêm | Ghi chú |
+|---|---|---|
+| **0 (mới)** | **R1:** badge tab 3 đếm đơn từ máy chủ (cùng nguồn với ô 03). **R2:** tính lại KPI khi danh mục tải xong, và lấy tổng sản phẩm từ đúng chương trình. **R3:** tách 2 dòng "Tổng giá trị đơn" và "Đã nộp (chờ đối soát + đã duyệt)" | Là **sửa cách tính hoặc nhãn hiển thị**, không đổi dữ liệu trên máy chủ. Vẫn là thay đổi chức năng đã duyệt, nên **cần anh/chị đồng ý**. Mỗi lỗi có test tái hiện trước khi sửa |
+| 1 | **R4:** thanh chương trình có dấu hiệu còn đợt khác (mép mờ, hoặc chuyển thành danh sách chọn). **R8:** giữ "·" và "↗" không rơi dòng | CSS |
+| 2 | **R5:** đợt hết hàng thì gom thẻ "đã giữ" thành 1 dòng, có thông báo "Đợt đã hết" và nút "Xem đợt khác". **R6/R7:** thu gọn bảng "đơn gửi từ máy này" và các khối ghi chú (chạm để mở) trên điện thoại. **R9:** đổi chữ thành "Đang tải đơn…" | Hiển thị |
+
+### 7.4 Giới hạn của lần kiểm này
+- Chỉ có Android. **iPhone thật chưa kiểm** (N5 chỉ là suy luận theo cách Safari hoạt động).
+- Chưa có ảnh cửa sổ "Nộp tiền ngay", form nộp tiền khi cổng đã mở, chế độ tối, và cửa sổ xem biên lai của PM.
+- R2: phần "tại sao trên máy anh/chị KPI ra 0" là [INFERRED] từ code. Cần tái hiện bằng test trước khi sửa: PM/ADMIN có 2 chương trình, danh mục tải sau dashboard.
+

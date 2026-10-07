@@ -39,3 +39,6 @@ __pycache__/
 
 # Bản production sinh tự động khi chạy test
 .portal_regression_test.html
+
+# Ảnh chụp thật trên điện thoại (có tên người / dữ liệu thật) — không đưa lên repo công khai
+Phone test (Android)/
