@@ -1,6 +1,6 @@
 # Thêm tiếng Anh (nút VI/EN): đánh giá khả năng làm & kế hoạch
 
-> **Trạng thái (08/10/2026):** ĐÁNH GIÁ + BẢN THỬ + RÀ SOÁT NÚT/LỆNH (§8). **Chưa thay đổi web.** Chủ dự án đã trả lời Q-I1 đến Q-I5 (§7). **Còn chờ: Q-I6 (thời điểm), Q-I7, Q-I8 (§8.4).**
+> **Trạng thái (08/10/2026):** **ĐÃ LÀM XONG trên nhánh `i18n/en`, bản `v2.4.0`. Kết quả và số đo: §9.** Chủ dự án đã trả lời đủ Q-I1 đến Q-I8 (§7, §8.4). **Còn chờ: chủ dự án duyệt bản dịch Tab 1** → [`i18n/TAB1_EN_REVIEW.md`](i18n/TAB1_EN_REVIEW.md).
 > **Yêu cầu của chủ dự án:**
 > - Giữ nguyên bản tiếng Việt, không đổi gì.
 > - Thêm nút VI/EN; bản tiếng Anh **dịch đầy đủ**, ngắn gọn, dễ hiểu, **không song ngữ** trên cùng màn hình.
@@ -117,7 +117,7 @@ Nhánh riêng `i18n/en` tạo từ `v2-final`. Mỗi bước có tag riêng. App
 | **Q-I3** | Cách ghi tiền khi ở EN | (a) Giữ `1.875.000 đ` · (b) `1,875,000 VND` | **ĐÃ CHỐT: (a) giữ cách ghi tiền** |
 | **Q-I4** | Ai duyệt bản dịch **Tab 1 (thư thông báo và quy định)**? Đây là nội dung chính sách | Chủ dự án · HR/Pháp chế · Không cần | **ĐÃ CHỐT: chủ dự án duyệt** |
 | **Q-I5** | Thứ tự với v3 (giao diện điện thoại) | (a) Làm v3 / Đợt 0 trước, rồi EN · (b) EN trước | **ĐÃ CHỐT: (b) tiếng Anh trước.** Khi làm v3 sau, phải cập nhật từ điển EN cho mọi chữ mới hoặc đổi (đưa vào tiêu chí nghiệm thu v3) |
-| **Q-I6** | Thời điểm | Trước hay sau mở bán 14/10 | **CHỜ TRẢ LỜI.** Đề xuất **sau 14/10**: khối lượng ≈ 11.500 từ cộng kiểm tra toàn bộ, không nên chen vào tuần mở bán |
+| **Q-I6** | Thời điểm | Trước hay sau mở bán 14/10 | **ĐÃ CHỐT (08/10): làm ngay** (đang giai đoạn thử, chưa triển khai thật) |
 
 **Ước lượng sau khi duyệt:**
 - Dịch và rà thuật ngữ: khoảng 1,5–2 ngày làm việc.
@@ -180,11 +180,50 @@ Phạm vi: Nhân viên (đăng nhập, tab 1–4, form nộp tiền, cửa sổ 
 ### 8.4 Câu hỏi mới
 | # | Câu hỏi | Lựa chọn | Đề xuất |
 |---|---|---|---|
-| **Q-I7** | Sửa **lỗi có sẵn H1b** (bộ lọc trạng thái tab 3 luôn ẩn hết dòng, kể cả ở tiếng Việt) | Duyệt · Không duyệt | Duyệt. Sửa cùng lúc với H1 (lọc theo trạng thái gốc), có test cả VI và EN |
-| **Q-I8** | File "Xuất Excel" ở **tab 3** (bản sao của chính nhân viên) khi đang ở EN | (a) Giữ tiêu đề tiếng Việt (giống file PM) · (b) Theo ngôn ngữ đang chọn | (a): thống nhất với quyết định "chỉ dịch giao diện web" |
+| **Q-I7** | Sửa **lỗi có sẵn H1b** (bộ lọc trạng thái tab 3 luôn ẩn hết dòng, kể cả ở tiếng Việt) | Duyệt · Không duyệt | **ĐÃ DUYỆT (08/10)**, đã sửa (§9) |
+| **Q-I8** | File "Xuất Excel" ở **tab 3** (bản sao của chính nhân viên) khi đang ở EN | (a) Giữ tiêu đề tiếng Việt (giống file PM) · (b) Theo ngôn ngữ đang chọn | **ĐÃ CHỐT (08/10): (a) giữ tiếng Việt**, đã làm (§9) |
 
 ### 8.5 Tiêu chí nghiệm thu bổ sung
 - Chạy lại bản rà §8.1 ở **chế độ EN**: 93/93 phần tử vẫn chạy đúng lệnh. Bấm thử tự động các nút chính: giữ chỗ, nộp tiền, huỷ, mở cổng, duyệt, xuất Excel, kết sổ.
 - 24 nút đổi chữ khi xử lý (H3): sau mỗi lần xử lý **vẫn hiện tiếng Anh**.
 - Bộ lọc tab 3 lọc đúng ở cả VI và EN (sau khi Q-I7 được duyệt).
+
+---
+
+## 9. Kết quả triển khai (08/10/2026, bản `v2.4.0`)
+
+### 9.1 Đã làm
+| Phần | Nội dung |
+|---|---|
+| Lớp dịch | `assets/i18n/i18n.js`. Ở VI: không tải từ điển, không theo dõi trang, `T()` trả nguyên văn. Ở EN: dịch chữ hiển thị, `placeholder` / `title` / `aria-label`, hộp thoại `alert` / `confirm` / `prompt`, thông báo nhỏ, màn chờ |
+| Từ điển | `assets/i18n/en_source.json` (người đọc / sửa) → `python3 scripts/i18n_build.py` → `assets/i18n/en.js`. **1.097 câu + 215 mẫu câu** (câu có số, mã, tên). Gồm cả 86 câu báo lỗi từ máy chủ (`Code.gs` không đổi, web dịch khi hiện) |
+| Nút VI/EN | Góc phải khung đăng nhập + đầu trang, cạnh nút Đêm / Sáng. Nhớ lựa chọn trên máy (`lg_lang`). Link `?lang=en` / `?lang=vi` |
+| H1 / H1b (Q-I7) | Bộ lọc tab 3 lọc theo `data-status` gốc của dòng. Trước: chọn trạng thái nào cũng ẩn hết dòng (cả ở tiếng Việt) |
+| H2 (Q-I8) | "Xuất Excel" tab 3 đọc chữ tiếng Việt gốc (`lgI18nText`) → file luôn tiếng Việt |
+| H6 | Ô chỉ-đọc "Mã Slot" ở form tab 3 hiện tiếng Anh; ô gửi máy chủ không đổi |
+| Không dịch (cố ý) | Dữ liệu: mô tả / tình trạng sản phẩm, tên chương trình, ghi chú PM, tên người. Máy chủ, email, Google Sheet, mọi file Excel: tiếng Việt (Q-I1, Q-I2). Cách ghi tiền `1.875.000 đ` (Q-I3) |
+
+### 9.2 Bổ sung so với kế hoạch (phát hiện khi đo)
+| # | Vấn đề | Cách xử lý |
+|---|---|---|
+| 1 | "Kho", "Tivi" và viết tắt "SP" (sản phẩm), "NV" (nhân viên) là tiếng Việt **không dấu** → bộ nhận diện bỏ sót (vd. "2 / 3 SP", "1 SP / NV") | Nhận diện thêm `Kho` / `kho` / `Tivi` / `SP` / `NV`; `i18n_build.py` báo lỗi nếu bản dịch còn các từ này |
+| 2 | Câu máy chủ bị web ghép thêm tiền tố (vd. "Không thể xóa: " + lời máy chủ) | Mẫu câu có `$T1` = dịch tiếp phần bên trong |
+| 3 | Lớp dịch tự dịch lại chính bản dịch của mình (thừa, ghi nhầm "chưa dịch") | Ghi nhớ bản dịch vừa ghi, bỏ qua |
+| 4 | Mẫu cú pháp chuyển khoản nằm trong thẻ `<code>` bị bỏ qua | Dịch cả `<code>` (mã, số tài khoản không có chữ Việt nên giữ nguyên) |
+
+### 9.3 Nghiệm thu (đo được)
+| Tiêu chí (§5, §8.5) | Kết quả |
+|---|---|
+| EN: chữ tiếng Việt còn hiện | **0** — quét tự động `scripts/i18n_collect.py`: đăng nhập, 5 trạng thái đơn × 4 tab, form nộp tiền, 7 cửa sổ, hướng dẫn từng bước (NV + PM), PM / ADMIN, duyệt / từ chối / kết sổ, mọi hộp thoại. Kiểm tĩnh thêm mọi câu trong mã JS: phần còn lại chỉ là dữ liệu, khóa đọc cột Excel, tiêu đề file Excel (giữ tiếng Việt), bộ chọn CSS |
+| VI giống hệt `v2-final` | DOM: **56/56** màn hình trùng (đăng nhập, NV 4 tab, PM, ADMIN × 1920 / 1440 / 1024 / 390px × sáng / tối; bỏ nút VI/EN). Điểm ảnh: **56/56** trùng từng điểm (che nút VI/EN; ẩn icon động GIF/SVG ở **cả 2 bản** vì khung hình đổi theo thời điểm) |
+| Chức năng | Hồi quy **156/156** (v2) và **156/156** (`?ui=v1`), thêm Kịch bản 24 (EN) và 25 (VI). e2e: đạt toàn bộ. Harness `Code.gs`: **98/98** |
+| Nút ở EN chạy đúng | Kịch bản 24: bấm "Cancel reservation" → lệnh hủy tới máy chủ có token; giữ chỗ gửi đúng mã slot; trạng thái trong bộ nhớ giữ giá trị gốc; hộp thoại tiếng Anh; bấm "VI" → về tiếng Việt và nhớ |
+| Bộ lọc tab 3 | Đúng ở cả VI và EN (Kịch bản 24, 25) |
+| File Xuất Excel tab 3 ở EN | Tiêu đề tiếng Việt; tiêu đề trên màn hình tiếng Anh (Kịch bản 24) |
+| Kiểm tay trên điện thoại thật (EN) | **Chưa làm**: chủ dự án kiểm khi duyệt |
+
+### 9.4 Khi sửa chữ trên web về sau (v3…)
+1. Thêm câu mới vào `assets/i18n/en_source.json` → `python3 scripts/i18n_build.py` (báo lỗi nếu trùng khóa, mẫu câu sai, bản dịch còn chữ Việt).
+2. `python3 scripts/i18n_collect.py` → phải ra **0**.
+3. Chạy lại 3 bộ test.
 

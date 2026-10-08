@@ -2,7 +2,7 @@
 
 > **Mục đích:** quay lại việc v3 bất cứ lúc nào mà không thiếu gì. Đọc trang này trước, rồi mới mở báo cáo chi tiết.
 > **Trạng thái (08/10/2026):** **TẠM DỪNG, chờ chủ dự án trả lời 6 câu hỏi ở §2.** Chưa có thay đổi nào trên web.
-> **Điểm xuất phát code:** tag **`v2-final`** (= v2.3.1). Mọi việc v3 làm trên nhánh mới tạo từ tag này.
+> **Điểm xuất phát code:** tag **`v2.4.0`** (= `v2-final` + tiếng Anh; ở tiếng Việt DOM trùng `v2-final` 56/56 màn hình). Mọi việc v3 làm trên nhánh mới tạo từ tag này.
 
 ---
 
@@ -38,7 +38,7 @@
 - Thay đổi về **chữ** (Q4, R9 "Đang gửi…" → "Đang tải đơn…") sẽ chỉ áp dụng trên điện thoại, nếu chủ dự án muốn máy tính giữ nguyên tuyệt đối.
 
 **Tiêu chí nghiệm thu bắt buộc mỗi lần phát hành v3:**
-1. Tạo nhánh từ `v2-final`.
+1. Tạo nhánh từ `v2.4.0`.
 2. So máy tính trước/sau ở **1920 / 1440 / 1280 / 1024px**, cả 3 vai trò, các tab chính, sáng và tối:
    - **Thuộc tính hiển thị của từng phần tử phải giống hệt.**
    - **Ảnh chụp phải trùng từng điểm ảnh** (che đồng hồ và thời gian thay đổi theo giây).
@@ -82,4 +82,4 @@ Chạy lại số đo: `python3 scripts/mobile_audit.py "iPhone 13"` và `"Galax
 ---
 
 ## 7. Việc song song: tiếng Anh (VI/EN)
-Đánh giá khả năng làm và kế hoạch: [`design/I18N_EN_FEASIBILITY.md`](I18N_EN_FEASIBILITY.md). **Chủ dự án chốt 08/10: làm tiếng Anh TRƯỚC v3 (Q-I5 = b).** Khi làm v3, mọi chữ mới hoặc đổi phải được cập nhật vào từ điển EN. Phần tiếng Anh còn chờ: Q-I6 (thời điểm), Q-I7 (sửa lỗi bộ lọc tab 3), Q-I8 (ngôn ngữ file Xuất Excel tab 3).
+**ĐÃ LÀM XONG 08/10 (bản `v2.4.0`)**: [`design/I18N_EN_FEASIBILITY.md`](I18N_EN_FEASIBILITY.md) §9. Khi làm v3: mọi chữ mới hoặc đổi phải thêm vào `assets/i18n/en_source.json`, chạy `python3 scripts/i18n_build.py` và `python3 scripts/i18n_collect.py` (= 0). So sánh máy tính trước/sau ở §3 dùng tag `v2.4.0` làm bản gốc.

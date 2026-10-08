@@ -1,0 +1,1963 @@
+{
+ "dict": {
+  "\"2. Đăng Ký Trực Tuyến Trên Hệ Thống\"": "\"2. Register Online in the System\"",
+  "\"Mã giao dịch\"": "\"Transaction ID\"",
+  "\"Mã tham chiếu\"": "\"Reference no.\"",
+  "\"Số bút toán\"": "\"Entry no.\"",
+  "\"Số tham chiếu\"": "\"Reference number\"",
+  "(= Số ca nộp tiền / Đơn ĐK hợp lệ).": "(= payments made / valid orders).",
+  "(= Đã ĐK / Tổng SP niêm yết) và": "(= registered / total listed items) and",
+  "(Căn cứ theo Timestamp hệ thống tự động ghi nhận khi nhấn Gửi Đăng Ký).": "(based on the system timestamp recorded when you press Submit).",
+  "(Hệ thống tự động sinh Mã đợt bán chuẩn hóa)": "(The system creates a standard program code automatically)",
+  "(Tự động nạp)": "(Auto-filled)",
+  "(Ví dụ: Sai số tiền chuyển khoản, trùng đơn, nhân viên yêu cầu hủy)": "(e.g. wrong amount, duplicate order, employee asked to cancel)",
+  "(tự điền)": "(auto-filled)",
+  "+24 giờ (Khuyên dùng)": "+24 hours (recommended)",
+  "+30 phút": "+30 minutes",
+  "+7 Ngày tới": "Next 7 days",
+  "+7 ngày (18:00)": "+7 days (18:00)",
+  "-- Chọn Mã Slot ID --": "-- Select slot ID --",
+  "-- Chọn sản phẩm chi tiết --": "-- Select a product --",
+  "-- Tất Cả Trạng Thái --": "-- All statuses --",
+  ". Cột Đăng ký nhanh tự cập nhật theo thời gian thực.": ". The Quick register column updates in real time.",
+  ". Danh sách Slot ID đầy đủ xem ở Tab 4.": ". See the full slot ID list in Tab 4.",
+  ". Nút": ". The",
+  ". Theo nguyên tắc Quản trị Minh bạch & Tách bạch Trách nhiệm (Separation of Duties - SoD) của LG Electronics, Quản trị viên phụ trách tạo, duyệt, vận hành và kết sổ chương trình bán hàng": ". Under LG Electronics' transparency and Separation of Duties (SoD) rules, the admin creates, approves, runs and closes sales programs",
+  ". Từ lúc cổng mở, bạn có 24 giờ để nộp tiền.": ". Once it opens, you have 24 hours to pay.",
+  "01 Sản phẩm / 01 Nhân viên": "1 item / 1 employee",
+  "01 sản phẩm / 01 nhân viên": "1 item / 1 employee",
+  "1 năm gần nhất (Mặc định)": "Last 12 months (default)",
+  "1. Bảng Điều Khiển PM": "1. PM Dashboard",
+  "1. Hẹn Giờ Mở Bán Chương Trình (Auto-Open)": "1. Program auto-open time",
+  "1. Mã Slot ID Đã Đăng Ký": "1. Registered slot ID",
+  "1. NGUYÊN TẮC XÉT DUYỆT & HẠN MỨC": "1. APPROVAL RULES & LIMITS",
+  "1. THÔNG TIN CHƯƠNG TRÌNH & THỜI GIAN MỞ ĐĂNG KÝ HỆ THỐNG": "1. PROGRAM DETAILS & REGISTRATION TIME",
+  "1. Thư Thông Báo & Quy Định": "1. Notice & Rules",
+  "1. Tất Cả Đơn Đăng Ký": "1. All orders",
+  "2. Bảng Chi Tiết Sản Phẩm": "2. Product Details",
+  "2. Danh Mục & Đăng Ký Mua Hàng": "2. Catalog & Register",
+  "2. HƯỚNG DẪN ĐĂNG KÝ THẲNG TRÊN HỆ THỐNG (SYSTEM DIRECT REGISTRATION)": "2. HOW TO REGISTER IN THE SYSTEM",
+  "2. Hẹn Giờ Kết Sổ Chương Trình (Auto-Close)": "2. Program auto-close time",
+  "2. Mã NV Đăng Ký": "2. Registered employee ID",
+  "2. Sản Phẩm (STT · Kho · Model · Loại · Giá)": "2. Product (No. · Warehouse · Model · Grade · Price)",
+  "2. Sản Phẩm Còn Trống (Chưa ĐK)": "2. Available items (not registered)",
+  "2. Sản phẩm": "2. Product",
+  "2. THÔNG TIN CHUYỂN KHOẢN HỢP LỆ (LGEVH)": "2. VALID BANK TRANSFER DETAILS (LGEVH)",
+  "24 Giờ (Giúp nhân viên xem trước danh sách sản phẩm và mã Slot ID).": "24 hours (so staff can preview products and slot IDs).",
+  "3. Hẹn Giờ Mở Cổng Thanh Toán (Auto-Open Payment)": "3. Payment window auto-open time",
+  "3. Họ & Tên NV Đăng Ký": "3. Registered employee name",
+  "3. Mã Slot ID": "3. Slot ID",
+  "3. Nhân Viên Chưa Nộp Tiền": "3. Employees not yet paid",
+  "3. PHƯƠNG THỨC THANH TOÁN & NỘP CHỨNG TỪ TIỀN GỬI NGÂN HÀNG": "3. HOW TO PAY & UPLOAD THE BANK RECEIPT",
+  "3. Sản phẩm đã chọn · Mã Slot": "3. Selected product · Slot ID",
+  "3. THỜI HẠN THANH TOÁN & GIAO HÀNG LOGISTICS": "3. PAYMENT DEADLINE & DELIVERY",
+  "3. Xác Nhận Mua & Nộp Tiền": "3. Confirm & Pay",
+  "30 ngày gần đây": "Last 30 days",
+  "4 số cuối SĐT": "Last 4 digits of phone",
+  "4. Bảng Chi Tiết Sản Phẩm": "4. Product Details",
+  "4. Bộ phận (Division)": "4. Department",
+  "4. Họ và Tên Nhân Viên Nộp Tiền (Trường Độc Lập)": "4. Payer full name (separate field)",
+  "4. ĐIỀU KHOẢN VÀ CHÍNH SÁCH BẢO HÀNH & TUÂN THỦ JEONG-DO": "4. WARRANTY TERMS & JEONG-DO COMPLIANCE",
+  "5. Mã NV Người Nộp Tiền (Trường Độc Lập)": "5. Payer employee ID (separate field)",
+  "5. Mã Nhân Viên Đăng Ký (EMP Code)": "5. Employee ID",
+  "6 tháng gần đây": "Last 6 months",
+  "6. Họ và Tên Nhân Viên Đăng Ký": "6. Employee full name",
+  "6. Số Tiền Đã Chuyển Khoản (VNĐ)": "6. Amount transferred (VND)",
+  "7. Ngân Hàng & Mã Giao Dịch": "7. Bank & transaction ID",
+  "7. Số Điện Thoại Liên Hệ": "7. Contact phone",
+  "8. Ngày Giờ Nộp Tiền": "8. Payment date & time",
+  "8. Địa Chỉ Giao Hàng Chi Tiết": "8. Full delivery address",
+  "9. Upload File Chứng Từ / Ảnh Chụp Màn Hình Biên Lai Nộp Tiền Ngân Hàng": "9. Upload the bank receipt (file or screenshot)",
+  "9:00 sáng mai": "9:00 tomorrow morning",
+  ": Mỗi Quản Trị Viên (PM) hoặc AI Agent khi triển khai hệ thống có thể kết nối với Web App trên Google Drive riêng của mình mà không chia sẻ quyền truy cập hay lộ dữ liệu cá nhân của người khác.": ": each admin (PM) or AI agent who deploys the system can connect a Web App on their own Google Drive without sharing access or exposing other people's personal data.",
+  "> Chọn loại": "> Select type",
+  "AP · Máy lọc không khí Purifier": "AP · Air purifier",
+  "AV · Loa thanh Soundbar / Dàn âm thanh": "AV · Soundbar / Audio",
+  "Admin hệ thống": "System admin",
+  "AutoEmail & Quét giữ chỗ 24h: Đang kích hoạt": "Auto email & 24h reservation check: on",
+  "BIDV / Khác": "BIDV / Other",
+  "Ban Quản Trị Bán Hàng Nội Bộ (Internal Sales PM Team)": "Internal Sales PM Team",
+  "Ban Quản Trị Bán Hàng Nội Bộ - HS Division <internalsales.support@lge.com>": "Internal Sales PM Team - HS Division <internalsales.support@lge.com>",
+  "Biên lai": "Receipt",
+  "Biên lai chuyển khoản": "Transfer receipt",
+  "Biên lai thật được lưu trên Google Drive": "The original receipt is stored on Google Drive",
+  "BÁO CÁO & QUYẾT TOÁN": "REPORTS & SETTLEMENT",
+  "BÁO CÁO TỈ LỆ ĐĂNG KÝ & THANH TOÁN THEO KHO (AYA · AYB · AYC)": "REGISTRATION & PAYMENT RATE BY WAREHOUSE (AYA · AYB · AYC)",
+  "Sau khi hủy, slot sẽ được hoàn lại kho cho đồng nghiệp khác đăng ký.": "After cancelling, the slot goes back to stock for other colleagues.",
+  "Hệ thống tự động tra cứu lịch sử đơn hàng của tài khoản": "The system looks up the order history of account",
+  "mở khi PM duyệt mở cổng thanh toán; từ lúc đó bạn có 24 giờ để nộp tiền.": "button opens when the PM opens the payment window; you then have 24 hours to pay.",
+  "Bạn chưa có đợt bán nào": "You have no sales programs yet",
+  "Bạn chưa đăng ký sản phẩm nào trong chương trình này.": "You haven't registered any item in this program yet.",
+  "Bạn có chắc muốn HỦY giữ chỗ cho đơn này?": "Cancel the reservation for this order? Are you sure?",
+  "Bạn có chắc muốn đăng ký sản phẩm này?": "Register this item? Are you sure?",
+  "Bạn có muốn quét kiểm tra các đơn hàng quá hạn giữ chỗ 24h và tự động giải phóng slot không?": "Scan for reservations past 24 hours and release those slots automatically?",
+  "Bạn có thể kiểm tra tồn kho theo từng kho (Hải Phòng AYA, Hà Nội AYB, Hưng Yên AYC) ngay trên thẻ sản phẩm.": "You can check stock by warehouse (Hai Phong AYA, Ha Noi AYB, Hung Yen AYC) right on each product card.",
+  "Bạn đã đăng nhập nên không cần gõ lại Mã NV hay SĐT. Mọi thông tin đơn hàng, tiến độ duyệt tiền và nút \"Hủy Giữ Chỗ\" (đổi máy khác) đều hiển thị tự động tại ô này!": "You are signed in, so no need to type your ID or phone again. Your order, payment progress and the \"Cancel reservation\" button (to pick another item) all show here automatically!",
+  "BẢO MẬT & CÁCH LY DỮ LIỆU · GOOGLE DRIVE BACKEND": "SECURITY & DATA ISOLATION · GOOGLE DRIVE BACKEND",
+  "BẢO MẬT DỮ LIỆU CÁ NHÂN & CHỐNG TRANH CHẤP TIMESTAMP": "PERSONAL DATA PROTECTION & FAIR TIMESTAMPS",
+  "BẢO MẬT TÀI KHOẢN · TỰ PHỤC VỤ": "ACCOUNT SECURITY · SELF-SERVICE",
+  "Bảng Chi Tiết": "Details",
+  "Bảng Chi Tiết Sản Phẩm": "Product Details",
+  "Bảng tra cứu thông số chi tiết, kho hàng (AYA · AYB · AYC), loại hàng (GoodSet, A, B) và tình trạng đăng ký của toàn bộ sản phẩm niêm yết. Cột Đăng ký nhanh tự cập nhật theo thời gian thực.": "Look up specs, warehouse (AYA · AYB · AYC), grade (GoodSet, A, B) and registration status of all listed items. The Quick register column updates in real time.",
+  "Bảng tra cứu thông số chi tiết, kho hàng (AYA · AYB · AYC), loại hàng và tình trạng đăng ký của toàn bộ": "Look up specs, warehouse (AYA · AYB · AYC), grade and registration status of all",
+  "sản phẩm niêm yết trong chương trình": "listed products in program",
+  "Bảng tóm tắt tiến độ bán hàng": "Sales progress summary",
+  "Bảng tổng hợp chốt đơn tách riêng 2 cột:": "The order summary keeps 2 separate columns:",
+  "Bảng Điều Khiển Quản Trị Bán Hàng Nội Bộ": "Internal Sales Admin Dashboard",
+  "Bảo hành:": "Warranty:",
+  "Bảo mật thông tin địa chỉ cá nhân:": "Address privacy:",
+  "Bấm Giữ Chỗ Để Khóa Máy Riêng 24H": "Reserve to hold the item for 24h",
+  "Bấm vào các biểu tượng động (TV OLED, InstaView, WashTower...) để lọc ngay danh mục sản phẩm đang mở bán mà không cần gõ tìm kiếm.": "Tap the category icons (OLED TV, InstaView, WashTower…) to jump to the products on sale.",
+  "Bấm vào các thanh chương trình trên cùng (Gia dụng HA, Tivi & Loa HE, Thiết bị IT...) để xem đúng danh sách sản phẩm ưu đãi của đợt đó.": "Tap a program at the top (Home appliances HA, TV & Audio HE, IT…) to see the deals in that program.",
+  "Bấm vào đây để tạo đợt bán mới. Tải file mẫu 7 cột, điền danh sách model và kéo thả vào để kích hoạt mở bán cho toàn công ty.": "Click here to create a new program. Download the template, fill in the models and drop the file in to open the sale company-wide.",
+  "Bấm vào ảnh biên lai để phóng to 300% soi rõ mã giao dịch ngân hàng. Sau đó bấm nút này để duyệt hàng trăm đơn trong 1 giây.": "Click a receipt to zoom 300% and check the bank transaction ID. Then use this button to approve hundreds of orders at once.",
+  "Bấm để tải file Excel mẫu chuẩn hệ thống": "Click to download the standard Excel template",
+  "Bấm để xem hoặc chỉnh sửa hẹn giờ tự động": "Click to view or edit the auto schedule",
+  "Bấm để đăng nhập ngay": "Click to sign in",
+  "BẬT": "ON",
+  "Bật Cổng Nộp Tiền Chuyển Khoản": "Open the payment window",
+  "Bật tự động": "Auto on",
+  "Bật/tắt gửi email tự động cho nhân viên (Config: ENABLE_AUTO_EMAIL)": "Turn auto emails to staff on/off (Config: ENABLE_AUTO_EMAIL)",
+  "Bắt đầu bằng chữ FT...": "Starts with FT…",
+  "Bắt đầu mua sắm →": "Start shopping →",
+  "Bỏ qua": "Skip",
+  "Bộ Phận": "Department",
+  "Bộ Phận (Division) | Mã Nhân Viên Đăng Ký | Họ Tên NV Đăng Ký": "Department | Employee ID | Employee name",
+  "Bộ phận Logistics sẽ xuất hàng và giao trực tiếp đến địa chỉ đã đăng ký trong vòng 3–5 ngày làm việc sau khi PM duyệt thanh toán.": "Logistics will ship to your registered address within 3–5 working days after the PM approves your payment.",
+  "Bộ phận PM Support xin thông báo chương trình": "PM Support is pleased to announce the",
+  "CHUYỂN KHOẢN VCB PHÁP NHÂN": "TRANSFER TO COMPANY VCB ACCOUNT",
+  "CHƯƠNG TRÌNH ĐẶC QUYỀN NỘI BỘ · LG ELECTRONICS VIETNAM": "EXCLUSIVE STAFF PROGRAM · LG ELECTRONICS VIETNAM",
+  "CHỨNG TỪ BIÊN LAI NỘP TIỀN NGÂN HÀNG": "BANK PAYMENT RECEIPT",
+  "Ca Nộp Tiền": "Payments",
+  "Cam kết Jeong-Do Management:": "Jeong-Do commitment:",
+  "Cam kết Jeong-Do:": "Jeong-Do commitment:",
+  "Chi tiết giao dịch đối soát thanh toán chuyển khoản": "Transfer details for payment check",
+  "Chuyển Khoản Đối Soát": "Transfer & check",
+  "Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với cú pháp [MãNV]_[MãSlot]. Lưu ý: Cổng nộp tiền mở khi PM duyệt danh sách đăng ký; từ lúc mở bạn có 24 giờ để chuyển khoản và tải ảnh biên lai lên.": "Transfer to the LGEVH company account at Vietcombank with the note [EmpID]_[SlotID]. Note: the payment window opens after the PM reviews registrations; you then have 24 hours to transfer and upload the receipt.",
+  "Chuyển tiền thành công": "Transfer successful",
+  "Chuyển trạng thái từ Bản nháp (Draft) sang Đang Mở Bán (Open)": "Change status from Draft to Open",
+  "Chuyển đơn từ Chờ duyệt sang Chờ nộp tiền & kích hoạt đồng hồ 24h nộp tiền của NV": "Move orders from Waiting to Awaiting payment and start the 24h payment timer",
+  "Chào mừng bạn đến với Cổng Bán Hàng Nội Bộ LG! Bấm \"Hướng dẫn nhanh\" bất kỳ lúc nào nếu cần hỗ trợ.": "Welcome to the LG Internal Sales Portal! Click \"Quick guide\" any time you need help.",
+  "Chính sách Jeong-Do Management · Bảo vệ quyền lợi cán bộ công nhân viên LGE": "Jeong-Do Management policy · Protecting LGE staff",
+  "Chưa bật hẹn giờ": "No schedule set",
+  "Chưa chọn sản phẩm. Bấm vào một thẻ sản phẩm ở trên để chọn.": "No item selected. Click a product card above to choose.",
+  "Chưa có": "None",
+  "Chưa có chương trình nào. Vui lòng bấm \"+ Tạo chương trình\" để bắt đầu.": "No programs yet. Click \"+ New program\" to start.",
+  "Chưa có file mẫu?": "No template yet?",
+  "Chưa có đơn nào được gửi từ máy này. Muốn xem đơn đã gửi trước đó, dùng ô": "No orders sent from this device yet. To see earlier orders, use",
+  "ở trên.": "above.",
+  "Chưa giữ chỗ": "Not reserved",
+  "Chưa khai": "Not submitted",
+  "Chưa khởi tạo": "Not set up",
+  "Chưa mở cổng TT": "Payment not open",
+  "Chưa nộp tiền": "Not paid",
+  "Chương trình hiện tại": "Current program",
+  "Chương trình đang áp dụng:": "Active program:",
+  "Chương trình ưu tiên FCFS, thanh toán trong 24h": "First come, first served · pay within 24h",
+  "Chạy (Run)": "Run",
+  "Chấp nhận file ảnh JPG, PNG, HEIC (iPhone) hoặc PDF (được tự động nén & chuyển đổi). Ảnh biên lai được quét để tự điền Mã giao dịch và Ngày giờ.": "Accepts JPG, PNG, HEIC (iPhone) or PDF (compressed and converted automatically). Receipt images are scanned to fill in the transaction ID and date.",
+  "Chế Độ Giám Sát & Điều Phối": "Monitoring mode",
+  "Chỉ hiện slot còn đặt được": "Only show available slots",
+  "Chọn Nhanh Ngành Hàng 1-Chạm": "Quick category pick",
+  "Chọn Slot Giữ Chỗ (24h)": "Pick a slot (held 24h)",
+  "Chọn bước": "Go to step",
+  "Chọn hoặc kéo thả file biên lai": "Choose or drop the receipt file",
+  "Chọn nhanh:": "Quick pick:",
+  "Chọn sản phẩm": "Choose product",
+  "Chọn sản phẩm này": "Choose this item",
+  "Chọn sản phẩm trực tuyến theo đợt bán hàng để giữ chỗ nhanh (thời hạn thanh toán 24h theo quy chế FCFS). Mỗi nhân viên được đăng ký 01 sản phẩm / đợt.": "Choose a product online to reserve it fast (pay within 24h, first come first served). Each employee can register 1 item per program.",
+  "Chọn Đợt Mở Bán Ưu Đãi Bạn Cần": "Choose the program you want",
+  "Chờ Nộp Tiền Ngân Hàng": "Awaiting bank payment",
+  "Chờ PM mở cổng TT": "Waiting for PM to open payment",
+  "Chờ mở cổng TT": "Waiting for payment window",
+  "Chờ nộp tiền": "Awaiting payment",
+  "Chờ nộp tiền (Đã mở cổng)": "Awaiting payment (window open)",
+  "Chờ đối soát": "Awaiting check",
+  "Chủ thụ hưởng": "Account holder",
+  "Chứng từ nộp tiền": "Payment proof",
+  "Copy mã": "Copy the",
+  "Cuối tháng": "End of month",
+  "CÀI ĐẶT HẸN GIỜ CHƯƠNG TRÌNH (TIMER SETTINGS)": "PROGRAM SCHEDULE SETTINGS",
+  "CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG": "LG ELECTRONICS VIETNAM HAI PHONG CO., LTD",
+  "Cài đặt hẹn giờ tự động mở chương trình, kết sổ": "Schedule auto-open and auto-close",
+  "Cài đặt hẹn giờ tự động mở chương trình, kết sổ và mở cổng thanh toán": "Schedule auto-open, auto-close and payment window",
+  "Cách mở: (1) Nhập": "How to open: (1) Enter",
+  "Còn": "Left",
+  "Còn Khả Dụng": "Available",
+  "Còn Trống Chưa ĐK": "Available (not registered)",
+  "Còn khả dụng": "Available",
+  "Còn trống": "Available",
+  "Có sẵn mã VietQR tự điền số tiền và cú pháp chuẩn, quét bằng app ngân hàng trong 5 giây siêu an toàn.": "A VietQR code fills in the amount and transfer note — scan it with any banking app in 5 seconds.",
+  "Có thể bấm nút \"Hẹn Giờ (Timer)\" bên cạnh nếu muốn hệ thống tự động quét mỗi ngày.": "Use the \"Schedule (Timer)\" button next to it to scan automatically every day.",
+  "Công ty hỗ trợ vận chuyển đến địa chỉ đăng ký của nhân viên.": "The company delivers to the employee's registered address.",
+  "Cú pháp CK": "Transfer note",
+  "Cú pháp chuyển khoản (Bắt buộc):": "Transfer note (required):",
+  "Cú pháp chuẩn (Bắt buộc):": "Required note:",
+  "Cấp quyền Google Drive khi được hỏi. Hàm sẽ": "Grant Google Drive access when asked. The function will",
+  "Cấu Hình API Google Apps Script & Sheet Cá Nhân": "Google Apps Script API & personal Sheet setup",
+  "Cấu hình API": "API setup",
+  "Cấu hình API Google Sheet (Dành cho PM/PIC)": "Google Sheet API setup (PM/PIC)",
+  "Cấu hình Google Apps Script Web App URL & Google Sheet Database": "Set the Google Apps Script Web App URL & Google Sheet database",
+  "Cấu hình Google Sheet API / Chế độ Demo": "Google Sheet API setup / Demo mode",
+  "Cần quyền xem thư mục Drive \"Bien lai nop tien\". Đối chiếu thêm với sao kê ngân hàng trước khi duyệt.": "Needs view access to the Drive folder \"Bien lai nop tien\". Check against the bank statement before approving.",
+  "Cập Nhật Mật Khẩu": "Update password",
+  "Cập nhật mật khẩu mới cho tài khoản": "Set a new password for account",
+  "CỔNG BÁN HÀNG NỘI BỘ": "INTERNAL SALES PORTAL",
+  "CỔNG TT ĐÃ MỞ": "PAYMENT OPEN",
+  "Cổng thanh toán": "Payment window",
+  "Cổng Đăng Ký Đang Mở Live": "Registration open · Live",
+  "Cổng đang mở": "Window open",
+  "CỬA NGÕ MUA SẮM": "SHOPPING GATEWAY",
+  "DANH MỤC KHO HÀNG · IMPORT DỮ LIỆU": "STOCK CATALOG · DATA IMPORT",
+  "DANH SÁCH MÃ SẢN PHẨM TRÊN HỆ THỐNG ĐĂNG KÝ": "PRODUCT CODES IN THE REGISTRATION SYSTEM",
+  "Danh mục sản phẩm (Kéo thả file Excel .xlsx)": "Product catalog (drop an .xlsx file)",
+  "Danh sách Slot ID chi tiết (xem Tab 4)": "Full slot ID list (see Tab 4)",
+  "Danh sách bộ phận": "Department list",
+  "Deploy (Triển khai)": "Deploy",
+  "Display · Màn hình chuyên dụng / Quảng cáo": "Display · Signage / Commercial displays",
+  "Doanh Thu Dự Kiến": "Expected Revenue",
+  "Duyệt": "Approve",
+  "Duyệt Thanh Toán Này": "Approve this payment",
+  "Duyệt hàng loạt (": "Batch approve (",
+  "Duyệt tất cả đơn hàng đã nộp tiền": "Approve all paid orders",
+  "Duyệt tất cả đơn hàng đã nộp tiền (GAP-OPS-02)": "Approve all paid orders",
+  "Dành cho Nhân Viên": "For employees",
+  "Dãy số tham chiếu": "Reference number",
+  "Dạng Bảng": "Table",
+  "Dạng Thẻ": "Cards",
+  "Dự án mới (New project)": "New project",
+  "ES · Thiết bị điện tử gia dụng (Electronic Systems)": "ES · Home electronics",
+  "Email tự động": "Auto email",
+  "File Chứng Từ Nộp Tiền": "Payment proof file",
+  "GHI CHÚ VỀ TRƯỜNG THÔNG TIN \"NHÂN VIÊN NỘP TIỀN\" ĐẢM BẢO ĐỘC LẬP": "NOTE ON THE SEPARATE \"PAYER\" FIELDS",
+  "Giá (MRP)": "Price (MRP)",
+  "Giá MRP": "MRP",
+  "Giá Nhân Viên:": "Staff price:",
+  "Giá bán": "Price",
+  "Giá bán nội bộ": "Staff price",
+  "Giá niêm yết": "List price",
+  "Giá niêm yết (MRP)": "List price (MRP)",
+  "Giá niêm yết:": "List price:",
+  "Giá nội bộ": "Staff price",
+  "Giá ưu đãi nội bộ:": "Staff price:",
+  "Giá: cao → thấp": "Price: high → low",
+  "Giá: thấp → cao": "Price: low → high",
+  "Giám Sát Bán Hàng (PM View)": "Sales Monitor (PM view)",
+  "Giám sát số liệu": "Monitor the figures",
+  "Giám sát số liệu thời gian thực theo từng kho hàng:": "Live figures by warehouse:",
+  "Tỉ lệ đăng ký": "Registration rate",
+  "Tỉ lệ thanh toán": "Payment rate",
+  "Giúp nhân viên chủ động thanh toán sớm mà không phải chờ hết giờ khóa tạm thời.": "Lets staff pay early without waiting for the hold time to end.",
+  "Giảm": "Off",
+  "Giảm nhiều nhất": "Biggest discount",
+  "Gõ tên bộ phận, ví dụ: AUDIT": "Type a department, e.g. AUDIT",
+  "Gửi Xác Nhận Nộp Tiền & Upload File Chứng Từ": "Submit payment & upload receipt",
+  "Gửi Đăng Ký Lên Hệ Thống (Record Timestamp)": "Submit registration",
+  "Hiển thị": "Showing",
+  "sản phẩm · Còn khả dụng:": "products · Available:",
+  "Hiện mật khẩu": "Show password",
+  "Hoàn tất quản trị ✓": "Finish ✓",
+  "Hướng dẫn 1-Click tạo CSDL tự động trên Drive cá nhân:": "One-click setup of the database on your own Drive:",
+  "Hướng dẫn nhanh": "Quick guide",
+  "Hạn chót 24h & Cảnh báo": "24h deadline & alerts",
+  "Hạn chót đăng ký (Deadline):": "Registration deadline:",
+  "Hạn mức SP / Nhân viên": "Items per employee",
+  "Hạn mức mua hàng:": "Purchase limit:",
+  "Hạn mức mua:": "Limit:",
+  "Hẹn Giờ (Timer)": "Schedule (Timer)",
+  "Hẹn giờ: Chưa đặt": "Schedule: not set",
+  "Hết hàng (100% Slot đã đăng ký)": "Sold out (100% of slots registered)",
+  "Hết hàng (100% Slot)": "Sold out (100%)",
+  "Hết tháng này": "End of this month",
+  "Hệ thống chạy ngầm kiểm tra lịch hẹn mỗi giây. Cấu hình được lưu an toàn trên máy chủ & trình duyệt.": "The system checks the schedule every second in the background. Settings are saved on the server and in the browser.",
+  "Hệ thống có sẵn nút chọn nhanh thời gian (+7 ngày, +14 ngày, cuối tháng) cực kỳ tiện lợi.": "Quick time buttons are available (+7 days, +14 days, end of month).",
+  "Hệ thống giám sát số liệu thời gian thực, quản lý phân bổ sản phẩm theo kho, đối soát nộp tiền và phê duyệt danh sách bàn giao Logistics.": "Track live figures, stock by warehouse, payment checks and the approved delivery list for Logistics.",
+  "Hệ thống hỗ trợ cơ chế": "The system supports",
+  "Hệ thống phân phối sản phẩm giá ưu đãi nội bộ dành riêng cho Cán bộ Nhân viên chính thức của LG.": "Staff-price sales for official LG employees only.",
+  "Hệ thống tự sinh...": "Auto-generated…",
+  "Hệ thống tự động gửi Email xác nhận thành công cho nhân viên ngay khi PM bấm duyệt.": "The system emails the employee a confirmation as soon as the PM approves.",
+  "Họ & Tên NV Đăng Ký": "Employee name",
+  "Họ Tên NV Nộp Tiền (Trường 1)": "Payer name (field 1)",
+  "Họ tên & Mã NV người nộp tiền:": "Payer name & ID:",
+  "Họ và tên người nộp": "Payer full name",
+  "Họ và tên người nộp tiền thực tế": "Full name of the person who paid",
+  "Họ và tên nhân viên đăng ký": "Full name of the employee",
+  "HỖ TRỢ ĐỐI SOÁT THANH TOÁN · HƯỚNG DẪN NGƯỜI DÙNG": "PAYMENT CHECK HELP · USER GUIDE",
+  "Hỗ Trợ Nội Bộ": "Staff Support",
+  "Hỗ trợ file cấu trúc sheet \"Slots\" hoặc danh sách Model, Kho, Giá nội bộ": "Accepts a \"Slots\" sheet or a list of Model, Warehouse, Staff price",
+  "Hỗ trợ nội bộ & tư vấn viên LGE": "LGE staff support",
+  "Hỗ trợ nội bộ: Ban Quản Trị Bán Hàng Nội Bộ · Liên hệ hỗ trợ: minhhien.hoang@lge.com": "Support: Internal Sales PM Team · Contact: minhhien.hoang@lge.com",
+  "Hỗ trợ định dạng: .PNG, .JPG, .JPEG, .PDF (Tối đa 5MB)": "Formats: .PNG, .JPG, .JPEG, .PDF (max 5MB)",
+  "Hủy": "Cancel",
+  "Hủy Bỏ": "Cancel",
+  "Hủy giữ chỗ": "Cancel reservation",
+  "Hủy giữ chỗ và hoàn slot về kho": "Cancel reservation and return the slot",
+  "Hủy giữ chỗ để nhường slot cho đồng nghiệp (GAP-EDGE-02)": "Cancel to free the slot for a colleague",
+  "Hủy slot": "Cancel slot",
+  "In / Xuất PDF": "Print / PDF",
+  "KHÁM PHÁ DANH MỤC": "BROWSE THE CATALOG",
+  "KHÓA MÁY NHANH (FCFS)": "RESERVE FAST (FCFS)",
+  "KHÔNG NHẬP (SAI)": "DON'T ENTER (WRONG)",
+  "KHỞI TẠO ĐỢT BÁN": "CREATE A PROGRAM",
+  "KIỂM SOÁT TỒN KHO": "STOCK CONTROL",
+  "Khi hết đợt bán, bấm \"Kết Sổ\" để khóa cổng đăng ký. Sau đó bấm \"Xuất Excel\" để tải file đầy đủ 23 trường nộp Giám đốc Tài chính và Kế toán kho LGEVH.": "When the sale ends, click \"Close program\" to lock registration. Then click \"Export Excel\" to download the full 23-field file for LGEVH Finance and warehouse accounting.",
+  "Kho / Trung Tâm": "Warehouse / Center",
+  "Kho AYA (Miền Bắc)": "AYA warehouse (North)",
+  "Kho AYA · Miền Bắc (Hải Phòng / Hà Nội)": "AYA · North (Hai Phong / Ha Noi)",
+  "Kho AYB (Miền Trung)": "AYB warehouse (Central)",
+  "Kho AYB · Miền Trung (Đà Nẵng)": "AYB · Central (Da Nang)",
+  "Kho AYC (Miền Nam)": "AYC warehouse (South)",
+  "Kho AYC · Miền Nam (Bình Dương / HCM)": "AYC · South (Binh Duong / HCMC)",
+  "Kho bàn giao:": "Pickup warehouse:",
+  "Kho này hiện không còn slot trống.": "No slots left in this warehouse.",
+  "Khoảng thời gian tra cứu": "Period",
+  "Khuyến nghị đường truyền:": "Network tip:",
+  "Khám Phá Danh Mục & Mua Hàng Ngay (Tab 2) →": "Browse the catalog & buy (Tab 2) →",
+  "Khám phá ưu đãi ngay ↓": "See the deals ↓",
+  "Không có dữ liệu nào khớp với bộ lọc hiện tại.": "Nothing matches the current filter.",
+  "Không có sản phẩm phù hợp.": "No matching products.",
+  "Thử bỏ bớt bộ lọc hoặc đổi từ khoá tìm kiếm.": "Try fewer filters or another search word.",
+  "Không thấy bộ phận của mình? Chọn": "Can't find your department? Choose",
+  "Không tìm thấy sản phẩm phù hợp với bộ lọc.": "No products match the filter.",
+  "Khởi tạo đợt bán hàng mới và tải danh mục sản phẩm từ file Excel chỉ trong 1 màn hình duy nhất.": "Create a new program and load the catalog from Excel on one screen.",
+  "Kitchen · Bếp / Lò vi sóng / Máy rửa bát": "Kitchen · Cooking / Microwave / Dishwasher",
+  "Kiểm Tra & Lưu Cấu Hình": "Test & save",
+  "Kiểm tra hàng tồn & Hủy slot giữ chỗ quá hạn": "Check stock & cancel expired reservations",
+  "Kéo thả file Excel (.xlsx) vào đây hoặc bấm để chọn": "Drop an Excel file (.xlsx) here or click to choose",
+  "Kích Hoạt Mở Bán": "Open the sale",
+  "Kính gửi Toàn thể Cán bộ Nhân viên LG Electronics Việt Nam (Dear All LG Team Members),": "Dear all LG Electronics Vietnam team members,",
+  "Kết Sổ Chương Trình & Xuất Quyết Toán": "Close program & export settlement",
+  "Kết sổ chương trình": "Close program",
+  "Kết sổ ngay (Thủ công)": "Close now (manual)",
+  "LG ELECTRONICS VIETNAM · GIÁM SÁT VẬN HÀNH BÁN HÀNG NỘI BỘ": "LG ELECTRONICS VIETNAM · INTERNAL SALES OPERATIONS",
+  "LG ELECTRONICS VIETNAM · VẬN HÀNH BÁN HÀNG TỰ ĐỘNG": "LG ELECTRONICS VIETNAM · AUTOMATED SALES OPERATIONS",
+  "LG Electronics Vietnam · Cổng Bán Hàng Ưu Đãi Nội Bộ": "LG Electronics Vietnam · Staff Deals Portal",
+  "LG Internal Sales Portal – Đăng ký mua hàng nội bộ": "LG Internal Sales Portal – Staff purchase registration",
+  "LG Internal Sales Portal — Đăng nhập để tiếp tục": "LG Internal Sales Portal — Sign in to continue",
+  "Laptop LG gram & Màn hình UltraWide": "LG gram laptops & UltraWide monitors",
+  "Life's Good! Bạn cần hỗ trợ gì về ưu đãi hôm nay?": "Life's Good! How can we help with today's deals?",
+  "Link Đăng Ký:": "Registration link:",
+  "Link “Xem trên LG.com” chỉ để tham khảo tính năng. Giá, quà tặng và khuyến mãi trên LG.com không áp dụng cho đợt bán nội bộ.": "The \"View on LG.com\" link is only for product features. LG.com prices, gifts and promotions do not apply to this staff sale.",
+  "Liên hệ Ban Quản Trị (internalsales.support@lge.com) nếu cần hỗ trợ tài khoản.": "Contact the PM team (internalsales.support@lge.com) for account help.",
+  "Liên hệ giao hàng": "Delivery contact",
+  "Loại": "Grade",
+  "Loại A": "Grade A",
+  "Loại B": "Grade B",
+  "Loại hàng": "Grade",
+  "Làm mới / Tra cứu": "Refresh / Look up",
+  "Lên lịch trình tự động thực thi hoặc kích hoạt thủ công ngay lập tức cho 3 tác vụ chính:": "Schedule or run now, for 3 main tasks:",
+  "Mở chương trình, Kết sổ chương trình và Mở cổng thanh toán.": "Open program, Close program and Open payment window.",
+  "Lưu Cấu Hình Hẹn Giờ": "Save schedule",
+  "Lưu ý về đường truyền mạng nội bộ (Factory/Office Intranet):": "Note about the factory/office network:",
+  "Lịch sử giao dịch": "Transaction history",
+  "Lọc theo kho": "Filter by warehouse",
+  "Lọc theo kho, loại hàng hoặc gõ tên model, rồi bấm vào thẻ sản phẩm muốn mua.": "Filter by warehouse or grade, or type a model, then click the product you want.",
+  "MS · Màn hình máy tính (Monitor Series)": "MS · Monitors",
+  "Minh bạch trong bảng báo cáo:": "Clear reporting:",
+  "Model & Sản phẩm": "Model & product",
+  "Màn Hình · gram": "Monitors · gram",
+  "Máy Giặt": "Washers",
+  "Máy giặt WashTower & AI DD": "WashTower & AI DD washers",
+  "Mã GD 16 số": "16-digit transaction ID",
+  "Mã Model Sản Phẩm": "Model code",
+  "Mã Model | Mã Slot ID (#001, #002...) | SĐT Liên Hệ | Địa Chỉ Giao Hàng": "Model | Slot ID (#001, #002…) | Phone | Delivery address",
+  "Mã NV": "Employee ID",
+  "Mã NV + 4 số cuối SĐT": "Employee ID + last 4 phone digits",
+  "Mã NV Nộp Tiền (Trường 2)": "Payer ID (field 2)",
+  "Mã NV của người nộp tiền": "Payer's employee ID",
+  "Mã NV người nộp": "Payer ID",
+  "Mã NV Đăng Ký": "Employee ID",
+  "Mã SP": "Item code",
+  "Mã SP / Slot": "Item / Slot",
+  "Mã Slot / SP": "Slot / Item",
+  "Mã Slot ID được điền tự động": "Slot ID is filled in automatically",
+  "Mã Slot:": "Slot ID:",
+  "Mã VietQR chuyển khoản Vietcombank": "VietQR code for Vietcombank transfer",
+  "Mã bút toán / GD": "Entry / transaction no.",
+  "Mã giao dịch (Txn Ref / Mã tham chiếu / Trace No.) là mã do ngân hàng tự động cấp sau khi chuyển khoản thành công. Kế toán LG dùng mã này để đối soát tiền vào tài khoản.": "The transaction ID (Txn Ref / Reference / Trace No.) is given by your bank after a successful transfer. LG Accounting uses it to match the payment.",
+  "Mã giao dịch ngân hàng (Txn Ref) *": "Bank transaction ID (Txn Ref) *",
+  "Mã giao dịch:": "Transaction ID:",
+  "Mã hợp lệ": "Valid code",
+  "Mã nhân viên (Employee ID)": "Employee ID",
+  "Mã nhân viên không tồn tại.": "Employee ID not found.",
+  "Mã đề xuất": "Suggested code",
+  "Mã đợt bán *": "Program code *",
+  "Mô tả": "Description",
+  "Mô tả / Điều kiện áp dụng": "Description / Terms",
+  "MẪU BIỂU ĐIỀN THÔNG TIN NỘP TIỀN & UPLOAD CHỨNG TỪ CHUYỂN KHOẢN": "PAYMENT FORM & RECEIPT UPLOAD",
+  "Mẫu Biểu Xác Nhận Mua & Upload File Nộp Tiền Ngân Hàng": "Confirm Purchase & Upload Bank Receipt",
+  "Mẫu nộp tiền đang khoá": "Payment form is locked",
+  "Mật khẩu (Password)": "Password",
+  "Mật khẩu hiện tại *": "Current password *",
+  "Mật khẩu mới (tối thiểu 6 ký tự) *": "New password (min. 6 characters) *",
+  "Mỗi chương trình có hạn mức và thời gian mở bán riêng, hãy chọn đúng đợt bạn có nhu cầu.": "Each program has its own limit and sale time — choose the one you need.",
+  "Mỗi nhân viên chỉ xem được đơn của mình, bằng Mã NV kèm 4 số cuối điện thoại. Biên lai chỉ PM xem trên Google Drive.": "Each employee sees only their own orders, using their ID and last 4 phone digits. Only PMs see receipts on Google Drive.",
+  "Tra cứu riêng tư:": "Private lookup:",
+  "Một số hệ thống mạng Wi-Fi tại nhà máy/văn phòng LG có tường lửa chặn kết nối đến Google Scripts. Nếu bạn gặp lỗi không lưu được hoặc bị xoay chờ, vui lòng chuyển sang": "Some LG factory/office Wi-Fi networks block Google Scripts. If saving fails or keeps loading, please switch to",
+  "Mới đăng ký (Legacy)": "Newly registered (legacy)",
+  "Mở / Kết sổ đợt bán & Điều phối slot": "Open / close programs & manage slots",
+  "Mở Bảng Điều Khiển PM (Tab 5) →": "Open PM Dashboard →",
+  "Mở PM Dashboard →": "Open PM Dashboard →",
+  "Mở TT": "Open payment",
+  "Mở biên lai thật ↗": "Open the actual receipt ↗",
+  "Mở bán ngay (Thủ công)": "Open now (manual)",
+  "Mở chương trình": "Open program",
+  "Mở cổng TT ngay (Thủ công)": "Open payment now (manual)",
+  "Mở cổng thanh toán": "Open payment window",
+  "Mở cổng thanh toán cho các đơn đăng ký trước thời điểm này": "Open payment for orders registered before this time",
+  "Mở cổng thanh toán cho nhân viên này": "Open payment for this employee",
+  "Mở danh sách bộ phận": "Open department list",
+  "Nghiêm cấm bán lại cho bên thứ 3 (Resale prohibited). Vi phạm sẽ xử lý kỷ luật theo quy chế công ty.": "Resale to third parties is prohibited. Violations lead to disciplinary action under company rules.",
+  "Nguyên tắc xét duyệt:": "Approval rule:",
+  "Ngành hàng": "Category",
+  "Ngành hàng / Phân khúc sản phẩm *": "Category / product segment *",
+  "Ngày giờ chuyển khoản *": "Transfer date & time *",
+  "Ngân Hàng & Mã GD": "Bank & transaction ID",
+  "Ngân Hàng:": "Bank:",
+  "Ngân hàng": "Bank",
+  "Ngân hàng:": "Bank:",
+  "Người nộp tiền (Họ tên)": "Payer (full name)",
+  "Người nộp tiền giống thông tin người đăng ký (tự điền ô 4 và 5)": "Payer is the same as the registered employee (fills fields 4 and 5)",
+  "Người nộp:": "Payer:",
+  "Người đăng ký": "Registered by",
+  "Nhân viên": "Employee",
+  "Nhân viên giữ chỗ quá 24h không nộp tiền sẽ bị thu hồi suất. Bấm nút này để hủy đơn quá hạn và trả máy về kho cho người khác mua.": "Reservations unpaid after 24h are released. Click to cancel expired orders and return the items to stock.",
+  "Nhân viên truy cập tab": "Employees open the tab",
+  "và điền đầy đủ các trường thông tin quy định độc lập:": "and fill in all required fields:",
+  "Nhân viên điền thông tin xác nhận nộp tiền và": "Employees fill in the payment details and",
+  "file biên lai/ảnh chụp màn hình chuyển khoản ngân hàng để PM đối soát.": "the bank receipt / screenshot for the PM to check.",
+  "Nhân viên đăng ký": "Registered employee",
+  "Nhấn": "Click",
+  "Nhấn nút \"+ Tạo chương trình\" trên thanh tab để nạp danh mục sản phẩm từ file Excel.": "Click \"+ New program\" on the tab bar to load the catalog from Excel.",
+  "Nhấn vào đây để chọn file, hoặc": "Click here to choose a file, or",
+  "file biên lai vào khung này (JPG, PNG, PDF)": "your receipt here (JPG, PNG, PDF)",
+  "kéo thả": "drag and drop",
+  "Nhận Bàn Giao Logistics": "Delivery by Logistics",
+  "Nhập Lại Form": "Reset form",
+  "Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn và": "Enter your employee ID and the last 4 digits of your registered phone to see your order status and",
+  "số tiền cần nộp": "the amount due",
+  "mở sau 2 giờ kể từ lúc đăng ký thành công (hoặc khi PM mở cổng thanh toán).": "button opens 2 hours after you register (or when the PM opens payment).",
+  "Nhập lại mật khẩu mới": "Re-enter new password",
+  "Nhập mã giao dịch/FT trên biên lai. Không nhập nội dung CK.": "Enter the transaction/FT ID from the receipt — not the transfer note.",
+  "Nhập mật khẩu (test: test123)": "Enter password (test: test123)",
+  "Nhập mật khẩu hiện tại": "Enter current password",
+  "Nhập mật khẩu mới": "Enter new password",
+  "Nhập đúng số tiền trên biên lai (chỉ PM & Kế toán xem)": "Enter the exact amount on the receipt (only PM & Accounting see it)",
+  "Nhắc nhở nộp tiền": "Payment reminder",
+  "NÊN NHẬP (ĐÚNG)": "ENTER THIS (CORRECT)",
+  "NẠP SẢN PHẨM TỪ FILE EXCEL (.XLSX)": "LOAD PRODUCTS FROM EXCEL (.XLSX)",
+  "Nạp Excel SP": "Load Excel",
+  "Nạp danh mục sản phẩm từ file Excel (.xlsx)": "Load the catalog from Excel (.xlsx)",
+  "Nạp hoặc cập nhật danh mục sản phẩm cho chương trình:": "Load or update the catalog for program:",
+  "Nếu PM chưa mở cổng thanh toán, dòng đơn sẽ hiện trạng thái tương ứng. Vui lòng": "If the PM has not opened payment yet, your order row shows that status. Please",
+  "chưa chuyển khoản": "do not transfer money",
+  "trước khi cổng mở.": "before the window opens.",
+  "Nếu cần xem lại hướng dẫn, bấm nút \"Hướng dẫn nhanh\" trên thanh Header bất cứ lúc nào!": "To see this guide again, click \"Quick guide\" at the top at any time!",
+  "Nếu mạng nội bộ nhà máy/văn phòng có tường lửa chặn dịch vụ Google Apps Script, vui lòng chuyển sang": "If the factory/office network blocks Google Apps Script, please switch to",
+  "mạng di động 4G/5G cá nhân": "your own 4G/5G mobile data",
+  "để hoàn tất đăng ký giữ chỗ và thanh toán thông suốt.": "to reserve and pay without problems.",
+  "Nội dung CK:": "Transfer note:",
+  "Nộp tiền": "Pay",
+  "Nộp tiền ngay (1-Chạm) →": "Pay now →",
+  "Other segment · Phân khúc khác": "Other segment",
+  "PC · Laptop LG Gram / Thiết bị tin học": "PC · LG gram laptops / IT",
+  "PM Quản trị": "PM Admin",
+  "PM Quản trị (Product / Promotion Manager)": "PM Admin (Product / Promotion Manager)",
+  "PM duyệt mở cổng thanh toán": "PM opens the payment window",
+  "Phóng to": "Zoom in",
+  "QUY CHẾ PHÂN QUYỀN PM QUẢN TRỊ (JEONG-DO GOVERNANCE)": "PM ADMIN RIGHTS (JEONG-DO GOVERNANCE)",
+  "QUẢN TRỊ BÁN HÀNG NỘI BỘ · THIẾT LẬP ĐỢT BÁN": "INTERNAL SALES ADMIN · PROGRAM SETUP",
+  "QUẢN TRỊ THANH TOÁN": "PAYMENT ADMIN",
+  "Quay lại": "Back",
+  "Quy Chế & VCB": "Rules & VCB",
+  "Quyền hạn PM": "PM rights",
+  "Quá hạn 24h": "Past 24h",
+  "Quá thời hạn trên mà chưa nộp chứng từ, hệ thống sẽ tự động hủy đơn và mở lại slot cho đồng nghiệp khác.": "If no proof is sent in time, the system cancels the order and frees the slot for others.",
+  "Quét VietQR & Nộp Biên Lai Khi Cổng Mở": "Scan VietQR & upload the receipt when payment opens",
+  "Quét bằng mọi App Ngân hàng": "Scan with any banking app",
+  "Quét giải phóng các slot giữ chỗ quá hạn 24h và gửi cảnh báo": "Release reservations past 24h and send alerts",
+  "Quét hoàn tất (Mô phỏng Demo):": "Scan finished (demo):",
+  "Quét mã VietQR chuyển khoản chính xác số tiền, sau đó tải ảnh biên lai để PM đối soát.": "Scan the VietQR code to transfer the exact amount, then upload the receipt for the PM to check.",
+  "Quét quá hạn 24h": "Scan for 24h expiry",
+  "Quản lý kho": "Stock management",
+  "Quản trị PM": "PM Admin",
+  "RAC · Điều hòa không khí dân dụng": "RAC · Home air conditioners",
+  "REF · Tủ lạnh (Refrigerator / InstaView)": "REF · Refrigerators / InstaView",
+  "SP còn trống": "Items available",
+  "STK thụ hưởng:": "Account no.:",
+  "Sao chép URL Web App vừa tạo, dán vào ô bên trên và bấm": "Copy the new Web App URL, paste it above and click",
+  "Sao chép số tài khoản": "Copy account number",
+  "Sao chép toàn bộ mã nguồn tệp": "Copy the full source of",
+  "trong dự án này dán vào trình biên tập.": "from this project and paste it into the editor.",
+  "Sau khi hệ thống xác nhận đăng ký slot thành công, nhân viên thực hiện chuyển khoản 100% giá trị đơn hàng và": "After the slot is confirmed, the employee transfers 100% of the order value, then",
+  "Upload File Ảnh Biên Lai Nộp Tiền tại Tab 3:": "the receipt image in Tab 3:",
+  "Sau khi nhân viên đăng ký giữ chỗ máy thành công, bấm nút này để cho phép nhân viên quét mã VietQR nộp tiền ngay vào tài khoản LG.": "After employees reserve their items, click this to let them scan VietQR and pay into the LG account.",
+  "Sau khi đăng ký thành công, nhân viên có tối đa": "After registering, employees have up to",
+  "để hoàn tất chuyển khoản và upload ảnh biên lai.": "to transfer and upload the receipt.",
+  "Sinh mã": "Generate",
+  "Soi Biên Lai 300% & Duyệt 1-Click": "Zoom receipts 300% & approve in 1 click",
+  "Sản phẩm bán nội bộ Clearance/Internal Sales không áp dụng chế độ bảo hành (No Warranty).": "Clearance / internal sale items have no warranty.",
+  "Sắp xếp": "Sort",
+  "Sắp xếp: theo STT": "Sort: by number",
+  "Sẵn sàng nhận đăng ký": "Ready for registration",
+  "Số Tài Khoản:": "Account number:",
+  "Số liệu cập nhật theo thời gian thực (Real-time sync với Google Sheets & Database).": "Figures update in real time (synced with Google Sheets).",
+  "Số nhà, đường, phường/xã, quận/huyện, tỉnh/TP": "House no., street, ward, district, city/province",
+  "Số tham chiếu": "Reference number",
+  "Số tiền cần nộp": "Amount to pay",
+  "Số tiền nộp:": "Amount paid:",
+  "Số tiền thanh toán:": "Amount:",
+  "Số tài khoản": "Account number",
+  "Số tài khoản:": "Account number:",
+  "Số điện thoại liên hệ": "Contact phone",
+  "Số điện thoại và địa chỉ giao hàng chỉ hiển thị cho bộ phận Vận chuyển & PM Support.": "Phone and delivery address are shown only to Logistics and PM Support.",
+  "Sử Dụng Demo Nội Bộ (Offline)": "Use offline demo",
+  "THEO DÕI ĐƠN 1-CHẠM": "TRACK YOUR ORDER",
+  "THÔNG TIN ĐĂNG KÝ": "REGISTRATION DETAILS",
+  "THỂ LỆ & QUY ĐỊNH BÁN HÀNG NỘI BỘ (INTERNAL SALES RULES)": "INTERNAL SALES RULES",
+  "TOÀN QUỐC (TỔNG HỢP)": "NATIONWIDE (TOTAL)",
+  "TRA CỨU ĐƠN CỦA TÔI": "MY ORDERS",
+  "Tham Khảo": "Reference",
+  "Thanh Toán / Đối Soát": "Payment / Check",
+  "Thanh toán toàn quốc:": "Paid (all):",
+  "Thanh toán:": "Paid:",
+  "Thao tác": "Action",
+  "Thao tác PM": "PM action",
+  "Theo Dõi & Hủy Đơn Ngay Tại Dashboard": "Track & cancel right on the dashboard",
+  "Thu Hồi Suất Quá Hạn 24 Giờ": "Release reservations past 24h",
+  "Thu nhỏ": "Zoom out",
+  "Thông Báo Mở Bán Sản Phẩm Nội Bộ (PM Gửi Toàn Nhân Viên)": "Staff sale announcement (from PM to all staff)",
+  "Thông báo chương trình bán hàng nội bộ trên hệ thống trực tuyến, đảm bảo tính minh bạch, thời gian mở bán cố định và quy tắc đăng ký.": "The staff sale is announced online with clear rules, a fixed sale time and registration rules.",
+  "Thông tin Nhân Viên Nộp Tiền (Họ tên & Mã NV, tách 2 trường riêng) được khai ở bước Xác nhận nộp tiền.": "Payer details (name & employee ID, 2 separate fields) are entered at the payment step.",
+  "Thể Lệ & Chuyển Khoản": "Rules & Bank Transfer",
+  "Thời Gian Nộp Tiền": "Payment time",
+  "Thời gian bắt đầu mở bán *": "Sale start time *",
+  "Thời gian chính thức mở cổng đăng ký:": "Registration opens:",
+  "Thời gian hệ thống:": "System time:",
+  "Thời gian kết thúc đăng ký *": "Registration end time *",
+  "Thời gian thông báo trước:": "Advance notice:",
+  "Thời gian ĐK": "Registered at",
+  "Thời gian đăng ký": "Registered at",
+  "Thời điểm kết sổ:": "Close time:",
+  "Thời điểm mở bán:": "Open time:",
+  "Thời điểm mở cổng TT:": "Payment opens:",
+  "Thời điểm đăng ký do máy chủ Google ghi (giờ Việt Nam, chính xác đến giây), không lấy giờ trên máy nhân viên. Nhiều người gửi cùng lúc thì máy chủ xử lý lần lượt từng đơn, đơn tới trước giữ slot.": "Registration time is recorded by Google's server (Vietnam time, to the second), not the employee's device. If many people submit at once, the server handles them one by one — the first order gets the slot.",
+  "Timestamp máy chủ:": "Server timestamp:",
+  "Tiêu Đề:": "Subject:",
+  "Tiến Độ Kho Hàng & Thanh Toán": "Stock & Payment Progress",
+  "Tiếp →": "Next →",
+  "Toàn Quốc · Tỉ Lệ Thanh Toán": "Nationwide · Payment rate",
+  "Toàn Quốc · Tỉ Lệ Đăng Ký": "Nationwide · Registration rate",
+  "Toàn bộ dữ liệu sau khi kết sổ sẽ được niêm phong chống sửa đổi trái phép.": "All data is sealed after closing to prevent unauthorized changes.",
+  "Toàn bộ lịch sử": "All history",
+  "Toàn quốc:": "Nationwide:",
+  "Tra cứu": "Look up",
+  "Tra cứu chi tiết →": "See details →",
+  "Tra cứu đơn của tôi": "My orders",
+  "Triển khai (Deploy) > New deployment > Web app (Anyone)": "Deploy > New deployment > Web app (Anyone)",
+  "Trong mẫu biểu nộp tiền (Tab 3), \"Họ và Tên Nhân Viên Nộp Tiền\" và \"Mã NV Người Nộp Tiền\" là 2 ô riêng biệt, không gộp chung.": "In the payment form (Tab 3), \"Payer full name\" and \"Payer employee ID\" are 2 separate fields.",
+  "Tách riêng 2 trường độc lập:": "Two separate fields:",
+  "Trong vòng 07 ngày làm việc kể từ ngày nhận hàng, chỉ chấp nhận đổi sản phẩm nếu sản phẩm bị lỗi chức năng cơ bản.": "Within 7 working days of delivery, items can be exchanged only for basic functional defects.",
+  "Đổi trả:": "Returns:",
+  "Truy cập": "Go to",
+  "bằng tài khoản Google của bạn và tạo một Dự án mới (New project).": "with your Google account and create a New project.",
+  "Trân trọng cảm ơn,": "Thank you,",
+  "Trên biên lai chuyển tiền hoặc chi tiết lịch sử:": "On the transfer receipt or history details:",
+  "Trên hóa đơn điện tử chuyển khoản:": "On the e-receipt:",
+  "Trên màn hình": "On the",
+  "Trên thông báo thành công hoặc lịch sử biến động số dư:": "On the success message or balance history:",
+  "Trước": "Before",
+  "Trường 1-3:": "Fields 1-3:",
+  "Trường 4:": "Field 4:",
+  "Trường 5-8:": "Fields 5-8:",
+  "Trạng Thái PM Xác Nhận": "PM confirmation",
+  "Trạng Thái Vận Hành": "Operating status",
+  "Trạng thái": "Status",
+  "Trạng thái kết nối hiện tại:": "Current connection:",
+  "Trạng thái tồn kho": "Stock status",
+  "Trạng thái:": "Status:",
+  "• Dòng hiển thị:": "• Label:",
+  "• Định dạng mẫu:": "• Example:",
+  "Điền mã mẫu này vào đơn": "Enter this code in the form",
+  "hoặc": "or",
+  "ở cuối biên lai.": "at the bottom of the receipt.",
+  "Trạng thái: \"Đã đăng ký - Chờ mở cổng thanh toán\".": "Status: \"Registered - Waiting for payment window\".",
+  "Trợ lý nội bộ LG": "LG internal assistant",
+  "Trợ lý ảo hỗ trợ bán hàng nội bộ LG": "LG internal sales virtual assistant",
+  "Tuyệt đối nghiêm cấm mua hộ, bán lại cho bên thứ ba hoặc trục lợi thương mại. Vi phạm sẽ bị xử lý kỷ luật theo quy định công ty.": "Buying on behalf of others, reselling to third parties or any commercial gain is strictly prohibited. Violations lead to disciplinary action under company rules.",
+  "Tài khoản": "Account",
+  "Tài khoản kiểm tra mẫu (Demo)": "Demo test accounts",
+  "Tài khoản nhận:": "Receiving account:",
+  "Tài khoản đang đăng nhập với vai trò": "You are signed in as",
+  "Tên Tài Khoản:": "Account name:",
+  "Tên chương trình hiển thị *": "Program display name *",
+  "Tên tài khoản thụ hưởng:": "Beneficiary name:",
+  "Tìm / mở danh sách bộ phận": "Search / open department list",
+  "Tìm dòng chữ": "Look for",
+  "Tìm kiếm model, loại sản phẩm...": "Search model, product type...",
+  "Tìm model, ví dụ: OLED77, 65QNED, 55UA…": "Search model, e.g. OLED77, 65QNED, 55UA…",
+  "Tìm sản phẩm theo model hoặc STT": "Find product by model or No.",
+  "Tìm theo Mã NV, Tên NV Đăng Ký, Tên NV Nộp Tiền, Model, Mã GD...": "Search by ID, registrant, payer, model, transaction ID...",
+  "Tìm theo Mã NV, Tên NV, Model, Slot, Mã GD...": "Search by ID, name, model, slot, transaction ID...",
+  "Tìm thông tin model ↗": "Model info ↗",
+  "Tình trạng hàng hóa": "Item condition",
+  "Tôi cam kết thông tin đăng ký là chính xác, tuân thủ hạn mức 01 sản phẩm/nhân viên, thực hiện nộp tiền thanh toán đúng cú pháp ngay khi nhận thông báo và không bán lại cho bên thứ 3 theo nguyên tắc": "I confirm my details are correct. I will follow the limit of 1 product per employee, pay with the correct transfer note as soon as I am notified, and not resell to third parties, under the principles of",
+  "TẠO CHƯƠNG TRÌNH BÁN HÀNG MỚI": "CREATE A NEW SALES PROGRAM",
+  "Tại menu chọn hàm trên thanh công cụ, chọn": "In the function menu on the toolbar, choose",
+  "Tạo chương trình": "Create program",
+  "Tạo chương trình ngay": "Create program now",
+  "Tạo Đợt Bán & Nạp File Excel": "Create sale & load Excel",
+  "Tải file Excel mẫu tại đây": "Download the Excel template here",
+  "Tải file mẫu Excel (.xlsx)": "Download Excel template (.xlsx)",
+  "Tải file mẫu Excel chuẩn hệ thống": "Download the standard Excel template",
+  "Tải file mẫu Excel chuẩn hệ thống để điền danh mục sản phẩm": "Download the standard Excel template to fill in the product list",
+  "Tải lên (Upload) file biên lai/ảnh chụp màn hình chuyển khoản ngân hàng": "Upload the receipt / screenshot of the bank transfer",
+  "Tải lên biên lai": "Upload receipt",
+  "Tải lại": "Reload",
+  "Tất cả các kho": "All warehouses",
+  "Tất cả hồ sơ này sẽ được chuyển sang trạng thái \"Đã duyệt thanh toán\" và đủ điều kiện xuất lệnh giao hàng.": "All these orders will move to \"Payment approved\" and become ready for delivery.",
+  "Tất cả kho": "All warehouses",
+  "Tất cả loại": "All grades",
+  "Tất cả trạng thái": "All statuses",
+  "Tỉ Lệ Thanh Toán": "Payment rate",
+  "Tỉ Lệ Thanh Toán (#TT/#ĐK):": "Payment rate (#paid/#reg.):",
+  "Tỉ Lệ Đăng Ký": "Registration rate",
+  "Tỉ Lệ Đăng Ký (#ĐK/Tổng SP):": "Registration rate (#reg./total items):",
+  "Tỉ lệ đăng ký & Đối soát nộp tiền theo kho": "Registration & payment rate by warehouse",
+  "Tối đa": "Max",
+  "Tồn Kho Chưa ĐK Toàn Quốc": "Unregistered stock nationwide",
+  "Tổng SP": "Total items",
+  "Tổng SP Niêm Yết": "Listed items",
+  "Tổng Sản Phẩm": "Total items",
+  "Tổng giá trị đơn đăng ký": "Total registered value",
+  "Tổng số sản phẩm mở bán": "Total items on sale",
+  "Tủ Lạnh": "Refrigerators",
+  "Tủ lạnh InstaView & Side by Side": "InstaView & Side-by-Side refrigerators",
+  "Từ": "From",
+  "Từ (From):": "From:",
+  "Từ Chối Đơn": "Reject order",
+  "Từ chối": "Reject",
+  "Từ chối / Hủy": "Rejected / Cancelled",
+  "Từ ngày": "From date",
+  "Tự chọn mốc ngày...": "Custom dates...",
+  "Tự đổi mật khẩu": "Change your password",
+  "Tự động nhận diện cấu trúc kho AYC, AYB, AYA từ sheet \"Slots\" hoặc danh mục sản phẩm": "Detects warehouses AYC, AYB, AYA from the \"Slots\" sheet or the product list",
+  "Tự động tính toán lại Mã đợt bán theo Quý và Ngành hàng": "Recalculates the sale code by quarter and category",
+  "URL nhận được sau khi nhấn": "The URL you get after clicking",
+  "Upload File Biên Lai:": "Upload receipt:",
+  "Upload File Ảnh Biên Lai Nộp Tiền": "Upload the payment receipt",
+  "VD: Đợt Bán Hàng Q4/2026 – Ngành Kitchen": "e.g. Q4/2026 Sale – Kitchen",
+  "VIETCOMBANK - Chi Nhánh Tây Hồ": "VIETCOMBANK - Tay Ho Branch",
+  "VIETCOMBANK - Chi nhánh Tây Hồ": "VIETCOMBANK - Tay Ho Branch",
+  "VIETQR SMART PAYMENT · XÁC NHẬN NỘP TIỀN": "VIETQR SMART PAYMENT · PAYMENT CONFIRMATION",
+  "Vui lòng chờ máy chủ xác nhận.": "Please wait for the server to confirm.",
+  "Vui lòng không tắt trang trong lúc máy chủ ghi dữ liệu.": "Please keep this page open while the server saves.",
+  "Vui lòng không tắt trang. Thường mất vài giây.": "Please keep this page open. It usually takes a few seconds.",
+  "Vào Tab 3 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.": "Go to Tab 3 -> Fill in the payment form -> Upload the receipt image/PDF.",
+  "Ví dụ: Nguyễn Thị Quỳnh Như": "e.g. Nguyen Thi Quynh Nhu",
+  "Vận chuyển:": "Delivery:",
+  "VỊ TRÍ \"MÃ GIAO DỊCH\" TRÊN APP NGÂN HÀNG": "WHERE TO FIND THE \"TRANSACTION ID\" IN YOUR BANK APP",
+  "WM · Máy giặt / Tháp giặt sấy (Washing Machine / WashTower)": "WM · Washing Machine / WashTower",
+  "Wi-Fi ngoài": "outside Wi-Fi",
+  "Xem Danh Sách Hàng Tồn (Tab 5) →": "View unsold stock →",
+  "Xem Kho Hàng & Đăng Ký Ngay": "View stock & register now",
+  "Xem Thể Lệ & Quy Định Mở Bán": "View sale rules",
+  "Xem Thể Lệ Chi Tiết": "View full rules",
+  "Xem Tỉ Lệ Đăng Ký Kho AYA-AYB-AYC": "View registration rate AYA-AYB-AYC",
+  "Xem biên lai": "View receipt",
+  "Xem báo cáo kho ↗": "Stock report ↗",
+  "Xem chi tiết kho AYA · AYB · AYC (Pop-up) ↗": "Warehouse details AYA · AYB · AYC ↗",
+  "Xem lại tour hướng dẫn sử dụng nhanh": "Replay the quick guide",
+  "Xem nhanh giá gốc, giá nội bộ và số lượng suất còn lại theo thời gian thực.": "See list price, staff price and remaining stock in real time.",
+  "Xem thể lệ & quy định nộp tiền VCB": "View VCB payment rules",
+  "Xem thể lệ chi tiết →": "View full rules →",
+  "Xem trước biên lai": "Receipt preview",
+  "Xem vị trí mã giao dịch trên app Vietcombank, Techcombank, MB, Vietinbank...": "Where to find the transaction ID in Vietcombank, Techcombank, MB, Vietinbank...",
+  "Xem vị trí trên App NH": "Find it in your bank app",
+  "Xoay ảnh 90 độ": "Rotate 90°",
+  "Xuất Excel": "Export Excel",
+  "XÁC NHẬN NỘP TIỀN ĐƠN HÀNG NỘI BỘ": "INTERNAL ORDER PAYMENT CONFIRMATION",
+  "Xác Nhận Nạp Vào Catalog": "Confirm & load into catalog",
+  "Xác Nhận Nộp Tiền": "Confirm payment",
+  "Xác nhận mật khẩu mới *": "Confirm new password *",
+  "Xác nhận đăng ký:": "Confirm registration:",
+  "[INTERNAL SALES ANNOUNCEMENT] Thông Báo Mở Đăng Ký Bán Hàng Nội Bộ Qua Hệ Thống Trực Tuyến (Đợt T8/2026)": "[INTERNAL SALES ANNOUNCEMENT] Online registration is open for the Internal Sales Program (Aug 2026 round)",
+  "[MãNV]_[MãSlot]": "[EmpID]_[SlotID]",
+  "bằng tài khoản Google của bạn và tạo một": "with your Google account and create a",
+  "chưa có đơn đăng ký nào trên hệ thống.": "has no registrations in the system yet.",
+  "dành riêng cho nhân viên LG. Đợt này mở bán": "for LG employees only. This round offers",
+  "hoặc dãy 8-16 chữ số.": "or 8–16 digits.",
+  "hoặc trong phần": "or in",
+  "khai ở Tab 3 khi xác nhận nộp tiền.": "entered in Tab 3 when you confirm payment.",
+  "không tham gia đăng ký mua sản phẩm": "do not register to buy products",
+  "kể từ lúc đăng ký thành công (hoặc khi PM mở cổng thanh toán).": "after you register (or when the PM opens the payment window).",
+  "mạng 4G/5G cá nhân": "your own 4G/5G",
+  "mở sau": "button opens",
+  "ngay trên Drive của bạn với đầy đủ 8 sheet và định dạng chuẩn LG.": "in your Drive with all 8 sheets in the standard LG format.",
+  "nhằm đảm bảo công bằng tuyệt đối cho Cán bộ Công nhân viên toàn quốc.": "to keep it fully fair for all employees nationwide.",
+  "phía trên → (2) Bấm nút": "above → (2) Click",
+  "sản phẩm · còn đặt được": "products · still available",
+  "trong suốt thời gian diễn ra chương trình.": "for the whole program.",
+  "trên biên lai.": "on the receipt.",
+  "tại Tab 3:": "in Tab 3:",
+  "tự động tạo một file Google Sheet mới tên \"LG Internal Sales Database\"": "creates a new Google Sheet named \"LG Internal Sales Database\"",
+  "và": "and",
+  "và nhấn nút": "and click",
+  "Áp dụng nguyên tắc ai nhanh hơn được trước (FCFS). Khi chọn được máy ưng ý, bấm ngay \"Đăng ký\" để hệ thống khóa suất riêng cho bạn trong 24 giờ, không sợ người khác mua mất.": "First come, first served (FCFS). When you find an item you like, click \"Register\" and the system holds it for you for 24 hours so nobody else can take it.",
+  "ĐK": "reg.",
+  "Đang Mở Bán": "On sale",
+  "Đang duyệt hàng loạt…": "Bulk approving…",
+  "Đang giữ chỗ cho bạn…": "Reserving for you…",
+  "Đang gửi…": "Sending…",
+  "Đang hiện": "Showing",
+  "Đang hủy giữ chỗ…": "Cancelling reservation…",
+  "Đang khai nộp tiền cho": "Paying for",
+  "Đang tra cứu dữ liệu đơn hàng…": "Looking up your orders…",
+  "Đang tải...": "Loading...",
+  "Đang tải…": "Loading…",
+  "Đang xác thực…": "Signing in…",
+  "Điền Thông Tin & Upload File Nộp Tiền": "Fill in details & upload receipt",
+  "Điều Hòa": "Air conditioners",
+  "Điều hòa không khí Inverter UVnano": "UVnano Inverter air conditioners",
+  "Điều hướng nhanh danh mục sản phẩm LG": "LG product category shortcuts",
+  "ĐÃ DUYỆT": "APPROVED",
+  "Đã Có Người Giữ Chỗ": "Already reserved",
+  "Đã Xác Nhận Nộp Tiền": "Payment confirmed",
+  "Đã duyệt": "Approved",
+  "Đã duyệt TT": "Payment approved",
+  "Đã duyệt thanh toán": "Payment approved",
+  "Đã giữ chỗ": "Reserved",
+  "Đã hiểu, quay lại biểu mẫu": "Got it, back to the form",
+  "Đã hết hàng": "Sold out",
+  "Đã hủy": "Cancelled",
+  "Đã khai nộp - Chờ đối soát": "Paid - Under review",
+  "Đã khai nộp - chờ đối soát": "Paid - under review",
+  "Đã khai nộp tiền": "Payment submitted",
+  "Đã Đăng Ký": "Registered",
+  "Đã đăng ký": "Registered",
+  "Đã ĐK · Chờ mở cổng TT": "Registered · Waiting for payment window",
+  "Đã đăng ký - Chờ mở cổng TT": "Registered - Waiting for payment window",
+  "Đã đăng ký - Chờ mở thanh toán": "Registered - Waiting for payment",
+  "Đêm / Sáng": "Dark / Light",
+  "Đính Kèm:": "Attachment:",
+  "Đóng": "Close",
+  "Đóng cổng đăng ký, khóa slot và chuyển sang trạng thái Đã Kết Sổ (Closed)": "Close registration, lock slots and mark the program Closed",
+  "Đóng cửa sổ": "Close window",
+  "Đóng hướng dẫn": "Close guide",
+  "Đóng hướng dẫn (Phím Esc)": "Close guide (Esc)",
+  "Đôn đốc": "Remind",
+  "Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)": "Internal Sales Program",
+  "Đăng Ký Giữ Chỗ Ngay": "Reserve now",
+  "Đăng Ký Mua Hàng Trực Tuyến Trên Hệ Thống (Direct Registration Form)": "Online registration form",
+  "Đăng Ký Ngay Trên Hệ Thống": "Register now",
+  "Đăng ký giữ chỗ": "Reserve",
+  "Đăng ký mua hàng nội bộ · LGEVH": "Internal purchase registration · LGEVH",
+  "Đăng ký nhanh": "Quick register",
+  "Đăng ký thành công": "Registered successfully",
+  "Đăng ký toàn quốc:": "Registered nationwide:",
+  "Đăng nhập": "Sign in",
+  "Đăng xuất": "Sign out",
+  "Đơn Hàng Của Bạn": "Your orders",
+  "Đơn Hợp Lệ": "Valid order",
+  "Đơn hàng được ghi nhận và giữ chỗ dựa trên timestamp thực tế khi nhấn \"Đăng ký\".": "Orders are recorded and reserved by the exact time you click \"Register\".",
+  "Đặt hàng": "Order",
+  "Đặt lại góc và kích thước": "Reset rotation and size",
+  "Đặt mua": "Buy",
+  "Đến (To):": "To:",
+  "Đến ngày": "To date",
+  "Để sau (Nộp trong 24h)": "Later (pay within 24h)",
+  "Để đảm bảo kiểm duyệt công bằng và đối soát chính xác, chức năng nộp tiền sẽ mở khi": "For fair review and accurate checking, payment opens when the",
+  "ĐỐI SOÁT & PHÊ DUYỆT": "REVIEW & APPROVAL",
+  "ĐỔI MẬT KHẨU": "CHANGE PASSWORD",
+  "Đổi MK": "Password",
+  "Đổi file": "Change file",
+  "Đợt Mở Bán Thiết Bị Gia Dụng Cao Cấp Q3/2026": "Premium Home Appliance Sale Q3/2026",
+  "được in ra ở cửa sổ Execution Log dán vào dòng 21": "printed in the Execution Log and paste it into line 21 of",
+  "để PM & Kế toán dễ đối soát sao kê ngân hàng.": "so PM & Accounting can match bank statements easily.",
+  "để PM đối soát.": "for the PM to check.",
+  "để hoàn tất kết nối.": "to connect.",
+  "ƯU ĐÃI NỘI BỘ": "STAFF DEALS",
+  "Ưu Đãi Độc Quyền": "Exclusive deals",
+  "Ưu đãi độc quyền": "Exclusive deals",
+  "Ưu đãi độc quyền LGEVH": "LGEVH exclusive deals",
+  "Ảnh chụp biên lai chuyển khoản * (Tự động chuyển đổi & nén tốc độ cao)": "Transfer receipt image * (auto converted & compressed)",
+  "Ẩn sản phẩm đã hết": "Hide sold-out items",
+  "ở dòng đơn của bạn. Hệ thống tự điền Slot, Mã NV và số tiền cần nộp.": "on your order row. Slot, ID and amount due are filled in for you.",
+  "ở ô": "in the",
+  "• Bắt đầu bằng": "• Starts with",
+  "• Chữ:": "• Words:",
+  "• Mã do hệ thống ngân hàng tự sinh ra.": "• A code created by the bank.",
+  "• Nội dung chuyển khoản tự gõ:": "• Your own transfer note:",
+  "• Số tiền, số tài khoản nhận hoặc ngày giờ.": "• The amount, receiving account or date/time.",
+  "● Còn slot": "● Available",
+  "● Đã giữ chỗ": "● Reserved",
+  "Kho": "Warehouse",
+  "Kho:": "Warehouse:",
+  "1. Kho": "1. Warehouse",
+  "Kho AYA · AYB · AYC": "Warehouses AYA · AYB · AYC",
+  "Kho (AYA / AYB / AYC)": "Warehouse (AYA / AYB / AYC)",
+  "TV · Tivi OLED / QNED / UHD": "TV · OLED / QNED / UHD TVs",
+  "Xác nhận phê duyệt thanh toán cho đơn của nhân viên:": "Approve payment for this employee's order:",
+  "Sau khi duyệt, hồ sơ sẽ đủ điều kiện xuất danh sách giao hàng cho Logistics.": "Once approved, the order can go on the delivery list for Logistics.",
+  "Tivi OLED & Loa thanh": "OLED TVs & soundbars",
+  "Kho AYA-AYB-AYC ↗": "Warehouses AYA-AYB-AYC ↗",
+  "Thiếu programId.": "Missing programId.",
+  "Yêu cầu không hợp lệ.": "Invalid request.",
+  "Thiếu Token phiên làm việc (Chưa đăng nhập hoặc phiên đã kết thúc).": "Missing session token (not signed in or session ended).",
+  "Token phiên làm việc có định dạng không hợp lệ.": "Invalid session token format.",
+  "Chữ ký phiên làm việc không hợp lệ (Phát hiện can thiệp dữ liệu).": "Invalid session signature (tampering detected).",
+  "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.": "Your session has expired. Please sign in again.",
+  "Sheet Programs chưa tồn tại.": "Programs sheet does not exist.",
+  "Sheet Programs không tồn tại.": "Programs sheet does not exist.",
+  "Sheet Products chưa tồn tại.": "Products sheet does not exist.",
+  "Sheet Products không tồn tại.": "Products sheet does not exist.",
+  "Sheet Registrations không tồn tại.": "Registrations sheet does not exist.",
+  "Sheet Config không tồn tại.": "Config sheet does not exist.",
+  "Thiếu programId hoặc newStatus.": "Missing programId or newStatus.",
+  "Trạng thái không hợp lệ. Chỉ chấp nhận: Open, Closed.": "Invalid status. Only Open or Closed allowed.",
+  "Không tìm thấy chương trình.": "Program not found.",
+  "Chỉ có thể mở chương trình đang ở trạng thái Draft.": "Only Draft programs can be opened.",
+  "Chỉ có thể kết sổ chương trình đang Open.": "Only Open programs can be closed.",
+  "Thiếu mã chương trình cần xóa.": "Missing the program ID to delete.",
+  "Từ chối thẩm quyền: Bạn không có quyền nạp sản phẩm vào chương trình của PM khác.": "Access denied: you cannot load products into another PM's program.",
+  "Danh sách sản phẩm trống.": "The product list is empty.",
+  "Phiên đăng nhập không khớp mã nhân viên của thao tác này. Vui lòng đăng nhập lại.": "Your session does not match this employee ID. Please sign in again.",
+  "Thiếu thông tin đăng ký.": "Missing registration details.",
+  "Hệ thống đang bận phục vụ nhiều lượt đăng ký, vui lòng thử lại sau ít giây.": "The system is busy with many registrations. Please try again in a few seconds.",
+  "Không tìm thấy sản phẩm.": "Product not found.",
+  "Bạn đã đăng ký sản phẩm này rồi.": "You have already registered this product.",
+  "Từ chối truy cập: Chương trình này thuộc quyền quản lý của PM khác.": "Access denied: this program belongs to another PM.",
+  "Thiếu slotId hoặc regId.": "Missing slotId or regId.",
+  "Hệ thống đang bận, vui lòng thử lại sau ít giây.": "The system is busy. Please try again in a few seconds.",
+  "Không tìm thấy đơn đăng ký.": "Registration not found.",
+  "Từ chối: Bạn không có quyền phê duyệt đơn hàng thuộc chương trình của PM khác.": "Denied: you cannot approve orders in another PM's program.",
+  "Không tìm thấy đơn đăng ký cần duyệt.": "Order to approve not found.",
+  "Không có đơn nào cần duyệt.": "No orders to approve.",
+  "Từ chối: Bạn không có quyền từ chối đơn hàng thuộc chương trình của PM khác.": "Denied: you cannot reject orders in another PM's program.",
+  "Không tìm thấy đơn đăng ký cần từ chối.": "Order to reject not found.",
+  "Không có đơn đăng ký nào.": "No registrations.",
+  "Hệ thống đang bận, lượt quét sẽ chạy lại ở lần kích hoạt sau.": "The system is busy. The scan will run again next time.",
+  "Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog 24h!": "Hourly trigger for the 24h watchdog is now active!",
+  "Vui lòng điền đầy đủ Mã NV, Mật khẩu cũ và Mật khẩu mới.": "Please enter your employee ID, old password and new password.",
+  "Mật khẩu mới phải có tối thiểu 6 ký tự.": "The new password must have at least 6 characters.",
+  "Mật khẩu mới không được trùng với mật khẩu hiện tại.": "The new password must differ from the current one.",
+  "Hệ thống chưa cấu hình danh sách nhân viên.": "The employee list is not set up.",
+  "Danh sách nhân viên trống.": "The employee list is empty.",
+  "Tài khoản đã bị vô hiệu hóa. Không thể đổi mật khẩu.": "This account is disabled. The password cannot be changed.",
+  "Mật khẩu hiện tại không chính xác.": "The current password is incorrect.",
+  "Đổi mật khẩu thành công!": "Password changed!",
+  "Chưa xác nhận cam kết Jeong-Do.": "Jeong-Do commitment not confirmed.",
+  "Thiếu thông tin nộp tiền bắt buộc (Mã Slot, Mã NV, Tên người nộp, Mã GD).": "Missing required payment details (slot ID, employee ID, payer name, transaction ID).",
+  "Không tìm thấy đơn đăng ký. Vui lòng thử lại.": "Registration not found. Please try again.",
+  "Đơn này đã khai nộp tiền trước đó. Nếu cần sửa, vui lòng liên hệ PM phụ trách.": "Payment was already submitted for this order. To change it, please contact the PM in charge.",
+  "Vui lòng nhập Mã NV và đúng 4 số cuối điện thoại đã đăng ký.": "Please enter your employee ID and the last 4 digits of your registered phone.",
+  "Bạn chưa có đơn đăng ký mua hàng nào.": "You have no orders yet.",
+  "Không tìm thấy đơn khớp Mã NV và 4 số cuối điện thoại này.": "No order matches this employee ID and phone digits.",
+  "Không thể hủy đơn của nhân viên khác.": "You cannot cancel another employee's order.",
+  "Thiếu mã slot cần hủy.": "Missing the slot ID to cancel.",
+  "Registrations chưa có cột W.": "Registrations has no column W yet.",
+  "Hệ thống đang bận, chạy lại sau ít giây.": "The system is busy. Run again in a few seconds.",
+  "TỪ CHỐI THẨM QUYỀN (QUY CHUẨN JEONG-DO & BẢO MẬT):": "ACCESS DENIED (JEONG-DO & SECURITY RULES):",
+  "duyệt đơn": "approve orders",
+  "kết sổ hoặc cập nhật trạng thái": "close it or change its status",
+  "mở cổng thanh toán": "open the payment window",
+  "hủy slot": "cancel slots",
+  "từ chối đơn": "reject orders",
+  "Không có đơn hàng nào đang ở trạng thái \"Chờ đối soát\"!": "No orders are \"Under review\"!",
+  "Máy chủ chưa xác nhận duyệt hàng loạt. Chưa có đơn nào được duyệt — vui lòng thử lại.": "The server did not confirm the bulk approval. No orders were approved — please try again.",
+  "Mới đăng ký": "Just registered",
+  "Đơn hàng đã khai nộp tiền hoặc đã được PM xử lý nên không thể tự hủy. Vui lòng liên hệ PM phụ trách.": "This order has a payment submitted or was handled by the PM, so you cannot cancel it. Please contact the PM in charge.",
+  "Chưa hủy được giữ chỗ. Vui lòng thử lại.": "Could not cancel the reservation. Please try again.",
+  "Đã hủy bởi nhân viên": "Cancelled by employee",
+  "Nhân viên chủ động hủy giữ chỗ": "Employee cancelled the reservation",
+  "03 Đơn Hàng Của Bạn": "03 Your orders",
+  "TẮT": "OFF",
+  "Chỉ tài khoản ADMIN được đổi cài đặt email.": "Only ADMIN accounts can change email settings.",
+  "BẬT gửi email tự động tới nhân viên?": "Turn ON automatic emails to employees?",
+  "Lưu ý: tài khoản Gmail cá nhân chỉ gửi được tối đa 100 email/ngày. Khi chạm hạn mức, hệ thống tự ngừng gửi trong 1 giờ; đơn hàng vẫn xử lý bình thường.": "Note: a personal Gmail account can send at most 100 emails/day. At the limit, sending pauses for 1 hour; orders are still processed normally.",
+  "TẮT gửi email tự động?": "Turn OFF automatic emails?",
+  "Nhân viên sẽ KHÔNG nhận email thông báo. Hệ thống vẫn ghi nhật ký vào sheet AutoEmail. Hãy thông báo cho nhân viên qua kênh khác (Teams/Zalo).": "Employees will NOT get email notices. The system still logs to the AutoEmail sheet. Please inform employees another way (Teams/Zalo).",
+  "Chế độ Demo: chỉ mô phỏng, không có email nào được gửi.": "Demo mode: simulation only, no emails are sent.",
+  "Không đổi được cài đặt email. Vui lòng thử lại.": "Could not change the email setting. Please try again.",
+  "Ẩn mật khẩu": "Hide password",
+  "Bản chính thức đã kết nối sẵn máy chủ. Liên hệ PIC nếu cần thay đổi.": "The official version is already connected to the server. Contact the PIC to change it.",
+  "Đang kết nối:": "Connected to:",
+  "Đang ở chế độ Demo Nội Bộ (Dữ liệu lưu tạm trên trình duyệt)": "Internal demo mode (data kept in this browser)",
+  "Vui lòng nhập Google Apps Script Web App URL hoặc chọn \"Chạy Demo Offline\".": "Please enter the Google Apps Script Web App URL or choose \"Run offline demo\".",
+  "URL không đúng định dạng Google Apps Script (phải bắt đầu bằng https://script.google.com/macros/s/...)": "Not a Google Apps Script URL (must start with https://script.google.com/macros/s/...)",
+  "Đang kiểm tra kết nối…": "Checking connection…",
+  "Đang gửi yêu cầu ping đến máy chủ Google Apps Script…": "Pinging the Google Apps Script server…",
+  "Kết nối Google Apps Script thành công! Cơ sở dữ liệu đã được kích hoạt.": "Connected to Google Apps Script! The database is active.",
+  "Không thể hoàn tất kết nối trực tiếp đến URL này (có thể do mạng nội bộ chặn hoặc Web App chưa cấp quyền Anyone).": "Could not connect to this URL directly (the company network may block it, or the Web App is not shared with Anyone).",
+  "Bạn có muốn LƯU URL này vào trình duyệt để tiếp tục sử dụng không?": "Do you want to SAVE this URL in the browser and keep using it?",
+  "Đã lưu URL cấu hình. Hãy thử chuyển sang mạng 4G/5G nếu mạng công ty chặn kết nối.": "URL saved. Try 4G/5G if the company network blocks the connection.",
+  "Đã chuyển sang Chế độ Demo Nội Bộ (Offline). Dữ liệu được lưu an toàn trên trình duyệt.": "Switched to internal demo mode (offline). Data is kept safely in this browser.",
+  "Chế độ Demo Nội Bộ (Dữ liệu lưu trên trình duyệt của bạn). Nhấp để kết nối Google Sheet.": "Internal demo mode (data kept in your browser). Click to connect a Google Sheet.",
+  "Tài khoản đã bị vô hiệu hóa. Liên hệ PM Support.": "This account is disabled. Contact PM Support.",
+  "Máy chủ đang khởi động… vui lòng chờ (tối đa 45 giây)": "The server is starting… please wait (up to 45 seconds)",
+  "Kết nối máy chủ Google Sheet quá thời gian chờ (45s). Vui lòng thử lại sau ít phút.": "The Google Sheet server timed out (45s). Please try again in a few minutes.",
+  "Không thể kết nối đến máy chủ Google Sheet. Vui lòng kiểm tra kết nối mạng hoặc URL Web App.": "Cannot reach the Google Sheet server. Please check your network or the Web App URL.",
+  "Mật khẩu không đúng.": "Wrong password.",
+  "Mã nhân viên chưa có trong dữ liệu Demo cục bộ. Nếu bạn tạo tài khoản trên Google Sheet, vui lòng cấu hình \"API Google Sheet\" bên dưới để kết nối trực tuyến.": "This employee ID is not in the local demo data. If you created the account in Google Sheet, set up \"Google Sheet API\" below to connect online.",
+  "Mã nhân viên hoặc mật khẩu không đúng.": "Wrong employee ID or password.",
+  "Xác nhận mật khẩu mới không khớp.": "The new passwords do not match.",
+  "Đang cập nhật…": "Updating…",
+  "Đổi mật khẩu thành công! Mật khẩu mới đã được cập nhật.": "Password changed! Your new password is saved.",
+  "danh sách chương trình": "program list",
+  "Bạn chưa có chương trình nào do mình quản lý. Bấm": "You do not manage any program yet. Click",
+  "\"+ Tạo chương trình\"": "\"+ Create program\"",
+  "bên phải để khởi tạo đợt bán đầu tiên.": "on the right to set up your first sale.",
+  "Chưa có chương trình bán hàng nội bộ nào đang mở.": "No internal sales program is open yet.",
+  "Chương trình đã kết sổ": "Program closed",
+  "Không thể thay đổi trạng thái": "Cannot change the status",
+  "Đã tồn tại mã này!": "This code already exists!",
+  "Đã tải xuống file mẫu Excel danh mục sản phẩm chuẩn hệ thống (.xlsx)!": "Standard product list Excel template downloaded (.xlsx)!",
+  "Thư viện xử lý Excel chưa được tải xong. Vui lòng thử lại sau giây lát.": "The Excel library has not loaded yet. Please try again shortly.",
+  "File Excel rỗng hoặc không có dữ liệu hàng sản phẩm.": "The Excel file is empty or has no product rows.",
+  "Không tìm thấy cột \"Model\" hoặc \"Slot ID\" trong bảng tính.": "No \"Model\" or \"Slot ID\" column found in the sheet.",
+  "Thiết bị LG": "LG device",
+  "Không trích xuất được dòng sản phẩm hợp lệ nào từ file.": "No valid product rows found in the file.",
+  "Chỉ tài khoản Quản lý (PM) mới có quyền tạo chương trình.": "Only PM accounts can create programs.",
+  "Vui lòng điền đầy đủ các trường bắt buộc (*).": "Please fill in all required fields (*).",
+  "Đang khởi tạo...": "Creating...",
+  "Đang đồng bộ chương trình lên Google Sheet...": "Syncing the program to Google Sheet...",
+  "CẢNH BÁO LƯU GOOGLE SHEET:": "GOOGLE SHEET SAVE WARNING:",
+  "Không xác định": "Unknown",
+  "Chương trình hiện chỉ đang tạm lưu trên trình duyệt của bạn.": "The program is only saved in your browser for now.",
+  "[LGE] ĐÃ KHỞI TẠO VÀ ĐỒNG BỘ THÀNH CÔNG VÀO GOOGLE SHEET!": "[LGE] CREATED AND SYNCED TO GOOGLE SHEET!",
+  "• Trạng thái: Đang Mở Bán": "• Status: On sale",
+  "Dữ liệu đã được ghi trực tiếp vào Google Sheet (\"Programs\" và \"Products\").": "Data was written directly to Google Sheet (\"Programs\" and \"Products\").",
+  "CẢNH BÁO KẾT NỐI MÁY CHỦ:": "SERVER CONNECTION WARNING:",
+  "⚠️ THÔNG BÁO CHẾ ĐỘ NGOẠI TUYẾN (DEMO MODE):": "⚠️ OFFLINE MODE NOTICE (DEMO MODE):",
+  "Bạn chưa kết nối đường link Google Apps Script Web App.": "You have not connected a Google Apps Script Web App link.",
+  "👉 Để dữ liệu ghi vào Google Sheet thật, vui lòng nhấn nút \"Cấu hình API\" ở góc trên bên phải thanh công cụ PM và dán link Web App URL.": "👉 To save data to the real Google Sheet, click \"API settings\" at the top right of the PM toolbar and paste the Web App URL.",
+  "Vui lòng chọn file Excel danh mục sản phẩm trước khi xác nhận.": "Please choose the product list Excel file before confirming.",
+  "NẠP SẢN PHẨM THÀNH CÔNG!": "PRODUCTS LOADED!",
+  "Đã hủy bởi PM": "Cancelled by PM",
+  "Chưa có chương trình nào được chọn": "No program selected",
+  "Chưa chọn": "Not selected",
+  "Bấm \"+ Tạo chương trình\" trên thanh tab để khởi tạo đợt bán đầu tiên của bạn.": "Click \"+ Create program\" on the tab bar to set up your first sale.",
+  "Hiện tại chưa có đợt bán hàng nội bộ nào đang mở.": "No internal sale is open right now.",
+  "Chưa có đợt bán": "No sale yet",
+  "Dự Thảo": "Draft",
+  "Đã Kết Sổ": "Closed",
+  "Bản Nháp": "Draft",
+  "Chưa có sản phẩm": "No products yet",
+  "Đã nộp tiền": "Paid",
+  "Hải Phòng": "Hai Phong",
+  "\"ĐÃ ĐĂNG KÝ (Chờ PM mở cổng thanh toán)\"": "\"REGISTERED (waiting for the PM to open payment)\"",
+  "Quản lý (PM) đang kiểm soát danh sách để chống lỗi trùng lặp trước khi cho phép nộp tiền. Vui lòng đợi PM duyệt và bấm \"Mở cổng thanh toán\" cho đợt này!": "The PM is checking the list for duplicates before allowing payment. Please wait for the PM to open the payment window for this round!",
+  "Đã tự động khôi phục bản nháp thông tin nộp tiền từ phiên trước.": "Your payment draft from last time was restored.",
+  "Đang chuyển đổi định dạng ảnh iPhone (.HEIC) sang JPEG...": "Converting the iPhone image (.HEIC) to JPEG...",
+  "Mã giao dịch": "Transaction ID",
+  "Ngày giờ": "Date/time",
+  "Mã giao dịch và Ngày giờ chuyển khoản": "the transaction ID and transfer date/time",
+  "Vui lòng nhập Mã giao dịch ngân hàng (Txn Ref)!": "Please enter the bank transaction ID (Txn Ref)!",
+  "Vui lòng nhập Ngày giờ chuyển khoản!": "Please enter the transfer date/time!",
+  "Vui lòng đính kèm ảnh/PDF biên lai chuyển khoản.": "Please attach the transfer receipt image/PDF.",
+  "Đang nén ảnh & nộp...": "Compressing & submitting...",
+  "Quản lý (PM) chưa mở cổng nộp tiền cho đợt này. Vui lòng đợi thông báo!": "The PM has not opened payment for this round yet. Please wait for the notice!",
+  "Xác nhận nộp tiền thành công!": "Payment confirmed!",
+  "Đơn hàng đã được chuyển sang \"Đã khai nộp - chờ đối soát\". PM sẽ đối soát và duyệt giao hàng.": "Your order is now \"Paid - under review\". The PM will check it and approve delivery.",
+  "Lỗi nộp chứng từ từ máy chủ.": "The server could not accept the receipt.",
+  "Máy chủ phản hồi lỗi HTTP": "Server HTTP error",
+  "Mạng không ổn định, chưa thể gửi chứng từ lên máy chủ. Bản nháp đã được lưu an toàn trên máy của bạn, vui lòng bấm nộp lại khi có kết nối mạng.": "Unstable network: the receipt could not be sent. Your draft is saved on this device; please submit again when you are online.",
+  "Hết hàng": "Sold out",
+  "danh mục sản phẩm": "product list",
+  "Xem trên LG.com": "View on LG.com",
+  "Tìm thông tin model": "Model info",
+  "Chưa có sản phẩm nào trong chương trình này.": "No products in this program yet.",
+  "Khác": "Other",
+  "Khả dụng": "Available",
+  "Đang xử lý...": "Processing...",
+  "Không thể đăng ký.": "Could not register.",
+  "Mạng chập chờn, không thể kết nối máy chủ để giữ chỗ. Vui lòng kiểm tra kết nối mạng và thử lại.": "Unstable network: cannot reach the server to reserve. Please check your connection and try again.",
+  "Đăng ký": "Register",
+  "Chờ PM mở cổng thanh toán": "Waiting for PM to open payment",
+  "Trạng thái: \"Đã đăng ký - Chờ mở cổng thanh toán\". Quản lý sẽ mở cổng nộp tiền sau.": "Status: \"Registered - Waiting for payment window\". The PM will open payment later.",
+  "Máy chủ Google đang quá tải, vui lòng thử lại sau ít phút.": "The Google server is overloaded. Please try again in a few minutes.",
+  "Máy chủ phản hồi quá lâu. Vui lòng bấm Tra cứu đơn (Tab 3) để xem đơn đã được ghi chưa trước khi gửi lại.": "The server took too long. Please use Order lookup (Tab 3) to check whether your order was saved before sending again.",
+  "Đã cập nhật lại số liệu bảng điều khiển PM thành công.": "PM dashboard figures refreshed.",
+  "Điện tử": "Electronics",
+  "Không có nhân viên nào chưa nộp tiền": "Every employee has paid",
+  "Bạn không phải là PM phụ trách đợt bán này! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền hủy slot.": "You are not the PM in charge of this sale! Only the PM who created it or a system admin can cancel slots.",
+  "PM hủy giữ chỗ quá hạn 24h": "PM cancelled reservation past 24h",
+  "Chương trình Bán hàng": "Sales program",
+  "khác": "other",
+  "Xóa đợt bán (0 đơn)": "Delete sale (0 orders)",
+  "🔒 Quyền hạn bị giới hạn: Chỉ PM chủ quản mới có thể kết sổ hoặc xóa đợt bán này": "🔒 Limited access: only the owner PM can close or delete this sale",
+  "Mở bán ngay": "Open sale now",
+  "Mở lại chương trình": "Reopen program",
+  "Chỉ PM chủ quản mới có quyền mở cổng thanh toán": "Only the owner PM can open the payment window",
+  "Chỉ PM chủ quản mới có quyền duyệt đơn": "Only the owner PM can approve orders",
+  "Chỉ PM chủ quản mới có quyền cài đặt hẹn giờ": "Only the owner PM can set timers",
+  "KHÔNG THỂ XÓA ĐỢT BÁN (QUY CHUẨN JEONG-DO):": "CANNOT DELETE THIS SALE (JEONG-DO RULES):",
+  "Để bảo toàn tính minh bạch và lịch sử đối soát ngân hàng theo quy định của LG, bạn chỉ có thể chọn \"Kết sổ chương trình\".": "To keep transparency and the bank-check history under LG rules, you can only choose \"Close program\".",
+  "XÁC NHẬN XÓA ĐỢT BÁN (0 ĐƠN ĐĂNG KÝ):": "CONFIRM DELETING THIS SALE (0 REGISTRATIONS):",
+  "Bạn có chắc chắn muốn xóa vĩnh viễn đợt bán:": "Are you sure you want to permanently delete this sale:",
+  "Đợt bán này chưa có đơn hàng nào. Thao tác này sẽ dọn sạch đợt bán và danh mục sản phẩm kèm theo.": "This sale has no orders. This removes the sale and its product list.",
+  "Đang gửi lệnh xóa đợt bán lên máy chủ...": "Sending the delete request to the server...",
+  "Chỉ xem": "View only",
+  "Sai thông tin chứng từ chuyển khoản": "Wrong transfer receipt details",
+  "PM từ chối": "Rejected by PM",
+  "Hiện tại không có đơn đăng ký nào đang ở trạng thái \"Chờ mở cổng thanh toán\" trong chương trình này.": "No registrations in this program are \"Waiting for payment window\" right now.",
+  "Hệ thống Hẹn Giờ (Auto-Timer)": "Auto-timer",
+  "Chức năng này chỉ dành cho Quản lý (PM).": "This feature is for PMs only.",
+  "XÁC NHẬN MỞ CỔNG THANH TOÁN (ALLOW PAYMENT)": "CONFIRM OPENING THE PAYMENT WINDOW",
+  "Sau khi mở cổng:": "After opening:",
+  "2. Đồng hồ đếm ngược 24h nộp tiền của họ sẽ bắt đầu kích hoạt.": "2. Their 24h payment countdown starts.",
+  "3. Bất kỳ ai đăng ký sau thời điểm này vẫn sẽ ở trạng thái chờ đến đợt mở cổng tiếp theo.": "3. Anyone who registers after this stays waiting until the next opening.",
+  "Bạn có chắc chắn muốn mở cổng cho đợt này?": "Open the payment window for this round?",
+  "ĐÃ MỞ CỔNG THANH TOÁN THÀNH CÔNG!": "PAYMENT WINDOW OPENED!",
+  "XÁC NHẬN MỞ CỔNG THANH TOÁN CHO ĐƠN LẺ": "CONFIRM OPENING PAYMENT FOR ONE ORDER",
+  "Chuyển đơn này sang \"Chờ nộp tiền\" để nhân viên có thể nộp tiền ngay?": "Move this order to \"Awaiting payment\" so the employee can pay now?",
+  "Hết hạn giữ chỗ": "Reservation expired",
+  "Tự động giải phóng quá hạn 24h": "Auto-released after 24h",
+  "Chưa có ảnh biên lai trong hệ thống": "No receipt image in the system yet",
+  "Đối soát bằng sao kê ngân hàng (số tiền, nội dung chuyển khoản có Mã NV) trước khi duyệt.": "Check against the bank statement (amount, transfer note with employee ID) before approving.",
+  "Chưa có mã GD": "No transaction ID yet",
+  "Chương trình hiện tại chưa có đơn đăng ký nào để xuất file.": "This program has no registrations to export yet.",
+  "Chức năng cài đặt hẹn giờ chỉ dành cho Quản lý (PM).": "Timer settings are for PMs only.",
+  "Đang thực thi...": "Running...",
+  "Đã hoàn thành tự động": "Completed automatically",
+  "Đã đến giờ thực thi": "Time to run",
+  "Mở bán": "Open sale",
+  "Mở cổng TT": "Open payment",
+  "Kết sổ": "Close program",
+  "XÁC NHẬN MỞ BÁN THỦ CÔNG:": "CONFIRM OPENING THE SALE MANUALLY:",
+  "XÁC NHẬN KẾT SỔ THỦ CÔNG:": "CONFIRM CLOSING THE PROGRAM MANUALLY:",
+  "Không có đơn nào đang chờ mở cổng thanh toán.": "No orders are waiting for the payment window.",
+  "Chức năng này chỉ dành riêng cho Quản trị viên (PM).": "This feature is for PMs only.",
+  "giờ": "hours",
+  "đã có người đăng ký. Vui lòng chọn slot khác.": "is already taken. Please choose another slot.",
+  "vừa có người đăng ký. Vui lòng chọn slot khác.": "was just taken. Please choose another slot.",
+  "Đã chọn từ danh sách:": "Selected from list:",
+  "· Giá bán": "· Price",
+  ". Bạn chỉ cần điền thông tin cá nhân.": ". Just fill in your personal details.",
+  "Không đọc được thời gian đăng ký của đơn này. Vui lòng liên hệ PM phụ trách.": "Cannot read this order's registration time. Please contact the PM in charge.",
+  "Chưa đến giờ nộp tiền.": "Payment is not open yet.",
+  "Vui lòng chưa chuyển khoản trước giờ này.": "Please do not transfer money before this time.",
+  "· Số tiền cần nộp:": "· Amount due:",
+  "Sao chép Text": "Copy text",
+  "Sao chép": "Copy",
+  "Đã sao chép": "Copied",
+  "Không tìm thấy. Thử từ khoá khác hoặc chọn OTHER.": "Not found. Try another keyword or choose OTHER.",
+  "Không tìm thấy. Thử từ khoá khác hoặc chọn": "Not found. Try another keyword or choose",
+  "Đã chọn:": "Selected:",
+  "Tìm thấy": "Found",
+  "bộ phận. Bấm để chọn.": "departments. Click to choose.",
+  "Vui lòng chọn bộ phận trong danh sách.": "Please choose a department from the list.",
+  ": còn": ":",
+  "Đã chọn": "Selected",
+  "Đã hết": "Sold out",
+  "PM: Xem tồn kho": "PM: view stock",
+  "Bấm để đăng ký slot": "Click to register this slot",
+  "Vui lòng chọn slot khác.": "Please choose another slot.",
+  "File lớn hơn 5 MB. Vui lòng chụp lại hoặc nén file rồi chọn lại.": "The file is over 5 MB. Please retake or compress it and choose again.",
+  "Mục 7": "Field 7",
+  "Mục 8": "Field 8",
+  "mục 7 và 8": "fields 7 and 8",
+  "ô 7 và 8": "fields 7 and 8",
+  "Mục 6:": "Field 6:",
+  "Bạn chưa chọn sản phẩm.": "You have not chosen a product.",
+  "Vui lòng bấm vào một thẻ sản phẩm ở Bước 1 rồi Gửi lại.": "Please click a product card in Step 1, then Send again.",
+  "Nhiều người đang gửi cùng lúc…": "Many people are sending at once…",
+  "ĐÃ CÓ NGƯỜI ĐĂNG KÝ TRƯỚC.": "SOMEONE REGISTERED FIRST.",
+  "Đăng ký của bạn CHƯA được ghi nhận. Vui lòng chọn slot khác rồi bấm Gửi lại.": "Your registration was NOT saved. Please choose another slot and click Send again.",
+  "CHƯA GỬI ĐƯỢC ĐĂNG KÝ.": "REGISTRATION NOT SENT.",
+  "Lỗi không xác định.": "Unknown error.",
+  "Vui lòng thử lại hoặc báo PM phụ trách.": "Please try again or tell the PM in charge.",
+  "LƯU Ý:": "NOTE:",
+  "BẢN MẪU: CHƯA KẾT NỐI GOOGLE SHEET, ĐĂNG KÝ NÀY KHÔNG ĐƯỢC LƯU.": "DEMO: NOT CONNECTED TO GOOGLE SHEET, THIS REGISTRATION IS NOT SAVED.",
+  "ĐĂNG KÝ ĐÃ ĐƯỢC GHI NHẬN VÀO HỆ THỐNG.": "REGISTRATION SAVED IN THE SYSTEM.",
+  "• Trạng thái: Chờ nộp tiền": "• Status: Awaiting payment",
+  "Đến giờ, vào Tab 3 → Tra cứu đơn của tôi (Mã NV + 4 số cuối SĐT) → bấm Nộp tiền.": "When it opens, go to Tab 3 → My order lookup (ID + last 4 phone digits) → click Pay.",
+  "Chưa đính kèm": "Not attached",
+  "Vui lòng Tra cứu đơn và bấm Nộp tiền ở dòng đơn của bạn trước.": "Please look up your order and click Pay on your order row first.",
+  "Vui lòng đính kèm file biên lai (chọn file hoặc kéo thả vào khung ô 9).": "Please attach the receipt (choose a file or drop it into box 9).",
+  "Bấm OK nếu đúng như biên lai và vẫn muốn gửi; bấm Cancel để sửa lại.": "Click OK if it matches the receipt and you still want to send; click Cancel to fix it.",
+  "Đang gửi thông tin nộp tiền…": "Sending payment details…",
+  "Vui lòng không tắt trang. Có file biên lai thì có thể mất lâu hơn.": "Please keep this page open. With a receipt file it may take longer.",
+  "CHƯA GỬI ĐƯỢC KHAI NỘP TIỀN.": "PAYMENT NOT SENT.",
+  "BẢN MẪU: CHƯA KẾT NỐI GOOGLE SHEET, KHAI NỘP NÀY KHÔNG ĐƯỢC LƯU.": "DEMO: NOT CONNECTED TO GOOGLE SHEET, THIS PAYMENT IS NOT SAVED.",
+  "ĐÃ GHI NHẬN KHAI NỘP TIỀN.": "PAYMENT SAVED.",
+  "• Trạng thái: Đã khai nộp - chờ đối soát": "• Status: Paid - under review",
+  "PM sẽ đối soát với sao kê ngân hàng trước khi xác nhận.": "The PM will check it against the bank statement before confirming.",
+  "Vui lòng nhập Mã NV và đúng 4 số cuối điện thoại.": "Please enter your employee ID and the last 4 digits of your phone.",
+  "Đã nộp": "Paid",
+  "Không tìm thấy đơn nào khớp với Mã NV": "No order matches employee ID",
+  "và 4 số cuối SĐT": "and phone ending",
+  "Đã khai": "Submitted",
+  "Đã tải lên": "Uploaded",
+  "Không áp dụng": "N/A",
+  "Liên hệ PM": "Contact PM",
+  "Life's Good! Bạn có thể chọn danh mục ở thanh biểu tượng phía trên để lọc nhanh sản phẩm nhé.": "Life's Good! Pick a category in the icon bar above to filter products quickly.",
+  "Tổng tiền chờ nộp: 0 đ": "Total awaiting payment: 0 đ",
+  "[Mã NV] - [Họ Tên] - [Mã Model] - [Slot ID]": "[Employee ID] - [Full name] - [Model] - [Slot ID]",
+  "[Mã NV]_[Mã Slot]_[Họ Tên]": "[EmpID]_[SlotID]_[Full name]",
+  "Họ Tên NV Nộp Tiền": "Payer name",
+  "Mã NV Nộp Tiền": "Payer ID"
+ },
+ "patterns": [
+  [
+   "^\\((\\d+|—) / (\\d+) Đơn\\)$",
+   "($1 / $2 orders)"
+  ],
+  [
+   "^(\\d+|—) / (\\d+) Đơn$",
+   "$1 / $2 orders"
+  ],
+  [
+   "^(\\d+) Đơn$",
+   "$1 orders"
+  ],
+  [
+   "^\\+(\\d+) giờ$",
+   "+$1 hours"
+  ],
+  [
+   "^\\+(\\d+) [Nn]gày$",
+   "+$1 days"
+  ],
+  [
+   "^(\\d+) [Gg]iờ$",
+   "$1 hours"
+  ],
+  [
+   "^- Nhắc nhở: (\\d+) đơn sắp hết hạn$",
+   "- Reminders: $1 orders close to expiry"
+  ],
+  [
+   "^- Đã giải phóng: (\\d+) đơn quá hạn 24h$",
+   "- Released: $1 orders past 24h"
+  ],
+  [
+   "^-- Chọn Bộ Phận \\((\\d+) phòng ban\\) --$",
+   "-- Select department ($1) --"
+  ],
+  [
+   "^-- Chọn Mã Slot ID \\((\\d+) slot\\) --$",
+   "-- Select slot ID ($1 slots) --"
+  ],
+  [
+   "^-- Chọn sản phẩm \\((\\d+) slot\\) --$",
+   "-- Select product ($1 slots) --"
+  ],
+  [
+   "^(\\d+) đơn chờ PM duyệt$",
+   "$1 orders awaiting PM review"
+  ],
+  [
+   "^(\\d+)/(\\d+) còn trống$",
+   "$1/$2 available"
+  ],
+  [
+   "^\\((.+)\\)\\. Mặc định hiển thị 1 năm gần nhất\\. Nút$",
+   "($1). Shows the last 12 months by default. The"
+  ],
+  [
+   "^(\\d+) bộ phận\\. Không thấy bộ phận của mình\\? Chọn$",
+   "$1 departments. Can't find yours? Choose"
+  ],
+  [
+   "^(\\d{1,2}:\\d{2}) (AM|PM), Ngày (.+)$",
+   "$1 $2, $3"
+  ],
+  [
+   "^(\\d+) sản phẩm \\((\\d+) model\\) tại 3 kho AYA, AYB, AYC$",
+   "$1 items ($2 models) in 3 warehouses: AYA, AYB, AYC"
+  ],
+  [
+   "^(\\d+) sản phẩm \\((\\d+) model\\) tại 3 kho AYA, AYB, AYC chính thức mở bán trực tuyến\\. Cơ hội sở hữu các dòng sản phẩm cao cấp LG OLED, Tủ lạnh InstaView và Tháp giặt sấy WashTower với chính sách ưu đãi đặc quyền cho cán bộ nhân viên\\.$",
+   "$1 items ($2 models) in 3 warehouses (AYA, AYB, AYC) are now on sale online. Own premium LG OLED TVs, InstaView fridges and WashTower washer-dryers at exclusive staff prices."
+  ],
+  [
+   "^BƯỚC (\\d+)/(\\d+) · NHÂN VIÊN$",
+   "STEP $1/$2 · EMPLOYEE"
+  ],
+  [
+   "^BƯỚC (\\d+)/(\\d+) · QUẢN TRỊ PM$",
+   "STEP $1/$2 · PM"
+  ],
+  [
+   "^BƯỚC (\\d+)/(\\d+) · HOÀN TẤT$",
+   "STEP $1/$2 · DONE"
+  ],
+  [
+   "^BƯỚC (\\d+)/(\\d+) · HOÀN TẤT QUẢN TRỊ$",
+   "STEP $1/$2 · DONE"
+  ],
+  [
+   "^Bước (\\d+)/(\\d+)$",
+   "Step $1/$2"
+  ],
+  [
+   "^Bấm để đăng ký slot (.+)$",
+   "Click to reserve slot $1"
+  ],
+  [
+   "^Bảng Chi Tiết Sản Phẩm — (.+)$",
+   "Product Details — $1"
+  ],
+  [
+   "^CHỨNG TỪ THANH TOÁN — (.+)$",
+   "PAYMENT PROOF — $1"
+  ],
+  [
+   "^Bạn có chắc muốn kết sổ chương trình (.+)\\?$",
+   "Close program $1? Are you sure?"
+  ],
+  [
+   "^Sản phẩm: (.+)$",
+   "Product: $1"
+  ],
+  [
+   "^Giá: (.+)$",
+   "Price: $1"
+  ],
+  [
+   "^Còn (\\d+) SP$",
+   "$1 left"
+  ],
+  [
+   "^Còn (\\d+) SP khả dụng$",
+   "$1 available"
+  ],
+  [
+   "^Còn (\\d+)/(\\d+) slot trống\\.$",
+   "$1/$2 slots available."
+  ],
+  [
+   "^Email tự động đang BẬT · Hạn mức email còn lại hôm nay: (\\d+) · Bấm để đổi$",
+   "Auto email is ON · emails left today: $1 · click to change"
+  ],
+  [
+   "^Email tự động đang TẮT · Hạn mức email còn lại hôm nay: (\\d+) · Bấm để đổi$",
+   "Auto email is OFF · emails left today: $1 · click to change"
+  ],
+  [
+   "^Giá nội bộ: (.+)$",
+   "Staff price: $1"
+  ],
+  [
+   "^Hạn mức: 0?(\\d+) SP / Nhân viên · Nguyên tắc: First Come, First Served \\(FCFS\\) · Thời hạn giữ slot: 24h$",
+   "Limit: $1 item per employee · Rule: first come, first served (FCFS) · Slot hold: 24h"
+  ],
+  [
+   "^Hạn mức: (\\d+) SP / Nhân viên · Thứ tự ưu tiên FCFS\\.$",
+   "Limit: $1 item per employee · first come, first served."
+  ],
+  [
+   "^Hạn mức: (\\d+) SP/NV · PM: (.+)$",
+   "Limit: $1 item/employee · PM: $2"
+  ],
+  [
+   "^Hạn mức: (\\d+) sản phẩm / nhân viên · Phụ trách: (.+)$",
+   "Limit: $1 item per employee · Owner: $2"
+  ],
+  [
+   "^Khu vực Hà Nội \\(HN\\) — (\\d+)$",
+   "Ha Noi area (HN) — $1"
+  ],
+  [
+   "^Khu vực Hồ Chí Minh \\(HCM\\) — (\\d+)$",
+   "Ho Chi Minh area (HCM) — $1"
+  ],
+  [
+   "^Khối quản lý & bộ phận khác — (\\d+)$",
+   "Management & other units — $1"
+  ],
+  [
+   "^Miền Bắc \\(NORTH\\) — (\\d+)$",
+   "North — $1"
+  ],
+  [
+   "^Miền Nam \\(SOUTH\\) — (\\d+)$",
+   "South — $1"
+  ],
+  [
+   "^Miền Trung \\(MIDDLE\\) — (\\d+)$",
+   "Central — $1"
+  ],
+  [
+   "^Model: (.+) · Đăng ký bởi: (.+)$",
+   "Model: $1 · Registered by: $2"
+  ],
+  [
+   "^Mã Đợt: (.+)$",
+   "Program code: $1"
+  ],
+  [
+   "^Lỗi cập nhật máy chủ: (.+)$",
+   "Server update error: $1"
+  ],
+  [
+   "^(.+) · Thiết bị gia dụng$",
+   "$1 · Home appliances"
+  ],
+  [
+   "^Mở cổng thanh toán \\((\\d+)\\)$",
+   "Open payment window ($1)"
+  ],
+  [
+   "^Nhập lý do từ chối đơn (.+) \\((.+)\\):$",
+   "Reason for rejecting order $1 ($2):"
+  ],
+  [
+   "^Nộp bởi: (.+)$",
+   "Paid by: $1"
+  ],
+  [
+   "^PM / PD \\(Quản lý sản phẩm\\) — (\\d+)$",
+   "PM / PD (product management) — $1"
+  ],
+  [
+   "^Sản phẩm: (.+) — (.+)$",
+   "Product: $1 — $2"
+  ],
+  [
+   "^Số tiền cần nộp cho slot (.+):$",
+   "Amount to pay for slot $1:"
+  ],
+  [
+   "^Tài khoản: (\\S+) · (.+)$",
+   "Account: $1 · $2"
+  ],
+  [
+   "^Tỉ lệ lấp đầy: (.+)$",
+   "Fill rate: $1"
+  ],
+  [
+   "^Tỉ lệ nộp tiền: (.+)$",
+   "Payment rate: $1"
+  ],
+  [
+   "^Tổng giá trị tồn: (.+)$",
+   "Unsold stock value: $1"
+  ],
+  [
+   "^Tổng số tiền chờ thanh toán: (.+)$",
+   "Total awaiting payment: $1"
+  ],
+  [
+   "^Tổng tiền thanh toán đã nộp: (.+)$",
+   "Total paid: $1"
+  ],
+  [
+   "^Tổng tiền: (.+)$",
+   "Total: $1"
+  ],
+  [
+   "^Ví dụ: (.+)$",
+   "e.g. $1"
+  ],
+  [
+   "^Xác nhận DUYỆT HÀNG LOẠT cho (\\d+) đơn hàng đã nộp tiền\\?$",
+   "Confirm BULK APPROVAL of $1 paid order(s)?"
+  ],
+  [
+   "^Kho: (\\S+)$",
+   "Warehouse: $1"
+  ],
+  [
+   "^· Kho (\\S+) · (.+) · Số tiền cần nộp:$",
+   "· Warehouse $1 · $2 · Amount due:"
+  ],
+  [
+   "^ĐK \\((.+) TT\\)$",
+   "reg. ($1 paid)"
+  ],
+  [
+   "^Đang hiển thị (\\d+) / (\\d+) bản ghi$",
+   "Showing $1 / $2 records"
+  ],
+  [
+   "^Đang hiển thị (\\d+) / (\\d+) sản phẩm còn trống$",
+   "Showing $1 / $2 available products"
+  ],
+  [
+   "^Đang hiển thị (\\d+) nhân viên chưa nộp tiền$",
+   "Showing $1 employees not yet paid"
+  ],
+  [
+   "^Đang hiển thị (\\d+) / (\\d+) đơn đăng ký$",
+   "Showing $1 / $2 registrations"
+  ],
+  [
+   "^Đang kết nối Google Sheet Drive cá nhân \\((.+)\\)\\. Nhấp để đổi\\.$",
+   "Connected to a personal Google Sheet ($1). Click to change."
+  ],
+  [
+   "^Đang kết nối: (.+)$",
+   "Connected to: $1"
+  ],
+  [
+   "^Đã hủy giữ chỗ (\\S+)\\. Slot đã được trả về kho cho đồng nghiệp khác\\.$",
+   "Reservation $1 cancelled. The slot is back in stock for other colleagues."
+  ],
+  [
+   "^Đã từ chối đơn (\\S+)\\. Slot đã được mở lại cho nhân viên khác\\.$",
+   "Order $1 rejected. The slot is open again for other employees."
+  ],
+  [
+   "^Đã ĐK \\(([\\d.,]+%)\\)$",
+   "Registered ($1)"
+  ],
+  [
+   "^Đăng ký: (\\d.+)$",
+   "Registered: $1"
+  ],
+  [
+   "^— / (\\d+) Đơn$",
+   "— / $1 orders"
+  ],
+  [
+   "^Kho (\\S+)$",
+   "Warehouse $1"
+  ],
+  [
+   "^Kho (\\S+):$",
+   "Warehouse $1:"
+  ],
+  [
+   "^Kho (\\S+) · Slot:$",
+   "Warehouse $1 · Slot:"
+  ],
+  [
+   "^(\\S+) · Kho (\\S*) · (.*)$",
+   "$1 · Warehouse $2 · $3"
+  ],
+  [
+   "^Số tiền: (.+)$",
+   "Amount: $1"
+  ],
+  [
+   "^Mã GD: (.+)$",
+   "Transaction ID: $1"
+  ],
+  [
+   "^Đã phê duyệt thanh toán cho đơn (\\S+) \\((.+)\\)!$",
+   "Payment approved for order $1 ($2)!"
+  ],
+  [
+   "^\\(Kho (\\S+)\\)$",
+   "(Warehouse $1)"
+  ],
+  [
+   "^Lỗi máy chủ: (.+)$",
+   "Server error: $1"
+  ],
+  [
+   "^Bạn không có quyền (\\S+) để thực hiện thao tác này\\.$",
+   "You need the $1 role to do this."
+  ],
+  [
+   "^Không thể giải mã dữ liệu token: (.+)$",
+   "Cannot decode the token: $1"
+  ],
+  [
+   "^Thiếu: (.+)$",
+   "Missing: $1"
+  ],
+  [
+   "^Thiếu thông tin: (.+)$",
+   "Missing information: $1"
+  ],
+  [
+   "^Mã chương trình đã tồn tại: (.+)$",
+   "Program ID already exists: $1"
+  ],
+  [
+   "^Đã tạo chương trình (\\S+) \\((.+)\\)\\.$",
+   "Program $1 created ($2)."
+  ],
+  [
+   "^Từ chối thẩm quyền: Bạn không có quyền kết sổ hoặc cập nhật trạng thái chương trình của PM khác \\((.+)\\)\\.$",
+   "Access denied: you cannot close or change the status of another PM's program ($1)."
+  ],
+  [
+   "^Đã chuyển chương trình (\\S+) sang (\\S+)\\.$",
+   "Program $1 moved to $2."
+  ],
+  [
+   "^Không tìm thấy chương trình (\\S+)\\.$",
+   "Program $1 not found."
+  ],
+  [
+   "^Không tìm thấy chương trình: (.+)$",
+   "Program not found: $1"
+  ],
+  [
+   "^Bạn không có quyền xóa chương trình này vì thuộc sở hữu của PM khác \\((.+)\\)\\.$",
+   "You cannot delete this program because it belongs to another PM ($1)."
+  ],
+  [
+   "^Không thể xóa đợt bán \\\"(.+)\\\" vì đã có (\\d+) đơn đăng ký\\. Theo quy chuẩn kiểm toán Jeong-Do của LG, bạn chỉ có thể chọn \\\"Kết sổ chương trình\\\" để bảo toàn lịch sử giao dịch\\.$",
+   "Cannot delete sale \"$1\" because it already has $2 registrations. Under LG's Jeong-Do audit rules, you can only choose \"Close program\" to keep the transaction history."
+  ],
+  [
+   "^Đã xóa thành công chương trình (.+)!$",
+   "Program $1 deleted!"
+  ],
+  [
+   "^Đã upload (\\d+) sản phẩm vào chương trình (.+)\\.$",
+   "Uploaded $1 products to program $2."
+  ],
+  [
+   "^Chương trình (\\S+) đã kết sổ, không thể đăng ký\\.$",
+   "Program $1 is closed. Registration is not possible."
+  ],
+  [
+   "^Sản phẩm (\\S+) đã có người đăng ký trước\\. Vui lòng chọn sản phẩm khác\\.$",
+   "Product $1 was already registered by someone else. Please choose another product."
+  ],
+  [
+   "^Không tìm thấy sản phẩm (\\S+)\\.$",
+   "Product $1 not found."
+  ],
+  [
+   "^Bạn đã đăng ký (\\d+) sản phẩm, vượt hạn mức (\\d+) SP/nhân viên\\.$",
+   "You have registered $1 product(s), over the limit of $2 per employee."
+  ],
+  [
+   "^Đăng ký thành công sản phẩm (\\S+)! Đơn đang ở trạng thái chờ PM mở cổng thanh toán\\.$",
+   "Product $1 registered! Your order is waiting for the PM to open the payment window."
+  ],
+  [
+   "^Đã phê duyệt thanh toán cho đơn (\\S+)\\.$",
+   "Payment approved for order $1."
+  ],
+  [
+   "^Đã duyệt thanh toán hàng loạt thành công cho (\\d+) đơn hàng\\.$",
+   "Bulk approval done for $1 order(s)."
+  ],
+  [
+   "^Đã từ chối đơn và mở lại slot (\\S+)\\.$",
+   "Order rejected and slot $1 reopened."
+  ],
+  [
+   "^Quét hoàn tất: Đã giải phóng (\\d+) slot quá hạn 24h, nhắc nhở (\\d+) slot sắp hết hạn\\.$",
+   "Scan done: released $1 slot(s) past 24h, reminded $2 slot(s) about to expire."
+  ],
+  [
+   "^Slot (\\S+) đã có người đăng ký trước\\. Vui lòng chọn slot khác\\.$",
+   "Slot $1 was already registered by someone else. Please choose another slot."
+  ],
+  [
+   "^Không tìm thấy đơn đăng ký với Slot (\\S+) và Mã NV (\\S+)\\. Vui lòng đăng ký ở Tab 2 trước\\.$",
+   "No registration found for slot $1 and employee ID $2. Please register in Tab 2 first."
+  ],
+  [
+   "^Cổng thanh toán chưa được mở cho đơn hàng (\\S+)\\. PM đang kiểm duyệt danh sách đăng ký để chống trùng lặp\\. Vui lòng chờ thông báo mở cổng thanh toán từ PM\\.$",
+   "The payment window is not open yet for order $1. The PM is reviewing registrations for duplicates. Please wait for the PM's notice."
+  ],
+  [
+   "^Không lưu được file biên lai: (.+)$",
+   "Could not save the receipt file: $1"
+  ],
+  [
+   "^Không tìm thấy đơn giữ chỗ (\\S+) của bạn\\.$",
+   "Your reservation $1 was not found."
+  ],
+  [
+   "^Đơn (\\S+) đang ở trạng thái \\\"(.+)\\\" nên không thể tự hủy\\. Nếu bạn đã khai nộp tiền, vui lòng liên hệ PM phụ trách\\.$",
+   "Order $1 has status \"$T2\" so you cannot cancel it yourself. If you already submitted payment, please contact the PM in charge."
+  ],
+  [
+   "^Không thể xóa: (.+)$",
+   "Cannot delete: $T1"
+  ],
+  [
+   "^Máy chủ Google Apps Script trả về lỗi: (.+)$",
+   "Google Apps Script server returned an error: $T1"
+  ],
+  [
+   "^Bạn không phải là PM phụ trách (?:đợt bán|chương trình) này \\((.+)\\)! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền (.+)\\.$",
+   "You are not the PM in charge of this program ($1)! Only the PM who created it or a system admin can $T2."
+  ],
+  [
+   "^Bạn không phải là PM phụ trách (?:đợt bán|chương trình) này! Chỉ PM tạo chương trình hoặc Quản trị viên hệ thống mới có quyền (.+)\\.$",
+   "You are not the PM in charge of this program! Only the PM who created it or a system admin can $T1."
+  ],
+  [
+   "^Bạn không phải là PM phụ trách chương trình này \\((.+)\\)! Chỉ PM tạo chương trình hoặc Quản trị viên mới có thẩm quyền thực hiện\\.$",
+   "You are not the PM in charge of this program ($1)! Only the PM who created it or an admin can do this."
+  ],
+  [
+   "^Từ chối thẩm quyền: Bạn không phải là PM phụ trách chương trình này \\((.+)\\)\\.$",
+   "Access denied: you are not the PM in charge of this program ($1)."
+  ],
+  [
+   "^Bạn không thể nạp sản phẩm vào chương trình của PM khác \\((.+)\\)! Chỉ PM tạo chương trình mới có quyền nạp sản phẩm\\.$",
+   "You cannot load products into another PM's program ($1)! Only the PM who created it can load products."
+  ],
+  [
+   "^Bạn không thể xóa chương trình này vì thuộc sở hữu của PM khác \\((.+)\\)!$",
+   "You cannot delete this program because it belongs to another PM ($1)!"
+  ],
+  [
+   "^Bạn không thể thay đổi cài đặt hẹn giờ cho chương trình của PM khác \\((.+)\\)!$",
+   "You cannot change timer settings for another PM's program ($1)!"
+  ],
+  [
+   "^Bạn không thể lưu cài đặt hẹn giờ cho chương trình của PM khác \\((.+)\\)!$",
+   "You cannot save timer settings for another PM's program ($1)!"
+  ],
+  [
+   "^Đã điền mã giao dịch mẫu \\\"(.+)\\\" vào đơn hàng!$",
+   "Sample transaction ID \"$1\" filled in!"
+  ],
+  [
+   "^Máy chủ đã duyệt thanh toán (\\d+) / (\\d+) đơn hàng\\.$",
+   "The server approved $1 / $2 order(s)."
+  ],
+  [
+   "^Đã duyệt thanh toán thành công (\\d+) đơn hàng hàng loạt!$",
+   "Bulk approval done for $1 order(s)!"
+  ],
+  [
+   "^Đã hủy giữ chỗ đơn (\\S+) \\((.+)\\) thành công\\. Slot đã được mở lại!$",
+   "Reservation $1 ($2) cancelled. The slot is open again!"
+  ],
+  [
+   "^Email tự động đang BẬT( · Hạn mức email còn lại hôm nay: (\\d+))? · Bấm để đổi$",
+   "Automatic email is ON · Click to change"
+  ],
+  [
+   "^Email tự động đang TẮT \\(chỉ ghi nhật ký AutoEmail\\)( · Hạn mức email còn lại hôm nay: (\\d+))? · Bấm để đổi$",
+   "Automatic email is OFF (AutoEmail log only) · Click to change"
+  ],
+  [
+   "^Kết nối thất bại: (.*)\\. Hãy kiểm tra lại quyền Web App \\(Execute as: Me, Anyone\\)\\.$",
+   "Connection failed: $1. Please check the Web App access (Execute as: Me, Anyone)."
+  ],
+  [
+   "^Bạn có chắc muốn kết sổ chương trình (.+)\\? Sau khi kết sổ, nhân viên sẽ không thể đăng ký thêm\\.$",
+   "Close program $1? After closing, employees can no longer register."
+  ],
+  [
+   "^Đã mở bán thành công chương trình (.+)!$",
+   "Program $1 is now on sale!"
+  ],
+  [
+   "^Đã kết sổ chương trình (.+)!$",
+   "Program $1 closed!"
+  ],
+  [
+   "^Đã kết sổ thành công chương trình (.+)!$",
+   "Program $1 closed!"
+  ],
+  [
+   "^Đã đọc (\\d+) sản phẩm từ Sheet \\\"(.+)\\\"$",
+   "Read $1 products from sheet \"$2\""
+  ],
+  [
+   "^Lỗi tạo chương trình: (.+)$",
+   "Error creating program: $T1"
+  ],
+  [
+   "^• Mã đợt: (.+)$",
+   "• Sale code: $1"
+  ],
+  [
+   "^• Tên đợt: (.+)$",
+   "• Sale name: $1"
+  ],
+  [
+   "^• Sản phẩm: (\\d+) model đã nạp$",
+   "• Products: $1 models loaded"
+  ],
+  [
+   "^• PM Quản trị: (.+)$",
+   "• PM: $1"
+  ],
+  [
+   "^Không thể gửi dữ liệu lên Google Sheet \\((.+)\\)\\.$",
+   "Could not send data to Google Sheet ($1)."
+  ],
+  [
+   "^Chương trình \\\"(.+)\\\" \\((.+)\\) đã được tạo và hiển thị trên giao diện, nhưng CHƯA ĐƯỢC GHI vào Google Sheet\\.$",
+   "Program \"$1\" ($2) was created and shows on screen, but is NOT SAVED to Google Sheet."
+  ],
+  [
+   "^Đã nạp (\\d+) sản phẩm vào chương trình (.+)\\. Bảng danh mục sản phẩm đã được cập nhật ngay lập tức\\.$",
+   "Loaded $1 products into program $2. The product list is updated."
+  ],
+  [
+   "^Đơn hàng (\\S+) \\((.+)\\) đang ở trạng thái:$",
+   "Order $1 ($2) has status:"
+  ],
+  [
+   "^Loại (\\S+)$",
+   "Grade $1"
+  ],
+  [
+   "^· loại (\\S+)$",
+   "· grade $1"
+  ],
+  [
+   "^· kho$",
+   "· warehouse"
+  ],
+  [
+   "^Bạn đã đăng ký sản phẩm (.+) \\((\\S+)\\) rồi!$",
+   "You have already registered $1 ($2)!"
+  ],
+  [
+   "^Hạn mức: 1 SP / NV\\. Nếu muốn đổi sang sản phẩm này, vui lòng bấm \\\"Hủy giữ chỗ\\\" ở ô Đơn Hàng Của Bạn trước\\.$",
+   "Limit: 1 item per employee. To switch to this item, first click \"Cancel reservation\" in Your orders."
+  ],
+  [
+   "^Đăng ký thành công sản phẩm (.+) \\((\\S+)\\)!$",
+   "Registered $1 ($2)!"
+  ],
+  [
+   "^Không kết nối được máy chủ: (.+)$",
+   "Cannot reach the server: $T1"
+  ],
+  [
+   "^Đang hiển thị (\\d+) sản phẩm còn trống chưa đăng ký$",
+   "Showing $1 unregistered products"
+  ],
+  [
+   "^Tổng giá trị hàng tồn: (.+)$",
+   "Unsold stock value: $1"
+  ],
+  [
+   "^Tổng tiền chờ nộp: (.+)$",
+   "Total awaiting payment: $1"
+  ],
+  [
+   "^Tổng tiền thanh toán: (.+)$",
+   "Total paid: $1"
+  ],
+  [
+   "^Còn ~(\\d+)h$",
+   "~$1h left"
+  ],
+  [
+   "^Đã gửi thông báo nhắc nhở chuyển khoản đến nhân viên (.+) qua tin nhắn/email!$",
+   "Payment reminder sent to $1 by message/email!"
+  ],
+  [
+   "^Đã hủy giữ chỗ Slot (\\S+)\\. Sản phẩm đã được hoàn về kho khả dụng!$",
+   "Reservation for slot $1 cancelled. The item is available again!"
+  ],
+  [
+   "^Chỉ xem · Thuộc PM (.+)$",
+   "View only · Owned by PM $T1"
+  ],
+  [
+   "^Đợt bán \\\"(.+)\\\" \\((.+)\\) đã có (\\d+) đơn đăng ký!$",
+   "Sale \"$1\" ($2) already has $3 registrations!"
+  ],
+  [
+   "^Đã xóa thành công đợt bán (.+)!$",
+   "Sale $1 deleted!"
+  ],
+  [
+   "^• Số lượng đơn chờ mở cổng: (\\d+) đơn$",
+   "• Orders waiting: $1"
+  ],
+  [
+   "^• Chương trình: (.+)$",
+   "• Program: $1"
+  ],
+  [
+   "^1\\. Tất cả (\\d+) nhân viên đã đăng ký trước thời điểm này sẽ được chuyển sang trạng thái \\\"Chờ nộp tiền\\\" và có thể nộp tiền/đính kèm biên lai\\.$",
+   "1. All $1 employees who registered before now move to \"Awaiting payment\" and can pay / attach receipts."
+  ],
+  [
+   "^Đã chuyển (\\d+) đơn đăng ký sang trạng thái \\\"Chờ nộp tiền\\\"\\. Nhân viên đã có thể vào nộp tiền và đính kèm biên lai\\.$",
+   "Moved $1 registrations to \"Awaiting payment\". Employees can now pay and attach receipts."
+  ],
+  [
+   "^• Mã Slot: (.+)$",
+   "• Slot ID: $1"
+  ],
+  [
+   "^• Nhân viên: (.+)$",
+   "• Employee: $1"
+  ],
+  [
+   "^• Giá nội bộ: (.+)$",
+   "• Staff price: $1"
+  ],
+  [
+   "^Đã mở cổng thanh toán cho đơn (\\S+) \\((.+)\\)!$",
+   "Payment window opened for order $1 ($2)!"
+  ],
+  [
+   "^Đã lưu cấu hình hẹn giờ tự động cho chương trình (.+)!$",
+   "Auto-timer saved for program $1!"
+  ],
+  [
+   "^Còn (\\d+) ngày (\\d+)g (\\d+)p$",
+   "$1d $2h $3m left"
+  ],
+  [
+   "^Còn (\\d+)g (\\d+)p (\\d+)s$",
+   "$1h $2m $3s left"
+  ],
+  [
+   "^Hẹn giờ: (.+) \\(Đang xử lý\\)$",
+   "Timer: $T1 (processing)"
+  ],
+  [
+   "^Hẹn giờ: (.+) \\((.+)\\)$",
+   "Timer: $T1 ($T2)"
+  ],
+  [
+   "^Bạn có muốn chuyển chương trình (.+) sang trạng thái \\\"Đang Mở Bán\\\" ngay lập tức\\?$",
+   "Put program $1 on sale now?"
+  ],
+  [
+   "^Bạn có muốn KẾT SỔ chương trình (.+) ngay lập tức\\? Cổng đăng ký sẽ bị khóa\\.$",
+   "CLOSE program $1 now? Registration will be locked."
+  ],
+  [
+   "^Đã mở cổng thanh toán cho (\\d+) đơn đăng ký!$",
+   "Payment window opened for $1 registration(s)!"
+  ],
+  [
+   "^\\[HẸN GIỜ TỰ ĐỘNG\\] Đã tự động MỞ BÁN chương trình (.+)!$",
+   "[AUTO-TIMER] Program $1 is now on sale!"
+  ],
+  [
+   "^\\[HẸN GIỜ TỰ ĐỘNG\\] Đã tự động MỞ CỔNG THANH TOÁN cho (\\d+) đơn đăng ký!$",
+   "[AUTO-TIMER] Payment window opened for $1 registration(s)!"
+  ],
+  [
+   "^\\[HẸN GIỜ TỰ ĐỘNG\\] Đến giờ mở cổng TT \\((.+)\\) nhưng chưa có đơn đăng ký chờ\\.$",
+   "[AUTO-TIMER] Payment opening time reached ($1) but no registrations are waiting."
+  ],
+  [
+   "^\\[HẸN GIỜ TỰ ĐỘNG\\] Đã tự động KẾT SỔ chương trình (.+)!$",
+   "[AUTO-TIMER] Program $1 closed!"
+  ],
+  [
+   "^Số vừa nhập \\((.+)\\) khác số tiền cần nộp\\. Vui lòng kiểm tra lại biên lai\\.$",
+   "The amount entered ($1) differs from the amount due. Please check your receipt."
+  ],
+  [
+   "^Slot (\\S+) mở nộp tiền lúc (.+) \\(hoặc khi PM mở cổng thanh toán\\)\\.$",
+   "Payment for slot $1 opens at $2 (or when the PM opens the payment window)."
+  ],
+  [
+   "^· Kho (\\S*) · (.*)$",
+   "· Warehouse $1 · $2"
+  ],
+  [
+   "^-- Chọn sản phẩm \\((\\d+) slot ở kho (\\S+)\\) --$",
+   "-- Choose a product ($1 slots in $2) --"
+  ],
+  [
+   "^(.+) — Đã hết$",
+   "$1 — Sold out"
+  ],
+  [
+   "^Slot (\\S+) vừa có người đăng ký\\.$",
+   "Slot $1 was just taken."
+  ],
+  [
+   "^Chỉ nhận 1 file biên lai\\. Hệ thống lấy file đầu tiên: (.+)$",
+   "Only 1 receipt file is accepted. Using the first file: $1"
+  ],
+  [
+   "^File \\\"(.+)\\\" không đúng định dạng\\. Chỉ nhận ảnh \\(\\.PNG, \\.JPG, \\.JPEG\\) hoặc \\.PDF\\.$",
+   "File \"$1\" is not supported. Only images (.PNG, .JPG, .JPEG) or .PDF."
+  ],
+  [
+   "^File đã chọn: (.+) \\(([\\d.]+) KB\\)$",
+   "Selected file: $1 ($2 KB)"
+  ],
+  [
+   "^Thư viện OCR chưa tải kịp\\. Bạn vui lòng tự điền (.+)\\.$",
+   "The OCR library has not loaded yet. Please fill in $T1 yourself."
+  ],
+  [
+   "^Đang phân tích dữ liệu biên lai \\((\\d+)%\\)…$",
+   "Reading the receipt ($1%)…"
+  ],
+  [
+   "^Đã tải ảnh biên lai\\. Không nhận diện được rõ mã giao dịch, vui lòng điền tay (.+)\\.$",
+   "Receipt uploaded. The transaction ID could not be read clearly; please type $T1."
+  ],
+  [
+   "^Slot (\\S+)\\. Vui lòng không tắt trang\\. Thường mất vài giây\\.$",
+   "Slot $1. Please keep this page open. It usually takes a few seconds."
+  ],
+  [
+   "^Đang tự thử lại \\(lần (\\d+)/(\\d+)\\)\\. Vui lòng không tắt trang\\.$",
+   "Retrying (attempt $1/$2). Please keep this page open."
+  ],
+  [
+   "^• Kho: (.+)$",
+   "• Warehouse: $1"
+  ],
+  [
+   "^• Nhân viên đăng ký: (.+)$",
+   "• Registered by: $1"
+  ],
+  [
+   "^• Thời gian Timestamp: (.+)$",
+   "• Timestamp: $1"
+  ],
+  [
+   "^NỘP TIỀN: mở sau (\\d+) giờ, từ (.+)\\. Vui lòng CHƯA chuyển khoản trước giờ này\\.$",
+   "PAYMENT: opens in $1 hours, from $2. Please do NOT transfer before then."
+  ],
+  [
+   "^NỘP TIỀN: mở sau (\\d+) giờ\\. Vui lòng CHƯA chuyển khoản trước giờ này\\.$",
+   "PAYMENT: opens in $1 hours. Please do NOT transfer before then."
+  ],
+  [
+   "^Chưa đến giờ nộp tiền cho slot (\\S+) \\(mở lúc (.+)\\) hoặc PM chưa mở cổng thanh toán\\.$",
+   "Payment for slot $1 is not open yet (opens at $2) or the PM has not opened the payment window."
+  ],
+  [
+   "^Chưa đến giờ nộp tiền cho slot (\\S+) hoặc PM chưa mở cổng thanh toán\\.$",
+   "Payment for slot $1 is not open yet or the PM has not opened the payment window."
+  ],
+  [
+   "^Số tiền khai \\((.+)\\) KHÁC số tiền cần nộp \\((.+)\\)\\.$",
+   "The amount entered ($1) DIFFERS from the amount due ($2)."
+  ],
+  [
+   "^• Họ Tên NV Nộp Tiền: (.+)$",
+   "• Payer name: $1"
+  ],
+  [
+   "^• Mã NV Người Nộp Tiền: (.+)$",
+   "• Payer ID: $1"
+  ],
+  [
+   "^• Mã Giao Dịch: (.+)$",
+   "• Transaction ID: $1"
+  ],
+  [
+   "^• File chứng từ: (.+)$",
+   "• Receipt file: $1"
+  ],
+  [
+   "^Biên Lai Nộp Tiền (\\S+)$",
+   "Payment receipt $1"
+  ],
+  [
+   "^Mở lúc (.+)$",
+   "Opens at $1"
+  ],
+  [
+   "^(\\d+) / (\\d+) SP$",
+   "$1 / $2 items"
+  ],
+  [
+   "^\\((\\d+) / (\\d+) SP\\)$",
+   "($1 / $2 items)"
+  ],
+  [
+   "^(\\d+) SP / NV$",
+   "$1 item / employee"
+  ]
+ ]
+}

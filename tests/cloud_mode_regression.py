@@ -792,6 +792,77 @@ def main():
             check(all(VN.search(v) for v in seen.values()), 'Tab 2 / Tab 3 / Tab 4 / bảng PM đều hiện số tiền kiểu 5.000.000 đ')
             check(amt[0] == '5.000.000' and 'khác số tiền' not in amt[1], f'Tab 3: ô số tiền điền sẵn 5.000.000, không báo lệch ({amt})')
 
+            # Bộ lọc tab 3 (Q-I7): lọc theo data-status gốc của dòng, không theo chữ hiển thị → đúng ở cả VI và EN
+            FILTER_JS = """() => { const tb = document.getElementById('confirmation-tbody');
+              tb.insertAdjacentHTML('beforeend', '<tr data-status="PENDING"><td>T-PEND</td><td>Chờ nộp tiền</td></tr><tr data-status="CONFIRMED"><td>T-CONF</td><td>Chờ đối soát</td></tr>');
+              const vis = () => [...tb.querySelectorAll('tr')].filter(r => r.style.display !== 'none').map(r => r.cells[0].innerText).filter(t => t.startsWith('T-')).join(',');
+              const f = document.getElementById('status-filter'), out = {};
+              for (const v of ['PENDING', 'CONFIRMED', 'ALL']) { f.value = v; filterTable(); out[v] = vis(); }
+              return out; }"""
+            VI_RE = _re.compile('[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]|\\b(Kho|kho|Tivi)\\b', _re.I)
+            LEFT_VI_JS = """() => { const NO = '[data-no-i18n], .lg-card-desc, .pk-cond, .ps-sub-cond, td.cond, .lgm-data, #grap-program-title, .program-tab-name';
+              const out = [], w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n;
+              while ((n = w.nextNode())) { const p = n.parentElement, t = n.nodeValue.trim();
+                if (!t || !p || p.closest('script,style,textarea,' + NO) || !p.getClientRects().length) continue; out.push(t); }
+              return out; }"""
+            NAMES = ('Nguyễn Thị Quỳnh Như', 'Trần Văn Nam')
+            def left_vi(page):
+                return [t for t in page.evaluate(LEFT_VI_JS) if VI_RE.search(_re.sub(r'\d[\d.,]*\s*đ', '', t)) and not any(x in t for x in NAMES)]
+
+            print('Scenario 24: tiếng Anh (EN) — chỉ đổi chữ hiển thị; nút vẫn chạy đúng; dữ liệu gửi máy chủ & file xuất giữ tiếng Việt')
+            s = MockServer(my_status=WAIT_GATE)
+            ctx, page = open_page(browser, port, s, extra_init="if (!sessionStorage.getItem('t24')) { sessionStorage.setItem('t24', '1'); localStorage.setItem('lg_lang', 'en'); }")   # chỉ lần mở đầu
+            dialogs = []; page.on('dialog', lambda d: dialogs.append(d.message))
+            page.wait_for_timeout(800)
+            st = page.evaluate("[document.documentElement.lang, document.documentElement.classList.contains('lang-en'), [...document.querySelectorAll('[data-lang-toggle]')].map(b => b.textContent)]")
+            check(st[0] == 'en' and st[1] and st[2] and all(t == 'VI' for t in st[2]), f'trang ở chế độ EN, nút chuyển ghi "VI" ({st})')
+            check(not left_vi(page), f'màn hình đăng nhập không còn chữ tiếng Việt ({left_vi(page)[:3]})')
+            login(page, ME)
+            card3 = page.evaluate(STATE_JS)['card3']
+            check('Cancel reservation' in card3 and 'MODEL-TAKEN-BY-ME' in card3, 'ô 03 bằng tiếng Anh, có nút "Cancel reservation", dữ liệu đơn giữ nguyên')
+            for tab in ['tab1', 'tab2', 'tab3', 'tab4']:
+                page.evaluate(f"switchTab('{tab}', document.getElementById('{tab}-btn'))"); page.wait_for_timeout(900)
+                lv = left_vi(page)
+                check(not lv, f'{tab}: không còn chữ tiếng Việt ngoài vùng dữ liệu ({lv[:3]})')
+            ui = {x['code']: x['status'] for x in page.evaluate(STATE_JS)['ui']}
+            check(ui == server_status, 'trạng thái sản phẩm trong bộ nhớ giữ giá trị gốc (Available/Registered), không bị dịch')
+            out = page.evaluate(FILTER_JS)
+            check(out == {'PENDING': 'T-PEND', 'CONFIRMED': 'T-CONF', 'ALL': 'T-PEND,T-CONF'}, f'EN: bộ lọc tab 3 lọc đúng theo trạng thái ({out})')
+            page.evaluate("() => { window.XLSX.writeFile = (wb) => { window.__rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); }; }")
+            page.evaluate("exportToCSV()"); page.wait_for_timeout(300)
+            head = (page.evaluate("window.__rows") or [[]])[0]
+            shown = page.evaluate("document.querySelector('#confirmation-table thead').innerText")
+            check(head and VI_RE.search(' '.join(map(str, head))) and not VI_RE.search(shown),
+                  f'EN: tiêu đề bảng tab 3 hiện tiếng Anh, file Xuất Excel giữ tiếng Việt (Q-I8) ({head[:3]} / {shown[:40]!r})')
+            btn = page.locator('#grap-brief-dashboard [onclick*="cancelUserRegistration"]', has_text='Cancel reservation').first
+            btn.click(); page.wait_for_timeout(5000)
+            cancel_calls = [c for c in s.calls if c[0] == 'user_cancel_registration']
+            check(cancel_calls and cancel_calls[-1][1].get('token') == 'mock.sig', 'EN: bấm "Cancel reservation" → gửi lệnh hủy tới máy chủ (đúng chức năng)')
+            check(dialogs and all(not VI_RE.search(_re.sub(r'\d[\d.,]*\s*đ', '', d)) for d in dialogs), f'EN: hộp thoại bằng tiếng Anh ({[d[:50] for d in dialogs]})')
+            s.my_status = None
+            page.evaluate("myServerOrders = []; takenProgramId = ''")
+            page.evaluate(f"handleRegisterProduct('{PID}-AYA-001')"); page.wait_for_timeout(3000)
+            reg_calls = [c for c in s.calls if c[0] == 'register_product']
+            check(reg_calls and reg_calls[-1][1].get('uniqueCode') == f'{PID}-AYA-001', f'EN: đăng ký giữ chỗ gửi đúng mã slot tới máy chủ ({reg_calls[-1][1].get("uniqueCode") if reg_calls else None})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            page.click('.btn-lang'); page.wait_for_timeout(1500)
+            st = page.evaluate("[document.documentElement.lang, localStorage.getItem('lg_lang'), document.querySelector('.btn-lang').textContent, !!window.LG_I18N_EN]")
+            check(st[0] != 'en' and st[1] == 'vi' and st[2] == 'EN' and not st[3], f'bấm "VI" → về tiếng Việt, nhớ lựa chọn, không tải từ điển ({st})')
+            ctx.close()
+
+            print('Scenario 25: tiếng Việt (mặc định) — lớp dịch không làm gì; bộ lọc tab 3 đúng')
+            s = MockServer(my_status=WAIT_GATE)
+            ctx, page = open_page(browser, port, s)
+            login(page, ME)
+            st = page.evaluate("[document.documentElement.lang, document.documentElement.classList.contains('lang-en'), !!window.LG_I18N_EN, T('Đăng xuất'), document.querySelector('.btn-lang').textContent]")
+            check(st[0] != 'en' and not st[1] and not st[2] and st[3] == 'Đăng xuất' and st[4] == 'EN', f'VI: không tải từ điển, T() trả nguyên văn, nút ghi "EN" ({st})')
+            check('Hủy giữ chỗ' in page.evaluate(STATE_JS)['card3'], 'VI: ô 03 vẫn tiếng Việt như cũ')
+            page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(600)
+            out = page.evaluate(FILTER_JS)
+            check(out == {'PENDING': 'T-PEND', 'CONFIRMED': 'T-CONF', 'ALL': 'T-PEND,T-CONF'}, f'VI: bộ lọc tab 3 lọc đúng (trước đây chọn trạng thái là ẩn hết) ({out})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()

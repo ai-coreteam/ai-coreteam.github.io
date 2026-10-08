@@ -13,7 +13,17 @@
         if (q === 'v2' || (UI_V2_DEFAULT && q !== 'v1')) document.documentElement.classList.add('ui-v2');
       } catch (e) {}
     })();
+    // Tiếng Anh VI/EN (design/I18N_EN_FEASIBILITY.md, 08/10/2026). Mặc định tiếng Việt; chỉ dịch chữ hiển thị.
+    // Tắt toàn bộ tiếng Anh (nút ẩn, trang chạy đúng bản tiếng Việt): đổi thành false → chạy test → build portal.html → push.
+    var I18N_ENABLED = true;
+    (function () {
+      try {
+        var l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('lg_lang');
+        if (I18N_ENABLED && l === 'en') document.write('<scr' + 'ipt src="assets/i18n/en.js"><\/scr' + 'ipt>');
+      } catch (e) {}
+    })();
   </script>
+  <script src="assets/i18n/i18n.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#A50034">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3457,6 +3467,14 @@
     html.ui-v2 .pay-qr-info, html.ui-v2 .pay-qr-hint { font-size: 14px; }
     html.ui-v2 .pay-qr-amt { font-size: 18px; }
 
+    /* Nút VI/EN (08/10/2026): màn đăng nhập — góc trên phải, không chiếm chỗ của nội dung; đầu trang — cùng kiểu nút "Đêm / Sáng" */
+    .login-card { position: relative; }
+    .lang-toggle-login { position: absolute; top: 14px; right: 14px; min-width: 44px; height: 32px; padding: 0 10px; border-radius: 999px;
+                         border: 1px solid #CBC8C2; background: #FFFFFF; color: #262626; font-family: inherit; font-size: 14px; font-weight: 600; line-height: 1; cursor: pointer; letter-spacing: .04em; }
+    .lang-toggle-login:hover { border-color: #A50034; color: #A50034; }
+    .lang-toggle-login:focus-visible, .btn-lang:focus-visible { outline: 2px solid #A50034; outline-offset: 2px; }
+    .btn-lang { min-width: 52px; letter-spacing: .04em; }
+
     /* Serial Number cạnh Model (06/10/2026): phụ, không nổi bật — chữ thường, nhỏ, mờ theo màu chữ bên cạnh (đúng cả nền sáng lẫn tối) */
     .sn { font-weight: 400; font-size: 12px; line-height: inherit; opacity: .72; letter-spacing: .02em; white-space: nowrap; font-family: inherit; }
     html.ui-v2 .sn { font-size: 14px; }
@@ -3484,6 +3502,7 @@
   <!-- P0: Login Overlay (LG Brand Compliant) -->
   <div id="login-overlay">
     <div class="login-card">
+      <button type="button" class="lang-toggle-login" data-lang-toggle onclick="lgToggleLang()">EN</button>
       <img class="login-logo" id="login-logo" src="" alt="LG Electronics">
       <h2>CỔNG BÁN HÀNG NỘI BỘ</h2>
       <p class="login-sub">LG Internal Sales Portal — Đăng nhập để tiếp tục</p>
@@ -3567,6 +3586,7 @@
         </button>
         <button class="btn-action" onclick="window.print()">In / Xuất PDF</button>
         <button class="btn-action btn-secondary" onclick="toggleTheme()">Đêm / Sáng</button>
+        <button type="button" class="btn-action btn-secondary btn-lang" data-lang-toggle onclick="lgToggleLang()">EN</button>
       </div>
     </header>
 
@@ -11593,7 +11613,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (slotSelect) slotSelect.value = order.slot;
       const slotDisplay = document.getElementById('pay-slot-display');
       if (slotDisplay) {
-        slotDisplay.value = `${order.slot} · Kho ${order.kho || ''} · ${order.model || ''}${snTxt(order)}`;
+        slotDisplay.value = T(`${order.slot} · Kho ${order.kho || ''} · ${order.model || ''}${snTxt(order)}`);   // T(): chỉ đổi khi xem tiếng Anh
       }
 
       // Field 2: EMP Code (Read-only)
@@ -12533,6 +12553,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       const tbody = document.getElementById('confirmation-tbody');
       const newRow = document.createElement('tr');
+      newRow.dataset.status = 'PENDING';   // 08/10/2026: bộ lọc tab 3 lọc theo trạng thái gốc, không đọc chữ hiển thị
       newRow.style.background = 'var(--lg-panel)';
       newRow.innerHTML = `
         <td><span class="badge-ordinal">${slotId}</span></td>
@@ -12686,12 +12707,14 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           `;
           row.cells[9].innerText = payDate;
           row.cells[10].innerHTML = `<span class="badge-status-ok badge-status-pending">Chờ đối soát</span>`;
+          row.dataset.status = 'CONFIRMED';
         }
       });
 
       if (!found) {
         const tbody = document.getElementById('confirmation-tbody');
         const newRow = document.createElement('tr');
+        newRow.dataset.status = 'CONFIRMED';
         newRow.style.background = 'var(--lg-panel)';
         newRow.innerHTML = `
           <td><span class="badge-ordinal">${slotId}</span></td>
@@ -13068,11 +13091,11 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         const text = row.innerText.toLowerCase();
         const matchesSearch = text.includes(search);
         
+        // 08/10/2026 (chủ dự án duyệt Q-I7): lọc theo trạng thái gốc của dòng (data-status). Trước đây so chữ "Đã Nộp" / "Chờ Nộp"
+        // trên dòng — không bao giờ khớp ("Chờ nộp tiền", "Chờ đối soát") nên chọn trạng thái là ẩn hết; và sẽ hỏng khi dịch sang tiếng Anh.
         let matchesStatus = true;
-        if (statusFilter === 'CONFIRMED') {
-          matchesStatus = row.innerText.includes('Đã Nộp');
-        } else if (statusFilter === 'PENDING') {
-          matchesStatus = row.innerText.includes('Chờ Nộp');
+        if (statusFilter === 'CONFIRMED' || statusFilter === 'PENDING') {
+          matchesStatus = row.dataset.status === statusFilter;
         }
 
         if (matchesSearch && matchesStatus) {
@@ -13086,7 +13109,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     // Export Table to CSV
     function exportToCSV() {
       const rows = Array.from(document.querySelectorAll('#confirmation-table tr'))
-        .map(row => Array.from(row.querySelectorAll('th, td')).map(c => c.innerText.replace(/\n/g, ' ')));
+        .map(row => Array.from(row.querySelectorAll('th, td')).map(c => lgI18nText(c).replace(/\n/g, ' ')));   // lgI18nText: chữ tiếng Việt gốc kể cả khi đang xem tiếng Anh (Q-I8)
       downloadTableFile(rows, 'Xac_Nhan_Dang_Ky_Banh_Hang_Noi_Bo_LGEVH', { sheetName: 'Xac nhan dang ky' });
     }
     // ===== P0: Realtime Gate State Auto-Refresh & Synchronization =====
