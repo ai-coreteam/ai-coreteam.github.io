@@ -863,6 +863,19 @@ def main():
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
+            print('Scenario 26: bảng PM "Hàng còn trống" — cột Giảm tính từ giá (trước: ghi cứng -35% cho mọi dòng)')
+            s = MockServer(); s.pm_regs = []
+            for x, (mrp, price) in zip(s.products, [(39990000, 5998500), (84990000, 12748500), (10000000, 0)]):
+                x['rrp'], x['internalPrice'], x['status'] = mrp, price, 'Available'
+            ctx, page = open_page(browser, port, s)
+            login(page, PM)
+            page.evaluate("loadPMDashboardData()"); page.wait_for_timeout(2500)
+            page.evaluate("setPMViewMode('remaining')"); page.wait_for_timeout(800)
+            offs = page.evaluate("[...document.querySelectorAll('#pm-remaining-tbody tr')].map(r => r.cells[7].innerText)")
+            check(offs == ['-85%', '-85%', '—'], f'39.990.000 → 5.998.500 = -85%; thiếu giá → "—" ({offs})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
             browser.close()
     finally:
         srv.shutdown()

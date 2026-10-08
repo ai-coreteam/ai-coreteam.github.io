@@ -9623,6 +9623,8 @@
       let totalVal = 0;
       tbody.innerHTML = remainingProds.map((p, idx) => {
         totalVal += Number(p.internalPrice || 0);
+        // 08/10/2026: % giảm tính từ giá như Tab 2 / bộ chọn (getCatalog). Trước đây ghi cứng '35%' vì dữ liệu máy chủ không có trường "off"
+        const disc = (p.rrp && p.internalPrice) ? Math.round((1 - p.internalPrice / p.rrp) * 100) : 0;
         return `
           <tr>
             <td class="num-col">${idx + 1}</td>
@@ -9635,7 +9637,7 @@
             </td>
             <td><span class="pk-tag g-${esc(p.grade || 'GoodSet')}">${esc(p.grade === 'GoodSet' ? 'GoodSet' : 'Loại ' + (p.grade || 'A'))}</span> <span style="font-size:11px; color:#716F6A;">${esc(p.cond || '')}</span></td>
             <td style="text-align:right; font-size:11.5px; color:#716F6A;"><s>${formatVND(p.rrp || 0)}</s></td>
-            <td style="text-align:right; color:#A50034; font-weight:700;">-${esc(p.off || '35%')}</td>
+            <td style="text-align:right; color:#A50034; font-weight:700;">${disc > 0 ? '-' + disc + '%' : '—'}</td>
             <td style="text-align:right;"><span class="price-internal">${formatVND(p.internalPrice || 0)}</span></td>
             <td style="text-align:center;"><span class="pm-pill pm-pill-new" style="background:#E8F8F5; color:#0E6251; border-color:#A2D9CE;">Còn trống · Nhận ĐK</span></td>
           </tr>
