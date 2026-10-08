@@ -82,4 +82,4 @@ Chạy lại số đo: `python3 scripts/mobile_audit.py "iPhone 13"` và `"Galax
 ---
 
 ## 7. Việc song song: tiếng Anh (VI/EN)
-Đánh giá khả năng làm và kế hoạch: [`design/I18N_EN_FEASIBILITY.md`](I18N_EN_FEASIBILITY.md). Việc này độc lập với v3. Nếu làm cả hai, **làm v3 / Đợt 0 trước**, sau đó lớp dịch EN dịch theo chữ mới.
+Đánh giá khả năng làm và kế hoạch: [`design/I18N_EN_FEASIBILITY.md`](I18N_EN_FEASIBILITY.md). **Chủ dự án chốt 08/10: làm tiếng Anh TRƯỚC v3 (Q-I5 = b).** Khi làm v3, mọi chữ mới hoặc đổi phải được cập nhật vào từ điển EN. Phần tiếng Anh còn chờ: Q-I6 (thời điểm), Q-I7 (sửa lỗi bộ lọc tab 3), Q-I8 (ngôn ngữ file Xuất Excel tab 3).

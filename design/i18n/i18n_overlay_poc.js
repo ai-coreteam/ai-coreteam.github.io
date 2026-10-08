@@ -6,6 +6,8 @@
   window.setLang = function (l) { try { localStorage.setItem('lg_lang', l); } catch (e) {} var u = new URL(location.href); u.searchParams.delete('lang'); location.href = u.toString(); };
   if (LANG !== 'en') return;
   var D = {
+    'CỔNG TT ĐÃ MỞ': 'PAYMENT OPEN', 'Nộp tiền ngay (1-Chạm) →': 'Pay now →', 'Hủy giữ chỗ': 'Cancel reservation', 'Xem báo cáo kho ↗': 'Stock report ↗',
+    'Xem chi tiết kho AYA · AYB · AYC (Pop-up) ↗': 'Warehouse details ↗', 'Đăng ký toàn quốc:': 'Registered (all):', 'Thanh toán toàn quốc:': 'Paid (all):',
     'CỔNG BÁN HÀNG NỘI BỘ': 'INTERNAL SALES PORTAL', 'Mã nhân viên (Employee ID)': 'Employee ID', 'Mật khẩu (Password)': 'Password', 'Đăng nhập': 'Sign in',
     'Đăng ký mua hàng nội bộ · LGEVH': 'Internal purchase registration · LGEVH', 'Nhân viên': 'Employee', 'Đổi MK': 'Change password', 'Đăng xuất': 'Sign out',
     'Hướng dẫn nhanh': 'Quick guide', 'In / Xuất PDF': 'Print / PDF', 'Đêm / Sáng': 'Dark / Light', 'Đang Mở Bán': 'Open for sale',
@@ -16,7 +18,7 @@
     'ƯU ĐÃI NỘI BỘ': 'STAFF DEAL', '● Còn slot': '● Available', 'Giá niêm yết:': 'List price:', 'Giá Nhân Viên:': 'Staff price:', 'Xem trên LG.com ↗': 'View on LG.com ↗',
     'Dạng Thẻ': 'Cards', 'Dạng Bảng': 'Table', 'Kho:': 'Warehouse:', 'Rules': 'Rules', 'Catalog Live': 'Live catalog', 'Excel View': 'Excel view'
   };
-  var P = [[/^(\d+) Đơn$/, '$1 orders'], [/^Đăng ký: (.+)$/, 'Registered: $1'], [/^Kho (\w+) · Slot:$/, 'Warehouse $1 · Slot:'], [/^Còn (\d+)\/(\d+) slot$/, '$1/$2 slots left']];
+  var P = [[/^(\d+) Đơn$/, '$1 orders'], [/^Đăng ký: (.+)$/, 'Registered: $1'], [/^Kho (\w+) · Slot:$/, 'Warehouse $1 · Slot:'], [/^Còn (\d+)\/(\d+) slot$/, '$1/$2 slots left'], [/^Còn (\d+) SP khả dụng$/, '$1 item(s) left']];
   function tr(s) { var k = s.trim(); if (!k) return s; if (D[k]) return s.replace(k, D[k]); for (var i = 0; i < P.length; i++) if (P[i][0].test(k)) return s.replace(k, k.replace(P[i][0], P[i][1])); return s; }
   var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, CODE: 1 };
   function walk(root) {
@@ -27,8 +29,8 @@
   }
   function start() {
     document.documentElement.lang = 'en'; walk(document.body);
-    new MutationObserver(function (ms) { ms.forEach(function (m) { if (m.type === 'characterData') walk(m.target); else m.addedNodes.forEach(walk); }); })
-      .observe(document.body, { childList: true, subtree: true, characterData: true });
+    new MutationObserver(function (ms) { ms.forEach(function (m) { if (m.type === 'characterData' || m.type === 'attributes') walk(m.target); else m.addedNodes.forEach(walk); }); })
+      .observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title', 'placeholder', 'aria-label'] });
     var a = window.alert; window.alert = function (s) { return a.call(window, tr(String(s))); };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

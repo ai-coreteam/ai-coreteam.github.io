@@ -1,0 +1,1183 @@
+[
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "",
+  "bind": "onclick: togglePasswordVisibility('login-password', this)",
+  "screens": [
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Đăng nhập",
+  "bind": "submit form #login-form",
+  "screens": [
+   "Đăng nhập"
+  ],
+  "class": "A · nút gửi form"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "VH12345 · Nguyễn Thị Quỳnh Như Quản trị PM",
+  "bind": "onclick: quickLogin('VH12345', 'test123')",
+  "screens": [
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "VH88921 · Trần Văn Nam Nhân viên",
+  "bind": "onclick: quickLogin('VH88921', 'test123')",
+  "screens": [
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "VH11111 · Nguyen Ngoc Bao Nhân viên",
+  "bind": "onclick: quickLogin('VH11111', 'test123')",
+  "screens": [
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "a",
+  "text": "Cấu hình API Google Sheet (Dành cho PM/PIC)",
+  "bind": "onclick: openApiConfigModal()",
+  "screens": [
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Hướng dẫn nhanh",
+  "bind": "onclick: startCurrentRoleTour()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Google Cloud Live",
+  "bind": "onclick: openApiConfigModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "In / Xuất PDF",
+  "bind": "onclick: window.print()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Đêm / Sáng",
+  "bind": "onclick: toggleTheme()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "HOT Ưu Đãi Độc Quyền",
+  "bind": "onclick: selectQuickCategory('all', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "NEW Tủ Lạnh",
+  "bind": "onclick: selectQuickCategory('ref', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Máy Giặt",
+  "bind": "onclick: selectQuickCategory('wm', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Điều Hòa",
+  "bind": "onclick: selectQuickCategory('ac', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Màn Hình · gram",
+  "bind": "onclick: selectQuickCategory('it', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Quy Chế & VCB",
+  "bind": "onclick: openFullLetterModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Hỗ Trợ Nội Bộ",
+  "bind": "onclick: openSupportModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "1. Thư Thông Báo & Quy Định Rules",
+  "bind": "onclick: switchTab('tab1', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "2. Danh Mục & Đăng Ký Mua Hàng Catalog Live",
+  "bind": "onclick: switchTab('tab2', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "3. Xác Nhận Mua & Nộp Tiền 0 Đơn",
+  "bind": "onclick: switchTab('tab3', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "4. Bảng Chi Tiết Sản Phẩm Excel View",
+  "bind": "onclick: switchTab('tab4', this)",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Khám Phá Danh Mục & Mua Hàng Ngay (Tab 2) →",
+  "bind": "onclick: switchTab('tab2')",
+  "screens": [
+   "NV · tab1",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Xem Thể Lệ Chi Tiết",
+  "bind": "onclick: openFullLetterModal()",
+  "screens": [
+   "NV · tab1",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "button",
+  "text": "Đăng Ký Ngay Trên Hệ Thống",
+  "bind": "onclick: goToPortal()",
+  "screens": [
+   "NV · tab1",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "Đăng nhập",
+  "tag": "div",
+  "text": "",
+  "bind": "onclick: handleAssistantClick()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình",
+   "Đăng nhập"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "button",
+  "text": "Đổi MK",
+  "bind": "onclick: openChangePasswordModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "button",
+  "text": "Đăng xuất",
+  "bind": "onclick: handleLogout()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "button",
+  "text": "",
+  "bind": "onclick: navigator.clipboard.writeText('0991000012525'); showToast('Đã sao chép",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "a",
+  "text": "Xem thể lệ chi tiết →",
+  "bind": "onclick: openFullLetterModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "a",
+  "text": "Xem chi tiết kho AYA · AYB · AYC (Pop-up) ↗",
+  "bind": "onclick: openRegionalStatsModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "a",
+  "text": "Xem báo cáo kho ↗",
+  "bind": "onclick: openRegionalStatsModal()",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4",
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "a",
+  "text": "Nộp tiền ngay (1-Chạm) →",
+  "bind": "onclick: openQuickPaymentModalForReg('IS-2026Q4-TV-01-AYA-003');",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab1",
+  "tag": "a",
+  "text": "Hủy giữ chỗ",
+  "bind": "onclick: cancelUserRegistration('IS-2026Q4-TV-01-AYA-003');",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab1",
+   "NV · tab2",
+   "NV · tab3",
+   "NV · tab4"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "button",
+  "text": "Xem Thể Lệ & Quy Định Mở Bán",
+  "bind": "onclick: openFullLetterModal()",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "button",
+  "text": "Tất cả kho (1/3)",
+  "bind": "onclick: setUnifiedCatalogKho('')",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "button",
+  "text": "Dạng Thẻ",
+  "bind": "onclick: setUnifiedViewMode('cards')",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "button",
+  "text": "Dạng Bảng",
+  "bind": "onclick: setUnifiedViewMode('table')",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "a",
+  "text": "Tìm thông tin model ↗",
+  "bind": "href: https://www.google.com/search?q=LG%20MODEL-FREE",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "button",
+  "text": "Đăng Ký Giữ Chỗ Ngay",
+  "bind": "onclick: handleRegisterProduct('IS-2026Q4-TV-01-AYA-001')",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "a",
+  "text": "Tìm thông tin model ↗",
+  "bind": "href: https://www.google.com/search?q=LG%20MODEL-TAKEN-B",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab2",
+  "tag": "button",
+  "text": "Đã Có Người Giữ Chỗ",
+  "bind": "(cha bắt sự kiện)",
+  "screens": [
+   "NV · tab2"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "button",
+  "text": "Điền Thông Tin & Upload File Nộp Tiền",
+  "bind": "onclick: goToLookup()",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "button",
+  "text": "Xuất Excel",
+  "bind": "onclick: exportToCSV()",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "1 năm gần nhất (Mặc định)",
+  "bind": "option value=\"1year\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "6 tháng gần đây",
+  "bind": "option value=\"6months\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "30 ngày gần đây",
+  "bind": "option value=\"30days\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "Toàn bộ lịch sử",
+  "bind": "option value=\"all\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "Tự chọn mốc ngày...",
+  "bind": "option value=\"custom\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "button",
+  "text": "Làm mới / Tra cứu",
+  "bind": "submit form #lookup-form",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · nút gửi form"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "button",
+  "text": "Nộp tiền",
+  "bind": "onclick: openPaymentFromLookup(0)",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "label",
+  "text": "Người nộp tiền giống thông tin người đăng ký (tự điền ô 4 và 5)",
+  "bind": "(cha bắt sự kiện)",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "div",
+  "text": "Tải lên biên lai Nhấn vào đây để chọn file, hoặc kéo thả file biên lai",
+  "bind": "onclick: document.getElementById('file-input-receipt').click()",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "button",
+  "text": "Hủy Bỏ",
+  "bind": "submit form #payment-form",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · nút gửi form"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "button",
+  "text": "Gửi Xác Nhận Nộp Tiền & Upload File Chứng Từ",
+  "bind": "submit form #payment-form",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "A · nút gửi form"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "-- Tất Cả Trạng Thái --",
+  "bind": "option value=\"ALL\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "Đã Xác Nhận Nộp Tiền",
+  "bind": "option value=\"CONFIRMED\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab3",
+  "tag": "option",
+  "text": "Chờ Nộp Tiền Ngân Hàng",
+  "bind": "option value=\"PENDING\"",
+  "screens": [
+   "NV · tab3"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "NV · tab4",
+  "tag": "button",
+  "text": "Đặt hàng",
+  "bind": "onclick: handleRegisterProduct('IS-2026Q4-TV-01-AYA-001'); event.stopPropagatio",
+  "screens": [
+   "NV · Báo cáo kho",
+   "NV · Nộp tiền ngay",
+   "NV · tab4"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · Nộp tiền ngay",
+  "tag": "button",
+  "text": "×",
+  "bind": "onclick: closeQuickPaymentModal()",
+  "screens": [
+   "NV · Nộp tiền ngay"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · Nộp tiền ngay",
+  "tag": "a",
+  "text": "Xem vị trí trên App NH",
+  "bind": "onclick: openTxnGuideModal()",
+  "screens": [
+   "NV · Nộp tiền ngay"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · Nộp tiền ngay",
+  "tag": "button",
+  "text": "Để sau (Nộp trong 24h)",
+  "bind": "onclick: closeQuickPaymentModal()",
+  "screens": [
+   "NV · Nộp tiền ngay"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · Nộp tiền ngay",
+  "tag": "button",
+  "text": "Xác Nhận Nộp Tiền",
+  "bind": "submit form #quick-payment-form",
+  "screens": [
+   "NV · Nộp tiền ngay"
+  ],
+  "class": "A · nút gửi form"
+ },
+ {
+  "screen": "NV · Báo cáo kho",
+  "tag": "button",
+  "text": "×",
+  "bind": "onclick: closeRegionalStatsModal()",
+  "screens": [
+   "NV · Báo cáo kho"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · Báo cáo kho",
+  "tag": "button",
+  "text": "Đóng cửa sổ",
+  "bind": "onclick: closeRegionalStatsModal()",
+  "screens": [
+   "NV · Báo cáo kho"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "NV · Báo cáo kho",
+  "tag": "button",
+  "text": "Xem Danh Sách Hàng Tồn (Tab 5) →",
+  "bind": "onclick: closeRegionalStatsModal(); switchTab('tab-pm'); setPMViewMode('remaini",
+  "screens": [
+   "NV · Báo cáo kho"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Tạo chương trình",
+  "bind": "submit form #?",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · nút gửi form"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "a",
+  "text": "Mở PM Dashboard →",
+  "bind": "onclick: switchTab('tab-pm');",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "1. Bảng Điều Khiển PM 1 Đơn",
+  "bind": "onclick: switchTab('tab-pm', this)",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "2. Bảng Chi Tiết Sản Phẩm Tham Khảo",
+  "bind": "onclick: switchTab('tab4', this)",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Mở cổng thanh toán (0)",
+  "bind": "onclick: pmAllowPaymentBatch()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Duyệt hàng loạt (1)",
+  "bind": "onclick: pmBatchApprovePayments()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Hẹn Giờ (Timer)",
+  "bind": "onclick: openTimerSettingsModal()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Nạp Excel SP",
+  "bind": "onclick: openImportExcelModal()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Xuất Excel",
+  "bind": "onclick: exportRegistrationsCSV()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Quét quá hạn 24h",
+  "bind": "onclick: triggerExpiredCheck()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Tải lại",
+  "bind": "onclick: loadPMDashboardData(true)",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Cấu hình API",
+  "bind": "onclick: openApiConfigModal()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "span",
+  "text": "Hẹn giờ: Chưa đặt",
+  "bind": "onclick: openTimerSettingsModal()",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Kết sổ chương trình",
+  "bind": "onclick: if(confirm('Bạn có chắc muốn kết sổ chương trình IS-2026Q4-TV-01?')){ ",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "1. Tất Cả Đơn Đăng Ký 1",
+  "bind": "onclick: setPMViewMode('all')",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "2. Sản Phẩm Còn Trống (Chưa ĐK) 2",
+  "bind": "onclick: setPMViewMode('remaining')",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "3. Nhân Viên Chưa Nộp Tiền 0",
+  "bind": "onclick: setPMViewMode('unpaid')",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Tất cả các kho",
+  "bind": "option value=\"\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Tất cả trạng thái",
+  "bind": "option value=\"\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Đã đăng ký - Chờ mở cổng TT",
+  "bind": "option value=\"Đã đăng ký - Chờ mở thanh toán\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Chờ nộp tiền (Đã mở cổng)",
+  "bind": "option value=\"Chờ nộp tiền\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Mới đăng ký (Legacy)",
+  "bind": "option value=\"Mới đăng ký\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Đã khai nộp - Chờ đối soát",
+  "bind": "option value=\"Đã khai nộp - chờ đối soát\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Đã duyệt thanh toán",
+  "bind": "option value=\"Đã duyệt thanh toán\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "option",
+  "text": "Từ chối / Hủy",
+  "bind": "option value=\"Từ chối\"",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "D · ô chọn (giữ value)"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Xem biên lai",
+  "bind": "onclick: openPMReceiptModal('REG-1')",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Duyệt",
+  "bind": "onclick: pmApprovePayment('REG-1')",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ },
+ {
+  "screen": "PM · Dashboard",
+  "tag": "button",
+  "text": "Từ chối",
+  "bind": "onclick: pmRejectPayment('REG-1')",
+  "screens": [
+   "PM · Dashboard",
+   "PM · Hẹn giờ",
+   "PM · Tạo chương trình"
+  ],
+  "class": "A · chỉ là nhãn"
+ }
+]

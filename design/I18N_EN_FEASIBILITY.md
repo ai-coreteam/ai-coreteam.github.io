@@ -1,6 +1,6 @@
 # Thêm tiếng Anh (nút VI/EN): đánh giá khả năng làm & kế hoạch
 
-> **Trạng thái (08/10/2026):** ĐÁNH GIÁ + BẢN THỬ. **Chưa thay đổi web.** Chờ chủ dự án duyệt §6 trước khi làm.
+> **Trạng thái (08/10/2026):** ĐÁNH GIÁ + BẢN THỬ + RÀ SOÁT NÚT/LỆNH (§8). **Chưa thay đổi web.** Chủ dự án đã trả lời Q-I1 đến Q-I5 (§7). **Còn chờ: Q-I6 (thời điểm), Q-I7, Q-I8 (§8.4).**
 > **Yêu cầu của chủ dự án:**
 > - Giữ nguyên bản tiếng Việt, không đổi gì.
 > - Thêm nút VI/EN; bản tiếng Anh **dịch đầy đủ**, ngắn gọn, dễ hiểu, **không song ngữ** trên cùng màn hình.
@@ -112,14 +112,79 @@ Nhánh riêng `i18n/en` tạo từ `v2-final`. Mỗi bước có tag riêng. App
 ## 7. Cần chủ dự án quyết định
 | # | Câu hỏi | Lựa chọn | Đề xuất |
 |---|---|---|---|
-| **Q-I1** | Email tự động (máy chủ gửi) | (a) Giữ tiếng Việt · (b) Theo ngôn ngữ người dùng chọn (phải sửa Apps Script, lưu ngôn ngữ mỗi người) | (a) |
-| **Q-I2** | File Excel gửi giao hàng / kế toán | (a) Giữ tiêu đề tiếng Việt · (b) Theo ngôn ngữ đang chọn | (a): kế toán và kho dùng tiếng Việt, tránh sai lệch |
-| **Q-I3** | Cách ghi tiền khi ở EN | (a) Giữ `1.875.000 đ` · (b) `1,875,000 VND` | (a): thống nhất với số trên biên lai / QR |
-| **Q-I4** | Ai duyệt bản dịch **Tab 1 (thư thông báo và quy định)**? Đây là nội dung chính sách | Chủ dự án · HR/Pháp chế · Không cần | Chủ dự án duyệt nhanh. Claude đánh dấu câu nào là chính sách |
-| **Q-I5** | Thứ tự với v3 (giao diện điện thoại) | (a) Làm v3 / Đợt 0 trước, rồi EN · (b) EN trước | (a): EN dịch theo chữ mới, tránh dịch 2 lần |
-| **Q-I6** | Thời điểm | Trước hay sau mở bán 14/10 | **Sau 14/10**: khối lượng ≈ 11.500 từ cộng kiểm tra toàn bộ, không nên chen vào tuần mở bán |
+| **Q-I1** | Email tự động (máy chủ gửi) | (a) Giữ tiếng Việt · (b) Theo ngôn ngữ người dùng chọn (phải sửa Apps Script, lưu ngôn ngữ mỗi người) | **ĐÃ CHỐT (08/10): chỉ dịch giao diện web; máy chủ, email, cơ sở dữ liệu giữ tiếng Việt** (Admin và PM đều là người Việt) |
+| **Q-I2** | File Excel gửi giao hàng / kế toán | (a) Giữ tiêu đề tiếng Việt · (b) Theo ngôn ngữ đang chọn | **ĐÃ CHỐT: (a)**, cùng quyết định Q-I1 |
+| **Q-I3** | Cách ghi tiền khi ở EN | (a) Giữ `1.875.000 đ` · (b) `1,875,000 VND` | **ĐÃ CHỐT: (a) giữ cách ghi tiền** |
+| **Q-I4** | Ai duyệt bản dịch **Tab 1 (thư thông báo và quy định)**? Đây là nội dung chính sách | Chủ dự án · HR/Pháp chế · Không cần | **ĐÃ CHỐT: chủ dự án duyệt** |
+| **Q-I5** | Thứ tự với v3 (giao diện điện thoại) | (a) Làm v3 / Đợt 0 trước, rồi EN · (b) EN trước | **ĐÃ CHỐT: (b) tiếng Anh trước.** Khi làm v3 sau, phải cập nhật từ điển EN cho mọi chữ mới hoặc đổi (đưa vào tiêu chí nghiệm thu v3) |
+| **Q-I6** | Thời điểm | Trước hay sau mở bán 14/10 | **CHỜ TRẢ LỜI.** Đề xuất **sau 14/10**: khối lượng ≈ 11.500 từ cộng kiểm tra toàn bộ, không nên chen vào tuần mở bán |
 
 **Ước lượng sau khi duyệt:**
 - Dịch và rà thuật ngữ: khoảng 1,5–2 ngày làm việc.
 - Lớp dịch, nút VI/EN, 2 dòng sửa bộ lọc, test cả 2 ngôn ngữ: khoảng 1 ngày.
 - Chủ dự án duyệt bản dịch Tab 1: tuỳ Q-I4.
+
+---
+
+## 8. Rà soát nút / lệnh: dịch thế nào để không hỏng chức năng (08/10/2026)
+
+**Câu hỏi của chủ dự án:**
+- Các cụm "Còn 1 SP khả dụng", "Xem báo cáo kho", "Cổng TT đã mở", "Nộp tiền ngay (1-Chạm)", "Hủy giữ chỗ" vẫn là tiếng Việt trong ảnh bản thử.
+- Đó là nút lệnh. Dịch có làm hỏng chức năng không?
+
+**Trả lời:**
+- Các cụm này **còn tiếng Việt chỉ vì bản thử đầu chưa có trong từ điển** (bản thử chỉ có khoảng 45 câu), không phải vì là nút lệnh.
+- Đã thêm cả 5 cụm vào bản thử, rồi **bấm thật từng nút ở chế độ EN**: chức năng chạy đúng (§8.2).
+- Lý do an toàn: **lệnh gắn với nút qua `onclick` hoặc mã nút (`id`), không qua chữ trên nút.**
+
+### 8.1 Rà toàn bộ phần tử bấm được (máy tính 1440px)
+Phạm vi: Nhân viên (đăng nhập, tab 1–4, form nộp tiền, cửa sổ Nộp tiền ngay, báo cáo kho) và PM (Dashboard). Danh sách đầy đủ: [`design/i18n/interactive_inventory.json`](i18n/interactive_inventory.json).
+
+| Cách gắn chức năng | Số phần tử có chữ tiếng Việt | Dịch chữ có ảnh hưởng chức năng? |
+|---|---|---|
+| `onclick="hàm(...)"`: lệnh nằm trong code | 67 | **Không** |
+| Lựa chọn trong ô chọn `<option value="…">` | 16 | **Không**, nếu **giữ nguyên value** và chỉ dịch chữ hiển thị |
+| Nút gửi form (`submit`) | 6 | **Không** |
+| Link `href` tạo từ mã model (Tìm thông tin model) | 2 | **Không** |
+| Nhận lệnh qua phần tử cha | 2 | **Không**: một nút đã khoá ("Đã có người giữ chỗ"), một nhãn của ô tích |
+| **Tổng** | **93** | **0 phần tử chạy lệnh dựa trên chữ** |
+
+### 8.2 Bằng chứng: bấm thật ở chế độ EN (bản thử 2, máy chủ giả)
+| Nút (EN) | Kết quả |
+|---|---|
+| **Pay now →** (Nộp tiền ngay) | Mở cửa sổ nộp tiền ✅ |
+| **Stock report ↗** (Xem báo cáo kho) | Mở cửa sổ báo cáo kho ✅ |
+| **Cancel reservation** (Hủy giữ chỗ) | Hiện hộp thoại xác nhận → gửi lệnh `user_cancel_registration` lên máy chủ ✅ |
+| **PAYMENT OPEN** (Cổng TT đã mở), **1 item(s) left** (Còn 1 SP khả dụng) | Chỉ là nhãn trạng thái, hiển thị đúng ✅ |
+| Lỗi JS | 0 |
+
+![Ô 01–03 ở chế độ EN, nút bấm vẫn chạy](i18n/poc2_cards_buttons_en.png)
+
+**Phát hiện thêm:** **hộp thoại xác nhận (`confirm`) vẫn là tiếng Việt** vì bản thử mới bọc `alert`. Bản chính sẽ bọc cả `confirm`, `prompt`, `showToast`, `showWait`. Kết quả Đồng ý/Huỷ của người dùng **không phụ thuộc chữ**.
+
+### 8.3 Những chỗ THẬT SỰ phải xử lý (đã kiểm bằng code)
+| # | Nhóm | Ở đâu | Vấn đề khi chuyển sang EN | Cách làm, không đổi chức năng |
+|---|---|---|---|---|
+| H1 | **Đọc chữ hiển thị để lọc** | Bộ lọc trạng thái tab 3, `filterTable` dòng 13073 / 13075 | So với chữ "Đã Nộp" / "Chờ Nộp" trên dòng bảng. Ở EN, dòng ghi tiếng Anh nên không khớp | Gắn trạng thái gốc vào dòng (`data-status`) và lọc theo đó. **Xem lỗi có sẵn H1b** |
+| H1b | **Lỗi có sẵn ở bản VI** [VERIFIED] | cùng chỗ | Bảng chỉ có các huy hiệu "Chờ nộp tiền" / "Chờ đối soát". Bộ lọc tìm "Chờ **N**ộp" (N hoa) và "Đã Nộp" (không có ở đâu). Nên **chọn bất kỳ trạng thái nào cũng ẩn hết dòng**, ngay cả ở tiếng Việt | Sửa cùng H1, **cần duyệt** (Q-I7) |
+| H2 | **Xuất file đọc chữ trên màn hình** | Nút "Xuất Excel" ở tab 3, `exportToCSV` dòng 13089 | Đọc chữ trong bảng tab 3. Ở EN, file tải về sẽ có **tiêu đề tiếng Anh** | Tuỳ Q-I8. Nếu giữ tiếng Việt thì xuất từ tiêu đề gốc, không đọc màn hình |
+| H3 | Nút **đổi chữ khi đang xử lý** | 24 chỗ (ví dụ "Đang xác thực…" → "Đăng nhập", "Đang nén ảnh & nộp…" → "Xác Nhận Nộp Tiền") | Code ghi lại chữ tiếng Việt sau mỗi lần xử lý | Lớp dịch theo dõi mọi thay đổi chữ và dịch lại **trước khi màn hình kịp vẽ**. Đưa đủ 24 câu này vào từ điển. Test từng nút |
+| H4 | **Chữ có số / tên thay đổi** | "Còn N SP khả dụng", "N Đơn", "Mở cổng thanh toán (N)", "Duyệt hàng loạt (N)", "… — Đã hết", "Đăng ký: <ngày>" | Từ điển câu cố định không khớp | Dùng **mẫu câu có chỗ trống**. Câu nào thiếu mẫu sẽ còn tiếng Việt, được **đo và báo** (§5), không làm hỏng chức năng |
+| H5 | **Chú thích (`title` / `placeholder`) đổi lúc chạy** | 4 chỗ (huy hiệu kết nối, dòng "Bấm để đăng ký slot…", chấm bước hướng dẫn) | Bản thử đầu không theo dõi thuộc tính | Bản thử 2 đã theo dõi thêm `title`, `placeholder`, `aria-label` |
+| H6 | **Ô chỉ để hiển thị có chữ tiếng Việt** | Ô "Mã Slot" ở form tab 3 (`… · Kho AYA · …`) | Lớp dịch không đổi giá trị ô nhập (cố ý, để không đụng dữ liệu) | Chỉ dịch các ô **chỉ-đọc** được đánh dấu rõ. **Không bao giờ** dịch ô người dùng nhập hoặc ô gửi máy chủ |
+| H7 | **Giá trị là dữ liệu, không được dịch** | Tên chương trình mặc định khi PM tạo đợt (dòng 7829): được lưu lên máy chủ | Nếu dịch sẽ lưu tiếng Anh vào cơ sở dữ liệu | **Giữ tiếng Việt** (Q-I1) |
+| H8 | **Dữ liệu trùng chữ với từ điển** | Mô tả sản phẩm, tên chương trình, ghi chú do PM nhập | Nếu một mô tả trùng đúng một câu trong từ điển, nó sẽ bị dịch nhầm | Đánh dấu vùng dữ liệu `data-no-i18n` (thẻ sản phẩm, tên đợt, mô tả, ghi chú) |
+| H9 | Câu báo từ máy chủ | 30 chỗ hiện `res.message` · 107 câu | Máy chủ trả tiếng Việt | Bảng đối chiếu câu và mẫu câu ở phía web. **Không sửa Apps Script** (Q-I1) |
+| — | `copyContent` (dòng 11659) | | Có xoá chữ "Sao chép" khi sao chép | **Không ai gọi hàm này** (code thừa), nên không có rủi ro |
+
+### 8.4 Câu hỏi mới
+| # | Câu hỏi | Lựa chọn | Đề xuất |
+|---|---|---|---|
+| **Q-I7** | Sửa **lỗi có sẵn H1b** (bộ lọc trạng thái tab 3 luôn ẩn hết dòng, kể cả ở tiếng Việt) | Duyệt · Không duyệt | Duyệt. Sửa cùng lúc với H1 (lọc theo trạng thái gốc), có test cả VI và EN |
+| **Q-I8** | File "Xuất Excel" ở **tab 3** (bản sao của chính nhân viên) khi đang ở EN | (a) Giữ tiêu đề tiếng Việt (giống file PM) · (b) Theo ngôn ngữ đang chọn | (a): thống nhất với quyết định "chỉ dịch giao diện web" |
+
+### 8.5 Tiêu chí nghiệm thu bổ sung
+- Chạy lại bản rà §8.1 ở **chế độ EN**: 93/93 phần tử vẫn chạy đúng lệnh. Bấm thử tự động các nút chính: giữ chỗ, nộp tiền, huỷ, mở cổng, duyệt, xuất Excel, kết sổ.
+- 24 nút đổi chữ khi xử lý (H3): sau mỗi lần xử lý **vẫn hiện tiếng Anh**.
+- Bộ lọc tab 3 lọc đúng ở cả VI và EN (sau khi Q-I7 được duyệt).
+
