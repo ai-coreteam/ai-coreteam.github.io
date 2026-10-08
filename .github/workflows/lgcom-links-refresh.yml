@@ -2,7 +2,7 @@
 # Thứ Hai 08:00 giờ VN: tải sitemap LG.com/vn → scripts/build_product_links.py → CHỈ khi link thay đổi mới commit
 # assets/content/lgcom_product_links.json lên main và yêu cầu GitHub Pages build lại.
 # An toàn: script DỪNG (job báo lỗi, GitHub gửi email) nếu sitemap bị chặn / không phải sitemap / số trang giảm > 30%
-# → web giữ nguyên bảng gần nhất, không bao giờ ghi bảng hỏng. Chỉ chạy trên repo Gobitangocbao (repo bản sao bỏ qua).
+# → web giữ nguyên bảng gần nhất, không bao giờ ghi bảng hỏng. Chỉ chạy trên repo chính ai-coreteam/ai-coreteam.github.io (repo bản sao bỏ qua).
 # Sau khi bot commit: máy cục bộ phải `git pull --ff-only gobita main` trước khi phát hành (Runbook §1).
 name: LG.com product links – weekly refresh
 on:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   refresh:
-    if: github.repository == 'Gobitangocbao/lg-internal-sales-portal'
+    if: github.repository == 'ai-coreteam/ai-coreteam.github.io'   # 08/10/2026: kho chuyển sang Organization ai-coreteam
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

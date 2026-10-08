@@ -12,8 +12,8 @@ Hệ thống mã nguồn được kết nối song song với 2 remote repositor
 ```mermaid
 graph LR
     LocalWorkspace[Local Workspace trên Laptop] -->|git push all main| RemoteOrigin[origin: minhhienlge/lg-internal-sales-portal<br/>Kho nguồn chính LGEVH]
-    LocalWorkspace -->|git push all main| RemoteGobita[gobita: Gobitangocbao/lg-internal-sales-portal<br/>Kho phát hành & GitHub Pages]
-    RemoteGobita -->|Tự động biên dịch .nojekyll| LiveWeb[🌐 Live Web Production<br/>https://gobitangocbao.github.io/lg-internal-sales-portal/]
+    LocalWorkspace -->|git push all main| RemoteGobita[gobita: ai-coreteam/ai-coreteam.github.io<br/>Kho phát hành & GitHub Pages]
+    RemoteGobita -->|Tự động biên dịch .nojekyll| LiveWeb[🌐 Live Web Production<br/>https://ai-coreteam.github.io/]
 ```
 
 ### Bảng thông số cấu hình mạng Git:
@@ -21,10 +21,10 @@ graph LR
 | Thuộc tính | Giá trị cấu hình | Ý nghĩa & Vai trò |
 |---|---|---|
 | **Remote 1 (`origin`)** | `https://github.com/minhhienlge/lg-internal-sales-portal.git` | Kho lưu trữ chính của chủ dự án LG Electronics Việt Nam. |
-| **Remote 2 (`gobita`)** | `https://github.com/Gobitangocbao/lg-internal-sales-portal.git` | Kho phát hành công khai phục vụ máy chủ GitHub Pages Live. |
+| **Remote 2 (`gobita`)** | `https://github.com/ai-coreteam/ai-coreteam.github.io.git` | Kho phát hành công khai phục vụ máy chủ GitHub Pages Live. |
 | **Remote Kép (`all`)** | Chứa cả 2 URL `origin` và `gobita` | Cho phép đẩy mã nguồn lên **đồng thời cả 2 kho** chỉ với 1 câu lệnh `git push all main`. |
 | **Nhánh mặc định (Branch)** | `main` | Nhánh sản xuất chính thức của toàn bộ dự án. |
-| **Website Go-Live** | `https://gobitangocbao.github.io/lg-internal-sales-portal/` | Đường dẫn trực tuyến công khai kiểm thử trên mọi thiết bị. |
+| **Website Go-Live** | `https://ai-coreteam.github.io/` | Đường dẫn trực tuyến công khai kiểm thử trên mọi thiết bị. |
 | **Trang đích điều hướng** | `index.html` → `Mau_Dang_Ky_Internal_Sales_3009.html` | Tự động chuyển hướng không giật trang, giữ nguyên query URL. |
 | **Cấu hình Static Host** | Tệp `.nojekyll` tại thư mục gốc | Bỏ qua trình biên dịch Jekyll của GitHub, giữ nguyên 100% cấu trúc tệp tĩnh. |
 
@@ -88,7 +88,7 @@ git commit -m "fix(brand): chỉnh sửa giao diện theo chuẩn LG BI V5.2"
 
 ### Bước 5: Đẩy lên cả 2 remote chỉ bằng 1 lệnh
 ```bash
-# Đẩy đồng thời lên cả origin (minhhienlge) và gobita (Gobitangocbao)
+# Đẩy đồng thời lên cả origin (minhhienlge) và gobita (ai-coreteam)
 git push all main
 ```
 *Lưu ý: Nếu remote `all` chưa được nhận diện, có thể chạy lần lượt:*
@@ -127,10 +127,10 @@ git clone https://github.com/minhhienlge/lg-internal-sales-portal.git
 cd lg-internal-sales-portal
 
 # Thiết lập remote kép để sau này push đồng bộ 1 chạm
-git remote add gobita https://github.com/Gobitangocbao/lg-internal-sales-portal.git
+git remote add gobita https://github.com/ai-coreteam/ai-coreteam.github.io.git
 git remote add all https://github.com/minhhienlge/lg-internal-sales-portal.git
 git remote set-url --add --push all https://github.com/minhhienlge/lg-internal-sales-portal.git
-git remote set-url --add --push all https://github.com/Gobitangocbao/lg-internal-sales-portal.git
+git remote set-url --add --push all https://github.com/ai-coreteam/ai-coreteam.github.io.git
 ```
 
 ### Bước 3: Tạo CSDL Google Sheet độc lập cho PIC mới (Zero-Pervasive-Access)
@@ -166,7 +166,7 @@ PIC mới có thể bắt đầu vận hành ngay với các tài khoản thử 
 | **Đẩy code lên đồng thời cả 2 kho** | `git push all main` |
 | **Đẩy riêng cho từng kho** | `git push origin main` và `git push gobita main` |
 | **Kiểm tra nhật ký commit gần nhất** | `git log -n 5 --oneline` |
-| **Kiểm tra trạng thái máy chủ GitHub Pages** | `gh api repos/Gobitangocbao/lg-internal-sales-portal/pages/builds/latest` |
+| **Kiểm tra trạng thái máy chủ GitHub Pages** | `gh api repos/ai-coreteam/ai-coreteam.github.io/pages/builds/latest` |
 | **Chạy Web Server cục bộ thử nghiệm** | `python3 -m http.server 8000` |
 
 ---

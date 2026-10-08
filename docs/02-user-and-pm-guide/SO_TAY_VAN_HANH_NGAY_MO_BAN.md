@@ -4,7 +4,7 @@
 | | |
 |---|---|
 | Áp dụng cho | Bản **v2.0** — giao diện mới bật cho mọi người 06/10/2026 (chức năng như v1.4). Tên nút / màu: [`PM_AND_USER_OPERATIONAL_GUIDE.md`](PM_AND_USER_OPERATIONAL_GUIDE.md) Phần D |
-| Link nhân viên | `https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html` · link ngắn `https://ai-coreteam.github.io` (mã QR: `assets/qr/ai-coreteam_qr_card.png`) |
+| Link nhân viên | `https://ai-coreteam.github.io` (mở thẳng cổng; mã QR: `assets/qr/ai-coreteam_qr_card.png`) · link đầy đủ `https://ai-coreteam.github.io/portal.html` |
 | Đợt bán | Mở **10:00 ngày 14/10/2026** → kết thúc **17:00 ngày 16/10/2026** |
 | Đối chiếu | Mọi bước dưới đây đã được kiểm tra với mã nguồn ngày 05/10/2026 |
 

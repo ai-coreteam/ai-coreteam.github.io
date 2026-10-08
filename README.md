@@ -4,13 +4,13 @@ Hệ thống số hóa toàn diện quy trình đăng ký, giữ chỗ theo nguy
 
 > 📌 **THÔNG TIN MỚI NHẤT (05/10/2026): đọc [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md) trước.** Bản v1 đã gia cố trên nhánh `v1-hardening` và đạt kiểm thử trên máy chủ staging; **chưa** triển khai bản chính thức. Mở bán: **10:00 14/10/2026**.
 
-> ✅ **LINK CHÍNH THỨC CHO NHÂN VIÊN (06/10/2026):**  
-> 🔗 **[https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html](https://gobitangocbao.github.io/lg-internal-sales-portal/portal.html)**  
-> 🔗 **Link ngắn (08/10/2026): [ai-coreteam.github.io](https://ai-coreteam.github.io)** — tự mở link chính thức ở trên. Mã QR: [`assets/qr/ai-coreteam_qr_card.png`](assets/qr/ai-coreteam_qr_card.png) (thẻ) · [`ai-coreteam_qr.png`](assets/qr/ai-coreteam_qr.png) (chỉ mã); mã QR link dài: [`portal_qr_card.png`](assets/qr/portal_qr_card.png). Chi tiết: Runbook §1.  
+> ✅ **LINK CHÍNH THỨC CHO NHÂN VIÊN (từ 08/10/2026, kho mã chuyển sang Organization `ai-coreteam`):**  
+> 🔗 **[https://ai-coreteam.github.io/portal.html](https://ai-coreteam.github.io/portal.html)**  
+> 🔗 **Link ngắn: [ai-coreteam.github.io](https://ai-coreteam.github.io)** — trang gốc mở thẳng cổng chính thức. Link cũ `gobitangocbao.github.io/lg-internal-sales-portal/…` tự chuyển sang link mới. Mã QR: [`assets/qr/ai-coreteam_qr_card.png`](assets/qr/ai-coreteam_qr_card.png) (thẻ) · [`ai-coreteam_qr.png`](assets/qr/ai-coreteam_qr.png) (chỉ mã); mã QR link dài: [`portal_qr_card.png`](assets/qr/portal_qr_card.png). Chi tiết: Runbook §1.  
 > *Gửi link này, **không kèm `?ui=v2`**: giao diện v2 đã là mặc định. `?ui=v2` ép v2 kể cả khi phải quay lại v1.4 (`UI_V2_DEFAULT = false`), nên người giữ link có tham số sẽ không nhận bản quay lại. `?ui=v1` chỉ dùng để xem giao diện cũ khi xử lý sự cố.*
 
 > 🚀 **BẢN DEMO TRỰC TUYẾN (đào tạo / thử nghiệm):**  
-> 🔗 **[https://gobitangocbao.github.io/lg-internal-sales-portal/](https://gobitangocbao.github.io/lg-internal-sales-portal/)**  
+> 🔗 **[https://ai-coreteam.github.io/Mau_Dang_Ky_Internal_Sales_3009.html](https://ai-coreteam.github.io/Mau_Dang_Ky_Internal_Sales_3009.html)** (từ 08/10/2026 trang gốc mở bản chính thức, không còn mở bản demo)  
 > *Đây là **bản demo**: mặc định chạy Demo Offline với tài khoản mẫu. Bản chính thức cho nhân viên là `portal.html`, sinh bằng `scripts/build_production.py` (không có tài khoản/dữ liệu demo) — xem [`docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md`](docs/04-v1-hardening/V1_RELEASE_RUNBOOK.md).*
 
 > 🔒 **LƯU Ý BẢO MẬT & BẢN QUYỀN:** Kho lưu trữ chứa thông tin tài khoản ngân hàng thụ hưởng pháp nhân, danh mục sản phẩm và quy trình kiểm toán Jeong-Do. Dữ liệu đã được **khử định danh (sanitized)** toàn diện để có thể triển khai an toàn trên môi trường cá nhân hóa mà không làm rò rỉ dữ liệu cá nhân của bất kỳ ai.
