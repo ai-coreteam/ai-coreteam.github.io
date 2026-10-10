@@ -3446,6 +3446,57 @@
     @media (max-width: 719px) {
       html.ui-v2 .nav-tabs { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
+
+    /* ===== Điện thoại ≤ 719px — v2.5 (11/10/2026, chủ dự án duyệt; design/UI_V3_MOBILE_AUDIT.md A1–A4, R4, R8, Q1).
+       Chỉ giao diện v2 trên màn hẹp; máy tính (≥ 720px) và ?ui=v1 không đổi. Không đổi chức năng, ID hay dữ liệu gửi máy chủ. ===== */
+    .btn-header-menu { display: none; }
+    @media (max-width: 719px) {
+      /* A1: đầu trang 1 hàng = logo · tên · EN · ☰. Bấm ☰ (.menu-open) hiện lại đủ các nút như cũ (Đổi MK, Đăng xuất, Hướng dẫn, In, Đêm/Sáng…) */
+      html.ui-v2 .header-actions > .btn-header-menu { display: inline-flex; align-items: center; justify-content: center; }
+      html.ui-v2 .header-actions > .btn-lang,
+      html.ui-v2 .header-actions > .btn-header-menu { flex: 0 0 auto !important; min-width: 44px !important; padding: 0 12px !important; }
+      html.ui-v2 .top-header:not(.menu-open) { flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 8px !important; padding: 8px 0 !important; }
+      html.ui-v2 .top-header:not(.menu-open) .brand-group { width: auto !important; flex: 0 0 auto; }
+      html.ui-v2 .top-header:not(.menu-open) .header-titles { display: none !important; }
+      html.ui-v2 .top-header:not(.menu-open) .header-actions { flex: 1 1 auto !important; width: auto !important; min-width: 0; flex-wrap: nowrap !important; justify-content: flex-end; }
+      html.ui-v2 .top-header:not(.menu-open) .header-actions > button:not(.btn-lang):not(.btn-header-menu) { display: none !important; }
+      html.ui-v2 .top-header:not(.menu-open) #user-bar { width: auto !important; flex: 1 1 auto; min-width: 0; padding: 0 14px !important; justify-content: flex-start !important; flex-wrap: nowrap !important; }
+      html.ui-v2 .top-header:not(.menu-open) #user-bar > :not(.user-name) { display: none !important; }
+      html.ui-v2 .top-header:not(.menu-open) #user-bar .user-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+      /* A2: nhân viên có đơn → ô 03 "Đơn hàng của bạn" lên đầu (trước ô 01, 02) */
+      html.ui-v2 .grap-cards-grid:has(#grap-card3-footer [onclick^="openQuickPaymentModalForReg"], #grap-card3-footer [onclick^="cancelUserRegistration"], #grap-card3-footer [onclick^="switchTab('tab4')"]) #grap-card-context { order: -1; }
+
+      /* A3: ô 03 — "Nộp tiền ngay" thành nút chính (Active Red, 48 px, rộng hết thẻ); "Hủy giữ chỗ" thành nút viền ở dòng riêng; nhãn cổng TT phẳng */
+      html.ui-v2 #grap-card3-footer > div,
+      html.ui-v2 #grap-card3-footer > div > div { flex-direction: column; align-items: stretch !important; gap: 10px !important; }
+      html.ui-v2 #grap-card3-footer .grap-pill { align-self: flex-start; animation: none !important; box-shadow: none !important; }
+      html.ui-v2 #grap-card3-footer [onclick^="openQuickPaymentModalForReg"] { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 16px;
+        border-radius: 999px; background: #EA1917; color: #FFFFFF !important; font-size: 16px !important; font-weight: 600 !important; text-decoration: none; }
+      html.ui-v2 #grap-card3-footer [onclick^="cancelUserRegistration"] { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px;
+        border-radius: 999px; border: 1px solid rgba(255,255,255,0.6); color: #FFFFFF !important; font-size: 14px !important; text-decoration: none !important; }
+
+      /* A4: nút trợ lý ảo không che nút xác nhận — ẩn khi đang mở cửa sổ hoặc form nộp tiền (tab 3); các màn khác thu về 44 px */
+      html.ui-v2 body:has(.modal-overlay.active) #lg-digital-assistant,
+      html.ui-v2 body:has(#tab3.active #payment-form:not([hidden])) #lg-digital-assistant { display: none !important; }
+      html.ui-v2 .lg-assistant-disc { width: 44px !important; height: 44px !important; }
+      html.ui-v2 .lg-assistant-disc img { width: 32px !important; height: 32px !important; }
+
+      /* Q1: thanh danh mục HOT/NEW chỉ chuyển tab, không lọc → ẩn trên điện thoại */
+      html.ui-v2 .lg-quick-category-bar { display: none !important; }
+
+      /* R4: thanh chương trình xuống dòng, thấy đủ mọi đợt (trước: đợt thứ 2 bị cắt, không biết còn để vuốt) */
+      html.ui-v2 .program-tab-bar { flex-wrap: wrap !important; overflow-x: visible !important; border-radius: 28px !important; }
+      html.ui-v2 .program-tab { max-width: 100%; height: auto; min-height: 44px; white-space: normal !important; text-align: left; line-height: 20px; padding-top: 8px !important; padding-bottom: 8px !important; }   /* tên đợt dài xuống dòng trong nút, không tràn khỏi màn hình */
+
+      /* R8: mũi tên "↗" không rơi xuống dòng riêng; ô 02 mỗi kho 1 dòng (dấu "·" ngăn cách không còn rơi lẻ đầu dòng) */
+      html.ui-v2 .grap-card-link { white-space: nowrap; }
+      html.ui-v2 #grap-wh-breakdown + div > a { text-wrap: balance; }
+      html.ui-v2 #grap-wh-breakdown { flex-direction: column; align-items: flex-start !important; }
+      html.ui-v2 #grap-wh-breakdown > span:nth-child(even) { display: none; }
+    }
+    /* B4 (11/10/2026): chế độ Đêm — chữ "Google Cloud Live" xanh đậm #1E8449 (viết inline) không đọc được trên nền tối */
+    [data-theme="dark"] #top-api-badge.api-online { color: #A5D6A7 !important; }
     html.ui-v2[data-theme="dark"] .tab-content .grap-section-header p { color: #CBC8C2 !important; }
     html.ui-v2[data-theme="dark"] [style*="color:var(--lg-ok)"],
     html.ui-v2[data-theme="dark"] .sec-card strong[style*="var(--lg-red"],
@@ -3587,6 +3638,8 @@
         <button class="btn-action" onclick="window.print()">In / Xuất PDF</button>
         <button class="btn-action btn-secondary" onclick="toggleTheme()">Đêm / Sáng</button>
         <button type="button" class="btn-action btn-secondary btn-lang" data-lang-toggle onclick="lgToggleLang()">EN</button>
+        <!-- 11/10/2026 (A1): nút ☰ chỉ hiện trên điện thoại ≤ 719px — mở/đóng các nút tài khoản & tiện ích -->
+        <button type="button" class="btn-action btn-secondary btn-header-menu" onclick="toggleHeaderMenu(this)" aria-expanded="false" title="Tài khoản & tiện ích" aria-label="Tài khoản & tiện ích"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
       </div>
     </header>
 
@@ -3829,7 +3882,7 @@
             CHƯƠNG TRÌNH ĐẶC QUYỀN NỘI BỘ · LG ELECTRONICS VIETNAM
           </div>
           <h2 class="hero-title">Đợt Mở Bán Thiết Bị Gia Dụng Cao Cấp Q3/2026</h2>
-          <p class="hero-subtitle">
+          <p class="hero-subtitle" id="tab1-hero-subtitle">
             90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC chính thức mở bán trực tuyến. Cơ hội sở hữu các dòng sản phẩm cao cấp LG OLED, Tủ lạnh InstaView và Tháp giặt sấy WashTower với chính sách ưu đãi đặc quyền cho cán bộ nhân viên.
           </p>
 
@@ -3914,7 +3967,7 @@
 
           <p>Kính gửi Toàn thể Cán bộ Nhân viên LG Electronics Việt Nam (Dear All LG Team Members),</p>
           <br>
-          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG. Đợt này mở bán <strong>90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC</strong>. Danh sách Slot ID đầy đủ xem ở Tab 4.</p>
+          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG. Đợt này mở bán <strong id="tab1-letter-count">90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC</strong>. Danh sách Slot ID đầy đủ xem ở Tab 4.</p>
           <p style="margin-top:8px;"><em>Thông tin Nhân Viên Nộp Tiền (Họ tên & Mã NV, tách 2 trường riêng) được khai ở bước Xác nhận nộp tiền.</em></p>
 
           <div class="sec-card">
@@ -7651,6 +7704,7 @@
         controls.style.display = 'none';
         return;
       }
+      if (!prog) { controls.style.display = 'none'; controls.innerHTML = ''; return; }   // 11/10/2026: PM chưa có chương trình → trước đây lỗi JS, dừng luôn phần hiển thị phía sau
       // Smart Visibility: When PM is on tab-pm (main dashboard), hide top duplicate #pm-controls
       const tabPm = document.getElementById('tab-pm');
       if (tabPm && tabPm.classList.contains('active')) {
@@ -7698,7 +7752,7 @@
           const res = await fetch(SHEET_API_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
-              action: 'program_update', programId: pid, newStatus: normStatus,
+              action: 'program_update', programId: pid, newStatus: normStatus, token: currentUser.token,   // 11/10/2026: máy chủ bắt buộc token (Code.gs program_update_) — thiếu token thì Mở bán / Kết sổ / Hẹn giờ đều bị từ chối
               role: currentUser.role, userId: currentUser.id, userName: currentUser.name
             }),
             signal: controller.signal
@@ -8810,6 +8864,9 @@
         if (card3Title) card3Title.textContent = 'Đơn Hàng Của Bạn';
         const myRegs = currentUser ? allRegs.filter(r => (r.programId === pid || !r.programId) && r.empCode === currentUser.id && r.status !== 'Đã hủy bởi nhân viên' && r.status !== 'Từ chối' && r.status !== 'Hủy' && r.status !== 'Đã hủy bởi PM') : [];
         const myReg = myRegs.length ? myRegs[myRegs.length - 1] : null;
+        // 11/10/2026 (R1): badge tab 3 đếm đơn từ máy chủ, cùng nguồn với ô 03 (trước đây chỉ đếm bảng "đơn gửi từ máy này" → "0 Đơn")
+        const tab3Badge = document.getElementById('tab3-count-badge');
+        if (tab3Badge && isServerUser()) tab3Badge.innerText = `${myRegs.length} Đơn`;
 
         if (myReg) {
           if (card3Body) {
@@ -9249,6 +9306,29 @@
         renderTab4ProductTable(currentProducts);
         renderBriefTopDashboard(programId);
       }
+      if (!currentUser || !programId || programId !== activeProgram) return;   // 0 chương trình / đã đổi chương trình / đăng xuất trong lúc chờ máy chủ
+      // 11/10/2026 (R2): selectProgram tính KPI PM trước khi danh mục về → "Tổng SP 0". Danh mục về rồi thì tính lại.
+      if (currentUser.role === 'PM' && typeof calculatePMStats === 'function') calculatePMStats(activeProgram);
+      updateTab1Counts(currentProducts);   // 11/10/2026 (C3)
+    }
+
+    // 11/10/2026 (A1): điện thoại — nút ☰ mở/đóng các nút tài khoản & tiện ích ở đầu trang (CSS: .top-header.menu-open)
+    function toggleHeaderMenu(btn) {
+      const open = document.querySelector('.top-header').classList.toggle('menu-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    // 11/10/2026 (C3, chủ dự án duyệt): Tab 1 lấy số thật từ danh mục đang xem, thay câu ghi cứng "90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC".
+    // Ghi câu tiếng Việt; khi xem tiếng Anh lớp dịch tự dịch theo mẫu câu trong assets/i18n/en_source.json.
+    function updateTab1Counts(products) {
+      if (!Array.isArray(products) || !products.length) return;   // chưa có danh mục: giữ câu đang hiện
+      const models = new Set(products.map(p => String(p.model || '').trim().toUpperCase()).filter(Boolean));
+      const khos = [...new Set(products.map(p => String(p.kho || '').trim().toUpperCase()).filter(Boolean))].sort();
+      const counts = `${products.length} sản phẩm (${models.size} model) tại ${khos.length} kho ${khos.join(', ')}`;
+      const hero = document.getElementById('tab1-hero-subtitle');
+      if (hero) hero.textContent = counts + ' chính thức mở bán trực tuyến. Cơ hội sở hữu các dòng sản phẩm cao cấp LG OLED, Tủ lạnh InstaView và Tháp giặt sấy WashTower với chính sách ưu đãi đặc quyền cho cán bộ nhân viên.';
+      const letter = document.getElementById('tab1-letter-count');
+      if (letter) letter.textContent = counts;
     }
 
     function formatVND(n) {
@@ -10113,7 +10193,7 @@
           gateStatus = `<span class="pm-pill live-pulse-badge" style="background:#287D00; color:#FFF; border:1px solid #1E8449;">Cổng đang mở</span>`;
           quickAction = `
             <div style="display:flex; gap:4px; justify-content:center;">
-              <button type="button" class="btn-table-action" style="background:#A50034; color:#FFF; border-color:#A50034; font-size:11px;" onclick="alert('Đã gửi thông báo nhắc nhở chuyển khoản đến nhân viên ${esc(r.empName)} qua tin nhắn/email!');" title="Nhắc nhở nộp tiền"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Đôn đốc</button>
+              <!-- 11/10/2026 (chủ dự án duyệt): ẩn nút "Đôn đốc" — nút chỉ hiện thông báo "Đã gửi…" nhưng không gửi gì tới nhân viên -->
               <button type="button" class="btn-table-action btn-reject" style="font-size:11px;" onclick="pmCancelUnpaidSlot('${esc(r.id)}')" title="Hủy giữ chỗ và hoàn slot về kho">Hủy slot</button>
             </div>
           `;
@@ -10403,17 +10483,19 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         tbody.innerHTML = '';
         if (emptyDiv) emptyDiv.style.display = 'block';
         if (tally) tally.textContent = `Đang hiển thị 0 / ${progRegs.length} đơn đăng ký`;
-        if (amount) amount.textContent = 'Tổng tiền thanh toán: 0 đ';
+        if (amount) amount.textContent = 'Tổng giá trị đơn: 0 đ · Đã nộp (chờ đối soát + đã duyệt): 0 đ';   // 11/10/2026 (R3)
         return;
       }
 
       if (emptyDiv) emptyDiv.style.display = 'none';
 
       let totalAmount = 0;
+      let paidAmount = 0;   // 11/10/2026 (R3): chỉ đơn đã khai nộp (chờ đối soát) + đã duyệt — máy chủ luôn trả amount = giá SP, kể cả đơn chưa nộp
       let html = '';
 
       filtered.forEach((r, idx) => {
         totalAmount += Number(r.amount || 0);
+        if (r.status === 'Đã khai nộp - chờ đối soát' || r.status === 'Đã duyệt thanh toán') paidAmount += Number(r.amount || 0);
 
         // Status badge
         let statusBadge = '';
@@ -10504,7 +10586,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
       tbody.innerHTML = html;
       if (tally) tally.textContent = `Đang hiển thị ${filtered.length} / ${progRegs.length} đơn đăng ký`;
-      if (amount) amount.textContent = `Tổng tiền thanh toán đã nộp: ${fmtVND(totalAmount)}`;
+      if (amount) amount.textContent = `Tổng giá trị đơn: ${fmtVND(totalAmount)} · Đã nộp (chờ đối soát + đã duyệt): ${fmtVND(paidAmount)}`;
     }
 
     function pmApprovePayment(regId) {
@@ -12575,7 +12657,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       tbody.insertBefore(newRow, tbody.firstChild);
 
       const totalCount = tbody.querySelectorAll('tr').length;
-      document.getElementById('tab3-count-badge').innerText = `${totalCount} Đơn`;
+      if (!isServerUser()) document.getElementById('tab3-count-badge').innerText = `${totalCount} Đơn`;   // tài khoản thật: badge đếm đơn máy chủ (R1)
 
       const warn = (res.warnings && res.warnings.length) ? `\n\nLƯU Ý:\n• ${res.warnings.join('\n• ')}` : '';
       const head = res.offline

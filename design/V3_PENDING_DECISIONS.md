@@ -1,8 +1,8 @@
 # v3 (giao diện điện thoại): hồ sơ tạm dừng, chờ quyết định
 
 > **Mục đích:** quay lại việc v3 bất cứ lúc nào mà không thiếu gì. Đọc trang này trước, rồi mới mở báo cáo chi tiết.
-> **Trạng thái (08/10/2026):** **TẠM DỪNG, chờ chủ dự án trả lời 6 câu hỏi ở §2.** Chưa có thay đổi nào trên web.
-> **Điểm xuất phát code:** tag **`v2.4.0`** (= `v2-final` + tiếng Anh; ở tiếng Việt DOM trùng `v2-final` 56/56 màn hình). Mọi việc v3 làm trên nhánh mới tạo từ tag này.
+> **Trạng thái (11/10/2026):** chủ dự án đã trả lời đủ 6 câu (§2). **Đợt 0 + Đợt 1 làm xong ở bản web v2.5.0** (§8). Đợt 2–3 chờ duyệt.
+> **Điểm xuất phát code:** tag **`v2.4.1`** (11/10: dùng bản mới nhất; trước ghi `v2.4.0` sẽ làm mất bản sửa cột "Giảm") (= `v2-final` + tiếng Anh; ở tiếng Việt DOM trùng `v2-final` 56/56 màn hình). Mọi việc v3 làm trên nhánh mới tạo từ tag này.
 
 ---
 
@@ -20,12 +20,12 @@
 ## 2. Sáu câu hỏi chờ chủ dự án trả lời
 | # | Câu hỏi | Lựa chọn | Đề xuất của Claude | Trả lời |
 |---|---|---|---|---|
-| **Q1** | Thanh danh mục HOT/NEW (Ưu đãi độc quyền, TV & Loa, Tủ lạnh…): bấm vào **không lọc**, chỉ chuyển sang tab 2 (N8) | (a) Ẩn trên điện thoại · (b) Làm thành bộ lọc thật (thay đổi chức năng) | (a) ở đợt 1; cân nhắc (b) ở đợt 2 | ☐ |
-| **Q2** | Làm gì trước ngày mở bán 14/10? | (a) Đợt 1 (A1–A5, chỉ CSS) · (b) Không đổi gì trước mở bán | (a) | ☐ |
-| **Q3** | Thanh tab trên điện thoại | (a) Giữ lưới 2×2 ở đầu trang · (b) Thanh tab cố định ở đáy màn hình | (a); để (b) sau | ☐ |
-| **Q4** | Tab 1 ghi cứng "90 sản phẩm (43 model)" (N10) | Lấy số thật từ danh mục · Sửa tay | Lấy số thật (đổi chữ trên cả máy tính, xem §3) | ☐ |
-| **Q5** | **Đợt 0: sửa 3 lỗi số liệu** R1 (badge tab 3 "0 Đơn"), R2 (KPI PM "Tổng SP 0 · 0.0%"), R3 ("Tổng tiền đã nộp" cộng cả đơn chưa nộp) | Duyệt · Không duyệt | Duyệt, **trước 14/10**. Đây là lỗi có cả trên máy tính; chỉ sửa cách tính và nhãn, không đổi dữ liệu máy chủ | ☐ |
-| **Q6** | Đợt bán 14/10 có khoảng **bao nhiêu sản phẩm**? | Con số | Quyết định độ ưu tiên của B1 (thẻ gọn): 6 SP thì gọn sẵn, 50 SP thì phải cuộn 45 màn hình | ☐ |
+| **Q1** | Thanh danh mục HOT/NEW (Ưu đãi độc quyền, TV & Loa, Tủ lạnh…): bấm vào **không lọc**, chỉ chuyển sang tab 2 (N8) | (a) Ẩn trên điện thoại · (b) Làm thành bộ lọc thật (thay đổi chức năng) | (a) ở đợt 1; cân nhắc (b) ở đợt 2 | ✅ (a) Ẩn trên điện thoại — làm ở v2.5.0 |
+| **Q2** | Làm gì trước ngày mở bán 14/10? | (a) Đợt 1 (A1–A5, chỉ CSS) · (b) Không đổi gì trước mở bán | (a) | ✅ (a) Đợt 1 — làm ở v2.5.0, **trừ A5** (xem §8) |
+| **Q3** | Thanh tab trên điện thoại | (a) Giữ lưới 2×2 ở đầu trang · (b) Thanh tab cố định ở đáy màn hình | (a); để (b) sau | ✅ (a) Giữ lưới 2×2 |
+| **Q4** | Tab 1 ghi cứng "90 sản phẩm (43 model)" (N10) | Lấy số thật từ danh mục · Sửa tay | Lấy số thật (đổi chữ trên cả máy tính, xem §3) | ✅ Web tự lấy số thật từ danh mục — làm ở v2.5.0 (cả máy tính) |
+| **Q5** | **Đợt 0: sửa 3 lỗi số liệu** R1 (badge tab 3 "0 Đơn"), R2 (KPI PM "Tổng SP 0 · 0.0%"), R3 ("Tổng tiền đã nộp" cộng cả đơn chưa nộp) | Duyệt · Không duyệt | Duyệt, **trước 14/10**. Đây là lỗi có cả trên máy tính; chỉ sửa cách tính và nhãn, không đổi dữ liệu máy chủ | ✅ Duyệt — làm ở v2.5.0 |
+| **Q6** | Đợt bán 14/10 có khoảng **bao nhiêu sản phẩm**? | Con số | Quyết định độ ưu tiên của B1 (thẻ gọn): 6 SP thì gọn sẵn, 50 SP thì phải cuộn 45 màn hình | **50–100 sản phẩm** → B1 (thẻ gọn) thành ưu tiên số 1 của Đợt 2 (chờ duyệt) |
 
 **Thêm (không bắt buộc):** chụp ảnh trên **1 iPhone thật** và **cửa sổ "Nộp tiền ngay"**, để kiểm N5 (iPhone tự phóng to ô nhập) và N6 (form 2 cột).
 
@@ -83,3 +83,48 @@ Chạy lại số đo: `python3 scripts/mobile_audit.py "iPhone 13"` và `"Galax
 
 ## 7. Việc song song: tiếng Anh (VI/EN)
 **ĐÃ LÀM XONG 08/10 (bản `v2.4.0`)**: [`design/I18N_EN_FEASIBILITY.md`](I18N_EN_FEASIBILITY.md) §9. Khi làm v3: mọi chữ mới hoặc đổi phải thêm vào `assets/i18n/en_source.json`, chạy `python3 scripts/i18n_build.py` và `python3 scripts/i18n_collect.py` (= 0). So sánh máy tính trước/sau ở §3 dùng tag `v2.4.0` làm bản gốc.
+
+---
+
+## 8. Kết quả bản web v2.5.0 (11/10/2026)
+**Nhánh** `v2.5-phone-fixes`, tạo từ `v2.4.1`, đưa lên ngang `main` (79c9780). Apps Script **không đổi** (Version 10).
+
+### 8.1 Đã làm
+| Mục | Trước | Sau | Kiểm bằng |
+|---|---|---|---|
+| **Token "Mở bán ngay" / "Kết sổ" / Hẹn giờ** | Web không gửi `token`, máy chủ từ chối. Sheet thật: **0 dòng** `PROGRAM_OPEN/CLOSED` trong 101 dòng ActivityLog (05–10/10) | Gửi `token`, máy chủ giả nhận lệnh | `tests/v25_phone_fixes_test.py` §1 |
+| R1 badge tab 3 | "0 Đơn" khi có đơn | = số đơn trên máy chủ, cùng bộ lọc với ô 03 | §2 |
+| R2 KPI "Tổng SP" của PM | 0 khi danh mục tải sau (tái hiện: tải chậm 3,5 giây) | = số SP của chương trình | §3 |
+| R3 dòng tổng bảng PM | "Tổng tiền thanh toán **đã nộp**" = mọi đơn | "Tổng giá trị đơn: X · Đã nộp (chờ đối soát + đã duyệt): Y" | §4 |
+| B1 PM chưa có chương trình | Lỗi JS `Cannot read properties of null` | Không lỗi | §6 |
+| B2 nút "Đôn đốc" | Báo "Đã gửi…", thực tế không gửi gì | Ẩn; nút "Hủy slot" giữ nguyên | §5 |
+| B3 EN ô mật khẩu (bản chính thức) | "Nhập mật khẩu" | "Enter password" | §7 |
+| B4 chế độ Đêm "Google Cloud Live" | Tương phản **1,03:1** | **9,45:1** | §8 |
+| C3 (Q4) Tab 1 | Ghi cứng "90 sản phẩm (43 model) tại 3 kho…" | Số SP / model / kho thật của đợt đang xem (cả máy tính; EN tự dịch) | §9 |
+| A1 đầu trang (điện thoại) | 285 px, 7 nút | **61 px**: logo · tên · EN · ☰ (bấm ☰ hiện lại đủ nút) | §10 |
+| A2 ô 03 | Bắt đầu ở 1.393 px (màn 2,1) | **487 px (màn 1)** khi nhân viên có đơn | §10 |
+| A3 "Nộp tiền ngay" | Link chữ 128×42 px | Nút đỏ rộng hết thẻ × 48 px; "Hủy giữ chỗ" dòng riêng 44 px | §10 |
+| A4 nút trợ lý ảo | Che nút "Xác Nhận Nộp Tiền" | Ẩn khi mở cửa sổ / form nộp tiền; 52 → 44 px | §10 |
+| Q1 thanh HOT/NEW | Hiện, không lọc | Ẩn trên điện thoại | §10 |
+| R4 thanh chương trình | Đợt 2 bị cắt | Xuống dòng, thấy đủ (tên dài xuống dòng trong nút) | §10 |
+| R8 "↗" và "·" ô 02 | Rơi dòng | Mỗi kho 1 dòng; "↗" đi cùng chữ | §10 + ảnh |
+
+### 8.2 Không làm và lý do
+- **A5 (ô nhập 16 px):** trang đã có `maximum-scale=1` trong thẻ viewport. Theo tài liệu cộng đồng, iPhone (Safari) **không** tự phóng to ô nhập khi có thẻ này. **[INFERRED]** Chưa kiểm trên iPhone thật vì chủ dự án chỉ có Android. Cách kiểm 30 giây: mượn 1 iPhone, mở link, chạm ô "Mã nhân viên". Nếu trang phóng to thì báo lại, sửa trong 1 dòng CSS.
+- Đợt 2–3 (B1–B4 thẻ gọn / bảng → thẻ / form 1 cột, C1–C3 PM): **chờ duyệt**. Với Q6 = 50–100 SP, ưu tiên số 1 của Đợt 2 là **B1 thẻ gọn**, vì danh mục 50 SP hiện dài 44,5 màn hình.
+
+### 8.3 Số đo điện thoại sau sửa (`scripts/mobile_audit.py`, iPhone 13 · Galaxy S8)
+- Mọi màn: nút < 44 px giảm 4 (đầu trang).
+- Khung phải vuốt ngang: bỏ thanh HOT/NEW. Còn lại bảng tab 3, tab 4 và bảng PM, thuộc Đợt 2 (B3).
+- Màn PM ngắn đi khoảng 0,6 màn hình.
+
+### 8.4 Máy tính không đổi
+**144 trạng thái** = 4 độ rộng (1920 / 1440 / 1280 / 1024) × (v2, `?ui=v1`) × 3 vai trò (Nhân viên 4 tab, PM 4 màn, ADMIN) × Sáng / Đêm. Mỗi trạng thái chụp 3 lần: bản cũ `v2.4.1` × 2 để lọc nhiễu, bản mới × 1.
+- Máy chủ giả trả 90 SP / 43 model / 3 kho, nên câu tab 1 mới (C3) **trùng chữ** với câu ghi cứng cũ. Nhờ vậy mọi khác biệt khác đều lộ ra.
+- **Mọi vùng khác nhau đã được phân loại, 0 vùng không giải thích được:**
+  - B4: 72 vùng, đúng chữ "Google Cloud Live" ở cả 72 trạng thái Đêm.
+  - R3: 32 vùng, dòng tổng bảng PM.
+  - B2: 37 vùng, cột thao tác bảng "Chưa nộp tiền".
+  - Thanh HOT/NEW: 95 vùng. Đây là hoạt ảnh biểu tượng; bản cũ chụp 2 lần cũng khác nhau, đã xem ảnh để xác nhận.
+- Không có lỗi JS ở cả 144 trạng thái.
+- Lệnh chạy lại (script trong scratchpad của phiên 11/10, chưa đưa vào repo): xem `tests/v25_phone_fixes_test.py` cho phần chức năng.

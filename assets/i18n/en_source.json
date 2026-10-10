@@ -746,6 +746,8 @@
   "Đóng hướng dẫn": "Close guide",
   "Đóng hướng dẫn (Phím Esc)": "Close guide (Esc)",
   "Đôn đốc": "Remind",
+  "Nhập mật khẩu": "Enter password",
+  "Tài khoản & tiện ích": "Account & tools",
   "Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)": "Internal Sales Program",
   "Đăng Ký Giữ Chỗ Ngay": "Reserve now",
   "Đăng Ký Mua Hàng Trực Tuyến Trên Hệ Thống (Direct Registration Form)": "Online registration form",
@@ -1164,12 +1166,12 @@
    "$1 $2, $3"
   ],
   [
-   "^(\\d+) sản phẩm \\((\\d+) model\\) tại 3 kho AYA, AYB, AYC$",
-   "$1 items ($2 models) in 3 warehouses: AYA, AYB, AYC"
+   "^(\\d+) sản phẩm \\((\\d+) model\\) tại (\\d+) kho ([A-Z0-9, ]+)$",
+   "$1 items ($2 models) in $3 warehouse(s): $4"
   ],
   [
-   "^(\\d+) sản phẩm \\((\\d+) model\\) tại 3 kho AYA, AYB, AYC chính thức mở bán trực tuyến\\. Cơ hội sở hữu các dòng sản phẩm cao cấp LG OLED, Tủ lạnh InstaView và Tháp giặt sấy WashTower với chính sách ưu đãi đặc quyền cho cán bộ nhân viên\\.$",
-   "$1 items ($2 models) in 3 warehouses (AYA, AYB, AYC) are now on sale online. Own premium LG OLED TVs, InstaView fridges and WashTower washer-dryers at exclusive staff prices."
+   "^(\\d+) sản phẩm \\((\\d+) model\\) tại (\\d+) kho ([A-Z0-9, ]+?) chính thức mở bán trực tuyến\\. Cơ hội sở hữu các dòng sản phẩm cao cấp LG OLED, Tủ lạnh InstaView và Tháp giặt sấy WashTower với chính sách ưu đãi đặc quyền cho cán bộ nhân viên\\.$",
+   "$1 items ($2 models) in $3 warehouse(s) ($4) are now on sale online. Own premium LG OLED TVs, InstaView fridges and WashTower washer-dryers at exclusive staff prices."
   ],
   [
    "^BƯỚC (\\d+)/(\\d+) · NHÂN VIÊN$",
@@ -1342,6 +1344,10 @@
   [
    "^Tổng tiền thanh toán đã nộp: (.+)$",
    "Total paid: $1"
+  ],
+  [
+   "^Tổng giá trị đơn: (.+) · Đã nộp \\(chờ đối soát \\+ đã duyệt\\): (.+)$",
+   "Order value: $1 · Paid (awaiting check + approved): $2"
   ],
   [
    "^Tổng tiền: (.+)$",

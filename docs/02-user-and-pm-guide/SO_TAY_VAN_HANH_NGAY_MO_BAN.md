@@ -87,10 +87,17 @@
 
 | Việc | Ai | ☐ |
 |---|---|---|
-| Đúng 10:00 bấm **"Mở bán ngay"** trên banner chương trình | PM | ☐ |
+| Đúng 10:00 bấm **"Mở bán ngay"** trên banner chương trình (hoặc để **Hẹn giờ** tự mở — xem lưu ý dưới bảng) | PM | ☐ |
+| Kiểm tra đã mở thật: tab `Programs` cột E = `Open` **và** tab `ActivityLog` có dòng `PROGRAM_OPEN` mới. **Không có → ADMIN gõ `Open` vào cột E ngay** (cách dự phòng, luôn chạy được) | ADMIN | ☐ |
 | Đăng nhập 1 tài khoản nhân viên → thấy chương trình và danh sách sản phẩm | ADMIN | ☐ |
 | 10:05 — Bảng Điều Khiển PM → **`Tải lại`** → bắt đầu có đơn mới | PM | ☐ |
 | Mỗi 15–30 phút: **`Tải lại`**, xem số đơn; mở tab `ActivityLog` xem có dòng báo lỗi bất thường không | PM, ADMIN | ☐ |
+
+> **Lưu ý "Mở bán ngay" / "Kết sổ" / Hẹn giờ (cập nhật 11/10/2026, bản web v2.5.0):**
+> - Trước bản v2.5.0, 3 nút này **bị máy chủ từ chối** (web không gửi token đăng nhập). `ActivityLog` thật từ 05/10 đến 10/10 có **0 dòng** `PROGRAM_OPEN` / `PROGRAM_CLOSED`. Bản v2.5.0 đã sửa. Nếu trình duyệt còn bản cũ, bấm **Ctrl/Cmd + Shift + R** để tải lại.
+> - **Hẹn giờ chạy trong trình duyệt của PM, không chạy trên máy chủ.** Hẹn giờ lưu trên chính máy đó và chỉ tự mở khi **trang PM đang mở, đã đăng nhập, đang chọn đúng chương trình** vào lúc 10:00. Đóng tab, máy ngủ, mất mạng, hoặc hẹn trên máy khác → **không mở**. Lần chạy lỗi thì **không tự thử lại**.
+> - Vì vậy dù dùng Hẹn giờ, PM vẫn phải ngồi trực từ 9:55 với trang đang mở. ADMIN kiểm tra dòng thứ 2 của bảng trên lúc 10:00–10:01.
+> - Nếu 2 người (PM và ADMIN) cùng để Hẹn giờ hoặc cùng bấm, người thứ hai sẽ thấy hộp thoại *"Chỉ có thể mở chương trình đang ở trạng thái Draft"*. Thông báo này **vô hại**: chương trình đã mở rồi.
 
 ### D. Mở cổng thanh toán & đối soát (theo giờ đã chốt ở mục A)
 
