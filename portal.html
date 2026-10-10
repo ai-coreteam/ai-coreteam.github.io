@@ -3489,6 +3489,33 @@
       html.ui-v2 .program-tab-bar { flex-wrap: wrap !important; overflow-x: visible !important; border-radius: 28px !important; }
       html.ui-v2 .program-tab { max-width: 100%; height: auto; min-height: 44px; white-space: normal !important; text-align: left; line-height: 20px; padding-top: 8px !important; padding-bottom: 8px !important; }   /* tên đợt dài xuống dòng trong nút, không tràn khỏi màn hình */
 
+      /* B1 (v2.6, 11/10/2026, chủ dự án duyệt): thẻ sản phẩm gọn — biểu tượng 64 px bên trái, tình trạng / kho / model bên phải;
+         mô tả tình trạng, link LG.com, giá và nút giữ chỗ chạy hết chiều ngang. Chỉ CSS: HTML, nút và chức năng giữ nguyên.
+         Mô tả tình trạng KHÔNG cắt bớt (là thông tin lỗi máy — người mua phải thấy đủ). */
+      html.ui-v2 .lg-product-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      html.ui-v2 .lg-product-card { display: grid; grid-template-columns: 64px minmax(0, 1fr); column-gap: 12px; row-gap: 0; align-content: start; padding: 12px; }
+      html.ui-v2 .lg-product-card > div { display: contents; }
+      html.ui-v2 .lg-product-card > div > * { grid-column: 1 / -1; min-width: 0; }
+      html.ui-v2 .lg-product-card .lg-card-visual { grid-column: 1; grid-row: 1 / span 2; align-self: start; width: 64px; height: 64px; min-height: 0; padding: 0; margin: 0 0 8px; border-radius: 12px; }
+      html.ui-v2 .lg-product-card .lg-card-visual svg { width: 36px; height: 36px; }
+      html.ui-v2 .lg-product-card .lg-card-top-badges,
+      html.ui-v2 .lg-product-card .lg-card-model { grid-column: 2; }
+      /* thứ tự hiển thị: bên cạnh biểu tượng = tình trạng còn slot + model/S/N; dòng Kho · Slot chạy hết chiều ngang (mã slot dài không gãy dòng) */
+      html.ui-v2 .lg-product-card > div > * { order: 2; }
+      html.ui-v2 .lg-product-card .lg-card-top-badges, html.ui-v2 .lg-product-card .lg-card-visual, html.ui-v2 .lg-product-card .lg-card-model { order: 0; }
+      html.ui-v2 .lg-product-card .lg-card-meta { order: 1; margin-top: 2px; }
+      html.ui-v2 .lg-product-card .lg-card-top-badges { justify-content: flex-start; margin-bottom: 2px; }
+      html.ui-v2 .lg-product-card .lg-tag-exclusive { display: none; }   /* cờ "Ưu đãi nội bộ" giống hệt trên mọi thẻ */
+      html.ui-v2 .lg-product-card .lg-card-meta { margin-bottom: 0; }
+      html.ui-v2 .lg-product-card .lg-card-model { font-size: 18px; line-height: 22px; margin: 2px 0 0; align-self: start; }
+      html.ui-v2 .lg-product-card .lg-card-desc { min-height: 0; margin: 0; }
+      html.ui-v2 .lg-product-card .lg-card-info-link { margin-top: 4px; justify-self: start; }
+      html.ui-v2 .lg-product-card .lg-price-box { margin: 8px 0; padding: 6px 12px; }
+      html.ui-v2 .lg-product-card .lg-internal-row { flex-direction: row; align-items: baseline; flex-wrap: wrap; column-gap: 8px; }   /* "Giá Nhân Viên: 4.948.500 đ" 1 dòng */
+      html.ui-v2 .lg-product-card .lg-rrp-row { margin-bottom: 0; }
+      html.ui-v2 .lg-product-card .lg-price-box .lg-internal-price { font-size: 20px; line-height: 24px; }
+      html.ui-v2 .lg-product-card .lg-btn-buy { height: 44px; }
+
       /* R8: mũi tên "↗" không rơi xuống dòng riêng; ô 02 mỗi kho 1 dòng (dấu "·" ngăn cách không còn rơi lẻ đầu dòng) */
       html.ui-v2 .grap-card-link { white-space: nowrap; }
       html.ui-v2 #grap-wh-breakdown + div > a { text-wrap: balance; }
@@ -7362,9 +7389,12 @@
                          (String(newStatus).toLowerCase() === 'closed') ? 'Closed' : 'Draft';
 
       if (SHEET_API_URL) {
+        // 11/10/2026 (chủ dự án duyệt): trước đây hủy sau 4 giây rồi VẪN đổi trạng thái trên màn hình + báo "thành công" dù máy chủ
+        // chưa xác nhận. Nay chờ tối đa 45 giây (như đăng nhập, máy chủ khởi động nguội) và KHÔNG tự gửi lại (lần 1 có thể đã thành công).
+        showWait(normStatus === 'Closed' ? 'Đang gửi lệnh kết sổ…' : 'Đang gửi lệnh mở bán…', 'Vui lòng không tắt trang. Máy chủ có thể mất tới 40 giây nếu vừa khởi động.');
         try {
           const controller = new AbortController();
-          const timerId = setTimeout(() => controller.abort(), 4000);
+          const timerId = setTimeout(() => controller.abort(), 45000);
           const res = await fetch(SHEET_API_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -7375,13 +7405,17 @@
           });
           clearTimeout(timerId);
           const data = await res.json();
+          hideWait();
           if (data && !data.ok) {
             alert('Lỗi cập nhật máy chủ: ' + (data.message || 'Không thể thay đổi trạng thái'));
             return;
           }
           console.log('Program status synced to sheet:', data ? data.message : '');
         } catch (err) {
-          console.warn('Sync to sheet failed, running in local mode:', err);
+          hideWait();
+          console.warn('program_update: chưa xác nhận được với máy chủ:', err);
+          alert('CHƯA XÁC NHẬN ĐƯỢC VỚI MÁY CHỦ (mạng chậm hoặc mất kết nối).\n\nTrạng thái chương trình trên màn hình CHƯA đổi.\nKiểm tra Google Sheet, tab Programs, cột E (hoặc bấm "Tải lại" sau 1 phút):\n• Đã đúng trạng thái mới → lệnh đã thành công, không cần bấm lại.\n• Chưa đổi → bấm lại, hoặc ADMIN gõ trực tiếp vào cột E.');
+          return;
         }
       }
 

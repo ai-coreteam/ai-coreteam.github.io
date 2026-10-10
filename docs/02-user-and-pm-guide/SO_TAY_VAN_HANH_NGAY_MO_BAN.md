@@ -48,6 +48,7 @@
 - [ ] Tài khoản ADMIN và mọi tài khoản PM đã đổi sang mật khẩu **riêng, từ 10 ký tự**, bằng nút **"Đổi MK"** trên web (không gõ thẳng vào Sheet — đổi trên web thì mật khẩu được mã hóa)
 - [ ] Tài khoản mẫu không dùng (`VH88921`, `VH55432`): tab `Users` → cột H `Status` = `Inactive`
 - [ ] Nạp danh sách nhân viên thật vào tab `Users`: mỗi người 1 dòng, đủ cột A–H, cột G `Role` = `USER`, cột H `Status` = `Active`
+- [ ] **(Thêm 11/10/2026) Đợt xoá dữ liệu test thứ 2:** cùng lúc nạp nhân viên thật, xoá **73 tài khoản test** "Nguyen Van 1…73" (mật khẩu chung, đang `Active`) trong tab `Users`. Giữ dòng PM / ADMIN thật. Kiểm tra **mã đăng nhập (cột A) không trùng nhau**: dữ liệu test đang trùng `hoa`, `linh`, `nhi`. Đợt 1 (11/10) đã xoá 3 chương trình test, 62 sản phẩm, 12 đơn; bản sao lưu: Runbook §1
 - [ ] Thử đăng nhập 1 tài khoản nhân viên thật trên link nhân viên → vào được
 
 **Máy chủ — ADMIN** (Google Apps Script, dự án "LG Internal sales API")
@@ -97,6 +98,7 @@
 > - Trước bản v2.5.0, 3 nút này **bị máy chủ từ chối** (web không gửi token đăng nhập). `ActivityLog` thật từ 05/10 đến 10/10 có **0 dòng** `PROGRAM_OPEN` / `PROGRAM_CLOSED`. Bản v2.5.0 đã sửa. Nếu trình duyệt còn bản cũ, bấm **Ctrl/Cmd + Shift + R** để tải lại.
 > - **Hẹn giờ chạy trong trình duyệt của PM, không chạy trên máy chủ.** Hẹn giờ lưu trên chính máy đó và chỉ tự mở khi **trang PM đang mở, đã đăng nhập, đang chọn đúng chương trình** vào lúc 10:00. Đóng tab, máy ngủ, mất mạng, hoặc hẹn trên máy khác → **không mở**. Lần chạy lỗi thì **không tự thử lại**.
 > - Vì vậy dù dùng Hẹn giờ, PM vẫn phải ngồi trực từ 9:55 với trang đang mở. ADMIN kiểm tra dòng thứ 2 của bảng trên lúc 10:00–10:01.
+> - **Từ bản v2.6.0:** sau khi bấm, màn hình hiện *"Đang gửi lệnh mở bán…"* và chờ máy chủ **tối đa 45 giây** (trước đây bỏ cuộc sau 4 giây nhưng vẫn báo "thành công"). **Không bấm lần 2 trong lúc chờ.** Nếu hiện hộp thoại *"CHƯA XÁC NHẬN ĐƯỢC VỚI MÁY CHỦ"*: màn hình **chưa** đổi trạng thái → mở tab `Programs` cột E. Đã là `Open` thì lệnh đã thành công, không bấm lại. Chưa đổi thì bấm lại, hoặc ADMIN gõ `Open`.
 > - Nếu 2 người (PM và ADMIN) cùng để Hẹn giờ hoặc cùng bấm, người thứ hai sẽ thấy hộp thoại *"Chỉ có thể mở chương trình đang ở trạng thái Draft"*. Thông báo này **vô hại**: chương trình đã mở rồi.
 
 ### D. Mở cổng thanh toán & đối soát (theo giờ đã chốt ở mục A)

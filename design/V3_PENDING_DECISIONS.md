@@ -128,3 +128,17 @@ Chạy lại số đo: `python3 scripts/mobile_audit.py "iPhone 13"` và `"Galax
   - Thanh HOT/NEW: 95 vùng. Đây là hoạt ảnh biểu tượng; bản cũ chụp 2 lần cũng khác nhau, đã xem ảnh để xác nhận.
 - Không có lỗi JS ở cả 144 trạng thái.
 - Lệnh chạy lại (script trong scratchpad của phiên 11/10, chưa đưa vào repo): xem `tests/v25_phone_fixes_test.py` cho phần chức năng.
+
+### 8.5 Bản web v2.6.0 (11/10/2026) — B1 thẻ gọn + chờ máy chủ khi đổi trạng thái chương trình
+**Điểm quay lại:** tag `v2.5.0` (lệnh: Runbook §1).
+
+| Mục | Trước (v2.5.0) | Sau (v2.6.0) |
+|---|---|---|
+| "Mở bán ngay" / "Kết sổ" / Hẹn giờ khi máy chủ chậm | Hủy lệnh sau 4 giây, rồi **vẫn đổi màn hình + báo "thành công"**. Tái hiện: mất mạng → màn hình hiện Open | Chờ tối đa 45 giây có màn chờ. Máy chủ chậm 6 giây → Open đúng. Mất mạng → màn hình giữ nguyên + hộp thoại hướng dẫn kiểm tra cột E. Không tự gửi lại |
+| B1 thẻ sản phẩm (iPhone 13, file 50 TV) | 515 px / thẻ; danh mục 40,3 màn hình | **308 px** (−40 %); danh mục **24,3 màn hình**. Galaxy S8: 536 → 309 px; 37,6 → 21,9 màn hình |
+
+**Thẻ gọn giữ đủ thông tin:** mô tả tình trạng (lỗi máy) **không cắt bớt**; giữ link LG.com, giá niêm yết, % giảm, giá nhân viên; nút giữ chỗ cao 44 px rộng hết thẻ. Chỉ ẩn cờ "Ưu đãi nội bộ" vì thẻ nào cũng giống nhau. Bấm nút trên thẻ vẫn gửi giữ chỗ đúng mã slot (test §13).
+
+**Đích ≤ 15 màn hình chưa đạt.** Muốn đạt phải chọn 1 trong 2: (a) mô tả tình trạng chỉ hiện 2 dòng, chạm để xem đủ; hoặc (b) bỏ link "Xem trên LG.com" trên điện thoại. Cả 2 đều làm giảm thông tin khi mua, nên **chờ chủ dự án quyết**.
+
+**Máy tính:** so 144 trạng thái với `v2.5.0` (cùng cách §8.4). Ngoài nhiễu hoạt ảnh (thanh HOT/NEW, nhãn "Cổng đang mở" nhấp nháy; đã soi ảnh) thì **không có khác biệt**, vì 2 thay đổi chỉ áp dụng ≤ 719 px hoặc chỉ hiện khi máy chủ chậm. Không có lỗi JS.

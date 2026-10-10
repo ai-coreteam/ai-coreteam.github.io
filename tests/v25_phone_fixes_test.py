@@ -3,7 +3,8 @@
     git show v2.4.1:Mau_Dang_Ky_Internal_Sales_3009.html > .v241_baseline.html
     PAGE=.v241_baseline.html python3 tests/v25_phone_fixes_test.py   # chạy trên bản cũ để thấy lỗi (tái hiện); xong thì xoá file tạm
     BROWSER=webkit python3 tests/v25_phone_fixes_test.py      # engine Safari (không có iPhone thật)
-Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1–B4, C3, A1–A4, Q1, R4, R8.
+Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1–B4, C3, A1–A4, Q1, R4, R8 (v2.5.0);
+12 = chờ máy chủ khi đổi trạng thái chương trình, 13 = thẻ sản phẩm gọn (v2.6.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +32,18 @@ class Mock(T.MockServer):
         return {'ok': True, 'programs': [{'id': p['id'], 'name': p['name'], 'pmId': T.PM, 'pmName': 'PM That', 'status': p['status'],
                                           'startDate': '', 'endDate': '', 'description': '', 'maxPerEmployee': 1} for p in self.programs]}
 
+    update_delay_s = 0      # v2.6: máy chủ chậm (khởi động nguội)
+    update_fail = False     # v2.6: mất mạng → yêu cầu program_update bị hủy
+
+    def handle(self, route):
+        if self.update_fail and route.request.method == 'POST' and '"program_update"' in (route.request.post_data or ''):
+            self.calls.append(('program_update', json.loads(route.request.post_data)))
+            return route.abort()
+        return super().handle(route)
+
     def do_program_update(self, d):   # Code.gs program_update_: verifySessionToken_(d.token, 'PM') đứng đầu
+        if self.update_delay_s:
+            import time; time.sleep(self.update_delay_s)
         if not d.get('token'):
             return {'ok': False, 'message': 'Thiếu Token phiên làm việc (Chưa đăng nhập hoặc phiên đã kết thúc).'}
         for p in self.programs:
@@ -212,6 +224,49 @@ def main():
             check(fab() == 'none', 'A4: đang mở "Nộp tiền ngay" → nút trợ lý ảo ẩn (không che nút Xác nhận)')
             page.evaluate('closeQuickPaymentModal()'); page.wait_for_timeout(400)
             check(fab() != 'none', 'A4: đóng cửa sổ → nút trợ lý ảo hiện lại')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('12. v2.6: "Mở bán ngay" khi máy chủ chậm 6 giây / mất mạng — không báo thành công giả')
+            s = Mock(programs=[dict(id=T.PID, name='Dot test', status='Draft')]); s.update_delay_s = 6
+            ctx, page = open_page(browser, port, s)
+            T.login(page, T.PM)
+            # máy chủ giả "ngủ" trong luồng Python → trình duyệt tự ghi trạng thái ở giây 1,5 (lúc vẫn đang chờ máy chủ)
+            page.evaluate(f"setTimeout(() => {{ window.__probe = [(programs.find(p => p.id === '{T.PID}') || {{}}).status, document.getElementById('wait-overlay').classList.contains('show')]; }}, 1500);"
+                          f"setTimeout(() => updateProgramStatus('{T.PID}', 'Open'), 0)")
+            page.wait_for_timeout(9000)
+            st = page.evaluate('window.__probe')
+            check(st == ['Draft', True], f'đang chờ máy chủ (giây 1,5): màn hình chưa đổi, có màn chờ ({st})')
+            st = page.evaluate(f"[(programs.find(p => p.id === '{T.PID}') || {{}}).status, document.getElementById('wait-overlay').classList.contains('show')]")
+            check(st == ['Open', False] and s.programs[0]['status'] == 'Open' and not page.dialogs, f'máy chủ trả lời sau 6 giây → Open, hết màn chờ, không hộp thoại lỗi ({st}, {page.dialogs[-1:]})')
+            ctx.close()
+            s = Mock(programs=[dict(id=T.PID, name='Dot test', status='Draft')]); s.update_fail = True
+            ctx, page = open_page(browser, port, s)
+            T.login(page, T.PM)
+            page.evaluate(f"updateProgramStatus('{T.PID}', 'Open')"); page.wait_for_timeout(2500)
+            st = page.evaluate(f"[(programs.find(p => p.id === '{T.PID}') || {{}}).status, document.getElementById('wait-overlay').classList.contains('show')]")
+            check(st == ['Draft', False], f'mất mạng: màn hình KHÔNG đổi sang Open, hết màn chờ ({st})')
+            check(any('CHƯA XÁC NHẬN ĐƯỢC VỚI MÁY CHỦ' in d for d in page.dialogs), f'có hộp thoại hướng dẫn kiểm tra cột E ({[d[:40] for d in page.dialogs]})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('13. v2.6 B1: thẻ sản phẩm gọn trên điện thoại — đủ thông tin, nút giữ chỗ vẫn gửi đúng slot')
+            s = Mock(my_status=None)
+            s.products[0]['description'] = 'Màn hình có 2 điểm chết góc trái, thùng rách, thiếu Magic Remote, viền trầy nặng, chân đế cong nhẹ'
+            ctx, page = open_page(browser, port, s, device=ip13)
+            T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1500)
+            c = page.evaluate("""() => { const card = document.querySelector('.lg-product-card'); const q = s => card.querySelector(s).getBoundingClientRect();
+              const desc = card.querySelector('.lg-card-desc');
+              return { h: Math.round(card.getBoundingClientRect().height), vis: q('.lg-card-visual'), model: q('.lg-card-model'), btn: q('.lg-btn-buy'), cardW: card.clientWidth,
+                       descFull: desc.scrollHeight <= desc.clientHeight + 1 && getComputedStyle(desc).webkitLineClamp === 'none', descText: desc.innerText }; }""")
+            check(c['h'] <= 320, f"thẻ cao {c['h']} px (v2.5.0: 515 px)")
+            check(c['vis']['width'] <= 64 and c['vis']['right'] <= c['model']['left'], f"biểu tượng 64 px nằm bên trái model ({round(c['vis']['width'])} px)")
+            check(c['descFull'] and 'chân đế cong nhẹ' in c['descText'], 'mô tả tình trạng hiện ĐỦ, không bị cắt')
+            check(c['btn']['height'] >= 44 and c['btn']['width'] >= c['cardW'] - 30, f"nút giữ chỗ cao {round(c['btn']['height'])} px, rộng gần hết thẻ")
+            page.click('.lg-product-card >> nth=0 >> .lg-btn-buy'); page.wait_for_timeout(2500)
+            regs = [x[1] for x in s.calls if x[0] == 'register_product']
+            check(regs and regs[-1].get('uniqueCode') == f'{T.PID}-AYA-001', f"bấm nút trên thẻ → gửi giữ chỗ đúng slot ({regs[-1].get('uniqueCode') if regs else 'không gửi'})")
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
