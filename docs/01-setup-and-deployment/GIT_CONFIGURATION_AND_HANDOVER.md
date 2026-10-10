@@ -27,6 +27,7 @@ graph LR
 | **Website Go-Live** | `https://ai-coreteam.github.io/` | Đường dẫn trực tuyến công khai kiểm thử trên mọi thiết bị. |
 | **Trang đích điều hướng** | `index.html` → `Mau_Dang_Ky_Internal_Sales_3009.html` | Tự động chuyển hướng không giật trang, giữ nguyên query URL. |
 | **Cấu hình Static Host** | Tệp `.nojekyll` tại thư mục gốc | Bỏ qua trình biên dịch Jekyll của GitHub, giữ nguyên 100% cấu trúc tệp tĩnh. |
+| **Thư mục chỉ có trên máy** | `.agents/skills/` (`lg-brand`, `smart-image-guideline-creator`, `skill-creator`) — trong `.gitignore` từ 10/10/2026 | Skill của AI agent; `lg-brand` chứa font LG EI bản quyền nội bộ LGE nên **không đưa lên GitHub**. Web không dùng thư mục này (font đã nhúng sẵn trong `portal.html`). PIC/máy mới: chép tay thư mục này từ máy chủ dự án. |
 
 ---
 

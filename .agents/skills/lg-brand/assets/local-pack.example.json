@@ -1,7 +1,0 @@
-{
-  "_comment": "Copy to assets/local-pack.json and set pack_root to the folder holding 01_guidelines, 03_fonts, 04_logo and '09. Digital Logo'. A list is allowed: Claude's desktop workspace mounts a connected folder under ~/mnt/<folder name>, which is not the path you see in Finder, so listing both makes the skill work in either place. Keep your copy local - a path from your machine does not belong in a shared package.",
-  "pack_root": [
-    "~/mnt/<your connected folder>/LG assets",
-    "~/Documents/LG assets"
-  ]
-}

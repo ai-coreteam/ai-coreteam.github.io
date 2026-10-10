@@ -42,3 +42,9 @@ __pycache__/
 
 # Ảnh chụp thật trên điện thoại (có tên người / dữ liệu thật) — không đưa lên repo công khai
 Phone test (Android)/
+
+# Tài nguyên thương hiệu LG (font LG EI bản quyền nội bộ LGE, logo, slogan, gradient) — không đưa lên kho công khai
+docs/05-visual-guide/assets/brand/
+
+# Skill của agent (lg-brand có font LG EI bản quyền nội bộ LGE) — chỉ dùng trên máy, không đưa lên GitHub
+.agents/skills/
