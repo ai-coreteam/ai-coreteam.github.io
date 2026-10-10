@@ -4,7 +4,8 @@
     PAGE=.v241_baseline.html python3 tests/v25_phone_fixes_test.py   # chạy trên bản cũ để thấy lỗi (tái hiện); xong thì xoá file tạm
     BROWSER=webkit python3 tests/v25_phone_fixes_test.py      # engine Safari (không có iPhone thật)
 Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1–B4, C3, A1–A4, Q1, R4, R8 (v2.5.0);
-12 = chờ máy chủ khi đổi trạng thái chương trình, 13 = thẻ sản phẩm gọn (v2.6.0).
+12 = chờ máy chủ khi đổi trạng thái chương trình, 13 = thẻ sản phẩm gọn (v2.6.0);
+13 (mô tả 2 dòng + Xem đủ), 14 = bảng → thẻ (B3), 15 = cửa sổ nộp tiền toàn màn hình (B4), 16 = máy tính không đổi (v2.7.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -252,21 +253,117 @@ def main():
 
             print('13. v2.6 B1: thẻ sản phẩm gọn trên điện thoại — đủ thông tin, nút giữ chỗ vẫn gửi đúng slot')
             s = Mock(my_status=None)
-            s.products[0]['description'] = 'Màn hình có 2 điểm chết góc trái, thùng rách, thiếu Magic Remote, viền trầy nặng, chân đế cong nhẹ'
+            s.products[0]['description'] = 'Màn hình có 2 điểm chết góc trái, thùng rách, thiếu Magic Remote, viền trầy nặng, panel có vệt sáng mờ khi nền tối, cổng HDMI 2 lỏng, thiếu sách hướng dẫn, chân đế cong nhẹ'
             ctx, page = open_page(browser, port, s, device=ip13)
             T.login(page, T.ME)
             page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1500)
             c = page.evaluate("""() => { const card = document.querySelector('.lg-product-card'); const q = s => card.querySelector(s).getBoundingClientRect();
-              const desc = card.querySelector('.lg-card-desc');
+              const desc = card.querySelector('.lg-card-desc'), more = card.querySelector('.lg-desc-more');
               return { h: Math.round(card.getBoundingClientRect().height), vis: q('.lg-card-visual'), model: q('.lg-card-model'), btn: q('.lg-btn-buy'), cardW: card.clientWidth,
-                       descFull: desc.scrollHeight <= desc.clientHeight + 1 && getComputedStyle(desc).webkitLineClamp === 'none', descText: desc.innerText }; }""")
+                       descH: desc.clientHeight, lineH: parseFloat(getComputedStyle(desc).lineHeight), clipped: getComputedStyle(desc).webkitLineClamp === '2',
+                       moreVisible: !more.hidden && more.getBoundingClientRect().height > 0, moreText: more.textContent }; }""")
             check(c['h'] <= 320, f"thẻ cao {c['h']} px (v2.5.0: 515 px)")
             check(c['vis']['width'] <= 64 and c['vis']['right'] <= c['model']['left'], f"biểu tượng 64 px nằm bên trái model ({round(c['vis']['width'])} px)")
-            check(c['descFull'] and 'chân đế cong nhẹ' in c['descText'], 'mô tả tình trạng hiện ĐỦ, không bị cắt')
+            check(c['clipped'] and c['descH'] <= 2 * c['lineH'] + 1 and c['moreVisible'], f"v2.7 (a): mô tả dài hiện 2 dòng ({c['descH']} px) + nút \"{c['moreText']}\"")
+            page.click('.lg-product-card >> nth=0 >> .lg-desc-more'); page.wait_for_timeout(400)
+            o = page.evaluate("""() => { const card = document.querySelector('.lg-product-card'), d = card.querySelector('.lg-card-desc');
+              return { full: getComputedStyle(d).webkitLineClamp === 'none' && d.clientHeight > 2 * parseFloat(getComputedStyle(d).lineHeight) + 1, text: d.innerText, more: card.querySelector('.lg-desc-more').textContent }; }""")
+            check(o['full'] and 'chân đế cong nhẹ' in o['text'] and 'Thu gọn' in o['more'], f"bấm \"Xem đủ\" → hiện ĐỦ mô tả, nút đổi thành \"{o['more']}\"")
+            page.evaluate('renderProductTable(currentProducts)'); page.wait_for_timeout(400)   # polling vẽ lại danh mục
+            still = page.evaluate("document.querySelector('.lg-product-card').classList.contains('desc-open')")
+            check(still, 'danh mục vẽ lại (polling) → mô tả đã mở vẫn mở')
+            short = page.evaluate("[...document.querySelectorAll('.lg-product-card')].slice(1).every(c => c.querySelector('.lg-desc-more').hidden)")
+            check(short, 'mô tả ngắn (vừa 2 dòng) → không có nút "Xem đủ"')
             check(c['btn']['height'] >= 44 and c['btn']['width'] >= c['cardW'] - 30, f"nút giữ chỗ cao {round(c['btn']['height'])} px, rộng gần hết thẻ")
             page.click('.lg-product-card >> nth=0 >> .lg-btn-buy'); page.wait_for_timeout(2500)
             regs = [x[1] for x in s.calls if x[0] == 'register_product']
             check(regs and regs[-1].get('uniqueCode') == f'{T.PID}-AYA-001', f"bấm nút trên thẻ → gửi giữ chỗ đúng slot ({regs[-1].get('uniqueCode') if regs else 'không gửi'})")
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            CARD_CHECK = """sel => { const t = document.querySelector(sel); if (!t || !t.offsetParent) return null;
+              const ths = [...t.querySelectorAll('thead th')].map(x => x.textContent.replace(/\\s+/g, ' ').trim());
+              const rows = [...t.querySelectorAll('tbody tr')].filter(r => r.offsetParent);
+              let out = 0, mism = 0, cells = 0;
+              rows.forEach(tr => { const R = tr.getBoundingClientRect(); let i = 0;
+                [...tr.cells].forEach(td => { if (td.colSpan === 1) { cells++; if ((td.dataset.label || '') !== ths[i]) mism++; } i += td.colSpan;
+                  td.querySelectorAll('*').forEach(e => { const b = e.getBoundingClientRect(); if (b.width && (b.right > R.right + 1 || b.left < R.left - 1)) out++; }); }); });
+              const sc = t.closest('[style*="overflow"], .pm-table-wrapper'); 
+              return { rows: rows.length, cells, mism, out, theadShown: getComputedStyle(t.querySelector('thead')).display !== 'none',
+                       hscroll: document.documentElement.scrollWidth > innerWidth + 1 || (sc ? sc.scrollWidth > sc.clientWidth + 1 : false) }; }"""
+            s8 = dict(p.devices['Galaxy S8']); s8['device_scale_factor'] = 2
+            if ENGINE == 'firefox': s8.pop('is_mobile', None)
+            for dev_name, dev in (('iPhone 13', ip13), ('Galaxy S8', s8)):
+                print(f'14. v2.7 B3 ({dev_name}): bảng → thẻ "nhãn: giá trị" — tab 3, tab 4, bảng PM; không vuốt ngang; nút trong bảng vẫn chạy')
+                s = Mock(my_status=T.NEW)
+                ctx, page = open_page(browser, port, s, device=dev)
+                T.login(page, T.ME)
+                page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(2500)
+                for sel in ('#lookup-result table', '#confirmation-table'):
+                    r = page.evaluate(CARD_CHECK, sel)
+                    check(r and r['rows'] >= 1 and r['mism'] == 0 and r['out'] == 0 and not r['theadShown'] and not r['hscroll'], f'{sel}: {r}')
+                page.click('#lookup-result .btn-pay-open'); page.wait_for_timeout(1500)
+                check(page.evaluate("!document.getElementById('payment-form').hidden"), 'tab 3: nút "Nộp tiền" trong thẻ vẫn mở form nộp tiền')
+                page.evaluate("switchTab('tab4', document.getElementById('tab4-btn'))"); page.wait_for_timeout(1500)
+                r = page.evaluate(CARD_CHECK, '#tab4 .slot-table')
+                check(r and r['rows'] >= 3 and r['mism'] == 0 and r['out'] == 0 and not r['hscroll'], f'tab 4: {r}')
+                page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1200)
+                check(page.evaluate("[...document.querySelectorAll('.btn-view-mode')].every(b => getComputedStyle(b).display === 'none')"), 'tab 2: nút "Dạng Thẻ / Dạng Bảng" ẩn trên điện thoại')
+                check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+                ctx.close()
+                s = Mock(); s.pm_regs = [reg(4, 'Đã khai nộp - chờ đối soát', 1000000), reg(5, 'Chờ nộp tiền', 4000000), reg(6, 'Đã đăng ký - Chờ mở thanh toán', 3000000)]   # slot 4–6: để 3 sản phẩm còn trống cho bảng "Hàng còn trống"
+                ctx, page = open_page(browser, port, s, device=dev)
+                T.login(page, T.PM)
+                page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+                for mode, sel in (('all', '#pm-reg-table'), ('unpaid', '#pm-unpaid-table'), ('remaining', '#pm-remaining-table')):
+                    page.evaluate(f"setPMViewMode('{mode}')"); page.wait_for_timeout(800)
+                    r = page.evaluate(CARD_CHECK, sel)
+                    check(r and r['rows'] >= 1 and r['mism'] == 0 and r['out'] == 0 and not r['hscroll'], f'PM {mode}: {r}')
+                page.evaluate("toggleTheme()"); page.wait_for_timeout(300)
+                dk = page.evaluate("""() => { const td = document.querySelector('#pm-remaining-tbody td'); return [getComputedStyle(td.parentElement).backgroundColor, getComputedStyle(td).color, getComputedStyle(td, '::before').color]; }""")
+                check(dk == ['rgb(255, 255, 255)', 'rgb(38, 38, 38)', 'rgb(74, 73, 70)'], f'PM chế độ Đêm: thẻ nền trắng, chữ tối như bảng PM trên máy tính ({dk})')
+                page.evaluate("toggleTheme()")
+                page.evaluate("setPMViewMode('all')"); page.wait_for_timeout(800)
+                page.click('#pm-reg-tbody [onclick*="pmApprovePayment"]'); page.wait_for_timeout(2000)
+                check(any(c[0] in ('pm_approve_payment',) for c in s.calls), f'PM: nút "Duyệt" trong thẻ vẫn gửi lệnh duyệt ({[c[0] for c in s.calls][-3:]})')
+                check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+                ctx.close()
+
+            print('15. v2.7 B4: cửa sổ "Nộp tiền ngay" toàn màn hình, ô nhập 1 cột, 2 nút luôn thấy ở đáy')
+            s = Mock(my_status=T.NEW)
+            ctx, page = open_page(browser, port, s, device=ip13)
+            T.login(page, T.ME)
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(1500)
+            m = page.evaluate("""() => { const card = document.querySelector('#quick-payment-modal .modal-card').getBoundingClientRect();
+              const L = id => document.getElementById(id).getBoundingClientRect();
+              const btns = [...document.querySelectorAll('#quick-payment-form > div:last-child > button')].map(b => { const r = b.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.bottom), Math.round(r.height)]; });
+              return { vh: innerHeight, vw: innerWidth, card: [Math.round(card.left), Math.round(card.top), Math.round(card.width), Math.round(card.height)],
+                       name: L('quick-payer-name').left, code: L('quick-payer-code').left, codeTop: L('quick-payer-code').top, nameTop: L('quick-payer-name').top, btns }; }""")
+            check(m['card'][2] == m['vw'] and m['card'][3] == m['vh'], f"toàn màn hình: {m['card']} (màn {m['vw']}×{m['vh']})")
+            check(abs(m['name'] - m['code']) < 1 and m['codeTop'] > m['nameTop'], 'ô nhập 1 cột (Mã NV nằm dưới Họ tên)')
+            check(len(m['btns']) == 2 and all(b[1] <= m['vh'] and b[2] >= 48 for b in m['btns']), f"mở cửa sổ: 2 nút thấy ngay ở đáy, cao ≥ 48 px ({m['btns']})")
+            page.evaluate("document.querySelector('#quick-payment-modal .modal-card').scrollTop = 300"); page.wait_for_timeout(300)
+            bt = page.evaluate("[...document.querySelectorAll('#quick-payment-form > div:last-child > button')].map(b => Math.round(b.getBoundingClientRect().bottom))")
+            check(all(x <= m['vh'] for x in bt), f'cuộn giữa form: 2 nút vẫn ở đáy ({bt})')
+            page.click('#quick-payment-form > div:last-child > button >> nth=0'); page.wait_for_timeout(500)
+            check(not page.evaluate("document.getElementById('quick-payment-modal').classList.contains('active')"), 'bấm "Để sau" → đóng cửa sổ (như cũ)')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('16. Máy tính 1440 px: mô tả hiện đủ, không có nút "Xem đủ"; bảng vẫn là bảng; cửa sổ nộp tiền như cũ')
+            s = Mock(my_status=T.NEW)
+            s.products[0]['description'] = 'Màn hình có 2 điểm chết góc trái, thùng rách, thiếu Magic Remote, viền trầy nặng, panel có vệt sáng mờ khi nền tối, cổng HDMI 2 lỏng, thiếu sách hướng dẫn, chân đế cong nhẹ'
+            ctx, page = open_page(browser, port, s)
+            T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1500)
+            d = page.evaluate("""() => { const c = document.querySelector('.lg-product-card'), d = c.querySelector('.lg-card-desc');
+              return [c.querySelector('.lg-desc-more').hidden, d.scrollHeight <= d.clientHeight + 1, getComputedStyle(document.querySelector('.btn-view-mode')).display !== 'none'] }""")
+            check(d == [True, True, True], f'nút Xem đủ ẩn, mô tả đủ, nút Dạng Thẻ/Bảng còn ({d})')
+            page.evaluate("switchTab('tab4', document.getElementById('tab4-btn'))"); page.wait_for_timeout(1200)
+            check(page.evaluate("getComputedStyle(document.querySelector('#tab4 .slot-table thead')).display !== 'none' && getComputedStyle(document.querySelector('#tab4 .slot-table td')).display === 'table-cell'"), 'tab 4: vẫn dạng bảng')
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(1200)
+            w = page.evaluate("Math.round(document.querySelector('#quick-payment-modal .modal-card').getBoundingClientRect().width)")
+            check(w <= 680, f'cửa sổ nộp tiền rộng {w} px (≤ 680 như cũ)')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

@@ -142,3 +142,18 @@ Chạy lại số đo: `python3 scripts/mobile_audit.py "iPhone 13"` và `"Galax
 **Đích ≤ 15 màn hình chưa đạt.** Muốn đạt phải chọn 1 trong 2: (a) mô tả tình trạng chỉ hiện 2 dòng, chạm để xem đủ; hoặc (b) bỏ link "Xem trên LG.com" trên điện thoại. Cả 2 đều làm giảm thông tin khi mua, nên **chờ chủ dự án quyết**.
 
 **Máy tính:** so 144 trạng thái với `v2.5.0` (cùng cách §8.4). Ngoài nhiễu hoạt ảnh (thanh HOT/NEW, nhãn "Cổng đang mở" nhấp nháy; đã soi ảnh) thì **không có khác biệt**, vì 2 thay đổi chỉ áp dụng ≤ 719 px hoặc chỉ hiện khi máy chủ chậm. Không có lỗi JS.
+
+### 8.6 Bản web v2.7.0 (11/10/2026) — Đợt 2: B3 bảng → thẻ, B4 nộp tiền toàn màn hình, B1 phương án (a)
+**Điểm quay lại:** tag `v2.6.0` (lệnh: Runbook §1).
+
+| Chỉ số (iPhone 13, file 50 TV) | v2.6.0 | v2.7.0 |
+|---|---|---|
+| Khung phải vuốt ngang (tab 2 Bảng, tab 3 ×2, tab 4, bảng PM) | 4 | **0** |
+| Chữ < 14 px ở tab 4 | 524 | 62 |
+| Cửa sổ "Nộp tiền ngay" | 1,6 màn hình, nút xác nhận ở cuối | toàn màn hình, 2 nút luôn ở đáy |
+| Thẻ sản phẩm, mô tả ≤ 2 dòng (cả file test) | 308 px | 308 px (không đổi) |
+| Thẻ sản phẩm, mô tả 4 dòng | 357 px | 317 px |
+
+**Cần biết (sửa lại nhận định ở §8.5):** §8.5 ghi "muốn đạt ≤ 15 màn hình phải chọn (a) hoặc (b)". Đo thật cho thấy (a) **không rút ngắn** danh mục 50 TV vì mọi mô tả trong file test chỉ 2 dòng. Danh mục vẫn 24,3 màn hình. Thẻ 308 px gồm: biểu tượng + model + S/N, dòng Kho · Slot, mô tả 2 dòng, link LG.com, ô giá, nút giữ chỗ 44 px. Đạt ≤ 15 màn hình (~ 200 px / thẻ) phải bỏ bớt thông tin; chờ chủ dự án quyết nếu cần.
+
+**Máy tính:** so 144 trạng thái với `v2.6.0`. Ngoài hoạt ảnh (đã soi ảnh) thì không khác. Không có lỗi JS.

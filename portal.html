@@ -3450,6 +3450,7 @@
     /* ===== Điện thoại ≤ 719px — v2.5 (11/10/2026, chủ dự án duyệt; design/UI_V3_MOBILE_AUDIT.md A1–A4, R4, R8, Q1).
        Chỉ giao diện v2 trên màn hẹp; máy tính (≥ 720px) và ?ui=v1 không đổi. Không đổi chức năng, ID hay dữ liệu gửi máy chủ. ===== */
     .btn-header-menu { display: none; }
+    .lg-desc-row { display: contents; }   /* v2.7: khung bọc link LG.com + nút "Xem đủ" — máy tính: không tạo hộp, bố cục như cũ */
     @media (max-width: 719px) {
       /* A1: đầu trang 1 hàng = logo · tên · EN · ☰. Bấm ☰ (.menu-open) hiện lại đủ các nút như cũ (Đổi MK, Đăng xuất, Hướng dẫn, In, Đêm/Sáng…) */
       html.ui-v2 .header-actions > .btn-header-menu { display: inline-flex; align-items: center; justify-content: center; }
@@ -3515,6 +3516,51 @@
       html.ui-v2 .lg-product-card .lg-rrp-row { margin-bottom: 0; }
       html.ui-v2 .lg-product-card .lg-price-box .lg-internal-price { font-size: 20px; line-height: 24px; }
       html.ui-v2 .lg-product-card .lg-btn-buy { height: 44px; }
+      /* v2.7 B1(a): mô tả tình trạng 2 dòng; nút "Xem đủ tình trạng ▾" (JS markClampedDescs chỉ hiện khi mô tả thật sự bị cắt) */
+      html.ui-v2 .lg-product-card:not(.desc-open):not(.desc-measure) .lg-card-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+      html.ui-v2 .lg-product-card .lg-desc-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; column-gap: 12px; }   /* link LG.com và "Xem đủ" chung 1 hàng */
+      html.ui-v2 .lg-product-card .lg-desc-more:not([hidden]) { min-height: 32px; padding: 0; margin: 4px 0 0 auto; border: 0; background: none; cursor: pointer;
+        font-family: inherit; font-size: 14px; font-weight: 600; color: #A50034; text-decoration: underline; text-underline-offset: 3px; }
+
+      /* v2.7 B3 (chủ dự án duyệt): bảng → thẻ "nhãn: giá trị" trên điện thoại — tab 3 tra cứu + đơn gửi từ máy này, tab 4, 3 bảng PM, tab 2 dạng Bảng.
+         Nhãn = tiêu đề cột (JS labelCardTables ghi vào data-label, đúng ngôn ngữ đang xem). Không còn phải vuốt ngang. Nút trong bảng giữ nguyên. */
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) thead { display: none; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table),
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) :is(tbody, tr, td) {
+        display: block; width: 100%; min-width: 0; max-width: none; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) { border: 0; border-radius: 0; background: transparent; margin: 8px 0; overflow: visible; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) tr {
+        border: 1px solid var(--lg-border); border-radius: 12px; padding: 4px 12px; margin: 0 0 10px; background: var(--lg-card-bg) !important; }
+      /* ô = bảng 2 cột: nhãn (::before, 1 ô) + toàn bộ nội dung cũ (trình duyệt tự gói thành 1 ô) → ô cao theo phần dài hơn, không đè nhau */
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) td:not([colspan]) { display: table; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) td {
+        padding: 8px 0 !important; border: 0; text-align: left !important; white-space: normal !important;
+        font-size: 14px !important; line-height: 20px; overflow-wrap: anywhere; color: var(--lg-text); }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) td + td { border-top: 1px solid var(--lg-border); }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) td::before {
+        content: attr(data-label); display: table-cell; width: 40%; padding-right: 12px; vertical-align: top; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--lg-text-2); overflow-wrap: anywhere; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) td[colspan] { padding-left: 0 !important; text-align: center !important; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table) td[colspan]::before { display: none; }
+      /* bảng PM luôn nền sáng (như v2) → thẻ PM cũng sáng ở chế độ Đêm, chữ màu cố định */
+      html.ui-v2 :is(#pm-reg-table, #pm-remaining-table, #pm-unpaid-table).pm-table tr { background: #FFFFFF !important; border-color: #E6E1D6; }
+      html.ui-v2 :is(#pm-reg-table, #pm-remaining-table, #pm-unpaid-table).pm-table td { color: #262626; }
+      html.ui-v2 :is(#pm-reg-table, #pm-remaining-table, #pm-unpaid-table).pm-table td + td { border-top-color: #F0ECE4; }
+      html.ui-v2 :is(#pm-reg-table, #pm-remaining-table, #pm-unpaid-table).pm-table td::before { color: #4A4946; }
+      html.ui-v2 :is(#lookup-result table, #confirmation-table, #tab4 .slot-table) :is(.badge-ordinal, .badge-code) { display: inline-block; border-radius: 8px !important; white-space: normal !important; overflow-wrap: anywhere; }   /* mã slot dài xuống dòng: khung bo nhẹ, không vỡ viên tròn */
+      html.ui-v2 .pm-table-wrapper { overflow-x: visible; background: transparent; border: 0; box-shadow: none; }
+      html.ui-v2 :is(#pm-reg-table, #pm-remaining-table, #pm-unpaid-table) :is(.badge-code, code) { white-space: normal !important; overflow-wrap: anywhere; }   /* mã slot dài: xuống dòng trong thẻ, không tràn */
+      html.ui-v2 :is(#lookup-result, #tab3, #tab4, #product-container) div[style*="overflow-x:auto"] { overflow-x: visible !important; }
+      /* tab 2: ẩn nút chuyển "Dạng Thẻ / Dạng Bảng" (trên điện thoại chỉ dùng dạng thẻ) */
+      html.ui-v2 .btn-view-mode { display: none !important; }
+
+      /* v2.7 B4 (chủ dự án duyệt): cửa sổ "Nộp tiền ngay" = toàn màn hình, ô nhập 1 cột, 2 nút "Để sau · Xác nhận" luôn thấy ở đáy */
+      html.ui-v2 #quick-payment-modal { padding: 0 !important; align-items: stretch !important; }
+      html.ui-v2 #quick-payment-modal .modal-card { max-width: 100% !important; width: 100% !important; height: 100% !important; max-height: 100% !important; margin: 0 !important;
+        border-radius: 0 !important; padding-bottom: 0 !important; box-shadow: none !important; }
+      html.ui-v2 #quick-payment-form > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: minmax(0, 1fr) !important; }
+      html.ui-v2 #quick-payment-form > div:last-child { position: sticky; bottom: 0; z-index: 2; gap: 8px; margin: 0; padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+        background: var(--lg-card-bg); box-shadow: 0 -4px 12px rgba(38, 38, 38, 0.08); }
+      html.ui-v2 #quick-payment-form > div:last-child > button { flex: 1 1 0; min-width: 0; min-height: 48px; height: auto; white-space: normal; line-height: 20px; padding: 6px 12px; }
 
       /* R8: mũi tên "↗" không rơi xuống dòng riêng; ô 02 mỗi kho 1 dòng (dấu "·" ngăn cách không còn rơi lẻ đầu dòng) */
       html.ui-v2 .grap-card-link { white-space: nowrap; }
@@ -9183,7 +9229,7 @@
                 <div class="lg-card-meta">Kho ${esc(p.kho)} · Slot: <strong>${esc(p.uniqueCode)}</strong></div>
                 <div class="lg-card-model">${esc(p.model)}${snHtml(p)}</div>
                 <div class="lg-card-desc">${esc(p.description)}</div>
-                ${productInfoLink(p.model)}
+                <div class="lg-desc-row">${productInfoLink(p.model)}<button type="button" class="lg-desc-more" data-code="${esc(p.uniqueCode)}" onclick="toggleCardDesc(this)" hidden>Xem đủ tình trạng ▾</button></div>
               </div>
               <div>
                 <div class="lg-price-box">
@@ -9239,6 +9285,64 @@
       });
 
       container.innerHTML = html;
+      markClampedDescs();
+    }
+
+    // v2.7 (11/10/2026, chủ dự án duyệt — B1 phương án a): điện thoại ≤ 719 px, mô tả tình trạng hiện 2 dòng; mô tả dài hơn có nút
+    // "Xem đủ tình trạng ▾" để mở hết. Máy tính: nút luôn ẩn, mô tả hiện đủ như cũ. Mô tả đã mở vẫn mở sau khi danh mục vẽ lại (polling 6–8 giây).
+    var expandedDescs = new Set();
+    var PHONE_MQ = window.matchMedia('(max-width: 719px)');
+    function markClampedDescs() {
+      const phone = PHONE_MQ.matches && document.documentElement.classList.contains('ui-v2');
+      document.querySelectorAll('#product-container .lg-desc-more').forEach(b => {
+        const card = b.closest('.lg-product-card'), d = card && card.querySelector('.lg-card-desc');
+        if (!d) return;
+        const open = expandedDescs.has(b.dataset.code);
+        card.classList.toggle('desc-open', open);
+        let clipped = false;
+        if (phone && !open) {   // đo chiều cao đủ (tạm bỏ giới hạn 2 dòng) so với chiều cao đang hiện. Không dùng scrollHeight: Chromium mới không tính phần dòng bị ẩn
+          card.classList.add('desc-measure'); const full = d.getBoundingClientRect().height;
+          card.classList.remove('desc-measure'); clipped = full > d.getBoundingClientRect().height + 1;
+        }
+        const show = phone && (open || clipped);   // tab 2 đang ẩn → đo = 0 → ResizeObserver đo lại khi hiện
+        if (b.hidden === show) b.hidden = !show;
+        const label = T(open ? 'Thu gọn ▴' : 'Xem đủ tình trạng ▾');
+        if (b.textContent !== label) b.textContent = label;
+      });
+    }
+    function toggleCardDesc(btn) {
+      const code = btn.dataset.code;
+      if (expandedDescs.has(code)) expandedDescs.delete(code); else expandedDescs.add(code);
+      markClampedDescs();
+    }
+    PHONE_MQ.addEventListener('change', markClampedDescs);
+
+    // v2.7 B3 (11/10/2026, chủ dự án duyệt): điện thoại — bảng hiện thành thẻ "nhãn: giá trị". Ghi tiêu đề cột vào data-label của từng ô
+    // (CSS td::before hiện nhãn). Đọc chữ tiêu đề đang hiển thị nên đúng cả tiếng Anh. Chỉ thêm thuộc tính, không đổi nội dung / nút trong bảng.
+    var CARD_TABLES = '#lookup-result table, #confirmation-table, #tab4 .slot-table, #pm-reg-table, #pm-remaining-table, #pm-unpaid-table, .product-table';
+    function labelCardTables() {
+      if (!PHONE_MQ.matches) return;
+      document.querySelectorAll(CARD_TABLES).forEach(t => {
+        const heads = [...t.querySelectorAll('thead th')].map(th => th.textContent.replace(/\s+/g, ' ').trim());
+        t.querySelectorAll('tbody tr').forEach(tr => {
+          let i = 0;
+          [...tr.cells].forEach(td => {
+            const label = td.colSpan > 1 ? '' : (heads[i] || '');
+            if (td.getAttribute('data-label') !== label) td.setAttribute('data-label', label);
+            i += td.colSpan;
+          });
+        });
+      });
+    }
+    var labelQueued = false;
+    new MutationObserver(() => {
+      if (labelQueued || !PHONE_MQ.matches) return;
+      labelQueued = true;
+      requestAnimationFrame(() => { labelQueued = false; labelCardTables(); });
+    }).observe(document.body, { childList: true, subtree: true });
+    PHONE_MQ.addEventListener('change', labelCardTables);
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => markClampedDescs()).observe(document.getElementById('tab2') || document.body);
     }
 
     // ===== Render Tab 4: Bảng Chi Tiết Sản Phẩm (Đồng bộ trực tiếp với activeProgram) =====
