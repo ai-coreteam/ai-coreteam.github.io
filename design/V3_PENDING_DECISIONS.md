@@ -157,3 +157,18 @@ Chạy lại số đo: `python3 scripts/mobile_audit.py "iPhone 13"` và `"Galax
 **Cần biết (sửa lại nhận định ở §8.5):** §8.5 ghi "muốn đạt ≤ 15 màn hình phải chọn (a) hoặc (b)". Đo thật cho thấy (a) **không rút ngắn** danh mục 50 TV vì mọi mô tả trong file test chỉ 2 dòng. Danh mục vẫn 24,3 màn hình. Thẻ 308 px gồm: biểu tượng + model + S/N, dòng Kho · Slot, mô tả 2 dòng, link LG.com, ô giá, nút giữ chỗ 44 px. Đạt ≤ 15 màn hình (~ 200 px / thẻ) phải bỏ bớt thông tin; chờ chủ dự án quyết nếu cần.
 
 **Máy tính:** so 144 trạng thái với `v2.6.0`. Ngoài hoạt ảnh (đã soi ảnh) thì không khác. Không có lỗi JS.
+
+### 8.7 Bản web v2.8.0 (11/10/2026) — Đợt 3, nút Docs, bản dịch EN
+**Điểm quay lại:** tag `v2.7.0` (Runbook §1).
+
+| Mục | Trước | Sau (điện thoại ≤ 719 px trừ khi ghi khác) |
+|---|---|---|
+| C1 thanh nút PM | 10 nút, 5 hàng | 2 nút chính 48 px + "Thêm thao tác ▾" (8 nút phụ). Hướng dẫn nhanh chỉ vào nút trong nhóm → nhóm tự mở |
+| C2 KPI PM | 1 cột, 5 ô ~ 1,5 màn hình | Lưới 2 cột; ô Doanh thu (số dài) 1 hàng riêng |
+| C3 tab 3 | 2 nút đầu trang chật, xuống dòng | Xếp dọc, rộng hết hàng. Mô tả **giữ nguyên chữ** (là hướng dẫn thao tác — không cắt) |
+| Lỗi: nhãn "Dành cho Nhân viên" | Hình tròn 4 dòng | 1 dòng |
+| Lỗi: cửa sổ biên lai PM | Nút Duyệt / Từ chối bị cắt ở mép dưới | Toàn màn hình, 3 nút luôn ở đáy |
+| **Docs** (máy tính + điện thoại) | — | Nút Docs → bộ hướng dẫn đúng vai trò + ngôn ngữ (`guides/`). Máy tính: đầu trang; điện thoại: trong ☰ |
+| Bản dịch EN (cả 2) | STT, "TV & Loa Thanh", "Xoay 90°", "Còn trống · Nhận ĐK" còn tiếng Việt | Đã dịch; bộ nhận diện chữ Việt không dấu thêm STT/Loa/Thanh/Xoay |
+
+**Máy tính:** so 144 trạng thái với `v2.7.0` — chiều cao trang không đổi ở mọi trạng thái; khác biệt duy nhất là nút Docs ở đầu trang (đã xem ảnh 1024 / 1440 / `?ui=v1`) và hoạt ảnh. Không lỗi JS.

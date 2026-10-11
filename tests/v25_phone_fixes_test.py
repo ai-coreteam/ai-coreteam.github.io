@@ -5,7 +5,8 @@
     BROWSER=webkit python3 tests/v25_phone_fixes_test.py      # engine Safari (không có iPhone thật)
 Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1–B4, C3, A1–A4, Q1, R4, R8 (v2.5.0);
 12 = chờ máy chủ khi đổi trạng thái chương trình, 13 = thẻ sản phẩm gọn (v2.6.0);
-13 (mô tả 2 dòng + Xem đủ), 14 = bảng → thẻ (B3), 15 = cửa sổ nộp tiền toàn màn hình (B4), 16 = máy tính không đổi (v2.7.0).
+13 (mô tả 2 dòng + Xem đủ), 14 = bảng → thẻ (B3), 15 = cửa sổ nộp tiền toàn màn hình (B4), 16 = máy tính không đổi (v2.7.0);
+17–20 = PM điện thoại (C1, C2, cửa sổ biên lai), tab 3 (C3, nhãn), nút Docs, bản dịch EN (v2.8.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -348,6 +349,67 @@ def main():
             page.click('#quick-payment-form > div:last-child > button >> nth=0'); page.wait_for_timeout(500)
             check(not page.evaluate("document.getElementById('quick-payment-modal').classList.contains('active')"), 'bấm "Để sau" → đóng cửa sổ (như cũ)')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('17. v2.8 C1/C2 + lỗi 1 (điện thoại, PM): 2 nút chính + "Thêm thao tác"; KPI 2 cột; cửa sổ biên lai nút ở đáy')
+            s = Mock(); s.pm_regs = [reg(4, 'Đã khai nộp - chờ đối soát', 1000000), reg(5, 'Chờ nộp tiền', 4000000)]
+            s.pm_regs[0]['receipt'] = 'https://drive.google.com/file/d/x/view'
+            ctx, page = open_page(browser, port, s, device=ip13)
+            T.login(page, T.PM); page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+            vis = lambda sel: page.evaluate(f"(() => {{ const e = document.querySelector('{sel}'); return !!e && e.offsetParent !== null; }})()")
+            check(vis('#btn-allow-payment-header') and vis('#btn-batch-approve-header') and vis('.btn-pm-more') and not vis('#btn-pm-export-csv') and not vis('#btn-timer-settings-header'),
+                  'C1: đóng → chỉ thấy Mở cổng, Duyệt hàng loạt, Thêm thao tác')
+            page.click('.btn-pm-more'); page.wait_for_timeout(300)
+            check(vis('#btn-pm-export-csv') and vis('#btn-timer-settings-header') and vis('#btn-pm-expired-check'), 'C1: bấm "Thêm thao tác" → hiện các nút phụ')
+            page.click('.btn-pm-more'); page.wait_for_timeout(300)
+            t = page.evaluate("(() => { const e = findTourTargetElement('#btn-pm-export-csv, .btn-pm-export, .pm-header-actions'); return e && e.id; })()")
+            check(t == 'btn-pm-export-csv', f'C1: Hướng dẫn nhanh chỉ nút Xuất Excel → tự mở nhóm, khung đúng nút ({t})')
+            k = page.evaluate("[...document.querySelectorAll('.pm-kpi-grid > .pm-kpi-card')].map(c => { const r = c.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.width)]; })")
+            cols = sorted(set(x for x, _ in k))
+            check(len(cols) == 2 and max(w for _, w in k) <= page.evaluate('innerWidth'), f'C2: KPI 2 cột, không tràn ({k})')
+            page.evaluate("openPMReceiptModal(pmRegistrations[0].id)"); page.wait_for_timeout(1000)
+            m = page.evaluate("""() => { const c = document.querySelector('#receipt-modal .modal-card').getBoundingClientRect();
+              return { vh: innerHeight, card: [Math.round(c.width), Math.round(c.height)], btns: ['#modal-btn-approve', '#modal-btn-reject'].map(s => Math.round(document.querySelector(s).getBoundingClientRect().bottom)) }; }""")
+            check(m['card'] == [page.evaluate('innerWidth'), m['vh']] and all(b <= m['vh'] for b in m['btns']), f"lỗi 1: biên lai toàn màn hình, nút Duyệt / Từ chối thấy ngay ({m})")
+            page.click('#modal-btn-approve'); page.wait_for_timeout(1500)
+            check(any(c[0] == 'pm_approve_payment' for c in s.calls), 'lỗi 1: nút Duyệt trong cửa sổ vẫn gửi lệnh duyệt')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('18. v2.8 C3 + lỗi 2 (điện thoại, tab 3): 2 nút xếp dọc; nhãn "Dành cho Nhân Viên" 1 dòng')
+            s = Mock(my_status=T.NEW); ctx, page = open_page(browser, port, s, device=ip13); T.login(page, T.ME)
+            page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(1500)
+            r = page.evaluate("""() => { const b = [...document.querySelectorAll('#tab3 > div:first-child > div:last-child > button')].map(x => x.getBoundingClientRect());
+              const badge = document.querySelector('#payment-upload-card > div:first-child > span:last-child').getBoundingClientRect();
+              return { tops: b.map(x => Math.round(x.top)), widths: b.map(x => Math.round(x.width)), badgeH: Math.round(badge.height) }; }""")
+            check(len(r['tops']) == 2 and r['tops'][1] > r['tops'][0] and min(r['widths']) >= 300, f"C3: 2 nút xếp dọc, rộng hết hàng ({r['tops']}, {r['widths']})")
+            check(r['badgeH'] <= 30, f"lỗi 2: nhãn 1 dòng (cao {r['badgeH']} px; trước: hình tròn 4 dòng)")
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('19. v2.8 Docs: đúng vai trò + ngôn ngữ; file tồn tại; điện thoại: nút trong ☰, bản điện thoại đứng đầu')
+            for uid, role, lang, dev, first in ((T.ME, 'user', 'vi', None, 'laptop'), (T.PM, 'pm', 'en', None, 'laptop'), (T.ADMIN, 'admin', 'vi', ip13, 'phone')):
+                s = Mock(); ctx, page = open_page(browser, port, s, device=dev, extra_init=f"localStorage.setItem('lg_lang','{lang}');"); T.login(page, uid)
+                if dev:
+                    check(not vis('#btn-header-docs'), 'điện thoại: Docs ẩn khi ☰ đóng')
+                    page.click('.btn-header-menu'); page.wait_for_timeout(300)
+                page.click('#btn-header-docs'); page.wait_for_timeout(400)
+                links = page.evaluate("[...document.querySelectorAll('#docs-links a')].map(a => a.getAttribute('href'))")
+                exp = [f'guides/{first}/{role}_{lang}.html', f"guides/{'phone' if first == 'laptop' else 'laptop'}/{role}_{lang}.html"]
+                exists = page.evaluate("Promise.all([...document.querySelectorAll('#docs-links a')].map(a => fetch(a.href).then(r => r.status)))")
+                check(links == exp and exists == [200, 200], f'{uid} {lang} {"điện thoại" if dev else "máy tính"}: {links} → {exists}')
+                check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+                ctx.close()
+
+            print('20. v2.8 tiếng Anh: chữ Việt không dấu đã dịch (STT, TV & Loa Thanh, Xoay 90°, Còn trống · Nhận ĐK)')
+            s = Mock(); s.pm_regs = [reg(4, 'Đã khai nộp - chờ đối soát', 1000000)]; s.pm_regs[0]['receipt'] = 'https://drive.google.com/file/d/x/view'
+            ctx, page = open_page(browser, port, s, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.PM)
+            page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+            txt = page.evaluate("document.body.innerText")
+            page.evaluate("setPMViewMode('remaining')"); page.wait_for_timeout(600); txt += page.evaluate("document.body.innerText")
+            page.evaluate("openPMReceiptModal(pmRegistrations[0].id)"); page.wait_for_timeout(800); txt += page.evaluate("document.querySelector('#receipt-modal').innerText")
+            left = [w for w in ('STT', 'Loa Thanh', 'Xoay', 'Còn trống') if w in txt]
+            check(not left and 'TV & Soundbar' in txt and 'Rotate 90°' in txt, f'còn: {left}')
             ctx.close()
 
             print('16. Máy tính 1440 px: mô tả hiện đủ, không có nút "Xem đủ"; bảng vẫn là bảng; cửa sổ nộp tiền như cũ')

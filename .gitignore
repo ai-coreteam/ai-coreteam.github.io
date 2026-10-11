@@ -45,6 +45,8 @@ Phone test (Android)/
 
 # Tài nguyên thương hiệu LG (font LG EI bản quyền nội bộ LGE, logo, slogan, gradient) — không đưa lên kho công khai
 docs/05-visual-guide/assets/brand/
+# NGOẠI LỆ có chủ đích (11/10/2026, chủ dự án duyệt): guides/brand/ (font LG EI + logo) ĐƯỢC đưa lên web cho nút "Docs".
+# Font LG EI vốn đã nhúng sẵn trong portal.html công khai. Sinh bằng scripts/build_guides_web.py.
 
 # Skill của agent (lg-brand có font LG EI bản quyền nội bộ LGE) — chỉ dùng trên máy, không đưa lên GitHub
 .agents/skills/

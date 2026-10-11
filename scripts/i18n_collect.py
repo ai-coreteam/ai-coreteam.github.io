@@ -18,7 +18,7 @@ import re
 miss = {}
 # Giống i18n.js: bỏ ký hiệu tiền "đ" sau số; tên người (dữ liệu, giữ nguyên) không tính là thiếu
 VI = re.compile('[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]|\\b(Kho|kho|Tivi)\\b', re.I)
-VI_ABBR = re.compile(r'\b(SP|NV)\b')   # viết tắt không dấu: sản phẩm, nhân viên (phân biệt hoa thường)
+VI_ABBR = re.compile(r'\b(SP|NV|STT|Loa|Thanh|Xoay)\b')   # chữ Việt không dấu, phân biệt hoa thường (11/10/2026: + STT, Loa, Thanh, Xoay)   # viết tắt không dấu: sản phẩm, nhân viên (phân biệt hoa thường)
 NAME = re.compile(r'^·\s+(Nguyễn Thị Quỳnh Như|Trần Văn Nam)$')
 def has_vi(s): s = re.sub(r'\d[\d.,]*\s*đ', '', s); return bool(VI.search(s) or VI_ABBR.search(s))
 CTX = {}

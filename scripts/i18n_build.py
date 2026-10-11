@@ -12,7 +12,7 @@ d, bad = {}, []
 for k, v in src['dict'].items():
     nk = norm(k)
     if nk in d and d[nk] != v: bad.append(f'trùng khoá khác nghĩa: {nk}')
-    if VI.search(re.sub(r'\d[\d.,]*\s*đ', '', v)) or re.search(r'\b(SP|NV|Kho|kho|Tivi)\b', v): bad.append(f'bản dịch còn tiếng Việt: {nk} → {v}')
+    if VI.search(re.sub(r'\d[\d.,]*\s*đ', '', v)) or re.search(r'\b(SP|NV|Kho|kho|Tivi|STT|Loa|Thanh|Xoay)\b', v): bad.append(f'bản dịch còn tiếng Việt: {nk} → {v}')
     d[nk] = v
 for rx, rep in src.get('patterns', []):
     try: re.compile(rx)

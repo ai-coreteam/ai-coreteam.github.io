@@ -3450,6 +3450,8 @@
     /* ===== Điện thoại ≤ 719px — v2.5 (11/10/2026, chủ dự án duyệt; design/UI_V3_MOBILE_AUDIT.md A1–A4, R4, R8, Q1).
        Chỉ giao diện v2 trên màn hẹp; máy tính (≥ 720px) và ?ui=v1 không đổi. Không đổi chức năng, ID hay dữ liệu gửi máy chủ. ===== */
     .btn-header-menu { display: none; }
+    .btn-pm-more { display: none; }
+    .docs-link { display: flex; align-items: center; justify-content: center; height: 48px; text-decoration: none; font-size: 16px; }   /* v2.8: 2 link trong cửa sổ Docs */   /* v2.8 C1: nút "Thêm thao tác" chỉ có trên điện thoại */
     .lg-desc-row { display: contents; }   /* v2.7: khung bọc link LG.com + nút "Xem đủ" — máy tính: không tạo hộp, bố cục như cũ */
     @media (max-width: 719px) {
       /* A1: đầu trang 1 hàng = logo · tên · EN · ☰. Bấm ☰ (.menu-open) hiện lại đủ các nút như cũ (Đổi MK, Đăng xuất, Hướng dẫn, In, Đêm/Sáng…) */
@@ -3561,6 +3563,29 @@
       html.ui-v2 #quick-payment-form > div:last-child { position: sticky; bottom: 0; z-index: 2; gap: 8px; margin: 0; padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)) !important;
         background: var(--lg-card-bg); box-shadow: 0 -4px 12px rgba(38, 38, 38, 0.08); }
       html.ui-v2 #quick-payment-form > div:last-child > button { flex: 1 1 0; min-width: 0; min-height: 48px; height: auto; white-space: normal; line-height: 20px; padding: 6px 12px; }
+
+      /* v2.8 C1 (chủ dự án duyệt): PM — 2 nút chính to, rộng hết hàng; 8 nút phụ gom vào "Thêm thao tác ▾" */
+      html.ui-v2 .pm-header-actions > .btn-pm-more { display: inline-flex; align-items: center; justify-content: center; }
+      html.ui-v2 .pm-header-actions:not(.more-open) > :not(#btn-allow-payment-header):not(#btn-batch-approve-header):not(.btn-pm-more) { display: none !important; }
+      html.ui-v2 .pm-header-actions > :is(#btn-allow-payment-header, #btn-batch-approve-header, .btn-pm-more) { flex: 1 1 100%; justify-content: center; min-height: 48px; }
+      /* v2.8 C2: KPI lưới 2 cột gọn; ô Doanh thu dự kiến (số dài) chiếm 1 hàng riêng, đặt cuối */
+      html.ui-v2 .pm-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+      html.ui-v2 .pm-kpi-card { padding: 12px 14px !important; min-width: 0; }
+      html.ui-v2 .pm-kpi-grid > .pm-kpi-card:nth-child(4) { grid-column: 1 / -1; order: 1; }
+      html.ui-v2 .pm-kpi-value { font-size: 28px !important; line-height: 34px; overflow-wrap: anywhere; }
+      /* v2.8 C3 + lỗi 2: tab 3 — 2 nút đầu trang xếp dọc, rộng hết hàng; nhãn "Dành cho Nhân viên" 1 dòng, xuống hàng riêng khi chật */
+      html.ui-v2 #tab3 > div:first-child > div:last-child { flex-direction: column; width: 100%; }
+      html.ui-v2 #tab3 > div:first-child > div:last-child > button { width: 100%; min-height: 44px; font-size: 14px !important; }
+      html.ui-v2 #payment-upload-card > div:first-child { flex-wrap: wrap; gap: 8px; }
+      html.ui-v2 #payment-upload-card > div:first-child > span:last-child { white-space: nowrap; }
+      /* v2.8 lỗi 1: cửa sổ biên lai của PM = toàn màn hình, 3 nút Đóng · Từ chối · Duyệt luôn ở đáy (như cửa sổ Nộp tiền ngay) */
+      html.ui-v2 #receipt-modal { padding: 0 !important; align-items: stretch !important; }
+      html.ui-v2 #receipt-modal .modal-card { max-width: 100% !important; width: 100% !important; height: 100% !important; max-height: 100% !important; margin: 0 !important;
+        border-radius: 0 !important; padding-bottom: 0 !important; box-shadow: none !important; }
+      html.ui-v2 #receipt-modal .modal-card > div:last-child { position: sticky; bottom: 0; z-index: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+        margin: 12px 0 0; padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--lg-card-bg); box-shadow: 0 -4px 12px rgba(38, 38, 38, 0.08); }
+      html.ui-v2 #receipt-modal .modal-card > div:last-child > div { display: contents; }
+      html.ui-v2 #receipt-modal .modal-card > div:last-child button { min-width: 0; min-height: 48px; height: auto; padding: 6px 8px !important; white-space: normal; line-height: 18px; font-size: 14px !important; }
 
       /* R8: mũi tên "↗" không rơi xuống dòng riêng; ô 02 mỗi kho 1 dòng (dấu "·" ngăn cách không còn rơi lẻ đầu dòng) */
       html.ui-v2 .grap-card-link { white-space: nowrap; }
@@ -3703,6 +3728,10 @@
         <button type="button" class="btn-tour-header" id="btn-header-tour" onclick="startCurrentRoleTour()" title="Xem lại tour hướng dẫn sử dụng nhanh">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><path d="M9 21h6"></path></svg>
           <span>Hướng dẫn nhanh</span>
+        </button>
+        <!-- v2.8 (11/10/2026, chủ dự án duyệt): Docs — bộ hướng dẫn bằng hình theo vai trò (guides/), mở ở tab mới -->
+        <button type="button" class="btn-action btn-secondary" id="btn-header-docs" onclick="openDocsModal()" title="Tài liệu hướng dẫn bằng hình">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>Docs
         </button>
         <button type="button" class="api-status-badge api-offline" id="top-api-badge" onclick="openApiConfigModal()" style="cursor:pointer; font-size:11px; padding:4px 10px; border-radius:12px; background:#F0ECE4; color:#716F6A; font-weight:600; border:1px solid #CBC8C2; display:inline-flex; align-items:center; gap:5px;" title="Cấu hình Google Sheet API / Chế độ Demo">
           <span style="width:7px; height:7px; border-radius:50%; background:#716F6A; display:inline-block;"></span>
@@ -4997,6 +5026,8 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               <span>Duyệt hàng loạt (<strong id="batch-approve-count">0</strong>)</span>
             </button>
+            <!-- v2.8 C1 (11/10/2026): chỉ hiện trên điện thoại ≤ 719 px — mở/đóng 8 nút phụ (Hẹn giờ, Nạp Excel, Xuất Excel, Quét quá hạn, Tải lại, Email…) -->
+            <button type="button" class="btn-pm-action btn-pm-outline btn-pm-more" onclick="togglePmMoreActions(this)" aria-expanded="false">Thêm thao tác ▾</button>
             <button class="btn-pm-action btn-pm-outline" id="btn-timer-settings-header" onclick="openTimerSettingsModal()" style="border-color:#A50034; color:#A50034; font-weight:700; background:#FFF;" title="Cài đặt hẹn giờ tự động mở chương trình, kết sổ và mở cổng thanh toán">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A50034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <span>Hẹn Giờ (Timer)</span>
@@ -5654,6 +5685,20 @@
           <button type="submit" class="btn-action" id="quick-submit-btn" style="background:#A50034; border-color:#A50034;"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polyline points="20 6 9 17 4 12"/></svg> Xác Nhận Nộp Tiền</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- v2.8 (11/10/2026): cửa sổ Docs — link tới bộ slide hướng dẫn đúng vai trò + ngôn ngữ (guides/<laptop|phone>/<user|pm|admin>_<vi|en>.html) -->
+  <div class="modal-overlay" id="docs-modal">
+    <div class="modal-card" style="max-width:560px;">
+      <button class="modal-close" onclick="closeDocsModal()" aria-label="Đóng">×</button>
+      <h3 style="margin:0 0 6px;">Tài liệu hướng dẫn</h3>
+      <p id="docs-role" style="margin:0 0 4px; color:var(--lg-text-2); font-size:14px;"></p>
+      <p style="margin:0 0 16px; color:var(--lg-text-2); font-size:14px;">Slide ảnh chụp thật từng bước, mở ở tab mới. Dữ liệu trong ảnh là dữ liệu mẫu.</p>
+      <div id="docs-links" style="display:flex; flex-direction:column; gap:10px;">
+        <a id="docs-link-phone" class="btn-action docs-link" href="#" target="_blank" rel="noopener">Bản cho điện thoại</a>
+        <a id="docs-link-laptop" class="btn-action docs-link" href="#" target="_blank" rel="noopener">Bản cho máy tính</a>
+      </div>
     </div>
   </div>
 
@@ -9390,6 +9435,32 @@
       // 11/10/2026 (R2): selectProgram tính KPI PM trước khi danh mục về → "Tổng SP 0". Danh mục về rồi thì tính lại.
       if (currentUser.role === 'PM' && typeof calculatePMStats === 'function') calculatePMStats(activeProgram);
       updateTab1Counts(currentProducts);   // 11/10/2026 (C3)
+    }
+
+    // v2.8 (11/10/2026): Docs — bộ hướng dẫn theo vai trò (chỉ để tiện xem; link là trang công khai, ảnh chỉ có dữ liệu mẫu)
+    function docsRole() {
+      if (!currentUser) return 'user';
+      if (currentUser.isAdmin) return 'admin';
+      return currentUser.role === 'PM' ? 'pm' : 'user';
+    }
+    function openDocsModal() {
+      const role = docsRole(), lang = document.documentElement.classList.contains('lang-en') ? 'en' : 'vi';
+      const phone = document.getElementById('docs-link-phone'), laptop = document.getElementById('docs-link-laptop');
+      phone.href = `guides/phone/${role}_${lang}.html`;
+      laptop.href = `guides/laptop/${role}_${lang}.html`;
+      document.getElementById('docs-role').textContent = T(role === 'admin' ? 'Dành cho ADMIN: đầy đủ Nhân viên · PM · ADMIN' : role === 'pm' ? 'Dành cho PM' : 'Dành cho nhân viên');
+      const box = document.getElementById('docs-links');   // bản hợp với thiết bị đang dùng đứng đầu
+      if (PHONE_MQ.matches) box.prepend(phone); else box.prepend(laptop);
+      document.getElementById('docs-modal').classList.add('active');
+    }
+    function closeDocsModal() { document.getElementById('docs-modal').classList.remove('active'); }
+
+    // v2.8 C1 (11/10/2026): điện thoại — mở/đóng nhóm nút phụ của PM (CSS: .pm-header-actions.more-open)
+    function togglePmMoreActions(btn) {
+      const bar = btn.closest('.pm-header-actions'); if (!bar) return;
+      const open = bar.classList.toggle('more-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = T(open ? 'Thu gọn ▴' : 'Thêm thao tác ▾');
     }
 
     // 11/10/2026 (A1): điện thoại — nút ☰ mở/đóng các nút tài khoản & tiện ích ở đầu trang (CSS: .top-header.menu-open)
@@ -13840,6 +13911,12 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
     function findTourTargetElement(selectorString) {
       if (!selectorString) return null;
       const selectors = selectorString.split(',').map(s => s.trim());
+      // v2.8 C1: nút cần chỉ đang ẩn trong nhóm "Thêm thao tác" (điện thoại) → mở nhóm trước, để khung chỉ đúng nút thay vì cả thanh
+      const first = document.querySelector(selectors[0]), bar = document.querySelector('.pm-header-actions:not(.more-open)');
+      if (first && first.offsetParent === null && bar && bar.contains(first)) {
+        const more = bar.querySelector('.btn-pm-more');
+        if (more && more.offsetParent !== null) togglePmMoreActions(more);
+      }
       for (const sel of selectors) {
         const el = document.querySelector(sel);
         if (el && el.offsetParent !== null) {

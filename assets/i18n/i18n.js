@@ -67,7 +67,7 @@
   function norm(s) { return s.replace(/\s+/g, ' ').trim(); }
   // Có chữ tiếng Việt cần dịch? Bỏ qua ký hiệu tiền "đ" sau số (1.875.000 đ) — giữ cách ghi tiền (Q-I3)
   // + từ tiếng Việt không dấu hay gặp trên trang: "Kho"/"kho", "Tivi", "SP" (sản phẩm), "NV" (nhân viên)
-  var VI_WORD = /\b(Kho|kho|Tivi|SP|NV)\b/;
+  var VI_WORD = /\b(Kho|kho|Tivi|SP|NV|STT|Loa|Thanh|Xoay)\b/;   // chữ Việt KHÔNG DẤU (11/10/2026: thêm STT, Loa Thanh, Xoay — trước đây bị bỏ qua, không dịch)
   function hasVI(s) { s = String(s).replace(/\d[\d.,]*\s*đ/g, ''); return VI.test(s) || VI_WORD.test(s); }
   function one(k) {
     if (Object.prototype.hasOwnProperty.call(D, k)) return D[k];
