@@ -1,6 +1,6 @@
 # Đồng bộ nội dung web với tab `Config` của Google Sheet — khảo sát & đề xuất
 
-> **Trạng thái:** ĐỀ XUẤT, chờ chủ dự án quyết (11/10/2026). Chưa sửa gì.
+> **Trạng thái (11/10/2026):** chủ dự án duyệt P0 + P1 → **đã làm ở web v2.9.0 + Apps Script Version 11** (chờ chủ dự án deploy, Runbook §3c). Địa chỉ nhận hàng: thêm ô nhập khi giữ chỗ (P0-5 phương án b). Email hỗ trợ, giao hàng, đổi trả: đưa vào Config. `PAYMENT_DEADLINE_HOURS` vẫn cố định 24 giờ (xem §6). Phần dưới giữ nguyên làm hồ sơ khảo sát.
 > **Khảo sát trên:** web v2.7.0 (`Mau_Dang_Ky_Internal_Sales_3009.html`), `apps-script/Code.gs` (Version 10 đang chạy), Sheet chính thức đọc ngày 11/10/2026.
 > Số dòng `file:line` là của nhánh `v2.8-wave3-docs` lúc khảo sát; có thể lệch vài dòng sau khi sửa.
 
@@ -107,3 +107,12 @@ sequenceDiagram
 | Q-C6 | Làm P1 sau 16/10? Danh sách key §3 có cần thêm / bớt? | Có, sau đợt bán |
 
 **Khi nào đề xuất này sai:** nếu chủ dự án muốn sửa nội dung trong lúc đợt bán đang chạy (14–16/10) mà không chờ được bản sửa web, thì P1 phải làm trước 13/10 và chấp nhận rủi ro deploy Apps Script sát giờ mở bán.
+
+---
+
+## 6. Chưa làm và lý do (11/10/2026)
+| Mục | Lý do | Đề xuất |
+|---|---|---|
+| `PAYMENT_DEADLINE_HOURS` (hạn nộp tiền theo Config) | 29 chỗ chữ "24h / 24 giờ" trên web + bộ đếm hết hạn và nhắc 22h của máy chủ + các câu trong từ điển EN. Đổi sát giờ mở bán rủi ro cao; hạn này hiếm khi đổi | Làm sau 16/10. Hiện mô tả ô ghi rõ "cố định 24 giờ — đổi ô này không có tác dụng" |
+| `SYS_STATUS` (bảo trì) | Là chức năng mới, chưa yêu cầu | Mô tả ô ghi "KHÔNG có tác dụng" |
+| Đổi địa chỉ của đơn đã giữ | Cần lệnh máy chủ mới | Hiện: nhân viên liên hệ PM (web ghi rõ) |

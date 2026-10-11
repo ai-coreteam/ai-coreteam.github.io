@@ -3267,6 +3267,7 @@
     html.ui-v2 .grap-card-red .financial-row { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.25); }
     html.ui-v2 .grap-card-red .financial-row:last-child { border-bottom: 0; }
     html.ui-v2 .grap-card-red .fin-acc { background: transparent; padding: 0; font-family: var(--font-heading); font-size: 24px !important; line-height: 28px; font-weight: 600; letter-spacing: .02em; }
+    html.ui-v2 .grap-card-red .fin-acc > [data-cfg] { font: inherit !important; letter-spacing: inherit; color: inherit; }   /* v2.9: số TK bọc thẻ Config → giữ đúng cỡ 24 px như trước */
     html.ui-v2 .grap-card-red .syntax-code { background: rgba(255,255,255,.16); color: #FFFFFF; padding: 2px 8px; border-radius: 6px; }
     html.ui-v2 .grap-card-red .btn-copy-acc { color: #FFFFFF; }
     html.ui-v2 .grap-card-red .btn-copy-acc svg { stroke: currentColor !important; }
@@ -3451,6 +3452,15 @@
        Chỉ giao diện v2 trên màn hẹp; máy tính (≥ 720px) và ?ui=v1 không đổi. Không đổi chức năng, ID hay dữ liệu gửi máy chủ. ===== */
     .btn-header-menu { display: none; }
     .btn-pm-more { display: none; }
+    /* v2.9: dòng thông báo (Config ANNOUNCEMENT) + dòng địa chỉ nhận hàng ở tab 2 */
+    .site-announcement { margin: 0 0 12px; padding: 12px 16px; border-left: 4px solid #A50034; border-radius: 8px; background: var(--lg-card-bg); color: var(--lg-ink); font-size: 14px; line-height: 20px; white-space: pre-line; }
+    .site-announcement[hidden], .delivery-addr-row[hidden] { display: none; }
+    .delivery-addr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; padding: 12px 16px; border: 1px solid var(--lg-border); border-radius: 12px; background: var(--lg-card-bg); font-size: 14px; color: var(--lg-text); }
+    .delivery-addr-row .addr-val { font-weight: 600; color: var(--lg-ink); overflow-wrap: anywhere; }
+    .delivery-addr-row .addr-missing { color: var(--lg-heritage); font-weight: 600; }
+    .delivery-addr-row .addr-note { flex-basis: 100%; font-size: 13px; color: var(--lg-text-2); }
+    .delivery-addr-row button { margin-left: auto; }
+    #addr-input { font-size: 16px; }   /* iPhone không tự phóng to */
     .docs-link { display: flex; align-items: center; justify-content: center; height: 48px; text-decoration: none; font-size: 16px; }   /* v2.8: 2 link trong cửa sổ Docs */   /* v2.8 C1: nút "Thêm thao tác" chỉ có trên điện thoại */
     .lg-desc-row { display: contents; }   /* v2.7: khung bọc link LG.com + nút "Xem đủ" — máy tính: không tạo hộp, bố cục như cũ */
     @media (max-width: 719px) {
@@ -3675,7 +3685,7 @@
 
       
 
-      <p class="login-info">Liên hệ Ban Quản Trị (internalsales.support@lge.com) nếu cần hỗ trợ tài khoản.</p>
+      <p class="login-info" id="login-support">Liên hệ Ban Quản Trị Bán Hàng Nội Bộ (internalsales.support@lge.com) nếu cần hỗ trợ tài khoản.</p>
       <p class="login-info demo-only" style="margin-top:6px;">
         <a href="javascript:void(0)" onclick="openApiConfigModal()" style="color:#716F6A; font-size:11.5px; text-decoration:underline; display:inline-flex; align-items:center; gap:5px;">
           <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A; width:13px; height:13px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -3727,6 +3737,8 @@
     <!-- Multi-Program Selector Tabs & PM Controls -->
     <div id="program-tab-bar" class="program-tab-bar" style="margin-bottom:12px; border-radius:12px;"></div>
     <div id="pm-controls" class="pm-controls" style="margin-bottom:12px; border-radius:8px; display:none;"></div>
+    <!-- v2.9: dòng thông báo — nội dung ô ANNOUNCEMENT trong tab Config (để trống = ẩn) -->
+    <div id="site-announcement" class="site-announcement" role="status" hidden data-no-i18n></div>
 
     <!-- GRAP-STYLE COMPACT BRIEF TOP DASHBOARD (LG BI V5.2 Compliant) -->
     <section id="grap-brief-dashboard" class="grap-dashboard-section" style="display:none;" aria-label="Bảng tóm tắt tiến độ bán hàng">
@@ -3740,39 +3752,39 @@
       </div>
 
       <div class="grap-cards-grid">
-        <!-- Card 1: Thể Lệ & Tài Khoản (Heritage Red) -->
+        <!-- Card 1: Thông Tin Chuyển Khoản (Heritage Red) — v2.9: giá trị lấy từ tab Config (data-cfg) -->
         <div class="grap-card grap-card-red">
           <div class="grap-card-top">
             <span class="grap-card-num">01</span>
-            <h3 class="grap-card-title">Thể Lệ & Chuyển Khoản</h3>
+            <h3 class="grap-card-title">Thông Tin Chuyển Khoản</h3>
             <div class="grap-card-body" id="grap-card1-body">
               <div class="grap-financial-box">
                 <div class="financial-row">
                   <span class="fin-label">Ngân hàng</span>
-                  <span class="fin-value">VIETCOMBANK</span>
+                  <span class="fin-value" data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span>
                 </div>
                 <div class="financial-row">
                   <span class="fin-label">Số tài khoản</span>
                   <span class="fin-value fin-acc">
-                    0991000012525
-                    <button type="button" class="btn-copy-acc" onclick="navigator.clipboard.writeText('0991000012525'); showToast('Đã sao chép số tài khoản Vietcombank!', 'success');" title="Sao chép số tài khoản">
+                    <span data-cfg="BANK_ACC" data-no-i18n>0991000012525</span>
+                    <button type="button" class="btn-copy-acc" onclick="navigator.clipboard.writeText(cfg('BANK_ACC')); showToast('Đã sao chép số tài khoản!', 'success');" title="Sao chép số tài khoản">
                       <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     </button>
                   </span>
                 </div>
                 <div class="financial-row">
                   <span class="fin-label">Chủ thụ hưởng</span>
-                  <span class="fin-value">CTY TNHH LG Electronics VN HP</span>
+                  <span class="fin-value" data-cfg="BANK_HOLDER_SHORT" data-no-i18n>CTY TNHH LG Electronics VN HP</span>
                 </div>
                 <div class="financial-row">
                   <span class="fin-label">Cú pháp CK</span>
-                  <span class="fin-value syntax-code">[MãNV]_[MãSlot]</span>
+                  <span class="fin-value syntax-code" data-cfg-syntax data-no-i18n>[Mã NV] [Mã Slot]</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="grap-card-footer">
-            <span class="grap-pill">1 SP / NV</span>
+            <span class="grap-pill" id="grap-limit-pill">1 SP / NV</span>
             <a href="javascript:void(0)" onclick="openFullLetterModal()" class="grap-card-link">Xem thể lệ chi tiết →</a>
           </div>
         </div>
@@ -3926,7 +3938,8 @@
       function openSupportModal() {
         if (typeof showToast === 'function') {
           // v1-hardening: dùng bí danh hỗ trợ chung (như màn hình đăng nhập), không hiện tên/hotline/email cá nhân mẫu
-          showToast('Hỗ trợ nội bộ: Ban Quản Trị Bán Hàng Nội Bộ · Liên hệ hỗ trợ: minhhien.hoang@lge.com', 'info', 6000);
+          // v2.9: tên / email / số điện thoại hỗ trợ lấy từ tab Config (SUPPORT_NAME, SUPPORT_EMAIL, SUPPORT_PHONE)
+          showToast(`Hỗ trợ nội bộ: ${cfg('SUPPORT_NAME')} · Liên hệ: ${cfg('SUPPORT_EMAIL')}${cfg('SUPPORT_PHONE') ? ' · Hotline: ' + cfg('SUPPORT_PHONE') : ''}`, 'info', 6000);
         }
       }
     </script>
@@ -3962,7 +3975,7 @@
             <svg class="lg-icon lg-icon-red" viewBox="0 0 24 24"><path d="M12 2L2 7h20L12 2zM3 10h18M5 10v11M19 10v11M9 10v11M15 10v11"/></svg>
             CHƯƠNG TRÌNH ĐẶC QUYỀN NỘI BỘ · LG ELECTRONICS VIETNAM
           </div>
-          <h2 class="hero-title">Đợt Mở Bán Thiết Bị Gia Dụng Cao Cấp Q3/2026</h2>
+          <h2 class="hero-title" id="tab1-hero-title" data-no-i18n>Đợt Mở Bán Hàng Nội Bộ</h2>
           <p class="hero-subtitle" id="tab1-hero-subtitle">
             90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC chính thức mở bán trực tuyến. Cơ hội sở hữu các dòng sản phẩm cao cấp LG OLED, Tủ lạnh InstaView và Tháp giặt sấy WashTower với chính sách ưu đãi đặc quyền cho cán bộ nhân viên.
           </p>
@@ -4020,7 +4033,7 @@
         <div class="email-header-meta">
           <div class="meta-row">
             <span class="meta-label">Từ (From):</span>
-            <span class="meta-val">Ban Quản Trị Bán Hàng Nội Bộ - HS Division &lt;internalsales.support@lge.com&gt;</span>
+            <span class="meta-val"><span data-cfg="SUPPORT_NAME" data-no-i18n>Ban Quản Trị Bán Hàng Nội Bộ</span> &lt;<span data-cfg="SUPPORT_EMAIL" data-no-i18n>internalsales.support@lge.com</span>&gt;</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Đến (To):</span>
@@ -4077,10 +4090,10 @@
             <div class="sec-title">3. PHƯƠNG THỨC THANH TOÁN & NỘP CHỨNG TỪ TIỀN GỬI NGÂN HÀNG</div>
             <p>Sau khi hệ thống xác nhận đăng ký slot thành công, nhân viên thực hiện chuyển khoản 100% giá trị đơn hàng và <strong>Upload File Ảnh Biên Lai Nộp Tiền</strong> tại Tab 3:</p>
             <ul style="padding-left:20px; margin-top:8px; line-height:1.7;">
-              <li><strong>Tên Tài Khoản:</strong> CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</li>
-              <li><strong>Số Tài Khoản:</strong> <code>0991000012525</code></li>
-              <li><strong>Ngân Hàng:</strong> VIETCOMBANK - Chi Nhánh Tây Hồ</li>
-              <li><strong>Cú pháp chuyển khoản (Bắt buộc):</strong> <code>[Mã NV] - [Họ Tên] - [Mã Model] - [Slot ID]</code></li>
+              <li><strong>Tên Tài Khoản:</strong> <span data-cfg="BANK_HOLDER" data-no-i18n>CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</span></li>
+              <li><strong>Số Tài Khoản:</strong> <code data-cfg="BANK_ACC" data-no-i18n>0991000012525</code></li>
+              <li><strong>Ngân Hàng:</strong> <span data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span> - <span data-cfg="BANK_BRANCH" data-no-i18n>Chi nhánh Tây Hồ</span></li>
+              <li><strong>Cú pháp chuyển khoản (Bắt buộc):</strong> <code data-cfg-syntax data-no-i18n>[Mã NV] [Mã Slot]</code></li>
               <li><strong>Upload File Biên Lai:</strong> Vào Tab 3 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.</li>
             </ul>
           </div>
@@ -4090,14 +4103,14 @@
             <ul style="padding-left:20px; line-height:1.7; color:var(--lg-text);">
               <li><strong>Vận chuyển:</strong> Công ty hỗ trợ vận chuyển đến địa chỉ đăng ký của nhân viên.</li>
               <li><strong>Bảo hành:</strong> Sản phẩm bán nội bộ Clearance/Internal Sales không áp dụng chế độ bảo hành (No Warranty).</li>
-              <li><strong>Đổi trả:</strong> Trong vòng 07 ngày làm việc kể từ ngày nhận hàng, chỉ chấp nhận đổi sản phẩm nếu sản phẩm bị lỗi chức năng cơ bản.</li>
+              <li><strong>Đổi trả:</strong> <span data-cfg="RETURN_POLICY" data-no-i18n>Trong vòng 07 ngày làm việc kể từ ngày nhận hàng, chỉ chấp nhận đổi sản phẩm nếu sản phẩm bị lỗi chức năng cơ bản.</span></li>
               <li><strong>Cam kết Jeong-Do Management:</strong> Nghiêm cấm bán lại cho bên thứ 3 (Resale prohibited). Vi phạm sẽ xử lý kỷ luật theo quy chế công ty.</li>
               <li><strong>Khuyến nghị đường truyền:</strong> Nếu mạng nội bộ nhà máy/văn phòng có tường lửa chặn dịch vụ Google Apps Script, vui lòng chuyển sang <strong>mạng di động 4G/5G cá nhân</strong> để hoàn tất đăng ký giữ chỗ và thanh toán thông suốt.</li>
             </ul>
           </div>
 
           <p style="margin-top:20px;">Trân trọng cảm ơn,</p>
-          <p><strong>Ban Quản Trị Bán Hàng Nội Bộ (Internal Sales PM Team)</strong><br>HS PM Support | LG Electronics Vietnam<br>Email: internalsales.support@lge.com</p>
+          <p><strong>Ban Quản Trị Bán Hàng Nội Bộ (Internal Sales PM Team)</strong><br>HS PM Support | LG Electronics Vietnam<br>Email: <span data-cfg="SUPPORT_EMAIL" data-no-i18n>internalsales.support@lge.com</span></p>
         </div>
       </div>
 
@@ -4116,6 +4129,8 @@
       </div>
 
       <!-- Danh mục sản phẩm trực tuyến theo chương trình đang chọn -->
+      <!-- v2.9 (chủ dự án duyệt): địa chỉ nhận hàng — gửi kèm khi giữ chỗ (Registrations cột J), PM xem để đối chiếu kho -->
+      <div id="delivery-addr-row" class="delivery-addr-row" hidden></div>
       <div id="product-container" class="product-container" style="margin-bottom:24px;"></div>
 
       <!-- Khung Thông Báo Phân Quyền PM Quản Trị (Jeong-Do Governance Notice - SoD Compliance) -->
@@ -5521,7 +5536,8 @@
           <div><strong>Số tiền nộp:</strong> <span id="modal-amount" style="color:var(--lg-red); font-size:14px; font-weight:700;">-</span></div>
           <div><strong>Mã giao dịch:</strong> <code id="modal-txn-code" style="background:#E6E1D6; padding:2px 6px; border-radius:4px; font-weight:700; color:#262626;">-</code></div>
           <div><strong>Người nộp:</strong> <span id="modal-payer-name" style="color:var(--lg-ink); font-weight:600;">-</span></div>
-          <div><strong>Tài khoản nhận:</strong> 0991000012525 (VCB Tay Ho - LGEVH)</div>
+          <div><strong>Tài khoản nhận:</strong> <span data-cfg="BANK_ACC" data-no-i18n>0991000012525</span> (<span data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span>)</div>
+          <div><strong>Địa chỉ nhận hàng:</strong> <span id="modal-address" data-no-i18n>-</span></div>
         </div>
       </div>
 
@@ -5552,28 +5568,28 @@
         <div class="sec-title" style="color:#A50034; font-size:13px; font-weight:700; margin-bottom:6px;">1. NGUYÊN TẮC XÉT DUYỆT & HẠN MỨC</div>
         <ul style="padding-left:18px; line-height:1.6; font-size:12px; color:#4A4946; margin:0;">
           <li><strong>First Come, First Served (FCFS):</strong> Đơn hàng được ghi nhận và giữ chỗ dựa trên timestamp thực tế khi nhấn "Đăng ký".</li>
-          <li><strong>Hạn mức mua hàng:</strong> Tối đa <strong>01 sản phẩm / 01 nhân viên</strong> trong suốt thời gian diễn ra chương trình.</li>
-          <li><strong>Cam kết Jeong-Do:</strong> Tuyệt đối nghiêm cấm mua hộ, bán lại cho bên thứ ba hoặc trục lợi thương mại. Vi phạm sẽ bị xử lý kỷ luật theo quy định công ty.</li>
+          <li><strong>Hạn mức mua hàng:</strong> Tối đa <strong id="rules-limit-text">01 sản phẩm / 01 nhân viên</strong> trong suốt thời gian diễn ra chương trình.</li>
+          <li><strong>Cam kết Jeong-Do:</strong> <span data-cfg="RULE_JEONGDO" data-no-i18n>Tuyệt đối nghiêm cấm mua hộ, bán lại cho bên thứ ba hoặc trục lợi thương mại. Vi phạm sẽ bị xử lý kỷ luật theo quy định công ty.</span></li>
         </ul>
       </div>
 
       <div class="sec-card" style="margin-bottom:12px; background:#F0ECE4; border-color:#CBC8C2;">
         <div class="sec-title" style="color:#262626; font-size:13px; font-weight:700; margin-bottom:6px;">2. THÔNG TIN CHUYỂN KHOẢN HỢP LỆ (LGEVH)</div>
         <div style="font-size:12px; line-height:1.65; color:#262626;">
-          <div>• <strong>Tên tài khoản thụ hưởng:</strong> CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</div>
-          <div>• <strong>Số tài khoản:</strong> <code style="background:#E6E1D6; padding:2px 6px; border-radius:4px; font-weight:700;">0991000012525</code></div>
-          <div>• <strong>Ngân hàng:</strong> VIETCOMBANK - Chi nhánh Tây Hồ</div>
-          <div>• <strong>Cú pháp chuẩn (Bắt buộc):</strong> <code style="background:#E6E1D6; padding:2px 6px; border-radius:4px; font-weight:700;">[Mã NV]_[Mã Slot]_[Họ Tên]</code></div>
-          <div style="font-size:11px; color:#716F6A; margin-top:4px;"><em>Ví dụ: VH88921_HA-AYA-001_Tran Van Nam</em></div>
+          <div>• <strong>Tên tài khoản thụ hưởng:</strong> <span data-cfg="BANK_HOLDER" data-no-i18n>CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</span></div>
+          <div>• <strong>Số tài khoản:</strong> <code style="background:#E6E1D6; padding:2px 6px; border-radius:4px; font-weight:700;" data-cfg="BANK_ACC" data-no-i18n>0991000012525</code></div>
+          <div>• <strong>Ngân hàng:</strong> <span data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span> - <span data-cfg="BANK_BRANCH" data-no-i18n>Chi nhánh Tây Hồ</span></div>
+          <div>• <strong>Cú pháp chuẩn (Bắt buộc):</strong> <code style="background:#E6E1D6; padding:2px 6px; border-radius:4px; font-weight:700;" data-cfg-syntax data-no-i18n>[Mã NV] [Mã Slot]</code></div>
+          <div style="font-size:11px; color:#716F6A; margin-top:4px;"><em>Ví dụ:</em> <em data-cfg-syntax-example data-no-i18n>VH88921 IS-2026Q4-TV-01-AYA-001</em></div>
         </div>
       </div>
 
       <div class="sec-card" style="margin-bottom:16px;">
         <div class="sec-title" style="color:#A50034; font-size:13px; font-weight:700; margin-bottom:6px;">3. THỜI HẠN THANH TOÁN & GIAO HÀNG LOGISTICS</div>
         <ul style="padding-left:18px; line-height:1.6; font-size:12px; color:#4A4946; margin:0;">
-          <li>Sau khi đăng ký thành công, nhân viên có tối đa <strong>24 Giờ</strong> để hoàn tất chuyển khoản và upload ảnh biên lai.</li>
+          <li>Từ lúc PM mở cổng thanh toán, nhân viên có tối đa <strong>24 Giờ</strong> để hoàn tất chuyển khoản và upload ảnh biên lai.</li>
           <li>Quá thời hạn trên mà chưa nộp chứng từ, hệ thống sẽ tự động hủy đơn và mở lại slot cho đồng nghiệp khác.</li>
-          <li>Bộ phận Logistics sẽ xuất hàng và giao trực tiếp đến địa chỉ đã đăng ký trong vòng 3–5 ngày làm việc sau khi PM duyệt thanh toán.</li>
+          <li data-cfg="DELIVERY_POLICY" data-no-i18n>Bộ phận Logistics giao hàng đến địa chỉ nhận hàng nhân viên khai khi giữ chỗ, trong vòng 3–5 ngày làm việc sau khi PM duyệt thanh toán.</li>
         </ul>
       </div>
 
@@ -5607,8 +5623,8 @@
           <div>Model: <strong id="quick-model-name">OLED65C3PSA</strong></div>
           <div>Số tiền thanh toán: <strong id="quick-amount-text" style="color:#A50034; font-size:16px;">7.800.000 đ</strong></div>
           <div style="border-top:1px dashed #CBC8C2; margin-top:6px; padding-top:6px; font-size:11.5px; color:#4A4946;">
-            <div>STK thụ hưởng: <strong>0991000012525</strong> (Vietcombank Tay Ho)</div>
-            <div>CTY TNHH LG ELECTRONICS VN HAI PHONG</div>
+            <div>STK thụ hưởng: <strong data-cfg="BANK_ACC" data-no-i18n>0991000012525</strong> (<span data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span>)</div>
+            <div data-cfg="BANK_HOLDER_SHORT" data-no-i18n>CTY TNHH LG Electronics VN HP</div>
             <div>Nội dung CK: <code id="quick-transfer-syntax" style="background:#E6E1D6; padding:1px 5px; border-radius:4px; font-weight:700;">VH88921 HA-AYA-001</code></div>
           </div>
         </div>
@@ -5664,6 +5680,23 @@
           <button type="submit" class="btn-action" id="quick-submit-btn" style="background:#A50034; border-color:#A50034;"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polyline points="20 6 9 17 4 12"/></svg> Xác Nhận Nộp Tiền</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- v2.9 (11/10/2026): cửa sổ Địa chỉ nhận hàng -->
+  <div class="modal-overlay" id="addr-modal">
+    <div class="modal-card" style="max-width:560px;">
+      <button class="modal-close" onclick="closeAddressModal(null)" aria-label="Đóng">×</button>
+      <h3 style="margin:0 0 6px;">Địa chỉ nhận hàng</h3>
+      <p id="addr-modal-product" style="margin:0 0 6px; font-size:14px; color:var(--lg-ink);" hidden></p>
+      <p style="margin:0 0 12px; font-size:14px; color:var(--lg-text-2);">PM dùng địa chỉ này để kiểm tra bạn chọn đúng kho khu vực: AYA miền Bắc, AYB miền Trung, AYC miền Nam.</p>
+      <label class="form-label" for="addr-input">Địa chỉ nhận hàng (số nhà, đường, phường/xã, tỉnh/thành) *</label>
+      <textarea id="addr-input" class="form-control" rows="3" maxlength="300" style="height:auto; padding:10px 14px; margin-top:6px;" placeholder="Ví dụ: Số 12 Điện Biên Phủ, Ngô Quyền, Hải Phòng"></textarea>
+      <p id="addr-error" style="margin:6px 0 0; font-size:14px; color:var(--lg-heritage);" hidden>Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).</p>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px; flex-wrap:wrap;">
+        <button type="button" class="btn-action btn-secondary" onclick="closeAddressModal(null)">Hủy</button>
+        <button type="button" class="btn-action" id="addr-save-btn" onclick="saveAddressFromModal()" style="background:#EA1917; border-color:#EA1917; color:#FFF;">Lưu địa chỉ</button>
+      </div>
     </div>
   </div>
 
@@ -8470,12 +8503,15 @@
 
     function renderBriefTopDashboard(programId) {
       const pid = programId || activeProgram;
+      if (typeof applyProgramTexts === 'function') applyProgramTexts(pid);   // v2.9: hạn mức + tiêu đề Tab 1 theo chương trình
+      if (typeof renderDeliveryAddrRow === 'function') renderDeliveryAddrRow();
+      if (typeof applySiteConfig === 'function') applySiteConfig();   // v2.9: dòng thông báo chỉ hiện sau đăng nhập → áp lại Config
       const titleEl = document.getElementById('grap-program-title');
       const pillEl = document.getElementById('grap-status-pill');
       const subEl = document.getElementById('grap-program-subtitle');
 
       if (!pid) {
-        if (titleEl) titleEl.textContent = 'Chưa có chương trình nào được chọn';
+        if (titleEl) titleEl.textContent = T('Chưa có chương trình nào được chọn');   // v2.9: ô này thuộc vùng không dịch (tên chương trình) → tự dịch câu mặc định
         if (pillEl) {
           pillEl.innerHTML = 'Chưa chọn';
           pillEl.style.cssText = 'background:#F5F5F5; color:#716F6A; border:1px solid #E0E0E0;';
@@ -8652,7 +8688,7 @@
             card3Body.innerHTML = `
               <div style="font-size:12px; color:#CBC8C2; line-height:1.6;">
                 Bạn chưa đăng ký sản phẩm nào trong chương trình này.<br>
-                <span style="color:#A09E99; font-size:11px;">Hạn mức: 1 SP / Nhân viên · Thứ tự ưu tiên FCFS.</span>
+                <span style="color:#A09E99; font-size:11px;">Hạn mức: ${progMax(pid)} SP / Nhân viên · Thứ tự ưu tiên FCFS.</span>
               </div>`;
           }
           if (card3Footer) {
@@ -8736,10 +8772,9 @@
       }
 
       // Generate VietQR URL
-      const transferSyntax = `${currentUser.id} ${reg.slotId}`;
+      const transferSyntax = buildTransferSyntax(currentUser.id, reg.slotId, currentUser.name);   // v2.9: mẫu nội dung CK từ Config (TRANSFER_SYNTAX)
       document.getElementById('quick-transfer-syntax').textContent = transferSyntax;
-      const encodedSyntax = encodeURIComponent(transferSyntax);
-      const qrUrl = `https://img.vietqr.io/image/970436-0991000012525-compact.png?amount=${reg.internalPrice || 0}&addInfo=${encodedSyntax}&accountName=LG%20ELECTRONICS%20VN%20HAI%20PHONG`;
+      const qrUrl = vietQrUrl(reg.internalPrice || 0, transferSyntax);
       document.getElementById('quick-qr-img').src = qrUrl;
 
       document.getElementById('quick-payment-modal').classList.add('active');
@@ -9051,6 +9086,150 @@
       // 11/10/2026 (R2): selectProgram tính KPI PM trước khi danh mục về → "Tổng SP 0". Danh mục về rồi thì tính lại.
       if (currentUser.role === 'PM' && typeof calculatePMStats === 'function') calculatePMStats(activeProgram);
       updateTab1Counts(currentProducts);   // 11/10/2026 (C3)
+    }
+
+    // ===== v2.9 (11/10/2026, chủ dự án duyệt): nội dung "hay đổi" lấy từ tab Config của Google Sheet =====
+    // ADMIN sửa ô trong Sheet → mọi tài khoản thấy sau tối đa ~6 phút (máy chủ cache 60 giây + web hỏi lại mỗi 5 phút).
+    // Máy chủ chưa có lệnh public_config (Apps Script cũ) / mất mạng / ô sai dạng → dùng giá trị mặc định dưới đây: web không vỡ.
+    // Cột B = tiếng Việt, cột D = tiếng Anh (trống → dùng tiếng Việt). Chữ thuần: KHÔNG chạy HTML từ Sheet.
+    var SITE_CFG_DEFAULTS = {
+      BANK_NAME: { vi: 'VIETCOMBANK' },
+      BANK_BRANCH: { vi: 'Chi nhánh Tây Hồ', en: 'Tay Ho Branch' },
+      BANK_ACC: { vi: '0991000012525' },
+      BANK_HOLDER: { vi: 'CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG', en: 'LG ELECTRONICS VIETNAM HAI PHONG CO., LTD' },
+      BANK_HOLDER_SHORT: { vi: 'CTY TNHH LG Electronics VN HP' },
+      BANK_BIN: { vi: '970436' },
+      TRANSFER_SYNTAX: { vi: '{EMP} {SLOT}' },
+      SUPPORT_NAME: { vi: 'Ban Quản Trị Bán Hàng Nội Bộ', en: 'Internal Sales PM Team' },
+      SUPPORT_EMAIL: { vi: 'internalsales.support@lge.com' },
+      SUPPORT_PHONE: { vi: '' },
+      DELIVERY_POLICY: { vi: 'Bộ phận Logistics giao hàng đến địa chỉ nhận hàng nhân viên khai khi giữ chỗ, trong vòng 3–5 ngày làm việc sau khi PM duyệt thanh toán.',
+                         en: 'Logistics delivers to the delivery address you entered when reserving, within 3–5 working days after the PM approves your payment.' },
+      RETURN_POLICY: { vi: 'Trong vòng 07 ngày làm việc kể từ ngày nhận hàng, chỉ chấp nhận đổi sản phẩm nếu sản phẩm bị lỗi chức năng cơ bản.',
+                       en: 'Within 7 working days of delivery, items can be exchanged only for basic functional defects.' },
+      RULE_JEONGDO: { vi: 'Tuyệt đối nghiêm cấm mua hộ, bán lại cho bên thứ ba hoặc trục lợi thương mại. Vi phạm sẽ bị xử lý kỷ luật theo quy định công ty.',
+                      en: 'Buying on behalf of others, reselling to third parties or any commercial gain is strictly prohibited. Violations lead to disciplinary action under company rules.' },
+      ASSISTANT_GREETING: { vi: "Life's Good! Bạn cần hỗ trợ gì về ưu đãi hôm nay?", en: "Life's Good! How can we help with today's deals?" },
+      ASSISTANT_MESSAGE: { vi: "Life's Good! Chọn đợt bán ở thanh phía trên, rồi xem danh mục và giữ chỗ ở tab 2.", en: "Life's Good! Pick a sale in the bar above, then browse and reserve in tab 2." },
+      ANNOUNCEMENT: { vi: '' }
+    };
+    var SITE_CFG_CHECK = {   // ô sai dạng → bỏ qua, dùng mặc định
+      BANK_ACC: v => /^\d{6,20}$/.test(v), BANK_BIN: v => /^\d{6}$/.test(v), SUPPORT_EMAIL: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      TRANSFER_SYNTAX: v => v.includes('{EMP}') && v.includes('{SLOT}')
+    };
+    var SITE_CFG = {};
+    var SITE_CFG_STORE = 'lg_site_cfg_v1';
+    function cfgLangEN() { return document.documentElement.classList.contains('lang-en'); }
+    function cfgClean(raw) {
+      const out = {};
+      Object.keys(SITE_CFG_DEFAULTS).forEach(k => {
+        const e = raw && raw[k]; if (!e) return;
+        const vi = String(e.vi || '').trim(), en = String(e.en || '').trim(), ok = SITE_CFG_CHECK[k] || (() => true);
+        if (k === 'ANNOUNCEMENT' || k === 'SUPPORT_PHONE') { out[k] = { vi, en }; return; }   // được phép để trống (= ẩn)
+        if (vi && ok(vi)) out[k] = { vi, en: en && ok(en) ? en : '' };
+        else if (vi) console.warn('Config ' + k + ' sai dạng, dùng giá trị mặc định:', vi);
+      });
+      return out;
+    }
+    function cfg(key) {
+      const e = SITE_CFG[key] || SITE_CFG_DEFAULTS[key] || {};
+      return String((cfgLangEN() && e.en) ? e.en : (e.vi || ''));
+    }
+    function asciiFold(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); }
+    function buildTransferSyntax(emp, slot, name) {   // nội dung chuyển khoản thật (mã VietQR tự điền)
+      return cfg('TRANSFER_SYNTAX').replace(/\{EMP\}/g, emp || '').replace(/\{SLOT\}/g, slot || '').replace(/\{NAME\}/g, asciiFold(name)).replace(/\s+/g, ' ').trim();
+    }
+    function transferSyntaxLabel() {   // mẫu hiển thị: [Mã NV] [Mã Slot]
+      const en = cfgLangEN();
+      return cfg('TRANSFER_SYNTAX').replace(/\{EMP\}/g, en ? '[EmpID]' : '[Mã NV]').replace(/\{SLOT\}/g, en ? '[SlotID]' : '[Mã Slot]').replace(/\{NAME\}/g, en ? '[Full name]' : '[Họ tên]');
+    }
+    function vietQrUrl(amount, content) {
+      return `https://img.vietqr.io/image/${cfg('BANK_BIN')}-${cfg('BANK_ACC')}-compact.png?amount=${Number(amount) || 0}` +
+        `&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(asciiFold(cfg('BANK_HOLDER_SHORT')).toUpperCase())}`;
+    }
+    function applySiteConfig() {
+      document.querySelectorAll('[data-cfg]').forEach(el => { const v = cfg(el.dataset.cfg); if (el.textContent.trim() !== v) el.textContent = v; });
+      document.querySelectorAll('[data-cfg-syntax]').forEach(el => { const v = transferSyntaxLabel(); if (el.textContent !== v) el.textContent = v; });
+      document.querySelectorAll('[data-cfg-syntax-example]').forEach(el => { const v = buildTransferSyntax('VH88921', 'IS-2026Q4-TV-01-AYA-001', 'Tran Van Nam'); if (el.textContent !== v) el.textContent = v; });
+      const login = document.getElementById('login-support');
+      if (login) { const v = T(`Liên hệ ${cfg('SUPPORT_NAME')} (${cfg('SUPPORT_EMAIL')}) nếu cần hỗ trợ tài khoản.`); if (login.textContent !== v) login.textContent = v; }
+      const ann = document.getElementById('site-announcement');
+      if (ann) { const v = cfg('ANNOUNCEMENT'); ann.hidden = !v || !currentUser; if (ann.textContent !== v) ann.textContent = v; }
+    }
+    async function loadSiteConfig() {
+      if (!SHEET_API_URL) return;
+      try {
+        const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 10000);
+        const res = await fetch(SHEET_API_URL + (SHEET_API_URL.includes('?') ? '&' : '?') + 'action=public_config&t=' + Date.now(), { signal: ctrl.signal });
+        clearTimeout(t);
+        const data = await res.json();
+        if (data && data.ok && data.config && typeof data.config === 'object') {
+          SITE_CFG = cfgClean(data.config);
+          try { localStorage.setItem(SITE_CFG_STORE, JSON.stringify({ time: Date.now(), config: SITE_CFG })); } catch (e) {}
+          applySiteConfig();
+        }
+      } catch (e) { /* mạng lỗi hoặc Apps Script cũ: giữ giá trị đang có */ }
+    }
+    try { const c = JSON.parse(localStorage.getItem(SITE_CFG_STORE) || 'null'); if (c && c.config) SITE_CFG = cfgClean(c.config); } catch (e) {}
+    applySiteConfig();
+    loadSiteConfig();
+    setInterval(() => { if (!document.hidden) loadSiteConfig(); }, 5 * 60 * 1000);
+
+    // v2.9: hạn mức mua hàng theo đúng chương trình đang xem (Programs cột I) — máy chủ đã chặn đúng số này từ trước
+    function progMax(pid) {
+      const p = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs.find(x => x.id === (pid || activeProgram)) : null;
+      return Math.max(1, Number(p && p.maxPerEmployee) || 1);
+    }
+    function applyProgramTexts(pid) {
+      const max = progMax(pid);
+      const pill = document.getElementById('grap-limit-pill'); if (pill) pill.textContent = T(`${max} SP / NV`);
+      const rl = document.getElementById('rules-limit-text'); if (rl) rl.textContent = T(`${String(max).padStart(2, '0')} sản phẩm / 01 nhân viên`);
+      const p = (typeof programs !== 'undefined' && Array.isArray(programs)) ? programs.find(x => x.id === (pid || activeProgram)) : null;
+      const hero = document.getElementById('tab1-hero-title'); if (hero) hero.textContent = p && p.name ? p.name : T('Đợt Mở Bán Hàng Nội Bộ');
+    }
+
+    // ===== v2.9 (chủ dự án duyệt): địa chỉ nhận hàng — gửi kèm lệnh giữ chỗ (máy chủ đã lưu sẵn vào Registrations cột J) =====
+    // Lưu trên máy theo mã NV để lần sau không phải gõ lại. Đổi địa chỉ chỉ áp dụng cho lần giữ chỗ sau; đơn đã giữ: liên hệ PM.
+    function addrKey() { return 'lg_delivery_addr_' + (currentUser ? currentUser.id : ''); }
+    function getDeliveryAddress() { try { return (localStorage.getItem(addrKey()) || '').trim(); } catch (e) { return (currentUser && currentUser.address) || ''; } }
+    function setDeliveryAddress(a) { try { localStorage.setItem(addrKey(), a); } catch (e) {} if (currentUser) currentUser.address = a; renderDeliveryAddrRow(); }
+    function renderDeliveryAddrRow() {
+      const row = document.getElementById('delivery-addr-row'); if (!row) return;
+      if (!currentUser || currentUser.role === 'PM') { row.hidden = true; return; }
+      const a = getDeliveryAddress();
+      if (currentUser) currentUser.address = a;
+      row.hidden = false;
+      row.innerHTML = a
+        ? `<span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span><button type="button" class="btn-action btn-secondary" onclick="openAddressModal(null)">${T('Sửa')}</button>` +
+          `<span class="addr-note">${T('Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ PM.')}</span>`
+        : `<span class="addr-missing">${T('Chưa có địa chỉ nhận hàng — cần khi giữ chỗ.')}</span><button type="button" class="btn-action" onclick="openAddressModal(null)" style="background:#EA1917; border-color:#EA1917; color:#FFF;">${T('Thêm địa chỉ')}</button>` +
+          `<span class="addr-note">${T('Thêm trước giờ mở bán để giữ chỗ nhanh hơn.')}</span>`;
+    }
+    var addrModalResolve = null;
+    function openAddressModal(prod) {
+      const modal = document.getElementById('addr-modal'), input = document.getElementById('addr-input'), info = document.getElementById('addr-modal-product');
+      input.value = getDeliveryAddress();
+      document.getElementById('addr-error').hidden = true;
+      if (prod) {
+        const region = { AYA: 'Kho AYA · Miền Bắc (Hải Phòng / Hà Nội)', AYB: 'Kho AYB · Miền Trung (Đà Nẵng)', AYC: 'Kho AYC · Miền Nam (Bình Dương / HCM)' }[String(prod.kho || '').toUpperCase()] || ('Kho ' + (prod.kho || ''));
+        info.textContent = `${T('Bạn đang giữ chỗ:')} ${prod.model} · ${T(region)}`; info.hidden = false;
+        document.getElementById('addr-save-btn').textContent = T('Lưu & tiếp tục giữ chỗ');
+      } else {
+        info.hidden = true; document.getElementById('addr-save-btn').textContent = T('Lưu địa chỉ');
+      }
+      modal.classList.add('active');
+      setTimeout(() => input.focus(), 50);
+      return new Promise(resolve => { addrModalResolve = resolve; });
+    }
+    function closeAddressModal(value) {
+      document.getElementById('addr-modal').classList.remove('active');
+      const r = addrModalResolve; addrModalResolve = null; if (r) r(value);
+    }
+    function saveAddressFromModal() {
+      const a = document.getElementById('addr-input').value.replace(/\s+/g, ' ').trim();
+      if (a.length < 10) { document.getElementById('addr-error').hidden = false; return; }
+      setDeliveryAddress(a);
+      closeAddressModal(a);
     }
 
     // v2.8 (11/10/2026): Docs — bộ hướng dẫn theo vai trò (chỉ để tiện xem; link là trang công khai, ảnh chỉ có dữ liệu mẫu)
@@ -9543,16 +9722,24 @@
       const allRegs = (typeof pmRegistrations !== 'undefined' && pmRegistrations.length)
         ? pmRegistrations
         : (typeof DEMO_REGISTRATIONS !== 'undefined' ? DEMO_REGISTRATIONS : []);
-      const activeUserReg = allRegs.find(r => (r.programId === activeProgram || !r.programId) && r.empCode === currentUser.id && r.status !== 'Đã hủy bởi nhân viên' && r.status !== 'Từ chối' && r.status !== 'Hủy');
+      const myActiveRegs = allRegs.filter(r => (r.programId === activeProgram || !r.programId) && r.empCode === currentUser.id && r.status !== 'Đã hủy bởi nhân viên' && r.status !== 'Từ chối' && r.status !== 'Hủy');   // v2.9: đếm theo hạn mức của chương trình (trước: chặn từ đơn thứ 2 dù hạn mức 2)
+      const activeUserReg = myActiveRegs.length >= progMax(activeProgram) ? myActiveRegs[myActiveRegs.length - 1] : null;
       if (activeUserReg) {
-        showToast(`Bạn đã đăng ký sản phẩm ${activeUserReg.model}${snTxt(activeUserReg)} (${activeUserReg.slotId}) rồi!\n\nHạn mức: 1 SP / NV. Nếu muốn đổi sang sản phẩm này, vui lòng bấm "Hủy giữ chỗ" ở ô Đơn Hàng Của Bạn trước.`, 'warning', 6000);
+        showToast(`Bạn đã đăng ký sản phẩm ${activeUserReg.model}${snTxt(activeUserReg)} (${activeUserReg.slotId}) rồi!\n\nHạn mức: ${progMax(activeProgram)} SP / NV. Nếu muốn đổi sang sản phẩm này, vui lòng bấm "Hủy giữ chỗ" ở ô Đơn Hàng Của Bạn trước.`, 'warning', 6000);
         return;
       }
 
+      // v2.9: cần địa chỉ nhận hàng (PM đối chiếu kho khu vực). Chưa có → hỏi 1 lần, lưu cho lần sau
+      let deliveryAddr = getDeliveryAddress();
+      if (!deliveryAddr && currentUser.role !== 'PM') {
+        deliveryAddr = await openAddressModal(prod);
+        if (!deliveryAddr) return;
+      }
       const msg = `Xác nhận đăng ký:\n\n` +
         `Sản phẩm: ${prod.model}${snTxt(prod)} — ${prod.description}\n` +
         `Giá nội bộ: ${formatVND(prod.internalPrice)}\n` +
-        `Kho: ${prod.kho}\n\n` +
+        `Kho: ${prod.kho}\n` +
+        `Giao đến: ${deliveryAddr || '—'}\n\n` +
         `Bạn có chắc muốn đăng ký sản phẩm này?`;
       if (!confirm(msg)) return;
 
@@ -9574,7 +9761,7 @@
               empName: currentUser.name,
               division: currentUser.division || currentUser.dept || '',
               phone: currentUser.phone || '',
-              address: currentUser.address || '',
+              address: deliveryAddr || currentUser.address || '',   // v2.9: địa chỉ nhận hàng → Registrations cột J
               email: currentUser.email || ''
             })
           }, 2, 1000, 8000);
@@ -10038,6 +10225,7 @@
               <div class="pm-emp-badge">
                 <span class="pm-emp-name">${esc(r.empName)}</span>
                 <span class="pm-emp-meta">${esc(r.empCode)} · ${esc(r.division || '')}</span>
+                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
@@ -10398,6 +10586,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
               <div class="pm-emp-badge">
                 <span class="pm-emp-name">${esc(r.empName)}</span>
                 <span class="pm-emp-meta">${esc(r.empCode)} · ${esc(r.division || '')}</span>
+                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
@@ -10814,6 +11003,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (modalSubtitle) modalSubtitle.textContent = `Model: ${reg.model}${snTxt(reg)} · Đăng ký bởi: ${reg.empName} (${reg.empCode})`;
       if (modalAmount) modalAmount.textContent = fmtVND(reg.amount || reg.internalPrice);
       if (modalPayer) modalPayer.textContent = `${reg.payerName || reg.empName} (${reg.payerCode || reg.empCode})`;
+      const modalAddr = document.getElementById('modal-address'); if (modalAddr) modalAddr.textContent = reg.address || '—';   // v2.9
       if (modalTxn) modalTxn.textContent = reg.bankTxn || 'Chưa có mã GD';
 
       // Toggle Approve/Reject actions in modal
@@ -11549,15 +11739,14 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         `Đang khai nộp tiền cho <strong>Slot ${order.slot}</strong> · Kho ${order.kho || ''} · ${order.model || ''}${snHtml(order)}` +
         (payCtx.price ? ` · Số tiền cần nộp: <strong style="color:var(--lg-red);">${fmtVND(payCtx.price)}</strong>` : '');
       // Mã VietQR: cùng tài khoản, số tiền và nội dung CK "<Mã NV> <Mã Slot>" như cửa sổ "Nộp tiền ngay"
-      const qrSyntax = `${empCode} ${order.slot}`;
-      document.getElementById('pay-qr-img').src = 'https://img.vietqr.io/image/970436-0991000012525-compact.png?amount=' +
-        (payCtx.price || 0) + '&addInfo=' + encodeURIComponent(qrSyntax) + '&accountName=LG%20ELECTRONICS%20VN%20HAI%20PHONG';
+      const qrSyntax = buildTransferSyntax(empCode, order.slot, (currentUser && currentUser.name) || '');   // v2.9: mẫu từ Config
+      document.getElementById('pay-qr-img').src = vietQrUrl(payCtx.price || 0, qrSyntax);
       document.getElementById('pay-qr-info').innerHTML =
         `<div>Mã Slot: <strong class="pay-qr-slot">${esc(order.slot)}</strong> (Kho ${esc(order.kho || '')})</div>` +
         `<div>Model: <strong>${esc(order.model || '')}</strong>${snHtml(order)}</div>` +
         `<div>Số tiền thanh toán: <strong class="pay-qr-amt">${payCtx.price ? fmtVND(payCtx.price) : '—'}</strong></div>` +
-        `<div class="pay-qr-bank"><div>STK thụ hưởng: <strong>0991000012525</strong> (Vietcombank Tay Ho)</div>` +
-        `<div>CTY TNHH LG ELECTRONICS VN HAI PHONG</div>` +
+        `<div class="pay-qr-bank"><div>STK thụ hưởng: <strong data-no-i18n>${esc(cfg('BANK_ACC'))}</strong> (<span data-no-i18n>${esc(cfg('BANK_NAME'))}</span>)</div>` +
+        `<div data-no-i18n>${esc(cfg('BANK_HOLDER_SHORT'))}</div>` +
         `<div>Nội dung CK: <code class="pay-qr-syntax">${esc(qrSyntax)}</code></div></div>`;
       document.getElementById('pay-qr-box').hidden = false;
       document.getElementById('pay-lock').hidden = true;
@@ -13146,7 +13335,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           assistantImg.src = 'assets/digital-logo-play/black/LGE_Electronics_Digital_Logo_Play_Transparent_Black_LookingAround.gif';
         }, 3500);
       }
-      showToast("Life's Good! Bạn có thể chọn danh mục ở thanh biểu tượng phía trên để lọc nhanh sản phẩm nhé.", 'info', 4500);
+      showToast(cfg('ASSISTANT_MESSAGE'), 'info', 4500);   // v2.9: nội dung từ Config; câu cũ hứa "lọc nhanh" nhưng thanh biểu tượng không lọc
     }
 
     function triggerAssistantReaction(type, duration = 5000) {
@@ -13206,7 +13395,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
   <!-- SPRINT 6: Official LG Digital Logo Play Smart Assistant -->
   <div id="lg-digital-assistant" aria-label="Trợ lý ảo hỗ trợ bán hàng nội bộ LG">
-    <div class="lg-assistant-tooltip" id="lg-assistant-tooltip">
+    <div class="lg-assistant-tooltip" id="lg-assistant-tooltip" data-cfg="ASSISTANT_GREETING" data-no-i18n>
       Life's Good! Bạn cần hỗ trợ gì về ưu đãi hôm nay?
     </div>
     <div class="lg-assistant-disc" onclick="handleAssistantClick()" title="Trợ lý nội bộ LG">
@@ -13301,7 +13490,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           kicker: 'CHUYỂN KHOẢN VCB PHÁP NHÂN',
           motionIcon: 'assets/images/quick-links-ani/cat_vcb_security.svg',
           title: 'Quét VietQR & Nộp Biên Lai Khi Cổng Mở',
-          body: 'Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với cú pháp [MãNV]_[MãSlot]. Lưu ý: Cổng nộp tiền mở khi PM duyệt danh sách đăng ký; từ lúc mở bạn có 24 giờ để chuyển khoản và tải ảnh biên lai lên.',
+          body: 'Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với đúng nội dung chuyển khoản trên mã VietQR. Lưu ý: Cổng nộp tiền mở khi PM duyệt danh sách đăng ký; từ lúc mở bạn có 24 giờ để chuyển khoản và tải ảnh biên lai lên.',
           tip: 'Có sẵn mã VietQR tự điền số tiền và cú pháp chuẩn, quét bằng app ngân hàng trong 5 giây siêu an toàn.',
           nextBtnText: 'Tiếp →'
         },

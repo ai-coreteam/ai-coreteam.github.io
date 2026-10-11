@@ -155,6 +155,7 @@ STATE_JS = """() => ({
 def open_page(browser, port, server, page_name=PAGE, set_api=True, extra_init=''):
     ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
     init = "localStorage.setItem('lg_tour_completed_employee','true'); localStorage.setItem('lg_tour_completed_pm','true');" + extra_init
+    init += f"localStorage.setItem('lg_delivery_addr_{ME}','So 1 Duong Thu, Hai Phong');"   # v2.9: giữ chỗ cần địa chỉ nhận hàng (đã có sẵn → không hỏi)
     if set_api:
         init += f"localStorage.setItem('LGE_PORTAL_API_URL', '{API}');"
     ctx.add_init_script(init)

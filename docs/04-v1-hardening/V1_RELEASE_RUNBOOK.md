@@ -29,6 +29,7 @@
 |---|---|---|
 | Mã nguồn (web + Code.gs) | Git tag **`checkpoint-pre-v1-hardening-20261005`** (commit `5404e1a`) và nhánh **`backup/pre-v1-hardening-20261005`** | `git checkout checkpoint-pre-v1-hardening-20261005 -- Mau_Dang_Ky_Internal_Sales_3009.html apps-script/Code.gs` rồi commit; hoặc quay hẳn: `git switch main` (main chưa bị sửa) |
 | Dữ liệu Google Sheet | Bản sao **"LG Internal Sales Database - BACKUP 2026-10-05 (pre-v1-hardening) - KHONG SUA"** (ID `1WIUrSzTYxqKKtt5RbJ2bF2xZiZRVpXC_pxFdpQQ9lL4`, riêng tư) | Sao chép dữ liệu từ bản backup sang Sheet chính (không xóa Sheet chính) |
+| **v2.9.0 — nội dung từ tab Config, địa chỉ nhận hàng, hạn mức theo chương trình** (11/10/2026) | Điểm quay lại web: tag **`v2.8.0`**. Apps Script: **Version 11** (chủ dự án deploy theo §3c); quay lại **Version 10**. Tab `Config` 11/10: thêm cột D + 13 dòng (giá trị = nội dung web đang hiện); 8 dòng cũ: chỉ đổi mô tả, `BANK_ACC` sang dạng chữ `0991000012525`, `BANK_HOLDER` có dấu | **Quay lại web:** `git checkout v2.8.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/` → commit → `git pull --ff-only gobita main` → `git push all main`. Web v2.8.0 không đọc Config nên không cần đổi Sheet |
 | **v2.8.0 — Đợt 3 (PM điện thoại), nút Docs + thư mục `guides/`, sửa bản dịch EN** (11/10/2026) | Điểm quay lại: Git tag **`v2.7.0`**. Apps Script **không đổi** (Version 10) | **Quay lại v2.7.0:** `git checkout v2.7.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/` → commit → `git pull --ff-only gobita main` → `git push all main` → kiểm md5. Muốn gỡ riêng bộ hướng dẫn khỏi web: xoá thư mục `guides/` rồi push (lưu ý: nút Docs vẫn còn, 2 link trong cửa sổ sẽ báo 404 — nên quay lại v2.7.0 thay vì chỉ xoá thư mục) |
 | **v2.7.0 — điện thoại Đợt 2: bảng → thẻ, cửa sổ nộp tiền toàn màn hình, mô tả 2 dòng** (11/10/2026) | Điểm quay lại: Git tag **`v2.6.0`**. Apps Script **không đổi** (Version 10) | **Quay lại v2.6.0 (khoảng 2 phút):** `git checkout v2.6.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/en.js assets/i18n/en_source.json` → commit → `git pull --ff-only gobita main` → `git push all main` → kiểm md5 `portal.html` trên web. Quay xa hơn: `v2.5.0`, `v2.4.1` |
 | **v2.6.0 — thẻ sản phẩm gọn + chờ máy chủ khi Mở bán / Kết sổ** (11/10/2026) | Điểm quay lại: Git tag **`v2.5.0`** (bản live trước v2.6.0, đã kiểm md5 trên web). Apps Script **không đổi** (Version 10) | **Quay lại v2.5.0 cho tất cả (khoảng 2 phút):** `git checkout v2.5.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/en.js assets/i18n/en_source.json` → `git commit -m "revert web to v2.5.0"` → `git pull --ff-only gobita main` → `git push all main` → chờ Pages 1 phút → kiểm `md5` của `https://ai-coreteam.github.io/portal.html` = `md5 portal.html`. Muốn quay xa hơn: thay `v2.5.0` bằng `v2.4.1` |
@@ -135,6 +136,24 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 | 11 | ⏳ Làm vào **sáng 14/10**, 10 phút trước 10:00 | — |
 
 Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet tự đổi chuỗi `0991000012525` thành số khi `setupNewDatabase()` ghi). Code **không đọc** các ô `BANK_*`; nhân viên thấy số **đầy đủ `0991000012525`** ở ô 01, cửa sổ nộp tiền, mã VietQR (`970436-0991000012525`) và email — đã kiểm chứng trên `portal.html` 05/10. Muốn ô trong Sheet cũng đúng: gõ lại `'0991000012525` (có dấu nháy đơn ở đầu).
+
+### 3c. Deploy Apps Script **Version 11** (v2.9.0 — nội dung web lấy từ tab Config) — chủ dự án làm, **trước 17:00 ngày 13/10**
+
+Web v2.9.0 **chạy được với Version 10** (dùng nội dung mặc định, giống hệt hiện nay). Chỉ sau khi deploy Version 11 thì sửa tab `Config` mới làm web đổi theo.
+Version 11 chỉ **thêm** 1 lệnh đọc (`public_config`); không đổi lệnh nào đang chạy (giữ chỗ, nộp tiền, duyệt, hết hạn…).
+
+| # | Việc | Chi tiết | Kiểm tra |
+|---|---|---|---|
+| 1 | Ghi lại Version đang chạy | Deploy → Manage deployments | Đang là **Version 10** |
+| 2 | Dán toàn bộ `apps-script/Code.gs` (bản tag `v2.9.0`) vào dự án Apps Script **đang chạy** → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
+| 3 | **KHÔNG** chạy `rotateSessionSecret`, **KHÔNG** chạy `setupWatchdogTrigger` | Chạy `rotateSessionSecret` = đăng xuất mọi người; đồng hồ quét đã cài | — |
+| 4 | Deploy phiên bản mới trên deployment cũ | Manage deployments → ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
+| 5 | Kiểm tra (chỉ đọc) | Mở `<URL /exec>?action=public_config` trên trình duyệt | Thấy `"ok":true,"config":{"BANK_ACC":{"vi":"0991000012525"…` |
+| 6 | Kiểm tra trên web | Sửa ô `ANNOUNCEMENT` (tab Config, cột B) thành "Thử" → chờ ~6 phút → tải lại `portal.html` → thấy dòng "Thử" đầu trang → **xóa ô** | Dòng thông báo hiện rồi ẩn |
+| **Quay lại** | Manage deployments → ✏️ Edit → chọn **Version 10** → Deploy | Web tự quay về nội dung mặc định | — |
+
+**ADMIN sửa nội dung (sau khi có Version 11):** tab `Config`, cột B = tiếng Việt, cột D = tiếng Anh (trống → web dùng tiếng Việt). Mỗi dòng có cột C mô tả chỗ hiện trên web. Web đổi sau tối đa ~6 phút.
+Ô sai dạng (số tài khoản có chữ, BIN không đủ 6 số, email thiếu @, cú pháp thiếu `{EMP}` / `{SLOT}`) → web **bỏ qua ô đó** và dùng giá trị mặc định. Số tài khoản: gõ `'0991000012525` (dấu `'` giữ số 0 đầu).
 
 ### 3b. Danh mục cài đặt một lần (đối chiếu toàn bộ `Code.gs` ngày 05/10/2026)
 

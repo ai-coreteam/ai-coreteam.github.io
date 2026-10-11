@@ -51,6 +51,13 @@
 - [ ] **(Thêm 11/10/2026) Đợt xoá dữ liệu test thứ 2:** cùng lúc nạp nhân viên thật, xoá **73 tài khoản test** "Nguyen Van 1…73" (mật khẩu chung, đang `Active`) trong tab `Users`. Giữ dòng PM / ADMIN thật. Kiểm tra **mã đăng nhập (cột A) không trùng nhau**: dữ liệu test đang trùng `hoa`, `linh`, `nhi`. Đợt 1 (11/10) đã xoá 3 chương trình test, 62 sản phẩm, 12 đơn; bản sao lưu: Runbook §1
 - [ ] Thử đăng nhập 1 tài khoản nhân viên thật trên link nhân viên → vào được
 
+**Nội dung web từ tab `Config` — ADMIN** (thêm 11/10/2026, web v2.9.0)
+- [ ] Deploy **Apps Script Version 11** theo Runbook §3c (trước 17:00 13/10). Kiểm: `<URL /exec>?action=public_config` trả `"ok":true`
+- [ ] ⚠️ **Số tài khoản hiện là DEMO:** tab `Config` → `BANK_ACC` gõ số thật dạng `'0991…` (có dấu `'`), kiểm `BANK_NAME`, `BANK_BRANCH`, `BANK_HOLDER`, `BANK_HOLDER_SHORT`; ngân hàng khác Vietcombank thì đổi `BANK_BIN` (6 số)
+- [ ] Chờ ~6 phút → mở link nhân viên → ô 01 "Thông Tin Chuyển Khoản" hiện đúng số mới → mở "Nộp tiền ngay" của 1 đơn thử → **quét mã VietQR bằng app ngân hàng thật** (không chuyển tiền) → tên người nhận + số TK đúng
+- [ ] Kiểm `SUPPORT_EMAIL`, `SUPPORT_PHONE`, `DELIVERY_POLICY`, `RETURN_POLICY`; muốn báo giờ mở bán cho mọi người: gõ vào `ANNOUNCEMENT`
+- [ ] Xong → Sheet về **Restricted** (ai sửa được Config là đổi được số tài khoản nhân viên chuyển tiền vào)
+
 **Máy chủ — ADMIN** (Google Apps Script, dự án "LG Internal sales API")
 - [ ] Bấm biểu tượng **đồng hồ** (Triggers) ở cột trái → thấy **đúng 1 dòng** `runExpirationWatchdog`, Event `Time-based`
 - [ ] Cột **Last run** có giờ (không phải dấu `-`) và **Error rate** = `0%` → đồng hồ quét đang chạy
@@ -83,6 +90,8 @@
 | 9:45 | **Khởi động máy chủ**: mở link nhân viên, đăng nhập 1–2 lần. Lần đầu có thể chậm 15–40 giây — bình thường | ADMIN | ☐ |
 | 9:50 | Đăng nhập lại lần nữa → phản hồi trong vài giây | ADMIN | ☐ |
 | 9:55 | PM đăng nhập, chọn đúng chương trình, sẵn sàng nút **"Mở bán ngay"** | PM | ☐ |
+
+> **Địa chỉ nhận hàng (từ v2.9.0):** lần giữ chỗ đầu web hỏi địa chỉ — nhắc nhân viên **thêm địa chỉ ở tab 2 trước 10:00** để giữ chỗ nhanh. PM xem địa chỉ ở bảng đơn / cửa sổ biên lai / file Excel: **sai khu vực với kho** (vd. kho AYA miền Bắc nhưng giao TP HCM) → liên hệ nhân viên, rồi "Hủy slot" (chưa nộp tiền) hoặc "Từ chối" (đã nộp).
 
 ### C. 10:00 — Mở bán
 

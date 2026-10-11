@@ -37,6 +37,7 @@ class Range {
     return out;
   }
   getValue() { return this.getValues()[0][0]; }
+  getDisplayValues() { return this.getValues().map(r => r.map(v => (v === undefined || v === null ? '' : String(v)))); }   // Sheet thật: chữ hiển thị
   setValues(vals) {
     this.sheet.noteWrite(`setValues r${this.r} ${this.nr}x${this.nc}`);
     for (let i = 0; i < vals.length; i++) {
@@ -505,6 +506,19 @@ console.log('--- C3 / C4 / C5: Cài đặt an toàn & cache ---');
   check(!cache.has('prog_USER_all'), 'kết sổ chương trình xóa đúng cache → nhân viên thấy ngay (V1-13)');
   const src = fs.readFileSync(path.join(__dirname, '../apps-script/Code.gs'), 'utf8');
   check(/\['ENABLE_AUTO_EMAIL', 'false'/.test(src), 'CSDL mới tạo: email tự động mặc định TẮT (khớp tài liệu)');
+}
+
+console.log('--- v2.9: public_config — nội dung web lấy từ tab Config, chỉ trả key được phép ---');
+{
+  const book = freshBook(); const { get } = load(book);
+  const cfgSheet = book.getSheetByName('Config');
+  cfgSheet.rows.push(['BANK_ACC', '0991000012525', 'Số tài khoản', ''], ['SUPPORT_EMAIL', 'help@example.com', '', ''],
+                     ['DELIVERY_POLICY', 'Giao trong 3–5 ngày', '', 'Delivered in 3–5 days'], ['SECRET_X', 'không được lộ', '', '']);
+  const r = get({ action: 'public_config' });
+  check(r.ok === true && r.config && typeof r.config === 'object', 'doGet?action=public_config trả cấu hình');
+  check(r.config.BANK_ACC && r.config.BANK_ACC.vi === '0991000012525', `số tài khoản giữ số 0 đầu (${r.config.BANK_ACC && r.config.BANK_ACC.vi})`);
+  check(r.config.DELIVERY_POLICY && r.config.DELIVERY_POLICY.en === 'Delivered in 3–5 days', 'cột D = bản tiếng Anh');
+  check(!('SECRET_X' in r.config) && !('MAX_PER_EMPLOYEE' in r.config) && !('ENABLE_AUTO_EMAIL' in r.config), 'key ngoài danh sách cho phép KHÔNG bị trả ra');
 }
 
 console.log('--- V1-10: Mọi lệnh ghi Registrations / Products của luồng nghiệp vụ nằm trong khóa ---');

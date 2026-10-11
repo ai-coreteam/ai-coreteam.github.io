@@ -6,7 +6,8 @@
 Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1–B4, C3, A1–A4, Q1, R4, R8 (v2.5.0);
 12 = chờ máy chủ khi đổi trạng thái chương trình, 13 = thẻ sản phẩm gọn (v2.6.0);
 13 (mô tả 2 dòng + Xem đủ), 14 = bảng → thẻ (B3), 15 = cửa sổ nộp tiền toàn màn hình (B4), 16 = máy tính không đổi (v2.7.0);
-17–20 = PM điện thoại (C1, C2, cửa sổ biên lai), tab 3 (C3, nhãn), nút Docs, bản dịch EN (v2.8.0).
+17–20 = PM điện thoại (C1, C2, cửa sổ biên lai), tab 3 (C3, nhãn), nút Docs, bản dịch EN (v2.8.0);
+21–24 = địa chỉ nhận hàng, Config (public_config), hạn mức theo chương trình, EN (v2.9.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,12 +33,17 @@ class Mock(T.MockServer):
 
     def do_programs(self, d):
         return {'ok': True, 'programs': [{'id': p['id'], 'name': p['name'], 'pmId': T.PM, 'pmName': 'PM That', 'status': p['status'],
-                                          'startDate': '', 'endDate': '', 'description': '', 'maxPerEmployee': 1} for p in self.programs]}
+                                          'startDate': '', 'endDate': '', 'description': '', 'maxPerEmployee': p.get('max', 1)} for p in self.programs]}
 
     update_delay_s = 0      # v2.6: máy chủ chậm (khởi động nguội)
     update_fail = False     # v2.6: mất mạng → yêu cầu program_update bị hủy
 
+    public_config = None    # v2.9: dict → trả cho GET ?action=public_config (None = Apps Script cũ, không có lệnh này)
+
     def handle(self, route):
+        if route.request.method == 'GET' and 'action=public_config' in route.request.url and self.public_config is not None:
+            self.calls.append(('GET public_config', {}))
+            return route.fulfill(status=200, content_type='application/json', body=json.dumps({'ok': True, 'config': self.public_config}))
         if self.update_fail and route.request.method == 'POST' and '"program_update"' in (route.request.post_data or ''):
             self.calls.append(('program_update', json.loads(route.request.post_data)))
             return route.abort()
@@ -60,11 +66,12 @@ def reg(i, status, amount):
             'internalPrice': amount, 'amount': amount, 'bankTxn': '', 'payTime': '', 'receipt': '', 'timestamp': '2026-10-11T01:00:00.000Z'}
 
 
-def open_page(browser, port, server, page_name=None, device=None, extra_init='', query=''):
+def open_page(browser, port, server, page_name=None, device=None, extra_init='', query='', no_addr=False):
     opts = dict(device) if device else {'viewport': {'width': 1440, 'height': 900}}
     ctx = browser.new_context(**opts)
     ctx.add_init_script("localStorage.setItem('lg_tour_completed_employee','true'); localStorage.setItem('lg_tour_completed_pm','true');"
-                        f"localStorage.setItem('LGE_PORTAL_API_URL', '{T.API}');" + extra_init)
+                        f"localStorage.setItem('LGE_PORTAL_API_URL', '{T.API}');"
+                        + ("" if no_addr else f"localStorage.setItem('lg_delivery_addr_{T.ME}','So 1 Duong Thu, Hai Phong');") + extra_init)
     if server:
         ctx.route(T.API + '**', server.handle)
     page = ctx.new_page()
@@ -410,6 +417,76 @@ def main():
             page.evaluate("openPMReceiptModal(pmRegistrations[0].id)"); page.wait_for_timeout(800); txt += page.evaluate("document.querySelector('#receipt-modal').innerText")
             left = [w for w in ('STT', 'Loa Thanh', 'Xoay', 'Còn trống') if w in txt]
             check(not left and 'TV & Soundbar' in txt and 'Rotate 90°' in txt, f'còn: {left}')
+            ctx.close()
+
+            print('21. v2.9 địa chỉ nhận hàng: chưa có → hỏi khi giữ chỗ (kèm kho khu vực), gửi lên máy chủ, PM thấy')
+            s = Mock(my_status=None)
+            ctx, page = open_page(browser, port, s, device=ip13, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1200)
+            row = page.inner_text('#delivery-addr-row')
+            check('Chưa có địa chỉ nhận hàng' in row, f'tab 2: dòng nhắc thêm địa chỉ ({row[:60]!r})')
+            page.evaluate(f"setTimeout(() => handleRegisterProduct('{T.PID}-AYA-001'), 0)"); page.wait_for_timeout(600)   # không chờ: hàm đợi người dùng nhập địa chỉ
+            mod = page.evaluate("[document.getElementById('addr-modal').classList.contains('active'), document.getElementById('addr-modal-product').textContent]")
+            check(mod[0] and 'Miền Bắc' in mod[1] and 'MODEL-FREE' in mod[1], f'giữ chỗ khi chưa có địa chỉ → cửa sổ địa chỉ, ghi kho khu vực ({mod[1]!r})')
+            page.fill('#addr-input', 'ngắn'); page.click('#addr-save-btn'); page.wait_for_timeout(200)
+            check(page.evaluate("!document.getElementById('addr-error').hidden") and not [c for c in s.calls if c[0] == 'register_product'], 'địa chỉ quá ngắn → báo lỗi, chưa gửi giữ chỗ')
+            page.fill('#addr-input', 'Số 5 Lê Lợi, Quận 1, TP Hồ Chí Minh'); page.click('#addr-save-btn'); page.wait_for_timeout(2500)
+            regs = [c[1] for c in s.calls if c[0] == 'register_product']
+            check(regs and regs[-1].get('address') == 'Số 5 Lê Lợi, Quận 1, TP Hồ Chí Minh', f"lệnh giữ chỗ gửi kèm địa chỉ ({regs[-1].get('address') if regs else 'không gửi'})")
+            check(any('Giao đến: Số 5 Lê Lợi' in d for d in page.dialogs), 'hộp thoại xác nhận ghi "Giao đến: …"')
+            check('Số 5 Lê Lợi' in page.inner_text('#delivery-addr-row'), 'tab 2 hiện địa chỉ đã lưu + nút Sửa')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            s = Mock(); r1 = reg(4, 'Đã khai nộp - chờ đối soát', 1000000); r1['address'] = 'Số 5 Lê Lợi, Quận 1, TP Hồ Chí Minh'; r1['receipt'] = 'https://drive.google.com/file/d/x/view'; s.pm_regs = [r1]
+            ctx, page = open_page(browser, port, s); T.login(page, T.PM); page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+            check('Số 5 Lê Lợi' in page.inner_text('#pm-reg-tbody'), 'PM: bảng đơn hiện địa chỉ nhận hàng')
+            page.evaluate("openPMReceiptModal(pmRegistrations[0].id)"); page.wait_for_timeout(600)
+            check(page.inner_text('#modal-address').startswith('Số 5 Lê Lợi'), 'PM: cửa sổ biên lai hiện địa chỉ')
+            ctx.close()
+
+            print('22. v2.9 Config: web đọc tab Config (public_config); ô sai dạng → giữ mặc định; EN dùng cột D')
+            cfgv = {'BANK_ACC': {'vi': '0123456789012', 'en': ''}, 'BANK_BIN': {'vi': 'abc', 'en': ''}, 'TRANSFER_SYNTAX': {'vi': '{SLOT} {EMP}', 'en': ''},
+                    'SUPPORT_EMAIL': {'vi': 'hotro@example.com', 'en': ''}, 'SUPPORT_PHONE': {'vi': '0900000000', 'en': ''},
+                    'ANNOUNCEMENT': {'vi': 'Mở bán lúc 10:00 ngày 14/10', 'en': 'Sale opens 10:00 on 14 Oct'},
+                    'DELIVERY_POLICY': {'vi': 'Giao trong 7 ngày', 'en': 'Delivered within 7 days'}}
+            s = Mock(my_status=T.NEW); s.public_config = cfgv
+            ctx, page = open_page(browser, port, s); page.wait_for_timeout(1500)
+            check('hotro@example.com' in page.inner_text('#login-support'), f"đăng nhập: email hỗ trợ từ Config ({page.inner_text('#login-support')!r})")
+            T.login(page, T.ME)
+            st = page.evaluate("""() => ({ acc: document.querySelector('#grap-card1-body [data-cfg="BANK_ACC"]').textContent, syn: document.querySelector('#grap-card1-body [data-cfg-syntax]').textContent,
+              ann: document.getElementById('site-announcement').hidden ? '' : document.getElementById('site-announcement').textContent, bin: cfg('BANK_BIN'),
+              qr: vietQrUrl(100, buildTransferSyntax('VH70001', 'SLOT-1')), title: document.querySelector('#grap-card-context').previousElementSibling ? '' : '' })""")
+            check(st['acc'] == '0123456789012', f"ô 01: số tài khoản từ Config, giữ số 0 đầu ({st['acc']})")
+            check(st['syn'] == '[Mã Slot] [Mã NV]', f"cú pháp CK theo mẫu Config ({st['syn']})")
+            check(st['bin'] == '970436' and '970436-0123456789012' in st['qr'] and 'addInfo=SLOT-1%20VH70001' in st['qr'], f"BIN sai dạng → mặc định; mã VietQR dùng tài khoản + nội dung mới ({st['qr'][:90]})")
+            check(st['ann'] == 'Mở bán lúc 10:00 ngày 14/10', f"dòng thông báo hiện ({st['ann']!r})")
+            page.evaluate("openSupportModal()"); page.wait_for_timeout(300)
+            check(any('Hotline: 0900000000' in t for t in page.evaluate("[...document.querySelectorAll('.toast, .lg-toast, [class*=toast]')].map(e => e.innerText)")), 'nút Hỗ trợ: email + hotline từ Config')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            s = Mock(); s.public_config = cfgv
+            ctx, page = open_page(browser, port, s, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)
+            page.evaluate("openFullLetterModal && 0"); en = page.evaluate("[document.getElementById('site-announcement').textContent, document.querySelector('[data-cfg=\"DELIVERY_POLICY\"]').textContent]")
+            check(en == ['Sale opens 10:00 on 14 Oct', 'Delivered within 7 days'], f'EN: dùng cột D ({en})')
+            ctx.close()
+
+            print('23. v2.9 hạn mức theo chương trình (2 SP): mọi chữ hạn mức đổi theo')
+            s = Mock(my_status=None, programs=[dict(id=T.PID, name='Dot test', status='Open', max=2)])
+            ctx, page = open_page(browser, port, s); T.login(page, T.ME)
+            t = page.evaluate("[document.getElementById('grap-limit-pill').textContent, document.getElementById('rules-limit-text').textContent, document.getElementById('grap-card3-body').innerText, document.getElementById('tab1-hero-title').textContent]")
+            check(t[0] == '2 SP / NV' and t[1] == '02 sản phẩm / 01 nhân viên' and 'Hạn mức: 2 SP' in t[2], f'ô 01, Thể lệ, ô 03 = 2 ({t[:2]}, {t[2][:60]!r})')
+            check(t[3] == 'Dot test', f'Tab 1: tiêu đề = tên chương trình ({t[3]!r})')
+            ctx.close()
+
+            print('24. v2.9 EN: "Chưa có chương trình nào được chọn" đã dịch; ô 01 = "Bank Transfer"')
+            s = Mock(programs=[]); ctx, page = open_page(browser, port, s, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.PM)
+            check(page.inner_text('#grap-program-title') == 'No program selected', f"({page.inner_text('#grap-program-title')!r})")
+            ctx.close()
+            s = Mock(); ctx, page = open_page(browser, port, s, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)
+            check(page.inner_text('.grap-card-red .grap-card-title') == 'Bank Transfer', f"({page.inner_text('.grap-card-red .grap-card-title')!r})")
+            ctx.close()
+            s = Mock(); ctx, page = open_page(browser, port, s); T.login(page, T.ME)
+            check(page.inner_text('.grap-card-red .grap-card-title') == 'Thông Tin Chuyển Khoản', 'VI: "Thông Tin Chuyển Khoản"')
             ctx.close()
 
             print('16. Máy tính 1440 px: mô tả hiện đủ, không có nút "Xem đủ"; bảng vẫn là bảng; cửa sổ nộp tiền như cũ')

@@ -133,7 +133,6 @@
   "Cam kết Jeong-Do:": "Jeong-Do commitment:",
   "Chi tiết giao dịch đối soát thanh toán chuyển khoản": "Transfer details for payment check",
   "Chuyển Khoản Đối Soát": "Transfer & check",
-  "Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với cú pháp [MãNV]_[MãSlot]. Lưu ý: Cổng nộp tiền mở khi PM duyệt danh sách đăng ký; từ lúc mở bạn có 24 giờ để chuyển khoản và tải ảnh biên lai lên.": "Transfer to the LGEVH company account at Vietcombank with the note [EmpID]_[SlotID]. Note: the payment window opens after the PM reviews registrations; you then have 24 hours to transfer and upload the receipt.",
   "Chuyển tiền thành công": "Transfer successful",
   "Chuyển trạng thái từ Bản nháp (Draft) sang Đang Mở Bán (Open)": "Change status from Draft to Open",
   "Chuyển đơn từ Chờ duyệt sang Chờ nộp tiền & kích hoạt đồng hồ 24h nộp tiền của NV": "Move orders from Waiting to Awaiting payment and start the 24h payment timer",
@@ -1121,9 +1120,47 @@
   "[Mã NV] - [Họ Tên] - [Mã Model] - [Slot ID]": "[Employee ID] - [Full name] - [Model] - [Slot ID]",
   "[Mã NV]_[Mã Slot]_[Họ Tên]": "[EmpID]_[SlotID]_[Full name]",
   "Họ Tên NV Nộp Tiền": "Payer name",
-  "Mã NV Nộp Tiền": "Payer ID"
+  "Mã NV Nộp Tiền": "Payer ID",
+  "Chuyển khoản đúng tài khoản pháp nhân LGEVH tại Vietcombank với đúng nội dung chuyển khoản trên mã VietQR. Lưu ý: Cổng nộp tiền mở khi PM duyệt danh sách đăng ký; từ lúc mở bạn có 24 giờ để chuyển khoản và tải ảnh biên lai lên.": "Transfer to the LGEVH company account at Vietcombank with exactly the transfer note shown on the VietQR code. Note: the payment window opens after the PM reviews registrations; you then have 24 hours to transfer and upload the receipt.",
+  "Thông Tin Chuyển Khoản": "Bank Transfer",
+  "Đã sao chép số tài khoản!": "Account number copied!",
+  "Từ lúc PM mở cổng thanh toán, nhân viên có tối đa": "From when the PM opens payment, employees have up to",
+  "Ví dụ:": "e.g.",
+  "Địa chỉ nhận hàng:": "Delivery address:",
+  "Địa chỉ nhận hàng": "Delivery address",
+  "Đợt Mở Bán Hàng Nội Bộ": "Internal Staff Sale",
+  "PM dùng địa chỉ này để kiểm tra bạn chọn đúng kho khu vực: AYA miền Bắc, AYB miền Trung, AYC miền Nam.": "The PM uses this address to check you chose the right regional warehouse: AYA North, AYB Central, AYC South.",
+  "Địa chỉ nhận hàng (số nhà, đường, phường/xã, tỉnh/thành) *": "Delivery address (number, street, ward, province/city) *",
+  "Ví dụ: Số 12 Điện Biên Phủ, Ngô Quyền, Hải Phòng": "e.g. 12 Dien Bien Phu, Ngo Quyen, Hai Phong",
+  "Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).": "Please enter a full address (at least 10 characters).",
+  "Lưu địa chỉ": "Save address",
+  "Lưu & tiếp tục giữ chỗ": "Save & continue reserving",
+  "Bạn đang giữ chỗ:": "You are reserving:",
+  "Sửa": "Edit",
+  "Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ PM.": "Used for your next reservation. To change the address of an order you already hold, contact the PM.",
+  "Chưa có địa chỉ nhận hàng — cần khi giữ chỗ.": "No delivery address yet — needed to reserve.",
+  "Thêm địa chỉ": "Add address",
+  "Thêm trước giờ mở bán để giữ chỗ nhanh hơn.": "Add it before the sale opens to reserve faster.",
+  "Life's Good! Chọn đợt bán ở thanh phía trên, rồi xem danh mục và giữ chỗ ở tab 2.": "Life's Good! Pick a sale in the bar above, then browse and reserve in tab 2.",
+  "Bộ phận Logistics giao hàng đến địa chỉ nhận hàng nhân viên khai khi giữ chỗ, trong vòng 3–5 ngày làm việc sau khi PM duyệt thanh toán.": "Logistics delivers to the delivery address you entered when reserving, within 3–5 working days after the PM approves your payment."
  },
  "patterns": [
+  [
+   "^0?(\\d+) sản phẩm / 01 nhân viên$",
+   "$1 item(s) / 1 employee"
+  ],
+  [
+   "^Giao đến: (.+)$",
+   "Deliver to: $1"
+  ],
+  [
+   "^Hỗ trợ nội bộ: (.+?) · Liên hệ: (.+)$",
+   "Support: $1 · Contact: $2"
+  ],
+  [
+   "^Liên hệ (.+) \\((.+)\\) nếu cần hỗ trợ tài khoản\\.$",
+   "Contact $1 ($2) for account help."
+  ],
   [
    "^\\((\\d+|—) / (\\d+) Đơn\\)$",
    "($1 / $2 orders)"
@@ -1733,8 +1770,8 @@
    "You have already registered $1 ($2)!"
   ],
   [
-   "^Hạn mức: 1 SP / NV\\. Nếu muốn đổi sang sản phẩm này, vui lòng bấm \\\"Hủy giữ chỗ\\\" ở ô Đơn Hàng Của Bạn trước\\.$",
-   "Limit: 1 item per employee. To switch to this item, first click \"Cancel reservation\" in Your orders."
+   "^Hạn mức: (\\d+) SP / NV\\. Nếu muốn đổi sang sản phẩm này, vui lòng bấm \\\"Hủy giữ chỗ\\\" ở ô Đơn Hàng Của Bạn trước\\.$",
+   "Limit: $1 item(s) per employee. To switch to this item, first click \"Cancel reservation\" in Your orders."
   ],
   [
    "^Đăng ký thành công sản phẩm (.+) \\((\\S+)\\)!$",

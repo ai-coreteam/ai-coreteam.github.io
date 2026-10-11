@@ -69,6 +69,7 @@ function book_() {
 function doGet(e) {
   var p = (e && e.parameter) || {};
   if (p.action === 'taken') return json_(taken_(p));
+  if (p.action === 'public_config') return json_(public_config_());   // v2.9: nội dung web lấy từ tab Config
   return json_({ ok: true, service: 'LG Internal Sales API', version: '8.3-v1-hardening', time: new Date().toISOString() });
 }
 
@@ -1988,6 +1989,31 @@ function email_setting_(d) {
 }
 
 /* ---------- Bộ nhớ đệm Config / Slots ---------- */
+// v2.9 (11/10/2026, chủ dự án duyệt): nội dung "hay đổi" trên web lấy từ tab Config — ADMIN sửa Sheet, không sửa code.
+// Chỉ trả các key trong danh sách cho phép (không cần token vì màn hình đăng nhập cũng dùng email hỗ trợ → KHÔNG thêm key nhạy cảm vào đây).
+// Cột B = tiếng Việt, cột D = tiếng Anh (để trống → web dùng tiếng Việt). Đọc GIÁ TRỊ HIỂN THỊ để giữ số 0 đầu (ô định dạng chữ: '0991000012525).
+// Web đổi theo Sheet sau tối đa ~6 phút (cache máy chủ 60 giây + web hỏi lại mỗi 5 phút).
+var PUBLIC_CONFIG_KEYS = ['BANK_NAME', 'BANK_BRANCH', 'BANK_ACC', 'BANK_HOLDER', 'BANK_HOLDER_SHORT', 'BANK_BIN', 'TRANSFER_SYNTAX',
+  'SUPPORT_NAME', 'SUPPORT_EMAIL', 'SUPPORT_PHONE', 'DELIVERY_POLICY', 'RETURN_POLICY', 'RULE_JEONGDO',
+  'ASSISTANT_GREETING', 'ASSISTANT_MESSAGE', 'ANNOUNCEMENT'];
+function public_config_() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get('pubcfg');
+  if (hit) return JSON.parse(hit);
+  var sh = book_().getSheetByName(SHEET_CONFIG);
+  if (!sh) return { ok: false, message: 'Thiếu tab Config.', config: {} };
+  var v = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 4).getDisplayValues();
+  var out = {};
+  for (var i = 0; i < v.length; i++) {
+    var k = String(v[i][0]).trim();
+    if (PUBLIC_CONFIG_KEYS.indexOf(k) < 0) continue;
+    out[k] = { vi: String(v[i][1]).trim().slice(0, 2000), en: String(v[i][3]).trim().slice(0, 2000) };
+  }
+  var res = { ok: true, config: out, time: new Date().toISOString() };
+  try { cache.put('pubcfg', JSON.stringify(res), 60); } catch (e) {}
+  return res;
+}
+
 function config_() {
   var cache = CacheService.getScriptCache();
   var hit = cache.get('cfg');
