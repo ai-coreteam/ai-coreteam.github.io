@@ -1,6 +1,6 @@
 # Đồng bộ nội dung web với tab `Config` của Google Sheet — khảo sát & đề xuất
 
-> **Trạng thái (11/10/2026):** chủ dự án duyệt P0 + P1 → **đã làm ở web v2.9.0 + Apps Script Version 11** (chờ chủ dự án deploy, Runbook §3c). Địa chỉ nhận hàng: thêm ô nhập khi giữ chỗ (P0-5 phương án b). Email hỗ trợ, giao hàng, đổi trả: đưa vào Config. `PAYMENT_DEADLINE_HOURS` vẫn cố định 24 giờ (xem §6). Phần dưới giữ nguyên làm hồ sơ khảo sát.
+> **Trạng thái (11/10/2026):** chủ dự án duyệt P0 + P1 → **đã làm ở web v2.9.0 + Apps Script Version 11** (chờ chủ dự án deploy, Runbook §3c). Địa chỉ nhận hàng: thêm ô nhập khi giữ chỗ (P0-5 phương án b). Email hỗ trợ, giao hàng, đổi trả: đưa vào Config. `PAYMENT_DEADLINE_HOURS`: **đã làm ở v2.10.0** (chủ dự án duyệt 11/10; cùng Version 11) — xem §6. Phần dưới giữ nguyên làm hồ sơ khảo sát.
 > **Khảo sát trên:** web v2.7.0 (`Mau_Dang_Ky_Internal_Sales_3009.html`), `apps-script/Code.gs` (Version 10 đang chạy), Sheet chính thức đọc ngày 11/10/2026.
 > Số dòng `file:line` là của nhánh `v2.8-wave3-docs` lúc khảo sát; có thể lệch vài dòng sau khi sửa.
 
@@ -113,6 +113,6 @@ sequenceDiagram
 ## 6. Chưa làm và lý do (11/10/2026)
 | Mục | Lý do | Đề xuất |
 |---|---|---|
-| `PAYMENT_DEADLINE_HOURS` (hạn nộp tiền theo Config) | 29 chỗ chữ "24h / 24 giờ" trên web + bộ đếm hết hạn và nhắc 22h của máy chủ + các câu trong từ điển EN. Đổi sát giờ mở bán rủi ro cao; hạn này hiếm khi đổi | Làm sau 16/10. Hiện mô tả ô ghi rõ "cố định 24 giờ — đổi ô này không có tác dụng" |
+| ~~`PAYMENT_DEADLINE_HOURS`~~ → **đã làm v2.10.0** (chủ dự án duyệt 11/10: "không có vấn đề gì, hãy tiến hành luôn") | Máy chủ: `paymentHours_()` (số nguyên 2–168, sai → 24) cho watchdog hết hạn + nhắc trước 2 giờ (hạn < 4 giờ → 1 giờ) + 5 câu email + ghi chú/nhật ký; key thêm vào `public_config`. Web: `payH()` cùng quy tắc; chữ gốc và từ điển EN giữ "24", lớp `applyPayHours()` đổi số giờ **sau khi dịch**; loại trừ vùng dữ liệu, ô nhập và `data-no-hours` (thời gian thông báo trước, nút hẹn giờ "+24 giờ", đồng hồ hẹn giờ, "Còn ~Nh"); hộp thoại: dịch rồi đổi giờ. Cờ chống nhắc lặp giữ tên `WARNED_22H` | Hạn mới áp dụng ngay cho mọi đơn đang chờ nộp → chỉ đổi trước khi mở cổng (ghi ở mô tả ô C3 và sổ tay) |
 | `SYS_STATUS` (bảo trì) | Là chức năng mới, chưa yêu cầu | Mô tả ô ghi "KHÔNG có tác dụng" |
-| Đổi địa chỉ của đơn đã giữ | Cần lệnh máy chủ mới | Hiện: nhân viên liên hệ PM (web ghi rõ) |
+| Đổi địa chỉ của đơn đã giữ | Cần lệnh máy chủ mới. Chủ dự án 11/10: không phải lỗi (địa chỉ bắt buộc trước khi giữ chỗ) | v2.10.0: tab 2 + bước nộp tiền (tab 3, cửa sổ "Nộp tiền ngay") ghi "liên hệ trực tiếp PM phụ trách"; bước nộp tiền hiện địa chỉ đã ghi trên đơn (`lookup` trả `address` khi đã đăng nhập) |

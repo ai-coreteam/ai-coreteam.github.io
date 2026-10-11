@@ -300,6 +300,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
   details = details || {};
   if (!details.serial && details.slotId) details.serial = prodSerials_()[details.slotId] || '';
   var snHtml = details.serial ? ' <span style="color:#716F6A; font-size:12px;">· S/N ' + details.serial + '</span>' : '';
+  var payH = paymentHours_(), payLead = paymentWarnLead_(payH);   // v2.10: hạn nộp tiền theo Config
 
   var brandHeader = '<div style="background:#A50034; color:#FFFFFF; padding:18px 24px; border-radius:8px 8px 0 0; font-family:Arial,sans-serif;">' +
     '<h2 style="margin:0; font-size:18px; letter-spacing:0.02em;">LG ELECTRONICS VIETNAM — CỔNG BÁN HÀNG NỘI BỘ</h2>' +
@@ -325,7 +326,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<div>• Trạng thái: <strong style="color:#B7950B;">Đã đăng ký (Chờ PM duyệt mở cổng thanh toán)</strong></div>' +
       '</div>' +
       '<div style="font-size:12.5px; background:#FFF9E6; border:1px solid #FFE082; padding:12px; border-radius:6px; margin:14px 0;">' +
-      'ℹ️ <strong>Quy trình kiểm soát:</strong> Để đảm bảo tính minh bạch và tránh chuyển khoản trùng, PM sẽ rà soát danh sách trước khi mở cổng thanh toán. Ngay khi PM mở cổng, bạn sẽ nhận được email hướng dẫn chuyển khoản và thời hạn nộp tiền 24 giờ sẽ chính thức bắt đầu.' +
+      'ℹ️ <strong>Quy trình kiểm soát:</strong> Để đảm bảo tính minh bạch và tránh chuyển khoản trùng, PM sẽ rà soát danh sách trước khi mở cổng thanh toán. Ngay khi PM mở cổng, bạn sẽ nhận được email hướng dẫn chuyển khoản và thời hạn nộp tiền ' + payH + ' giờ sẽ chính thức bắt đầu.' +
       '</div>' +
       '</div>' +
       brandFooter +
@@ -340,7 +341,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<div style="background:#E8F8F5; padding:14px 18px; border-radius:6px; border-left:4px solid #117A65; margin:16px 0;">' +
       '<div>• Mã Slot: <strong style="color:#A50034;">' + (details.slotId || '') + '</strong> (Kho: ' + (details.kho || '') + ')</div>' +
       '<div>• Model: <strong>' + (details.model || '') + '</strong>' + snHtml + '</div>' +
-      '<div>• Thời hạn nộp tiền: <strong>24 giờ</strong> kể từ thời điểm mở cổng (' + (details.openTime || '') + ').</div>' +
+      '<div>• Thời hạn nộp tiền: <strong>' + payH + ' giờ</strong> kể từ thời điểm mở cổng (' + (details.openTime || '') + ').</div>' +
       '</div>' +
       '<p><strong>Hướng dẫn chuyển khoản VietQR:</strong></p>' +
       '<div style="font-size:12.5px; background:#FFFFFF; border:1px dashed #CBC8C2; padding:12px; border-radius:6px;">' +
@@ -385,7 +386,7 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       brandFooter +
       '</div>';
   } else if (type === 'EXPIRATION_WARNING') {
-    subject = '[LG Internal Sales] Nhắc nhở: Đơn hàng ' + (details.slotId || '') + ' sắp hết hạn nộp tiền (còn 2 giờ)';
+    subject = '[LG Internal Sales] Nhắc nhở: Đơn hàng ' + (details.slotId || '') + ' sắp hết hạn nộp tiền (còn ' + payLead + ' giờ)';
     bodyHtml = '<div style="max-width:600px; margin:0 auto; border:1px solid #CBC8C2; border-radius:8px; font-family:Arial,sans-serif; color:#262626;">' +
       brandHeader +
       '<div style="padding:24px; line-height:1.6; font-size:13.5px;">' +
@@ -394,24 +395,24 @@ function sendEmailNotification_(type, empName, empCode, email, details) {
       '<div style="background:#FEF9E7; padding:14px 18px; border-radius:6px; border-left:4px solid #F39C12; margin:16px 0;">' +
       '<div>• Mã Slot: <strong>' + (details.slotId || '') + '</strong> (Model: ' + (details.model || '') + ')' + snHtml + '</div>' +
       '<div>• Thời gian đăng ký: <strong>' + (details.regTime || '') + '</strong></div>' +
-      '<div>• Thời hạn còn lại: <strong style="color:#C0392B;">Khoảng 2 giờ</strong> trước khi slot bị tự động giải phóng.</div>' +
+      '<div>• Thời hạn còn lại: <strong style="color:#C0392B;">Khoảng ' + payLead + ' giờ</strong> trước khi slot bị tự động giải phóng.</div>' +
       '</div>' +
       '<p>Nếu bạn đã nộp tiền qua VietQR, vui lòng truy cập ngay hệ thống và tải lên ảnh biên lai để PM đối soát.</p>' +
       '</div>' +
       brandFooter +
       '</div>';
   } else if (type === 'EXPIRATION_ALERT') {
-    subject = '[LG Internal Sales] Thông báo: Slot ' + (details.slotId || '') + ' đã bị giải phóng do quá hạn 24 giờ';
+    subject = '[LG Internal Sales] Thông báo: Slot ' + (details.slotId || '') + ' đã bị giải phóng do quá hạn ' + payH + ' giờ';
     bodyHtml = '<div style="max-width:600px; margin:0 auto; border:1px solid #CBC8C2; border-radius:8px; font-family:Arial,sans-serif; color:#262626;">' +
       brandHeader +
       '<div style="padding:24px; line-height:1.6; font-size:13.5px;">' +
       '<p>Xin chào <strong>' + empName + '</strong> (Mã NV: <strong>' + empCode + '</strong>),</p>' +
-      '<p style="color:#78281F; font-weight:bold;">Đơn hàng ' + (details.slotId || '') + ' đã hết thời hạn nộp tiền (24 giờ):</p>' +
+      '<p style="color:#78281F; font-weight:bold;">Đơn hàng ' + (details.slotId || '') + ' đã hết thời hạn nộp tiền (' + payH + ' giờ):</p>' +
       '<div style="background:#F2D7D5; padding:14px 18px; border-radius:6px; border-left:4px solid #922B21; margin:16px 0;">' +
       '<div>• Mã Slot: <strong>' + (details.slotId || '') + '</strong> (Model: ' + (details.model || '') + ')' + snHtml + '</div>' +
       '<div>• Trạng thái hiện tại: <strong style="color:#922B21;">Đã hủy giữ chỗ & mở lại kho công khai.</strong></div>' +
       '</div>' +
-      '<p>Theo chính sách FCFS của chương trình bán hàng nội bộ, các suất chưa nộp tiền sau 24h được tự động mở lại cho các nhân viên khác.</p>' +
+      '<p>Theo chính sách FCFS của chương trình bán hàng nội bộ, các suất chưa nộp tiền sau ' + payH + 'h được tự động mở lại cho các nhân viên khác.</p>' +
       '</div>' +
       brandFooter +
       '</div>';
@@ -1387,7 +1388,7 @@ function pm_allow_payment_(d) {
   };
 }
 
-/* ---------- P7: 24h Expiration Auto-Release & Reminders ---------- */
+/* ---------- P7: Expiration Auto-Release & Reminders (hạn = PAYMENT_DEADLINE_HOURS, mặc định 24h) ---------- */
 function check_expired_slots_(d) {
   // If invoked via client HTTP API, require valid PM session token
   if (d && d.action === 'check_expired_slots') {
@@ -1399,8 +1400,10 @@ function check_expired_slots_(d) {
   if (!regSheet) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
 
   var now = new Date().getTime();
-  var TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-  var TWENTY_TWO_HOURS_MS = 22 * 60 * 60 * 1000;
+  var PAY_H = paymentHours_();                       // v2.10: theo Config (mặc định 24)
+  var WARN_LEAD = paymentWarnLead_(PAY_H);
+  var DEADLINE_MS = PAY_H * 60 * 60 * 1000;
+  var WARN_MS = (PAY_H - WARN_LEAD) * 60 * 60 * 1000;
 
   var releasedCount = 0;
   var warnedCount = 0;
@@ -1428,7 +1431,7 @@ function check_expired_slots_(d) {
       var regDate = rawTs instanceof Date ? rawTs : new Date(rawTs);
       var curNote = String(data[r][C.NOTE - 1]).trim();
 
-      // SPRINT P8: Bắt buộc đếm 24h từ thời điểm PM mở cổng thanh toán (GATE_OPEN) thay vì lúc đăng ký ban đầu
+      // SPRINT P8: Bắt buộc đếm hạn nộp tiền từ thời điểm PM mở cổng thanh toán (GATE_OPEN) thay vì lúc đăng ký ban đầu
       var gateMatch = curNote.match(/GATE_OPEN:([^\s|\)]+)/);
       var baseDate = regDate;
       if (gateMatch && gateMatch[1]) {
@@ -1451,22 +1454,22 @@ function check_expired_slots_(d) {
       var model = String(data[r][C.MODEL - 1]).trim();
       var rowNum = r + 2;
 
-      if (diffMs >= TWENTY_FOUR_HOURS_MS) {
-        // 1. Release expired slot (>24h)
+      if (diffMs >= DEADLINE_MS) {
+        // 1. Release expired slot (quá hạn PAY_H giờ)
         regSheet.getRange(rowNum, C.STATUS).setValue('Hết hạn giữ chỗ');
-        regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'Tự động giải phóng quá hạn 24h');
+        regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'Tự động giải phóng quá hạn ' + PAY_H + 'h');
         releasedSlots.push(curSlot);
         releasedKeys[pProg.toUpperCase() + '|' + curSlot + '|' + empCode.toUpperCase()] = true;
         if (pProg) affectedPrograms[pProg.toUpperCase()] = true;
         releasedCount++;
         notices.push({ type: 'EXPIRATION_ALERT', empName: empName, empCode: empCode, slot: curSlot, model: model,
-                       log: ['AUTO_RELEASE_EXPIRED', 'Quá hạn 24h (' + Math.round(diffMs / 3600000) + 'h)'] });
-      } else if (diffMs >= TWENTY_TWO_HOURS_MS && curNote.indexOf('WARNED_22H') === -1) {
-        // 2. Warn employee if 22h - 24h
+                       log: ['AUTO_RELEASE_EXPIRED', 'Quá hạn ' + PAY_H + 'h (' + Math.round(diffMs / 3600000) + 'h)'] });
+      } else if (diffMs >= WARN_MS && curNote.indexOf('WARNED_22H') === -1) {
+        // 2. Nhắc nhân viên khi còn WARN_LEAD giờ (giữ tên cờ WARNED_22H để đơn cũ không bị nhắc lại)
         regSheet.getRange(rowNum, C.NOTE).setValue((curNote ? curNote + ' | ' : '') + 'WARNED_22H');
         warnedCount++;
         notices.push({ type: 'EXPIRATION_WARNING', empName: empName, empCode: empCode, slot: curSlot, model: model,
-                       regTime: fmt_(regDate), log: ['WARN_EXPIRE_22H', 'Cảnh báo 22h (' + Math.round(diffMs / 3600000) + 'h)'] });
+                       regTime: fmt_(regDate), log: ['WARN_EXPIRE_22H', 'Cảnh báo còn ' + WARN_LEAD + 'h (' + Math.round(diffMs / 3600000) + 'h)'] });
       }
     }
 
@@ -1512,7 +1515,7 @@ function check_expired_slots_(d) {
     releasedCount: releasedCount,
     warnedCount: warnedCount,
     releasedSlots: releasedSlots,
-    message: 'Quét hoàn tất: Đã giải phóng ' + releasedCount + ' slot quá hạn 24h, nhắc nhở ' + warnedCount + ' slot sắp hết hạn.'
+    message: 'Quét hoàn tất: Đã giải phóng ' + releasedCount + ' slot quá hạn ' + PAY_H + 'h, nhắc nhở ' + warnedCount + ' slot sắp hết hạn.'
   };
 }
 
@@ -1523,7 +1526,7 @@ function runExpirationWatchdog() {
   return res;
 }
 
-/** Tự động cài đặt Time-Driven Trigger chạy mỗi 1 giờ cho Watchdog 24h (1-Click Setup) */
+/** Tự động cài đặt Time-Driven Trigger chạy mỗi 1 giờ cho Watchdog hạn nộp tiền (1-Click Setup) */
 function setupWatchdogTrigger() {
   var triggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < triggers.length; i++) {
@@ -1535,8 +1538,8 @@ function setupWatchdogTrigger() {
     .timeBased()
     .everyHours(1)
     .create();
-  Logger.log('Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog 24h!');
-  return { ok: true, message: 'Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog 24h!' };
+  Logger.log('Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog hạn nộp tiền!');
+  return { ok: true, message: 'Đã kích hoạt thành công Trigger tự động chạy mỗi 1 giờ cho Watchdog hạn nộp tiền!' };
 }
 
 /* ---------- P0: Xác thực (auth) ---------- */
@@ -1884,7 +1887,8 @@ function lookup_(d) {
       name: empName,
       amount: curAmt, price: curAmt,
       status: str_(v[r][C.STATUS - 1]) || 'Chưa có trạng thái',
-      paid: !!str_(v[r][C.BANK_TXN - 1]), receipt: !!str_(v[r][C.RECEIPT - 1])
+      paid: !!str_(v[r][C.BANK_TXN - 1]), receipt: !!str_(v[r][C.RECEIPT - 1]),
+      address: isAuthenticated ? str_(v[r][C.ADDRESS - 1]) : ''   // v2.10: chỉ trả khi đã đăng nhập (tra cứu bằng 4 số cuối không lộ địa chỉ)
     });
   }
   if (!out.length) {
@@ -1995,7 +1999,7 @@ function email_setting_(d) {
 // Web đổi theo Sheet sau tối đa ~6 phút (cache máy chủ 60 giây + web hỏi lại mỗi 5 phút).
 var PUBLIC_CONFIG_KEYS = ['BANK_NAME', 'BANK_BRANCH', 'BANK_ACC', 'BANK_HOLDER', 'BANK_HOLDER_SHORT', 'BANK_BIN', 'TRANSFER_SYNTAX',
   'SUPPORT_NAME', 'SUPPORT_EMAIL', 'SUPPORT_PHONE', 'DELIVERY_POLICY', 'RETURN_POLICY', 'RULE_JEONGDO',
-  'ASSISTANT_GREETING', 'ASSISTANT_MESSAGE', 'ANNOUNCEMENT'];
+  'ASSISTANT_GREETING', 'ASSISTANT_MESSAGE', 'ANNOUNCEMENT', 'PAYMENT_DEADLINE_HOURS'];
 function public_config_() {
   var cache = CacheService.getScriptCache();
   var hit = cache.get('pubcfg');
@@ -2013,6 +2017,15 @@ function public_config_() {
   try { cache.put('pubcfg', JSON.stringify(res), 60); } catch (e) {}
   return res;
 }
+
+// v2.10 (11/10/2026, chủ dự án duyệt): hạn nộp tiền lấy từ Config PAYMENT_DEADLINE_HOURS (số nguyên 2–168; trống/sai → 24).
+// Nhắc trước hạn 2 giờ (hạn < 4 giờ → nhắc trước 1 giờ). Web dùng cùng quy tắc (paymentHours trong HTML).
+function paymentHours_() {
+  var h = 24;
+  try { var raw = config_().PAYMENT_DEADLINE_HOURS; h = Number(String(raw == null ? '' : raw).trim()); } catch (e) { h = 24; }
+  return (h >= 2 && h <= 168 && Math.floor(h) === h) ? h : 24;
+}
+function paymentWarnLead_(h) { return h >= 4 ? 2 : 1; }
 
 function config_() {
   var cache = CacheService.getScriptCache();

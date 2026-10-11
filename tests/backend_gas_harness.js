@@ -521,6 +521,49 @@ console.log('--- v2.9: public_config — nội dung web lấy từ tab Config, c
   check(!('SECRET_X' in r.config) && !('MAX_PER_EMPLOYEE' in r.config) && !('ENABLE_AUTO_EMAIL' in r.config), 'key ngoài danh sách cho phép KHÔNG bị trả ra');
 }
 
+console.log('--- v2.10: hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS (watchdog + email) + địa chỉ trong lookup ---');
+{
+  // ageH = số giờ kể từ lúc PM mở cổng (ghi chú GATE_OPEN)
+  const run = (cfgVal, ages) => {
+    state.mails.length = 0;
+    const book = freshBook();
+    if (cfgVal !== undefined) book.getSheetByName('Config').rows.push(['PAYMENT_DEADLINE_HOURS', cfgVal, '']);
+    ages.forEach((ageH, i) => {
+      const gate = new Date(Date.now() - ageH * 3600e3).toISOString();
+      book.getSheetByName('Registrations').rows.push([new Date(Date.now() - (ageH + 1) * 3600e3), PID, 'QA', 'VH70001', 'Nhan Vien 1', 'AYA', 'M' + (i + 1),
+        PID + '-AYA-00' + (i + 1), '0900001111', 'HN', 'Đồng ý', 'Chờ nộp tiền', '', '', 5000000, '', '', '', '', '', 'GATE_OPEN:' + gate, '']);
+    });
+    const { ctx } = load(book);
+    const r = ctx.check_expired_slots_();
+    return { r, st: regRows(book).map(x => x[11]), notes: regRows(book).map(x => x[20]), mails: state.mails.slice() };
+  };
+  const a = run(undefined, [21, 23, 25]);
+  check(a.r.ok && a.st[0] === 'Chờ nộp tiền' && a.st[1] === 'Chờ nộp tiền' && a.st[2] === 'Hết hạn giữ chỗ' && a.r.warnedCount === 1 && a.r.releasedCount === 1,
+    `không có PAYMENT_DEADLINE_HOURS → giữ 24h như cũ: 21h yên, 23h nhắc, 25h giải phóng (${a.st.join(' / ')})`);
+  check(a.mails.some(m => /quá hạn 24 giờ/.test(m.subject)) && a.mails.some(m => /còn 2 giờ/.test(m.subject)), 'email mặc định vẫn ghi 24 giờ / còn 2 giờ');
+  const b = run('48', [25, 47, 49]);
+  check(b.st[0] === 'Chờ nộp tiền' && b.st[1] === 'Chờ nộp tiền' && b.st[2] === 'Hết hạn giữ chỗ' && b.r.warnedCount === 1 && b.r.releasedCount === 1,
+    `PAYMENT_DEADLINE_HOURS=48: 25h yên, 47h nhắc, 49h giải phóng (${b.st.join(' / ')})`);
+  check(b.mails.some(m => /quá hạn 48 giờ/.test(m.subject) && /\(48 giờ\)/.test(m.htmlBody || '')) && /quá hạn 48h/.test(b.notes[2]) && /quá hạn 48h/.test(b.r.message),
+    'hạn 48: tiêu đề + nội dung email, ghi chú đơn và thông báo quét đều ghi 48');
+  const c = run('3', [1.5, 2.5, 3.5]);
+  check(c.st.join('|') === 'Chờ nộp tiền|Chờ nộp tiền|Hết hạn giữ chỗ' && c.r.warnedCount === 1 && c.mails.some(m => /còn 1 giờ/.test(m.subject)),
+    'hạn 3 giờ: nhắc trước 1 giờ (2,5h nhắc), 3,5h giải phóng');
+  for (const bad of ['abc', '0', '1', '200', '12.5', '']) {
+    const x = run(bad, [23, 25]);
+    check(x.st[1] === 'Hết hạn giữ chỗ' && x.st[0] === 'Chờ nộp tiền' && x.r.warnedCount === 1, `giá trị sai "${bad}" → quay về 24h`);
+  }
+  const book = freshBook(); const { post, get } = load(book);
+  book.getSheetByName('Config').rows.push(['PAYMENT_DEADLINE_HOURS', '48', '', '']);
+  check(get({ action: 'public_config' }).config.PAYMENT_DEADLINE_HOURS.vi === '48', 'public_config trả PAYMENT_DEADLINE_HOURS cho web');
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'Nhan Vien 1', phone: '0900001111', address: '12 Lê Lợi, Q1, HCM' });
+  const lkA = post({ action: 'lookup', token: u1.token, empCode: 'VH70001' });
+  check(lkA.ok && lkA.orders[0].address === '12 Lê Lợi, Q1, HCM', `lookup đã đăng nhập trả địa chỉ nhận hàng (${lkA.orders && lkA.orders[0].address})`);
+  const lkB = post({ action: 'lookup', empCode: 'VH70001', phoneLast4: '1111' });
+  check(lkB.ok && lkB.orders[0].address === '', 'tra cứu bằng 4 số cuối (chưa đăng nhập) KHÔNG trả địa chỉ');
+}
+
 console.log('--- V1-10: Mọi lệnh ghi Registrations / Products của luồng nghiệp vụ nằm trong khóa ---');
 {
   const allowed = /program_delete|product_upload|setup/; // ngoài phạm vi đợt này (thêm dòng mới / xóa chương trình 0 đơn)

@@ -3460,6 +3460,10 @@
     .delivery-addr-row .addr-missing { color: var(--lg-heritage); font-weight: 600; }
     .delivery-addr-row .addr-note { flex-basis: 100%; font-size: 13px; color: var(--lg-text-2); }
     .delivery-addr-row button { margin-left: auto; }
+    /* v2.10: bước nộp tiền — địa chỉ nhận hàng của đơn + nhắc đổi địa chỉ qua PM */
+    .pay-addr-note { margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--lg-border); border-left: 4px solid #A50034; border-radius: 8px; background: var(--lg-card-bg); font-size: 12.5px; line-height: 1.5; color: var(--lg-text-2); }
+    .pay-addr-note[hidden] { display: none; }
+    .pay-addr-note .addr-val { font-weight: 600; color: var(--lg-ink); overflow-wrap: anywhere; }
     #addr-input { font-size: 16px; }   /* iPhone không tự phóng to */
     .docs-link { display: flex; align-items: center; justify-content: center; height: 48px; text-decoration: none; font-size: 16px; }   /* v2.8: 2 link trong cửa sổ Docs */   /* v2.8 C1: nút "Thêm thao tác" chỉ có trên điện thoại */
     .lg-desc-row { display: contents; }   /* v2.7: khung bọc link LG.com + nút "Xem đủ" — máy tính: không tạo hộp, bố cục như cũ */
@@ -4088,7 +4092,7 @@
           <div class="sec-card">
             <div class="sec-title">1. THÔNG TIN CHƯƠNG TRÌNH & THỜI GIAN MỞ ĐĂNG KÝ HỆ THỐNG</div>
             <ul style="padding-left: 20px; line-height: 1.7;">
-              <li><strong>Thời gian thông báo trước:</strong> 24 Giờ (Giúp nhân viên xem trước danh sách sản phẩm và mã Slot ID).</li>
+              <li data-no-hours><strong>Thời gian thông báo trước:</strong> 24 Giờ (Giúp nhân viên xem trước danh sách sản phẩm và mã Slot ID).</li>
               <li><strong>Thời gian chính thức mở cổng đăng ký:</strong> Từ <strong>10:00 AM, Ngày 14/10/2026</strong>.</li>
               <li><strong>Hạn chót đăng ký (Deadline):</strong> Trước <strong>17:00 PM, Ngày 16/10/2026</strong>.</li>
               <li><strong>Nguyên tắc xét duyệt:</strong> <code>FIRST COME, FIRST SERVED</code> (Căn cứ theo Timestamp hệ thống tự động ghi nhận khi nhấn Gửi Đăng Ký).</li>
@@ -4822,6 +4826,7 @@
 
         <form id="payment-form" onsubmit="handlePaymentSubmit(event)" hidden>
           <div id="pay-unlocked-info" style="font-size:12.5px; margin-bottom:12px; padding:10px 12px; background:var(--lg-card-bg); border:1px solid var(--lg-border); border-radius:8px;"></div>
+          <div id="pay-addr-note" class="pay-addr-note" hidden></div>
           <!-- 07/10/2026: mã VietQR ngay trong form (cùng định dạng cửa sổ "Nộp tiền ngay") — chuyển khoản không cần cuộn lên -->
           <div id="pay-qr-box" class="pay-qr-box" hidden>
             <div class="pay-qr-img">
@@ -5411,7 +5416,7 @@
               </div>
             </div>
             <div class="timer-status-row">
-              <div id="timer-open-countdown" class="timer-countdown-badge">Chưa bật hẹn giờ</div>
+              <div id="timer-open-countdown" class="timer-countdown-badge" data-no-hours>Chưa bật hẹn giờ</div>
               <button type="button" class="btn-pm-action btn-pm-primary" onclick="executeTimerActionNow('open')" style="font-size:11.5px; padding:6px 12px; background:#A50034; border-color:#A50034; color:#FFF;">
                 <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 Mở bán ngay (Thủ công)
@@ -5448,7 +5453,7 @@
               </div>
             </div>
             <div class="timer-status-row">
-              <div id="timer-close-countdown" class="timer-countdown-badge">Chưa bật hẹn giờ</div>
+              <div id="timer-close-countdown" class="timer-countdown-badge" data-no-hours>Chưa bật hẹn giờ</div>
               <button type="button" class="btn-pm-action btn-pm-outline" onclick="executeTimerActionNow('close')" style="font-size:11.5px; padding:6px 12px; border-color:#A50034; color:#A50034;">
                 <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Kết sổ ngay (Thủ công)
@@ -5480,12 +5485,12 @@
               <input type="datetime-local" id="timer-pay-datetime" class="pm-timer-input">
               <div class="timer-presets">
                 <button type="button" class="btn-timer-chip" onclick="setTimerPresetHours('pay', 12)">+12 giờ</button>
-                <button type="button" class="btn-timer-chip" onclick="setTimerPresetHours('pay', 24)">+24 giờ (Khuyên dùng)</button>
+                <button type="button" class="btn-timer-chip" onclick="setTimerPresetHours('pay', 24)" data-no-hours>+24 giờ (Khuyên dùng)</button>
                 <button type="button" class="btn-timer-chip" onclick="setTimerPresetDays('pay', 2)">+2 ngày</button>
               </div>
             </div>
             <div class="timer-status-row">
-              <div id="timer-pay-countdown" class="timer-countdown-badge">Chưa bật hẹn giờ</div>
+              <div id="timer-pay-countdown" class="timer-countdown-badge" data-no-hours>Chưa bật hẹn giờ</div>
               <button type="button" class="btn-pm-action" onclick="executeTimerActionNow('payment')" style="background:#0E6251; color:#FFF; border-color:#0E6251; font-size:11.5px; padding:6px 12px;">
                 <svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#FFF;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
                 Mở cổng TT ngay (Thủ công)
@@ -5650,6 +5655,8 @@
           </div>
         </div>
       </div>
+
+      <div id="quick-addr-note" class="pay-addr-note" hidden></div>
 
       <!-- Payment declaration form -->
       <form id="quick-payment-form" onsubmit="handleQuickPaymentSubmit(event)">
@@ -6466,7 +6473,8 @@
       return {
         id: o.slot, slotId: o.slot, programId: o.programId || '', kho: o.kho || '', model: o.model || '', serial: o.serial || '',
         internalPrice: Number(o.price || o.amount) || 0, empCode: String(o.empCode || '').toUpperCase(),
-        empName: o.empName || o.name || '', status: o.status || '', timestamp: o.time || '', paid: !!o.paid
+        empName: o.empName || o.name || '', status: o.status || '', timestamp: o.time || '', paid: !!o.paid,
+        address: o.address || ''   // v2.10: máy chủ trả khi đã đăng nhập
       };
     }
     async function refreshMyServerOrders() {
@@ -9137,6 +9145,7 @@
       document.getElementById('quick-kho-name').textContent = 'Kho ' + (reg.kho || 'Hải Phòng');
       document.getElementById('quick-model-name').innerHTML = esc(reg.model || '') + snHtml(reg);
       document.getElementById('quick-amount-text').textContent = formatVND(reg.internalPrice || 0);
+      renderPayAddrNote('quick-addr-note', reg.address);   // v2.10
 
       // Pre-fill user data (Zero-typing)
       document.getElementById('quick-payer-name').value = currentUser.name || '';
@@ -9495,11 +9504,13 @@
                       en: 'Buying on behalf of others, reselling to third parties or any commercial gain is strictly prohibited. Violations lead to disciplinary action under company rules.' },
       ASSISTANT_GREETING: { vi: "Life's Good! Bạn cần hỗ trợ gì về ưu đãi hôm nay?", en: "Life's Good! How can we help with today's deals?" },
       ASSISTANT_MESSAGE: { vi: "Life's Good! Chọn đợt bán ở thanh phía trên, rồi xem danh mục và giữ chỗ ở tab 2.", en: "Life's Good! Pick a sale in the bar above, then browse and reserve in tab 2." },
-      ANNOUNCEMENT: { vi: '' }
+      ANNOUNCEMENT: { vi: '' },
+      PAYMENT_DEADLINE_HOURS: { vi: '24' }   // v2.10: hạn nộp tiền (giờ) kể từ lúc PM mở cổng — máy chủ dùng cùng ô này
     };
     var SITE_CFG_CHECK = {   // ô sai dạng → bỏ qua, dùng mặc định
       BANK_ACC: v => /^\d{6,20}$/.test(v), BANK_BIN: v => /^\d{6}$/.test(v), SUPPORT_EMAIL: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-      TRANSFER_SYNTAX: v => v.includes('{EMP}') && v.includes('{SLOT}')
+      TRANSFER_SYNTAX: v => v.includes('{EMP}') && v.includes('{SLOT}'),
+      PAYMENT_DEADLINE_HOURS: v => /^\d{1,3}$/.test(v) && +v >= 2 && +v <= 168
     };
     var SITE_CFG = {};
     var SITE_CFG_STORE = 'lg_site_cfg_v1';
@@ -9539,7 +9550,85 @@
       if (login) { const v = T(`Liên hệ ${cfg('SUPPORT_NAME')} (${cfg('SUPPORT_EMAIL')}) nếu cần hỗ trợ tài khoản.`); if (login.textContent !== v) login.textContent = v; }
       const ann = document.getElementById('site-announcement');
       if (ann) { const v = cfg('ANNOUNCEMENT'); ann.hidden = !v || !currentUser; if (ann.textContent !== v) ann.textContent = v; }
+      applyPayHours();
     }
+
+    // ===== v2.10 (11/10/2026, chủ dự án duyệt): hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS =====
+    // Cùng quy tắc với máy chủ (paymentHours_ trong Code.gs): số nguyên 2–168, trống/sai → 24; nhắc trước hạn 2 giờ (hạn < 4 giờ → 1 giờ).
+    // Chữ gốc trên trang và từ điển tiếng Anh vẫn ghi "24"; khi hạn ≠ 24, lớp dưới đây đổi số giờ SAU khi đã dịch:
+    // "24h / 24 giờ / 24 Giờ / 24H / 24 hours" → "<hạn>h / <hạn> giờ…". Không đổi: vùng dữ liệu (mô tả SP, tên đợt, ghi chú đơn…),
+    // ô nhập liệu và phần tử gắn data-no-hours (thời gian thông báo trước, nút hẹn giờ "+24 giờ", đồng hồ hẹn giờ, "Còn ~Nh").
+    function payH() { const h = Number(cfg('PAYMENT_DEADLINE_HOURS')); return (h >= 2 && h <= 168 && Math.floor(h) === h) ? h : 24; }
+    function payWarnLead(h) { return h >= 4 ? 2 : 1; }
+    var PAY_H_RE = /(^|[^\d.,:+])24(\s?(?:h|H|giờ|Giờ|GIỜ|tiếng|hours?|Hours?|HOURS?))(?![A-Za-zÀ-ỹ\d])/g;
+    var PAY_H_SKIP = '[data-no-hours], [data-no-i18n], .lg-card-desc, .pk-cond, .ps-sub-cond, td.cond, .lgm-data, #grap-program-title, .program-tab-name';
+    var PAY_H_TAGS = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, NOSCRIPT: 1 };
+    var PAY_H_ATTRS = ['title', 'placeholder', 'aria-label'];
+    var payHApplied = 24, payHObs = null;
+    var PAY_H_TXT = new WeakMap();   // nút chữ → {src: chữ trước khi đổi, out: chữ đã đổi}
+    var PAY_H_ATT = new WeakMap();   // phần tử → {thuộc tính: {src, out}}
+    function payHoursText(t) {
+      const h = payH();
+      return (h === 24 || t == null) ? t : String(t).replace(PAY_H_RE, (m, a, b) => a + h + b);
+    }
+    function payHSkip(el) { return !el || PAY_H_TAGS[el.nodeName] || (el.closest && el.closest(PAY_H_SKIP)); }
+    function payHText(n) {
+      if (payHSkip(n.parentElement)) return;
+      const v = n.nodeValue, rec = PAY_H_TXT.get(n);
+      const src = (rec && rec.out === v) ? rec.src : v;   // đã đổi trước đó → tính lại từ chữ gốc (hạn đổi 48 → 72 hoặc về 24)
+      const out = payHoursText(src);
+      if (out !== v) n.nodeValue = out;
+      if (out !== src) PAY_H_TXT.set(n, { src, out }); else PAY_H_TXT.delete(n);
+    }
+    function payHAttrs(el) {
+      if (payHSkip(el)) return;
+      let rec = PAY_H_ATT.get(el);
+      PAY_H_ATTRS.forEach(a => {
+        if (!el.hasAttribute(a)) return;
+        const v = el.getAttribute(a), r = rec && rec[a];
+        const src = (r && r.out === v) ? r.src : v, out = payHoursText(src);
+        if (out !== v) el.setAttribute(a, out);
+        if (out !== src) { rec = rec || {}; rec[a] = { src, out }; PAY_H_ATT.set(el, rec); } else if (r) delete rec[a];
+      });
+    }
+    function payHWalk(node) {
+      if (node.nodeType === 3) { if (/24/.test(node.nodeValue) || PAY_H_TXT.has(node)) payHText(node); return; }
+      if (node.nodeType !== 1 || payHSkip(node)) return;
+      payHAttrs(node);
+      const w = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+      let n;
+      while ((n = w.nextNode())) {
+        if (n.nodeType === 3) { if (/\d/.test(n.nodeValue)) payHText(n); }
+        else if (PAY_H_ATTRS.some(a => n.hasAttribute(a))) payHAttrs(n);
+      }
+    }
+    function applyPayHours() {
+      if (document.readyState === 'loading') return;   // chờ lớp dịch dịch xong trang (DOMContentLoaded) rồi mới đổi số giờ
+      const h = payH();
+      if (h === payHApplied) return;
+      payHApplied = h;
+      if (document.body) payHWalk(document.body);   // đổi lại toàn trang (kể cả trả về 24)
+      if (h !== 24 && !payHObs) {
+        // Tạo SAU lớp dịch (i18n.js) → khi xem tiếng Anh, chữ được dịch trước rồi mới đổi số giờ
+        payHObs = new MutationObserver(ms => {
+          if (payH() === 24) return;
+          for (const m of ms) {
+            if (m.type === 'characterData') { if (/24/.test(m.target.nodeValue)) payHText(m.target); }
+            else if (m.type === 'attributes') { if (m.target.nodeType === 1) payHAttrs(m.target); }
+            else m.addedNodes.forEach(payHWalk);
+          }
+        });
+        payHObs.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: PAY_H_ATTRS });
+      }
+    }
+    // Hộp thoại của trình duyệt: dịch trước (T), rồi đổi số giờ; lớp dịch bọc ngoài thấy chữ đã là tiếng Anh nên không đụng lại
+    (function () {
+      const _a = window.alert, _c = window.confirm, _p = window.prompt;
+      window.alert = function (m) { return _a.call(window, payHoursText(T(m))); };
+      window.confirm = function (m) { return _c.call(window, payHoursText(T(m))); };
+      window.prompt = function (m, d) { return _p.call(window, payHoursText(T(m)), d); };
+    })();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyPayHours);
     async function loadSiteConfig() {
       if (!SHEET_API_URL) return;
       try {
@@ -9585,9 +9674,18 @@
       row.hidden = false;
       row.innerHTML = a
         ? `<span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span><button type="button" class="btn-action btn-secondary" onclick="openAddressModal(null)">${T('Sửa')}</button>` +
-          `<span class="addr-note">${T('Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ PM.')}</span>`
+          `<span class="addr-note">${T('Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.')}</span>`
         : `<span class="addr-missing">${T('Chưa có địa chỉ nhận hàng — cần khi giữ chỗ.')}</span><button type="button" class="btn-action" onclick="openAddressModal(null)" style="background:#EA1917; border-color:#EA1917; color:#FFF;">${T('Thêm địa chỉ')}</button>` +
           `<span class="addr-note">${T('Thêm trước giờ mở bán để giữ chỗ nhanh hơn.')}</span>`;
+    }
+    // v2.10: bước nộp tiền hiện địa chỉ đã ghi trên đơn (máy chủ trả khi đã đăng nhập) + nhắc đổi địa chỉ qua PM.
+    // Không lấy địa chỉ lưu trên máy: có thể đã sửa sau khi giữ chỗ → khác địa chỉ của đơn.
+    function renderPayAddrNote(id, address) {
+      const el = document.getElementById(id); if (!el) return;
+      const a = String(address || '').trim();
+      el.innerHTML = (a ? `<div><span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span></div>` : '') +
+        `<div>${T('Muốn đổi địa chỉ nhận hàng: liên hệ trực tiếp PM phụ trách.')}</div>`;
+      el.hidden = false;
     }
     var addrModalResolve = null;
     function openAddressModal(prod) {
@@ -10564,14 +10662,14 @@
           regTimeMs = now - 3600000 * 12;
         }
         const elapsedHours = (now - regTimeMs) / 3600000;
-        const remainHours = Math.max(0, Math.round(24 - elapsedHours));
-        const isOverdue = elapsedHours > 24;
+        const remainHours = Math.max(0, Math.round(payH() - elapsedHours));   // v2.10: hạn theo Config
+        const isOverdue = elapsedHours > payH();
 
         let deadlineBadge = '';
         if (isOverdue) {
           deadlineBadge = `<span class="pm-pill pm-pill-rejected" style="font-weight:700;"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#78281F;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Quá hạn 24h</span>`;
         } else {
-          deadlineBadge = `<span class="pm-pill" style="background:#FEF9E7; color:#7D6608; border:1px solid #F9E79F; font-weight:600;"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#7D6608;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Còn ~${remainHours}h</span>`;
+          deadlineBadge = `<span class="pm-pill" data-no-hours style="background:#FEF9E7; color:#7D6608; border:1px solid #F9E79F; font-weight:600;"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#7D6608;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Còn ~${remainHours}h</span>`;
         }
 
         let gateStatus = '';
@@ -10940,7 +11038,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
             </div>
           `;
         } else if (r.status === 'Từ chối' || r.status === 'Đã hủy bởi PM' || r.status === 'Đã hủy bởi nhân viên') {
-          actionCol = `<span style="font-size:11px;color:#78281F;font-style:italic;">${esc(r.note || 'Đã hủy')}</span>`;
+          actionCol = `<span style="font-size:11px;color:#78281F;font-style:italic;" data-no-hours>${esc(r.note || 'Đã hủy')}</span>`;
         } else if (r.status === 'Đã đăng ký - Chờ mở thanh toán') {
           actionCol = `
             <div style="display:flex;gap:4px;justify-content:center;">
@@ -11282,7 +11380,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         if (r.status === 'Chờ nộp tiền' || r.status === 'Mới đăng ký') {
           const regTime = new Date(r.timestamp).getTime();
           const ageHours = (now - regTime) / 3600000;
-          if (ageHours >= 24) {
+          if (ageHours >= payH()) {   // v2.10: cùng quy tắc máy chủ (hạn theo Config, nhắc trước 2 giờ)
             r.status = 'Hết hạn giữ chỗ';
             r.note = 'Tự động giải phóng quá hạn 24h';
             releasedCount++;
@@ -11290,7 +11388,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
               const p = DEMO_PRODUCTS[r.programId].find(x => x.uniqueCode === r.slotId);
               if (p) p.status = 'Available';
             }
-          } else if (ageHours >= 22) {
+          } else if (ageHours >= payH() - payWarnLead(payH())) {
             warnedCount++;
           }
         }
@@ -12133,6 +12231,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         `<div data-no-i18n>${esc(cfg('BANK_HOLDER_SHORT'))}</div>` +
         `<div>Nội dung CK: <code class="pay-qr-syntax">${esc(qrSyntax)}</code></div></div>`;
       document.getElementById('pay-qr-box').hidden = false;
+      renderPayAddrNote('pay-addr-note', order.address);   // v2.10
       document.getElementById('pay-lock').hidden = true;
       form.hidden = false;
       document.getElementById('payment-upload-card').scrollIntoView({ behavior: 'smooth' });

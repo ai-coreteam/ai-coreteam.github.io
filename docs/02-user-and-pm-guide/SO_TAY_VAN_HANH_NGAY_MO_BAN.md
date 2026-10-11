@@ -36,6 +36,7 @@
 | **Đã khai nộp - chờ đối soát** | Nhân viên đã báo nộp tiền, chờ PM kiểm tra |
 | **Đã duyệt thanh toán** | PM đã xác nhận tiền về. Đơn hoàn tất |
 | **Hết hạn giữ chỗ** | Quá 24 giờ chưa nộp → máy chủ **tự** trả máy về kho (mỗi giờ quét 1 lần) |
+| **Hạn 24 giờ** (từ v2.10.0) | Mặc định 24. ADMIN đổi được ở tab `Config`, ô `PAYMENT_DEADLINE_HOURS` (số nguyên 2–168; cần Apps Script Version 11). Máy chủ, email và mọi chữ "24h / 24 giờ" trên web đổi theo sau ~6 phút. ⚠️ Hạn mới áp dụng **ngay cho mọi đơn đang chờ nộp** (giảm hạn có thể hủy đơn đang chờ) → chỉ đổi **trước** khi mở cổng thanh toán. Sổ tay này ghi "24 giờ" = hạn mặc định |
 | **Trigger / Watchdog** | "Đồng hồ báo thức" của máy chủ, tự quét đơn quá hạn mỗi giờ. Đã cài ngày 05/10/2026 |
 
 ---
@@ -91,7 +92,7 @@
 | 9:50 | Đăng nhập lại lần nữa → phản hồi trong vài giây | ADMIN | ☐ |
 | 9:55 | PM đăng nhập, chọn đúng chương trình, sẵn sàng nút **"Mở bán ngay"** | PM | ☐ |
 
-> **Địa chỉ nhận hàng (từ v2.9.0):** lần giữ chỗ đầu web hỏi địa chỉ — nhắc nhân viên **thêm địa chỉ ở tab 2 trước 10:00** để giữ chỗ nhanh. PM xem địa chỉ ở bảng đơn / cửa sổ biên lai / file Excel: **sai khu vực với kho** (vd. kho AYA miền Bắc nhưng giao TP HCM) → liên hệ nhân viên, rồi "Hủy slot" (chưa nộp tiền) hoặc "Từ chối" (đã nộp).
+> **Địa chỉ nhận hàng (từ v2.9.0):** lần giữ chỗ đầu web hỏi địa chỉ — nhắc nhân viên **thêm địa chỉ ở tab 2 trước 10:00** để giữ chỗ nhanh. PM xem địa chỉ ở bảng đơn / cửa sổ biên lai / file Excel: **sai khu vực với kho** (vd. kho AYA miền Bắc nhưng giao TP HCM) → liên hệ nhân viên, rồi "Hủy slot" (chưa nộp tiền) hoặc "Từ chối" (đã nộp). Nhân viên muốn **đổi địa chỉ của đơn đã giữ**: web (tab 2 và bước nộp tiền) ghi "liên hệ trực tiếp PM phụ trách" → PM sửa ô địa chỉ (Registrations cột J) trên Sheet. Từ v2.10.0 bước nộp tiền hiện địa chỉ đã ghi trên đơn (cần Version 11).
 
 ### C. 10:00 — Mở bán
 

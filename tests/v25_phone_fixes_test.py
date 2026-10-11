@@ -7,7 +7,8 @@ Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1�
 12 = chờ máy chủ khi đổi trạng thái chương trình, 13 = thẻ sản phẩm gọn (v2.6.0);
 13 (mô tả 2 dòng + Xem đủ), 14 = bảng → thẻ (B3), 15 = cửa sổ nộp tiền toàn màn hình (B4), 16 = máy tính không đổi (v2.7.0);
 17–20 = PM điện thoại (C1, C2, cửa sổ biên lai), tab 3 (C3, nhãn), nút Docs, bản dịch EN (v2.8.0);
-21–24 = địa chỉ nhận hàng, Config (public_config), hạn mức theo chương trình, EN (v2.9.0).
+21–24 = địa chỉ nhận hàng, Config (public_config), hạn mức theo chương trình, EN (v2.9.0);
+25 = hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền (v2.10.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -487,6 +488,102 @@ def main():
             ctx.close()
             s = Mock(); ctx, page = open_page(browser, port, s); T.login(page, T.ME)
             check(page.inner_text('.grap-card-red .grap-card-title') == 'Thông Tin Chuyển Khoản', 'VI: "Thông Tin Chuyển Khoản"')
+            ctx.close()
+
+            print('25. v2.10 hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền')
+            # Mọi chữ "24h / 24 giờ / 24 hours" còn lại trên trang (cả phần đang ẩn) phải nằm trong vùng được loại trừ
+            LEFT24 = """() => { const re = /(^|[^\\d.,:+])24\\s?(h|H|giờ|Giờ|GIỜ|tiếng|hours?|Hours?)(?![A-Za-zÀ-ỹ\\d])/; const out = [];
+              const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n;
+              while ((n = w.nextNode())) { const p = n.parentElement; if (!p || /SCRIPT|STYLE/.test(p.nodeName)) continue;
+                if (re.test(n.nodeValue) && !p.closest('[data-no-hours], [data-no-i18n], .lg-card-desc')) out.push(n.nodeValue.trim().slice(0, 70)); }
+              document.querySelectorAll('[title], [placeholder]').forEach(e => ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v && re.test(v) && !e.closest('[data-no-hours]')) out.push(a + ': ' + v.slice(0, 60)); }));
+              return out; }"""
+            TXT = "id => (document.getElementById(id) || {}).textContent || ''"
+            class AddrMock(Mock):
+                lookup_addr = 'Số 9 Trần Phú, Ba Đình, Hà Nội'
+                def do_lookup(self, d):
+                    r = super().do_lookup(d)
+                    for o in r['orders']: o['address'] = self.lookup_addr
+                    return r
+            def h_cfg(v): return {'PAYMENT_DEADLINE_HOURS': {'vi': v, 'en': ''}}
+            s = AddrMock(my_status=T.NEW); s.public_config = h_cfg('48')
+            ctx, page = open_page(browser, port, s); T.login(page, T.ME)
+            sub = page.evaluate(TXT, 'grap-program-subtitle'); tab3 = page.evaluate(TXT, 'tab3')
+            check('Thời hạn giữ slot: 48h' in sub and '24h' not in sub, f'VI hạn 48: dòng chương trình ({sub[-30:]!r})')
+            check('bạn có 48 giờ để nộp tiền' in tab3 and '24 giờ để nộp' not in tab3, 'VI hạn 48: tab 3 "bạn có 48 giờ để nộp tiền"')
+            check('tối đa 48 Giờ' in page.evaluate("document.body.textContent"), 'VI hạn 48: Thể lệ "tối đa 48 Giờ"')
+            check('24 Giờ (Giúp nhân viên' in page.evaluate("document.body.textContent"), 'không đổi: "Thời gian thông báo trước: 24 Giờ" (không phải hạn nộp tiền)')
+            left = page.evaluate(LEFT24)
+            check(left == [], f'không còn chữ hạn 24 giờ ngoài vùng loại trừ ({left[:4]})')
+            page.evaluate("setTimeout(() => alert('Để sau (Nộp trong 24h)'), 0)"); page.wait_for_timeout(400)
+            check(page.dialogs and page.dialogs[-1] == 'Để sau (Nộp trong 48h)', f'hộp thoại cũng đổi số giờ ({page.dialogs[-1:]})')
+            page.evaluate("SITE_CFG = cfgClean({PAYMENT_DEADLINE_HOURS: {vi: '72'}}); applySiteConfig()"); page.wait_for_timeout(300)
+            check('slot: 72h' in page.evaluate(TXT, 'grap-program-subtitle') and page.evaluate(LEFT24) == [], 'Config đổi 48 → 72: chữ đổi theo, không còn 48')
+            page.evaluate("SITE_CFG = cfgClean({}); applySiteConfig()"); page.wait_for_timeout(300)
+            check('slot: 24h' in page.evaluate(TXT, 'grap-program-subtitle') and 'bạn có 24 giờ' in page.evaluate(TXT, 'tab3'), 'Config về trống → trả lại 24h')
+            page.evaluate("SITE_CFG = cfgClean({PAYMENT_DEADLINE_HOURS: {vi: '48'}}); applySiteConfig()")
+            page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(2500)
+            page.click('#lookup-result .btn-pay-open'); page.wait_for_timeout(1200)
+            note = page.evaluate(TXT, 'pay-addr-note')
+            check(s.lookup_addr in note and 'liên hệ trực tiếp PM phụ trách' in note and not page.evaluate("document.getElementById('pay-addr-note').hidden"),
+                  f'tab 3 nộp tiền: hiện địa chỉ của đơn + "liên hệ trực tiếp PM phụ trách" ({note[:90]!r})')
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(800)
+            qn = page.evaluate(TXT, 'quick-addr-note')
+            check(s.lookup_addr in qn and 'liên hệ trực tiếp PM phụ trách' in qn, f'cửa sổ "Nộp tiền ngay": địa chỉ + câu nhắc ({qn[:90]!r})')
+            check('Nộp trong 48h' in page.evaluate("document.querySelector('#quick-payment-modal .btn-secondary').textContent"), 'nút "Để sau (Nộp trong 48h)"')
+            page.evaluate("closeQuickPaymentModal(); switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            check('liên hệ trực tiếp PM phụ trách' in page.evaluate(TXT, 'delivery-addr-row'), 'tab 2: dòng địa chỉ ghi "liên hệ trực tiếp PM phụ trách"')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            for bad in ('1', 'abc', '200', '12.5'):
+                s = Mock(); s.public_config = h_cfg(bad)
+                ctx, page = open_page(browser, port, s); T.login(page, T.ME, settle_ms=3000)
+                check('slot: 24h' in page.evaluate(TXT, 'grap-program-subtitle') and page.evaluate('payH()') == 24, f'giá trị sai "{bad}" → giữ 24h')
+                ctx.close()
+            s = Mock(); ctx, page = open_page(browser, port, s); T.login(page, T.ME, settle_ms=3000)
+            check('slot: 24h' in page.evaluate(TXT, 'grap-program-subtitle') and 'bạn có 24 giờ' in page.evaluate(TXT, 'tab3'), 'máy chủ cũ (không có public_config): giữ 24h như cũ')
+            ctx.close()
+            # EN: dịch trước rồi mới đổi số giờ
+            s = AddrMock(my_status=T.NEW); s.public_config = h_cfg('48')
+            ctx, page = open_page(browser, port, s, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)
+            sub = page.evaluate(TXT, 'grap-program-subtitle'); tab3 = page.evaluate(TXT, 'tab3')
+            check(sub.startswith('Limit:') and sub.endswith('Slot hold: 48h'), f'EN hạn 48: dòng chương trình đã dịch + 48h ({sub!r})')
+            check('you have 48 hours to pay' in tab3 and '24 hours' not in tab3, 'EN hạn 48: tab 3 "you have 48 hours to pay"')
+            left = page.evaluate(LEFT24)
+            check(left == [], f'EN: không còn chữ hạn 24 giờ ngoài vùng loại trừ ({left[:4]})')
+            page.evaluate("setTimeout(() => confirm('Bạn có muốn quét kiểm tra các đơn hàng quá hạn giữ chỗ 24h và tự động giải phóng slot không?'), 0)"); page.wait_for_timeout(400)
+            check(page.dialogs and page.dialogs[-1] == 'Scan for reservations past 48 hours and release those slots automatically?', f'EN hộp thoại: dịch rồi đổi giờ ({page.dialogs[-1:]})')
+            page.evaluate("setTimeout(() => alert(T('Quét hoàn tất: Đã giải phóng 2 slot quá hạn 48h, nhắc nhở 1 slot sắp hết hạn.')), 0)"); page.wait_for_timeout(400)
+            check(page.dialogs[-1] == 'Scan done: released 2 slot(s) past 48h, reminded 1 slot(s) about to expire.', f'EN: thông báo quét của máy chủ (48h) vẫn dịch ({page.dialogs[-1:]})')
+            page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(2500)
+            page.click('#lookup-result .btn-pay-open'); page.wait_for_timeout(1200)
+            note = page.evaluate(TXT, 'pay-addr-note')
+            check('Delivery address:' in note and 'contact the PM in charge directly' in note and s.lookup_addr in note, f'EN: câu nhắc địa chỉ ({note[:100]!r})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # PM: đồng hồ "Còn ~Nh" và nhãn "Quá hạn" theo hạn cấu hình
+            import datetime as _dt
+            old = (_dt.datetime.now(_dt.timezone.utc) - _dt.timedelta(hours=30)).strftime('%Y-%m-%dT%H:%M:%S.000Z')
+            for hv, expect in (('48', 'Còn ~18h'), (None, 'Quá hạn 24h')):
+                s = Mock(); r5 = reg(5, 'Chờ nộp tiền', 4000000); r5['timestamp'] = old; s.pm_regs = [r5]
+                if hv: s.public_config = h_cfg(hv)
+                ctx, page = open_page(browser, port, s); T.login(page, T.PM); page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+                page.evaluate("setPMViewMode('unpaid')"); page.wait_for_timeout(800)
+                tx = page.inner_text('#pm-unpaid-table')
+                check(expect in tx and (f'Hạn chót {hv or 24}h' in tx), f'PM hạn {hv or 24}: đơn giữ 30 giờ → "{expect}", tiêu đề cột "Hạn chót {hv or 24}h" ({tx[:0]})')
+                check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+                ctx.close()
+            # Điện thoại: câu nhắc địa chỉ không tràn
+            s = AddrMock(my_status=T.NEW); s.lookup_addr = 'Căn hộ 1205 tòa S2.03 Vinhomes Ocean Park, xã Đa Tốn, huyện Gia Lâm, thành phố Hà Nội'
+            ctx, page = open_page(browser, port, s, device=ip13); T.login(page, T.ME)
+            page.evaluate("switchTab('tab3', document.getElementById('tab3-btn'))"); page.wait_for_timeout(2500)
+            page.click('#lookup-result .btn-pay-open'); page.wait_for_timeout(1200)
+            r = page.evaluate("(() => { const e = document.getElementById('pay-addr-note'), b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.right), innerWidth, e.scrollWidth <= e.clientWidth + 1, document.documentElement.scrollWidth <= innerWidth + 1]; })()")
+            check(r[0] >= 0 and r[1] <= r[2] and r[3] and r[4], f'iPhone 13: câu nhắc địa chỉ nằm trong màn hình, không vuốt ngang ({r})')
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(800)
+            r = page.evaluate("(() => { const e = document.getElementById('quick-addr-note'), b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.right), innerWidth, e.scrollWidth <= e.clientWidth + 1]; })()")
+            check(r[0] >= 0 and r[1] <= r[2] and r[3], f'iPhone 13: cửa sổ nộp tiền — câu nhắc địa chỉ không tràn ({r})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
             print('16. Máy tính 1440 px: mô tả hiện đủ, không có nút "Xem đủ"; bảng vẫn là bảng; cửa sổ nộp tiền như cũ')

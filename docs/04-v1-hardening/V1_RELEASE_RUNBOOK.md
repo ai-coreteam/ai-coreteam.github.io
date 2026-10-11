@@ -29,6 +29,7 @@
 |---|---|---|
 | Mã nguồn (web + Code.gs) | Git tag **`checkpoint-pre-v1-hardening-20261005`** (commit `5404e1a`) và nhánh **`backup/pre-v1-hardening-20261005`** | `git checkout checkpoint-pre-v1-hardening-20261005 -- Mau_Dang_Ky_Internal_Sales_3009.html apps-script/Code.gs` rồi commit; hoặc quay hẳn: `git switch main` (main chưa bị sửa) |
 | Dữ liệu Google Sheet | Bản sao **"LG Internal Sales Database - BACKUP 2026-10-05 (pre-v1-hardening) - KHONG SUA"** (ID `1WIUrSzTYxqKKtt5RbJ2bF2xZiZRVpXC_pxFdpQQ9lL4`, riêng tư) | Sao chép dữ liệu từ bản backup sang Sheet chính (không xóa Sheet chính) |
+| **v2.10.0 — hạn nộp tiền theo Config (`PAYMENT_DEADLINE_HOURS`), nhắc đổi địa chỉ ở bước nộp tiền** (11/10/2026) | Điểm quay lại web: tag **`v2.9.0`**. Apps Script: **Version 11** = `Code.gs` bản tag **`v2.10.0`** (gồm cả phần v2.9.0; chủ dự án deploy theo §3c); quay lại **Version 10**. Sheet: chỉ sửa mô tả ô C3 tab `Config` | **Quay lại web:** `git checkout v2.9.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/` → commit → `git pull --ff-only gobita main` → `git push all main`. Ô `PAYMENT_DEADLINE_HOURS` để **24** thì máy chủ / web chạy y như cũ |
 | **v2.9.0 — nội dung từ tab Config, địa chỉ nhận hàng, hạn mức theo chương trình** (11/10/2026) | Điểm quay lại web: tag **`v2.8.0`**. Apps Script: **Version 11** (chủ dự án deploy theo §3c); quay lại **Version 10**. Tab `Config` 11/10: thêm cột D + 13 dòng (giá trị = nội dung web đang hiện); 8 dòng cũ: chỉ đổi mô tả, `BANK_ACC` sang dạng chữ `0991000012525`, `BANK_HOLDER` có dấu | **Quay lại web:** `git checkout v2.8.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/` → commit → `git pull --ff-only gobita main` → `git push all main`. Web v2.8.0 không đọc Config nên không cần đổi Sheet |
 | **v2.8.0 — Đợt 3 (PM điện thoại), nút Docs + thư mục `guides/`, sửa bản dịch EN** (11/10/2026) | Điểm quay lại: Git tag **`v2.7.0`**. Apps Script **không đổi** (Version 10) | **Quay lại v2.7.0:** `git checkout v2.7.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/` → commit → `git pull --ff-only gobita main` → `git push all main` → kiểm md5. Muốn gỡ riêng bộ hướng dẫn khỏi web: xoá thư mục `guides/` rồi push (lưu ý: nút Docs vẫn còn, 2 link trong cửa sổ sẽ báo 404 — nên quay lại v2.7.0 thay vì chỉ xoá thư mục) |
 | **v2.7.0 — điện thoại Đợt 2: bảng → thẻ, cửa sổ nộp tiền toàn màn hình, mô tả 2 dòng** (11/10/2026) | Điểm quay lại: Git tag **`v2.6.0`**. Apps Script **không đổi** (Version 10) | **Quay lại v2.6.0 (khoảng 2 phút):** `git checkout v2.6.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/en.js assets/i18n/en_source.json` → commit → `git pull --ff-only gobita main` → `git push all main` → kiểm md5 `portal.html` trên web. Quay xa hơn: `v2.5.0`, `v2.4.1` |
@@ -137,23 +138,25 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 
 Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet tự đổi chuỗi `0991000012525` thành số khi `setupNewDatabase()` ghi). Code **không đọc** các ô `BANK_*`; nhân viên thấy số **đầy đủ `0991000012525`** ở ô 01, cửa sổ nộp tiền, mã VietQR (`970436-0991000012525`) và email — đã kiểm chứng trên `portal.html` 05/10. Muốn ô trong Sheet cũng đúng: gõ lại `'0991000012525` (có dấu nháy đơn ở đầu).
 
-### 3c. Deploy Apps Script **Version 11** (v2.9.0 — nội dung web lấy từ tab Config) — chủ dự án làm, **trước 17:00 ngày 13/10**
+### 3c. Deploy Apps Script **Version 11** (v2.9.0 + v2.10.0 — nội dung web và hạn nộp tiền lấy từ tab Config) — chủ dự án làm, **trước 17:00 ngày 13/10**
 
-Web v2.9.0 **chạy được với Version 10** (dùng nội dung mặc định, giống hệt hiện nay). Chỉ sau khi deploy Version 11 thì sửa tab `Config` mới làm web đổi theo.
-Version 11 chỉ **thêm** 1 lệnh đọc (`public_config`); không đổi lệnh nào đang chạy (giữ chỗ, nộp tiền, duyệt, hết hạn…).
+Web v2.9.0 / v2.10.0 **chạy được với Version 10** (dùng nội dung mặc định và hạn 24 giờ, giống hệt hiện nay). Chỉ sau khi deploy Version 11 thì sửa tab `Config` mới làm web / máy chủ đổi theo.
+Version 11 (= `Code.gs` tag **`v2.10.0`**) so với Version 10: (1) **thêm** lệnh đọc `public_config` (17 key, có `PAYMENT_DEADLINE_HOURS`); (2) **watchdog hết hạn + email** đọc hạn từ ô `PAYMENT_DEADLINE_HOURS` (số nguyên 2–168; trống / sai → 24; nhắc trước 2 giờ) — ô = **24** thì chạy **y như Version 10**; (3) `lookup` trả thêm `address` **chỉ khi đã đăng nhập** (bước nộp tiền hiện địa chỉ của đơn). Không đổi giữ chỗ, nộp tiền, duyệt, hủy.
 
 | # | Việc | Chi tiết | Kiểm tra |
 |---|---|---|---|
 | 1 | Ghi lại Version đang chạy | Deploy → Manage deployments | Đang là **Version 10** |
-| 2 | Dán toàn bộ `apps-script/Code.gs` (bản tag `v2.9.0`) vào dự án Apps Script **đang chạy** → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
+| 2 | Dán toàn bộ `apps-script/Code.gs` (bản tag **`v2.10.0`**) vào dự án Apps Script **đang chạy** → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
 | 3 | **KHÔNG** chạy `rotateSessionSecret`, **KHÔNG** chạy `setupWatchdogTrigger` | Chạy `rotateSessionSecret` = đăng xuất mọi người; đồng hồ quét đã cài | — |
 | 4 | Deploy phiên bản mới trên deployment cũ | Manage deployments → ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
 | 5 | Kiểm tra (chỉ đọc) | Mở `<URL /exec>?action=public_config` trên trình duyệt | Thấy `"ok":true,"config":{"BANK_ACC":{"vi":"0991000012525"…` |
 | 6 | Kiểm tra trên web | Sửa ô `ANNOUNCEMENT` (tab Config, cột B) thành "Thử" → chờ ~6 phút → tải lại `portal.html` → thấy dòng "Thử" đầu trang → **xóa ô** | Dòng thông báo hiện rồi ẩn |
-| **Quay lại** | Manage deployments → ✏️ Edit → chọn **Version 10** → Deploy | Web tự quay về nội dung mặc định | — |
+| 7 | Kiểm tra hạn nộp tiền (chỉ đọc) | Ô `PAYMENT_DEADLINE_HOURS` (tab Config, B3) = **24** — giữ nguyên trừ khi chủ dự án quyết đổi | `?action=public_config` có `"PAYMENT_DEADLINE_HOURS":{"vi":"24"` |
+| **Quay lại** | Manage deployments → ✏️ Edit → chọn **Version 10** → Deploy | Web tự quay về nội dung mặc định, hạn 24 giờ | — |
 
 **ADMIN sửa nội dung (sau khi có Version 11):** tab `Config`, cột B = tiếng Việt, cột D = tiếng Anh (trống → web dùng tiếng Việt). Mỗi dòng có cột C mô tả chỗ hiện trên web. Web đổi sau tối đa ~6 phút.
-Ô sai dạng (số tài khoản có chữ, BIN không đủ 6 số, email thiếu @, cú pháp thiếu `{EMP}` / `{SLOT}`) → web **bỏ qua ô đó** và dùng giá trị mặc định. Số tài khoản: gõ `'0991000012525` (dấu `'` giữ số 0 đầu).
+Ô sai dạng (số tài khoản có chữ, BIN không đủ 6 số, email thiếu @, cú pháp thiếu `{EMP}` / `{SLOT}`, hạn không phải số nguyên 2–168) → web **bỏ qua ô đó** và dùng giá trị mặc định.
+**Đổi hạn nộp tiền** (`PAYMENT_DEADLINE_HOURS`): áp dụng **ngay cho mọi đơn đang chờ nộp** ở lượt quét kế tiếp (máy chủ đọc lại Config sau ≤ 5 phút) — giảm hạn có thể hủy đơn đang chờ → chỉ đổi **trước khi mở cổng thanh toán**. Email đã gửi trước đó vẫn ghi hạn cũ. Số tài khoản: gõ `'0991000012525` (dấu `'` giữ số 0 đầu).
 
 ### 3b. Danh mục cài đặt một lần (đối chiếu toàn bộ `Code.gs` ngày 05/10/2026)
 

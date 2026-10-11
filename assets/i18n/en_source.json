@@ -1137,7 +1137,8 @@
   "Lưu & tiếp tục giữ chỗ": "Save & continue reserving",
   "Bạn đang giữ chỗ:": "You are reserving:",
   "Sửa": "Edit",
-  "Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ PM.": "Used for your next reservation. To change the address of an order you already hold, contact the PM.",
+  "Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.": "Used for your next reservation. To change the address of an order you already hold, contact the PM in charge directly.",
+  "Muốn đổi địa chỉ nhận hàng: liên hệ trực tiếp PM phụ trách.": "To change the delivery address, contact the PM in charge directly.",
   "Chưa có địa chỉ nhận hàng — cần khi giữ chỗ.": "No delivery address yet — needed to reserve.",
   "Thêm địa chỉ": "Add address",
   "Thêm trước giờ mở bán để giữ chỗ nhanh hơn.": "Add it before the sale opens to reserve faster.",
@@ -1602,8 +1603,8 @@
    "Order rejected and slot $1 reopened."
   ],
   [
-   "^Quét hoàn tất: Đã giải phóng (\\d+) slot quá hạn 24h, nhắc nhở (\\d+) slot sắp hết hạn\\.$",
-   "Scan done: released $1 slot(s) past 24h, reminded $2 slot(s) about to expire."
+   "^Quét hoàn tất: Đã giải phóng (\\d+) slot quá hạn (\\d+)h, nhắc nhở (\\d+) slot sắp hết hạn\\.$",
+   "Scan done: released $1 slot(s) past $2h, reminded $3 slot(s) about to expire."
   ],
   [
    "^Slot (\\S+) đã có người đăng ký trước\\. Vui lòng chọn slot khác\\.$",
