@@ -1083,6 +1083,9 @@
   "mục 7 và 8": "fields 7 and 8",
   "ô 7 và 8": "fields 7 and 8",
   "Mục 6:": "Field 6:",
+  "Mục 6": "Field 6",
+  "Tự động điền thành công từ biên lai:": "Filled in automatically from the receipt:",
+  "(Vui lòng đối chiếu với ảnh chụp)": "(Please check against the image)",
   "Bạn chưa chọn sản phẩm.": "You have not chosen a product.",
   "Vui lòng bấm vào một thẻ sản phẩm ở Bước 1 rồi Gửi lại.": "Please click a product card in Step 1, then Send again.",
   "Nhiều người đang gửi cùng lúc…": "Many people are sending at once…",
@@ -1945,6 +1948,18 @@
   [
    "^Đang phân tích dữ liệu biên lai \\((\\d+)%\\)…$",
    "Reading the receipt ($1%)…"
+  ],
+  [
+   "^(Mã giao dịch|Ngày giờ|Mục [678]): (.+?), (Mã giao dịch|Ngày giờ|Mục [678]): (.+?), (Mã giao dịch|Ngày giờ|Mục [678]): (.+)\\.$",
+   "$T1: $2, $T3: $4, $T5: $6."
+  ],
+  [
+   "^(Mã giao dịch|Ngày giờ|Mục [678]): (.+?), (Mã giao dịch|Ngày giờ|Mục [678]): (.+)\\.$",
+   "$T1: $2, $T3: $4."
+  ],
+  [
+   "^(Mã giao dịch|Ngày giờ|Mục [678]): (.+)\\.$",
+   "$T1: $2."
   ],
   [
    "^Đã tải ảnh biên lai\\. Không nhận diện được rõ mã giao dịch, vui lòng điền tay (.+)\\.$",

@@ -89,7 +89,7 @@ Internal sales platform/
 │   ├── i18n_build.py · i18n_collect.py      # Dựng từ điển EN · quét chữ tiếng Việt còn sót (phải = 0)
 │   ├── build_product_links.py               # Bảng link LG.com (GitHub Actions thứ Hai 08:00)
 │   └── mobile_audit.py · generate_mockup_10_models.js
-├── tests/                                   # backend_gas_harness.js · cloud_mode_regression.py · v25_phone_fixes_test.py
+├── tests/                                   # backend_gas_harness.js · cloud_mode_regression.py · v25_phone_fixes_test.py · guides_browser_check.py (hướng dẫn trên điện thoại + nhận diện LG + chống "tự làm tối")
 │                                            # run_e2e_tests.js · staging_smoke_test.py · polling_race_simulation.py
 ├── docs/
 │   ├── CURRENT_STATE.md                     # [ĐỌC TRƯỚC] Trạng thái hiện hành — nguồn chuẩn duy nhất

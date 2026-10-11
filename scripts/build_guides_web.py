@@ -72,7 +72,8 @@ def main():
                 h = h.replace(f'href="{other.format(l=o)}"', f'href="{role}_{o}.html"')   # nút đổi ngôn ngữ trong slide
                 if re.search(r'["\'(](assets/)?brand/', h): fail(f'{kind}/{role}_{l}: còn đường dẫn brand chưa đổi')
                 if h.count(FIT_OLD) != 1 or h.count('</head>') != 1: fail(f'{kind}/{role}_{l}: mẫu trang khác dự kiến (fit / </head>) — kiểm lại trước khi chèn CSS điện thoại')
-                h = h.replace(FIT_OLD, FIT_NEW).replace('</head>', '<link rel="stylesheet" href="../mobile.css">\n</head>')
+                h = h.replace(FIT_OLD, FIT_NEW).replace('</head>', '<meta name="color-scheme" content="only light">\n<link rel="stylesheet" href="../mobile.css">\n</head>')
+                # v2.10.2: color-scheme only light = chặn "tự làm tối trang web" của Cốc Cốc / trình duyệt Android khác (đổi màu chữ, logo → sai BI)
                 h = h.replace('within 24 h<', 'within 24\u00a0h<')                 # điện thoại: không để "h" rơi xuống dòng riêng
                 open(os.path.join(OUT, kind, f'{role}_{l}.html'), 'w', encoding='utf-8').write(h); n += 1
     open(os.path.join(OUT, 'README.md'), 'w', encoding='utf-8').write(
