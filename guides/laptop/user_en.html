@@ -98,6 +98,7 @@ body.present .lg-canvas{position:fixed;left:50%;top:50%;margin:0;box-shadow:none
 body.present .lg-canvas.is-live{visibility:visible}
 @media print{.bar,.hint{display:none}}
 </style>
+<link rel="stylesheet" href="../mobile.css">
 </head>
 <body>
 <div class="bar" data-noexport><button type="button" id="btn-present">⛶ Present</button><a href="user_vi.html">Tiếng Việt</a></div>
@@ -125,7 +126,7 @@ body.present .lg-canvas.is-live{visibility:visible}
     <img class="lg-logo lg-logo--upper-left" src="../brand/LGE_Logo_HeritageRed_Grey_RGB.png" alt="LG">
     <div class="wrap wrap--full"><div><p class="eyebrow">Life of an order</p>
       <h2 class="secttl">Four steps, four statuses.</h2></div>
-      <div class="flow"><div class="fl"><span></span><em>01</em><b>Reserve</b><p>Employee</p><code>Registered - Waiting for payment</code></div><div class="fl"><span></span><em>02</em><b>Open payment</b><p>PM</p><code>Awaiting payment</code></div><div class="fl"><span></span><em>03</em><b>Pay + receipt</b><p>Employee · within 24 h</p><code>Paid - under review</code></div><div class="fl"><span></span><em>04</em><b>Review &amp; approve</b><p>PM</p><code>Payment approved</code></div></div>
+      <div class="flow"><div class="fl"><span></span><em>01</em><b>Reserve</b><p>Employee</p><code>Registered - Waiting for payment</code></div><div class="fl"><span></span><em>02</em><b>Open payment</b><p>PM</p><code>Awaiting payment</code></div><div class="fl"><span></span><em>03</em><b>Pay + receipt</b><p>Employee · within 24 h</p><code>Paid - under review</code></div><div class="fl"><span></span><em>04</em><b>Review &amp; approve</b><p>PM</p><code>Payment approved</code></div></div>
       <p class="sub" style="margin:0">Each employee holds 1 item at most. First come, first served (FCFS).</p></div>
     <p class="note">Grey labels are the statuses you see on screen.</p><div class="pager">03 / 31</div></div></div>
 <div class="lg-canvas lg-dark" id="s4"><div class="lg-layer">
@@ -363,7 +364,7 @@ After cancelling, the slot goes back to stock for other colleagues.</p></div></d
   let i = 0;
   function fit() {
     const r = document.documentElement.style;
-    r.setProperty('--fit-page', (innerWidth >= 1920 ? 1 : (innerWidth - 32) / 1920).toFixed(4));
+    const cw = document.documentElement.clientWidth || innerWidth; r.setProperty('--fit-page', (cw >= 1920 ? 1 : (cw - 32) / 1920).toFixed(4));
     r.setProperty('--fit', Math.min(innerWidth / 1920, innerHeight / 1080).toFixed(4));
   }
   function show(n) {

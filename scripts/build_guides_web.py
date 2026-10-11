@@ -9,6 +9,9 @@ Nguồn (chỉ có trên máy, dựng bằng skill smart-image-guideline-creator
     guides/laptop/{user,pm,admin}_{vi,en}.html + assets/{vi,en}/*.webp
     guides/phone/{user,pm,admin}_{vi,en}.html  + shots/{vi,en}/*.webp + media/
 Web mở: guides/<laptop|phone>/<vai trò>_<ngôn ngữ>.html (openDocsModal). Ảnh chỉ có dữ liệu mẫu.
+Điện thoại (v2.10.1, 11/10/2026): mỗi trang được chèn guides/mobile.css (nguồn scripts/guides_mobile.css: < 1024 px → slide
+thành thẻ dọc, chữ đọc được) và sửa độ rộng thu nhỏ slide: innerWidth → clientWidth (Android Chrome tự thu nhỏ trang khi
+slide 1920 px tràn → innerWidth phình ra → slide lệch trái, bị cắt chữ). Nguồn docs/05, docs/06 và skill KHÔNG đổi.
 
     python3 scripts/build_guides_web.py
 """
@@ -23,6 +26,9 @@ ROLE_FILES = {   # vai trò → (file bộ máy tính, file bộ điện thoại
     'user': ('guide_user_{l}.html', 'guide_phone_user_{l}.html'),
     'pm': ('guide_pm_{l}.html', 'guide_phone_pm_{l}.html'),
 }
+MOBILE_CSS = os.path.join(ROOT, 'scripts/guides_mobile.css')
+FIT_OLD = "r.setProperty('--fit-page', (innerWidth >= 1920 ? 1 : (innerWidth - 32) / 1920).toFixed(4));"
+FIT_NEW = "const cw = document.documentElement.clientWidth || innerWidth; r.setProperty('--fit-page', (cw >= 1920 ? 1 : (cw - 32) / 1920).toFixed(4));"
 BRAND = ['LGEIHeadline-Regular.otf', 'LGEIHeadline-Semibold.otf', 'LGEIText-Bold.otf', 'LGEIText-Regular.otf', 'LGEIText-SemiBold.otf',
          'LGE_Logo_HeritageRed_Grey_RGB.png', 'LGE_Logo_HeritageRed_White_RGB.png', 'LGE_Electronics_Gradient_01_RGB.jpg',
          'LGE_Electronics_Slogan_Horizontal_Mono_ActiveRed_RGB.png']
@@ -50,6 +56,7 @@ def main():
         copy_tree(os.path.join(LAP, 'assets', l), os.path.join(OUT, 'laptop/assets', l), ('.webp',))
         copy_tree(os.path.join(PHO, 'shots', l), os.path.join(OUT, 'phone/shots', l), ('.webp',))
     copy_tree(os.path.join(PHO, 'media'), os.path.join(OUT, 'phone/media'), ('.png', '.jpg', '.webp'))
+    shutil.copy2(MOBILE_CSS, os.path.join(OUT, 'mobile.css'))
     n = 0
     for role, (lap, pho) in ROLE_FILES.items():
         for l in ('vi', 'en'):
@@ -64,6 +71,9 @@ def main():
                     h = re.sub(r'(["(])brand/', r'\1../brand/', h)                  # ảnh: shots/<lang>/, media/ giữ nguyên
                 h = h.replace(f'href="{other.format(l=o)}"', f'href="{role}_{o}.html"')   # nút đổi ngôn ngữ trong slide
                 if re.search(r'["\'(](assets/)?brand/', h): fail(f'{kind}/{role}_{l}: còn đường dẫn brand chưa đổi')
+                if h.count(FIT_OLD) != 1 or h.count('</head>') != 1: fail(f'{kind}/{role}_{l}: mẫu trang khác dự kiến (fit / </head>) — kiểm lại trước khi chèn CSS điện thoại')
+                h = h.replace(FIT_OLD, FIT_NEW).replace('</head>', '<link rel="stylesheet" href="../mobile.css">\n</head>')
+                h = h.replace('within 24 h<', 'within 24\u00a0h<')                 # điện thoại: không để "h" rơi xuống dòng riêng
                 open(os.path.join(OUT, kind, f'{role}_{l}.html'), 'w', encoding='utf-8').write(h); n += 1
     open(os.path.join(OUT, 'README.md'), 'w', encoding='utf-8').write(
         '# Bộ hướng dẫn bằng hình (nút "Docs" trên web)\n\nSINH TỰ ĐỘNG bằng `python3 scripts/build_guides_web.py` — không sửa tay.\n'

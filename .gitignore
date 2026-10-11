@@ -40,8 +40,19 @@ __pycache__/
 # Bản production sinh tự động khi chạy test
 .portal_regression_test.html
 
-# Ảnh chụp thật trên điện thoại (có tên người / dữ liệu thật) — không đưa lên repo công khai
-Phone test (Android)/
+# Ảnh / phản hồi chụp trên điện thoại thật (có tên người / dữ liệu thật) — chỉ trên máy, không đưa lên repo công khai.
+# 11/10/2026: gom vào feedback/<ngày>_<thiết bị>_<chủ đề>/ (trước đây: "Phone test (Android)/" ở thư mục gốc). Chỉ commit feedback/README.md.
+feedback/*
+!feedback/README.md
+
+# Nguồn bộ hướng dẫn bằng hình — chỉ trên máy (font/logo LG bản quyền, ảnh gốc). Bản công khai = guides/ (scripts/build_guides_web.py)
+docs/05-visual-guide/
+docs/06-visual-guide-phone/
+
+# File tạm do test / so sánh sinh ra ở thư mục gốc
+.portal_v25_test.html
+.v2*_baseline.html
+.guide_portal_*.html
 
 # Tài nguyên thương hiệu LG (font LG EI bản quyền nội bộ LGE, logo, slogan, gradient) — không đưa lên kho công khai
 docs/05-visual-guide/assets/brand/

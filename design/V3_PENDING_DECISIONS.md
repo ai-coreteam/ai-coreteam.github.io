@@ -12,7 +12,7 @@
 | Chốt v2 | Tag `v2-final`; `docs/CURRENT_STATE.md` cập nhật 07/10 | git, `docs/CURRENT_STATE.md` |
 | Giả lập điện thoại | iPhone 13 (390×664) + Galaxy S8 (360×740), 22 màn hình, có số đo | `design/v3/mobile_audit/`, `scripts/mobile_audit.py` |
 | Báo cáo giao diện điện thoại | 10 phát hiện của Nhân viên (N1–N10), 3 phát hiện của PM (P1–P3), đề xuất A1–A5 / B1–B4 / C1–C3 | `design/UI_V3_MOBILE_AUDIT.md` §0–§6 |
-| Đối chiếu bằng ảnh thật Android | 22 ảnh: xác nhận 9/11 phát hiện, sửa lại 1, chưa kiểm 1; phát hiện thêm **3 lỗi số liệu (R1–R3)** và **5 điểm mù giao diện (R4–R9)** | `design/UI_V3_MOBILE_AUDIT.md` §7 · ảnh gốc + ảnh ghép chỉ có trên máy: `Phone test (Android)/` và `…/_evidence/` (**không commit**: có dữ liệu cá nhân; đã thêm vào `.gitignore`) |
+| Đối chiếu bằng ảnh thật Android | 22 ảnh: xác nhận 9/11 phát hiện, sửa lại 1, chưa kiểm 1; phát hiện thêm **3 lỗi số liệu (R1–R3)** và **5 điểm mù giao diện (R4–R9)** | `design/UI_V3_MOBILE_AUDIT.md` §7 · ảnh gốc + ảnh ghép chỉ có trên máy: `feedback/2026-10-07_android_portal-test/` và `…/_evidence/` (**không commit**: có dữ liệu cá nhân; đã thêm vào `.gitignore`) |
 | Trả lời "điện thoại có ảnh hưởng máy tính không" | Không, ngoại trừ 2 trường hợp (§3) | trang này |
 
 ---

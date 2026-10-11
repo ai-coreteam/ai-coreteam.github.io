@@ -1,0 +1,70 @@
+/* Bộ hướng dẫn (nút "Docs") trên điện thoại / máy tính bảng dọc — v2.10.1, 11/10/2026, chủ dự án yêu cầu.
+   Chèn vào cả 12 trang guides/ bởi scripts/build_guides_web.py (KHÔNG sửa tay guides/mobile.css).
+   Lỗi cũ: slide cố định 1920×1080 thu nhỏ bằng `zoom` → Android Chrome tự thu nhỏ trang, slide lệch trái, chữ bị cắt;
+   kể cả khi vừa màn hình, chữ chỉ còn ~4 px. Cách sửa: màn hình < 1024 px (chế độ cuộn) → mỗi slide thành 1 thẻ dọc
+   rộng 100% (chữ trên, ảnh dưới). Thang chữ = LG.com bản mobile (lg-brand references/web-system.md: lề 16 px,
+   Title 24–36 px, chữ thân 16 px); logo cao 32 px (BI tối thiểu 16 px). Màu, font, logo, nền gradient giữ nguyên.
+   Chế độ "Present" (toàn màn hình) và màn hình ≥ 1024 px: không đổi. */
+@media (max-width: 1023.98px) {
+  body:not(.present) .hint { display: none; }
+  /* thanh nút = dải dính trên cùng, nền tối: luôn bấm được Present / đổi ngôn ngữ mà không đè lên chữ của slide */
+  body:not(.present) .bar { position: sticky; top: 0; right: auto; justify-content: flex-end; padding: 10px 12px; background: inherit; }
+  body:not(.present) .deck { align-items: stretch; gap: 16px; padding: 4px 12px 24px; }
+  body:not(.present) .lg-canvas {
+    --margin: 16px; --gutter: 10px;
+    width: auto; height: auto; zoom: 1; box-shadow: none; border-radius: 4px; scroll-margin-top: 64px;
+  }
+  body:not(.present) .lg-layer { position: relative; inset: auto; padding: 16px 16px 14px; }
+  body:not(.present) .lg-logo { position: static; height: 32px; margin-bottom: 18px; }
+  body:not(.present) .lg-slogan { position: static; height: 26px; margin: 20px 0 0 auto; }
+  body:not(.present) .wrap {
+    position: static; display: grid; gap: 16px; align-items: start; align-content: start;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  body:not(.present) .cover .lg-layer, body:not(.present) .lg-canvas:has(.lg-gradient) .lg-layer { min-height: 62vh; }
+  body:not(.present) .lg-dark .lg-layer { min-height: 30vh; }
+  body:not(.present) h1 { font-size: 36px; line-height: 1.1; }
+  body:not(.present) .h1d { font-size: 32px; }
+  body:not(.present) .h1link { font-size: 26px; white-space: normal; overflow-wrap: anywhere; }
+  body:not(.present) .secttl { font-size: 24px; line-height: 1.17; }
+  body:not(.present) .eyebrow { font-size: 12px; margin-bottom: 8px; }
+  body:not(.present) .rule { width: 48px; height: 4px; margin-bottom: 16px; }
+  body:not(.present) .sub { font-size: 16px; line-height: 1.5; margin-top: 12px; }
+  body:not(.present) .pager { position: absolute; top: 24px; right: 16px !important; bottom: auto; left: auto !important; font-size: 12px; }
+  body:not(.present) .note { position: static; max-width: none; margin-top: 14px; font-size: 12px; }
+  body:not(.present) .note:empty, body:not(.present) .sub:empty { display: none; }
+  body:not(.present) .txt { gap: 14px; overflow: visible; }
+  body:not(.present) .steps { gap: 12px; }
+  body:not(.present) .steps li { grid-template-columns: 26px minmax(0, 1fr); gap: 10px; font-size: 16px; line-height: 1.45; }
+  body:not(.present) .steps b { width: 26px; height: 26px; margin-top: -1px; font-size: 13px; }
+  body:not(.present) .dlg { padding: 12px 14px; border-radius: 8px; }
+  body:not(.present) .dlg-k { font-size: 12px; margin-bottom: 6px; }
+  body:not(.present) .dlg-t { font-size: 14px; }
+  body:not(.present) .warn { border-left-width: 4px; padding: 10px 12px; font-size: 14px; }
+  body:not(.present) .fig { gap: 12px; flex-wrap: wrap; }
+  body:not(.present) .frame { border-radius: 8px; box-shadow: 0 6px 18px rgba(38,38,38,.12); }
+  body:not(.present) .frame img, body:not(.present) .frame--phone img { max-height: 72vh; border-radius: 8px; }
+  body:not(.present) .frame--half img { max-height: 48vh; }
+  body:not(.present) .hl { border-width: 2px; border-radius: 6px; margin: -3px 0 0 -3px; padding: 3px; }
+  body:not(.present) .hl i { left: -11px; top: -11px; width: 22px; height: 22px; font-size: 12px; }
+  body:not(.present) .tiles { gap: 10px; }
+  body:not(.present) .tile { padding: 14px 14px 16px; }
+  body:not(.present) .tile span { font-size: 14px; margin-bottom: 6px; }
+  body:not(.present) .tile b { font-size: 18px; }
+  body:not(.present) .tile p { font-size: 14px; margin-top: 6px; }
+  body:not(.present) .flow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 10px; margin: 16px 0 0; }
+  body:not(.present) .fl { padding: 14px 12px 14px; }
+  body:not(.present) .fl span { height: 4px; margin: -14px -12px 12px; }
+  body:not(.present) .fl em { font-size: 14px; }
+  body:not(.present) .fl b { font-size: 17px; margin: 6px 0 4px; }
+  body:not(.present) .fl p { font-size: 13px; margin-bottom: 8px; }
+  body:not(.present) .fl code { font-size: 12px; padding: 4px 8px; white-space: normal; }
+  body:not(.present) .qr { justify-self: start; padding: 10px; }
+  body:not(.present) .qr img { width: 160px; height: 160px; }
+}
+/* Điện thoại xoay ngang / màn hình thấp: slide có ảnh chia 2 cột (chữ trái, ảnh phải) để ảnh cao gần hết màn hình */
+@media (max-width: 1023.98px) and (min-width: 600px) and (orientation: landscape) {
+  body:not(.present) .wrap--shot { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) !important; align-items: start; }
+  body:not(.present) .frame img, body:not(.present) .frame--phone img { max-height: 86vh; }
+  body:not(.present) .frame--half img { max-height: 60vh; }
+}

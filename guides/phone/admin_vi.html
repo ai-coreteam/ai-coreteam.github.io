@@ -103,6 +103,7 @@ body.present .lg-canvas{position:fixed;left:50%;top:50%;margin:0;box-shadow:none
 body.present .lg-canvas.is-live{visibility:visible}
 @media print{.bar,.hint{display:none}}
 </style>
+<link rel="stylesheet" href="../mobile.css">
 </head>
 <body>
 <div class="bar" data-noexport><button type="button" id="btn-present">⛶ Trình chiếu</button><a href="admin_en.html">English</a></div>
@@ -316,7 +317,7 @@ Sau khi duyệt, hồ sơ sẽ đủ điều kiện xuất danh sách giao hàng
   let i = 0;
   function fit() {
     const r = document.documentElement.style;
-    r.setProperty('--fit-page', (innerWidth >= 1920 ? 1 : (innerWidth - 32) / 1920).toFixed(4));
+    const cw = document.documentElement.clientWidth || innerWidth; r.setProperty('--fit-page', (cw >= 1920 ? 1 : (cw - 32) / 1920).toFixed(4));
     r.setProperty('--fit', Math.min(innerWidth / 1920, innerHeight / 1080).toFixed(4));
   }
   function show(n) {

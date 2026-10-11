@@ -153,9 +153,9 @@ flowchart LR
 ## 7. Kiểm chứng bằng ảnh chụp thật trên Android (07/10/2026)
 
 **Nguồn:** 22 ảnh do chủ dự án chụp trên điện thoại Android (Chrome, ảnh 1200×2640, tỷ lệ 20:9).
-- Thư mục `Phone test (Android)/`: User view 11 ảnh, Admin & PM view 11 ảnh, trong đó 2 ảnh trùng nhau ở cả 2 thư mục.
+- Thư mục `feedback/2026-10-07_android_portal-test/`: User view 11 ảnh, Admin & PM view 11 ảnh, trong đó 2 ảnh trùng nhau ở cả 2 thư mục.
 - Dữ liệu thật: 2 chương trình, chương trình đang xem có 6 slot **đã hết hàng**, tài khoản ADMIN "PM Quản trị".
-- **Ảnh có tên người, số điện thoại và dữ liệu thật, nên không commit lên repo công khai.** Ảnh ghép bằng chứng nằm ở `Phone test (Android)/_evidence/` (chỉ có trên máy).
+- **Ảnh có tên người, số điện thoại và dữ liệu thật, nên không commit lên repo công khai.** Ảnh ghép bằng chứng nằm ở `feedback/2026-10-07_android_portal-test/_evidence/` (chỉ có trên máy).
 
 ### 7.1 Đối chiếu phát hiện của giả lập với máy thật
 | Phát hiện (§3) | Trên Android thật | Ảnh |

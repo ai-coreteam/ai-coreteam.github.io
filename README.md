@@ -63,57 +63,48 @@ graph TD
 
 ## 2. Kiến trúc & Cấu trúc thư mục chuẩn hóa (Repository Structure)
 
-Toàn bộ repository được tổ chức khoa học, gọn gàng, tách biệt mã nguồn, tài sản thương hiệu và hệ thống tài liệu:
+Sơ đồ cập nhật 11/10/2026 (v2.10.1). **Đưa lên GitHub** = mọi thứ trừ các mục ghi "(chỉ trên máy)". Không đổi tên / chuyển chỗ
+`portal.html`, `index.html`, `guides/`, `assets/` — đó là đường dẫn đang chạy trên web.
 
 ```text
-lg-internal-sales-portal/
-├── index.html                               # Cổng điều hướng tự động vào ứng dụng mới nhất
-├── Mau_Dang_Ky_Internal_Sales_3009.html     # Ứng dụng Web lõi (Production Single-File System)
-├── apps-script/
-│   └── Code.gs                              # Backend Google Apps Script (1-Click setupNewDatabase, Auth, FCFS)
-├── assets/                                  # Thư mục tài nguyên có thể tùy biến cấu hình (Xem assets/README.md)
-│   ├── README.md                            # Cẩm nang tổng quan phân mục tài nguyên hệ thống
-│   ├── branding/                            # Bộ nhận diện thương hiệu LG (Digital Logo Play)
-│   ├── content/                             # Cấu hình tài khoản ngân hàng & dữ liệu hệ thống
-│   │   ├── bank_accounts.json               # Số tài khoản VCB/TCB, tên thụ hưởng, cú pháp
-│   │   ├── system_config.json               # Phân quyền, chương trình mặc định, hạn mức
-│   │   └── README.md                        # Hướng dẫn chỉnh sửa nội dung
-│   ├── digital-logo-play/                   # Ảnh động LG Digital Logo Play chuẩn nhận diện
-│   ├── images/                              # Banner showcase & biểu tượng chuyển động
-│   │   ├── lg_hero_banner.jpg               # Banner showcase sản phẩm cao cấp
-│   │   └── quick-links-ani/                 # [MỚI] Bộ Motion Icons & Kinetic SVG Suite chuẩn LG.com
-│   │       ├── *.gif                        # Hoạt ảnh GIF chính thức trích xuất từ CDN LG.com
-│   │       ├── *.svg                        # Biểu tượng vector động học có CSS keyframes nhúng sẵn
-│   │       └── README.md                    # Cẩm nang kỹ thuật & SOP thay thế icon hot-swapping
-│   └── templates/                           # Thư viện tệp mẫu chuẩn hệ thống
-│       ├── Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx # Mẫu Excel nạp danh mục sản phẩm cho PM
-│       ├── LG_Internal_Sales_Master_Database.xlsx    # Bảng tính cơ sở dữ liệu mẫu 8 sheets
-│       └── README.md                        # Hướng dẫn định dạng cột và công thức
-├── data/                                    # Thư viện runtime nhúng cục bộ
-│   ├── heic2any.min.js                      # Bộ giải mã ảnh iPhone (.HEIC) sang JPEG
-│   ├── xlsx.mini.min.js                     # SheetJS client-side xử lý Excel không cần server
-│   ├── LG_Internal_Sales_Database.xlsx      # Database cục bộ đồng bộ
-│   └── Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx # File mẫu sẵn sàng tải xuống
-├── docs/                                    # Hệ thống tài liệu kỹ thuật & cẩm nang vận hành
-│   ├── 01-setup-and-deployment/             # Hướng dẫn clone GitHub, cài đặt và cloud setup
-│   │   ├── GIT_CONFIGURATION_AND_HANDOVER.md # [CẨM NANG GIT & BÀN GIAO PIC] Cấu hình kép & chuyển giao
-│   │   ├── AGENT_GUIDE_AUTO_SETUP_SHEET.md  # [CẨM NANG AGENT & PIC] Tạo CSDL riêng 1-Click
-│   │   ├── GITHUB_CLONE_AND_LOCAL_SETUP.md  # [HƯỚNG DẪN CLONE & THIẾT LẬP CHI TIẾT]
-│   │   ├── SETUP_APPS_SCRIPT.md             # Hướng dẫn triển khai Apps Script Backend
-│   │   └── USERS_SHEET_TEMPLATE.md          # Đặc tả định dạng bảng tính Google Sheets
-│   ├── 02-user-and-pm-guide/                # Cẩm nang quy trình cho Người dùng & Quản trị viên
-│   │   └── PM_AND_USER_OPERATIONAL_GUIDE.md # [CẨM NANG VẬN HÀNH KÈM SƠ ĐỒ QUY TRÌNH]
-│   ├── CURRENT_STATE.md                     # [ĐỌC TRƯỚC] Thông tin hiện hành — nguồn chuẩn duy nhất
-│   ├── 04-v1-hardening/                     # Bản v1: đề xuất, Runbook triển khai & khôi phục, nhật ký thay đổi
-│   ├── 03-architecture-and-analysis/        # Báo cáo kiểm toán bảo mật, nhận diện thương hiệu
-│   │   ├── GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md
-│   │   ├── LG_BRAND_ARTISTIC_GAP_ANALYSIS.md
-│   │   └── KE_HOACH_TOI_UU_TOAN_DIEN_INTERNAL_SALES.md
-│   └── README.md                            # Mục lục điều hướng tài liệu docs
-├── scripts/build_production.py              # Sinh portal.html (bản chính thức, không dữ liệu demo)
-├── tests/                                   # Kiểm thử: backend_gas_harness.js, cloud_mode_regression.py, staging_smoke_test.py, run_e2e_tests.js
-├── PROJECT_PLANNING.md                      # Lộ trình kỹ thuật & kế hoạch phát triển
-└── README.md                                # Tài liệu tổng quan dự án (File này)
+Internal sales platform/
+├── portal.html                              # BẢN CHÍNH THỨC đang chạy (sinh tự động, không sửa tay) — ai-coreteam.github.io/portal.html
+├── index.html                               # Chuyển hướng vào portal.html
+├── Mau_Dang_Ky_Internal_Sales_3009.html     # NGUỒN web (bản demo, mọi sửa đổi làm ở đây) → scripts/build_production.py → portal.html
+├── apps-script/Code.gs                      # Máy chủ Google Apps Script (đang chạy: Version 11 = tag v2.10.0)
+├── assets/                                  # Tài nguyên web (xem assets/README.md)
+│   ├── i18n/                                # Tiếng Anh: i18n.js (lớp dịch), en_source.json (từ điển nguồn) → en.js (sinh tự động)
+│   ├── content/                             # bank_accounts.json, system_config.json, lgcom_product_links.json (bot thứ Hai cập nhật)
+│   ├── qr/                                  # Mã QR mở cổng
+│   ├── branding/ · slogan/ · digital-logo-play/ · images/   # Nhận diện LG, ảnh, icon động
+│   └── templates/                           # File Excel mẫu cho PM
+├── guides/                                  # Bộ hướng dẫn bằng hình cho nút "Docs" (SINH TỰ ĐỘNG: scripts/build_guides_web.py)
+│   ├── laptop/ · phone/                     # {user,pm,admin}_{vi,en}.html + ảnh chụp
+│   ├── brand/                               # Font + logo LG dùng chung
+│   └── mobile.css                           # Bố cục điện thoại (nguồn: scripts/guides_mobile.css)
+├── data/                                    # Thư viện chạy trên trình duyệt (SheetJS, heic2any, tesseract) + file Excel mẫu / test
+├── scripts/
+│   ├── build_production.py                  # Sinh portal.html (bỏ dữ liệu demo, gắn URL máy chủ)
+│   ├── build_guides_web.py · guides_mobile.css   # Xuất guides/ từ docs/05 + docs/06, chèn bố cục điện thoại
+│   ├── i18n_build.py · i18n_collect.py      # Dựng từ điển EN · quét chữ tiếng Việt còn sót (phải = 0)
+│   ├── build_product_links.py               # Bảng link LG.com (GitHub Actions thứ Hai 08:00)
+│   └── mobile_audit.py · generate_mockup_10_models.js
+├── tests/                                   # backend_gas_harness.js · cloud_mode_regression.py · v25_phone_fixes_test.py
+│                                            # run_e2e_tests.js · staging_smoke_test.py · polling_race_simulation.py
+├── docs/
+│   ├── CURRENT_STATE.md                     # [ĐỌC TRƯỚC] Trạng thái hiện hành — nguồn chuẩn duy nhất
+│   ├── 01-setup-and-deployment/             # Cài đặt, Apps Script, bàn giao Git
+│   ├── 02-user-and-pm-guide/                # Cẩm nang vận hành, SO_TAY_VAN_HANH_NGAY_MO_BAN.md
+│   ├── 03-architecture-and-analysis/        # Phân tích bảo mật, kiến trúc, nhận diện
+│   ├── 04-v1-hardening/                     # NHẬT KÝ PHÁT HÀNH (README.md) + Runbook triển khai & quay lại
+│   ├── 05-visual-guide/                     # (chỉ trên máy) nguồn bộ hướng dẫn máy tính
+│   └── 06-visual-guide-phone/               # (chỉ trên máy) nguồn bộ hướng dẫn điện thoại
+├── design/                                  # Đề xuất & quyết định: CONFIG_SYNC_PROPOSAL, V3_PENDING_DECISIONS, UI_V3_MOBILE_AUDIT, i18n/, v2/, v3/
+├── feedback/                                # (chỉ trên máy, trừ README) ảnh chụp từ điện thoại thật: <ngày>_<thiết bị>_<chủ đề>/
+├── .github/workflows/                       # lgcom-links-refresh.yml (bot cập nhật link LG.com)
+├── scratch/ · archive/                      # (chỉ trên máy) dữ liệu OCR, bản lưu cũ
+├── PROJECT_PLANNING.md · PM internal promotion template.xlsx   # Kế hoạch dự án · file Excel thật dùng cho test e2e
+└── README.md                                # File này
 ```
 
 ---
