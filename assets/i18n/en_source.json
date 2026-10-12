@@ -1084,6 +1084,32 @@
   "ô 7 và 8": "fields 7 and 8",
   "Mục 6:": "Field 6:",
   "Mục 6": "Field 6",
+  "Tỉnh / Thành phố *": "Province / City *",
+  "Số nhà, đường, phường / xã *": "House number, street, ward / commune *",
+  "Ví dụ: Số 12 Điện Biên Phủ, phường Ngô Quyền": "e.g. 12 Dien Bien Phu, Ngo Quyen ward",
+  "Vui lòng chọn Tỉnh / Thành phố và nhập số nhà, đường, phường / xã.": "Please choose the province / city and enter the house number, street and ward / commune.",
+  "— Chọn Tỉnh / Thành phố —": "— Choose province / city —",
+  "Miền Bắc": "North",
+  "Miền Trung": "Central",
+  "Miền Nam": "South",
+  "Đã lưu trên hệ thống: tự điền khi bạn đăng nhập ở máy khác. Đơn đã giữ: bấm \"Đổi địa chỉ\" ở ô 03 (trước khi khai nộp tiền).": "Saved in the system: filled in automatically when you sign in on another device. For an order you already hold, click \"Change address\" in card 03 (before declaring payment).",
+  "Đổi địa chỉ": "Change address",
+  "Giao đến:": "Deliver to:",
+  "Muốn đổi địa chỉ nhận hàng (trước khi khai nộp tiền):": "To change the delivery address (before declaring payment):",
+  "Đổi địa chỉ cho đơn:": "Change the address for order:",
+  "Lưu địa chỉ cho đơn này": "Save address for this order",
+  "Dùng lại:": "Use again:",
+  "Khác miền kho": "Region ≠ warehouse",
+  "Đã đổi địa chỉ": "Address changed",
+  "Chưa đổi được địa chỉ. Vui lòng thử lại.": "The address was not changed. Please try again.",
+  "Đã đổi địa chỉ nhận hàng.": "Delivery address changed.",
+  "Đã lưu địa chỉ trên máy này. Chưa lưu được lên hệ thống (mạng chậm) — sẽ tự thử lại lần sau.": "Address saved on this device. It could not be saved to the system yet (slow network) — it will retry automatically next time.",
+  "Đơn đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được. Vui lòng liên hệ trực tiếp PM phụ trách.": "This order has a payment declared or has been processed, so you cannot change the address yourself. Please contact the PM in charge directly.",
+  "Đã lưu địa chỉ nhận hàng.": "Delivery address saved.",
+  "Địa chỉ không thay đổi.": "The address did not change.",
+  "Thiếu mã slot.": "Missing slot ID.",
+  "Đang kết nối máy chủ…": "Connecting to the server…",
+  "Thử lại ngay": "Retry now",
   "Tự động điền thành công từ biên lai:": "Filled in automatically from the receipt:",
   "(Vui lòng đối chiếu với ảnh chụp)": "(Please check against the image)",
   "Bạn chưa chọn sản phẩm.": "You have not chosen a product.",
@@ -1960,6 +1986,26 @@
   [
    "^(Mã giao dịch|Ngày giờ|Mục [678]): (.+)\\.$",
    "$T1: $2."
+  ],
+  [
+   "^Lưu ý: địa chỉ ở (Miền \\S+), sản phẩm ở kho (\\S+) \\((Miền \\S+)\\)\\. Bạn vẫn giữ chỗ được; PM sẽ kiểm tra\\.$",
+   "Note: the address is in the $T1 region, but the item is in warehouse $2 ($T3 region). You can still reserve; the PM will check."
+  ],
+  [
+   "^Địa chỉ ở (Miền \\S+), kho (\\S+) ở (Miền \\S+)$",
+   "Address in the $T1 region, warehouse $2 in the $T3 region"
+  ],
+  [
+   "^Đã đổi địa chỉ nhận hàng của đơn (\\S+)\\.$",
+   "Delivery address of order $1 changed."
+  ],
+  [
+   "^Đơn (\\S+) đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được\\. Vui lòng liên hệ trực tiếp PM phụ trách\\.$",
+   "Order $1 has a payment declared or has been processed, so you cannot change the address yourself. Please contact the PM in charge directly."
+  ],
+  [
+   "^Chưa tải được (.+)\\. Máy chủ Google thường phản hồi chậm trong vài phút đầu mở bán; hệ thống sẽ tự thử lại sau 15 giây\\.$",
+   "Could not load the $T1 yet. The Google server is often slow in the first minutes of a sale; the page will retry automatically in 15 seconds."
   ],
   [
    "^Đã tải ảnh biên lai\\. Không nhận diện được rõ mã giao dịch, vui lòng điền tay (.+)\\.$",

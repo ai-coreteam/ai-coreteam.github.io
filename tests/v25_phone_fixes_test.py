@@ -8,7 +8,8 @@ Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1�
 13 (mô tả 2 dòng + Xem đủ), 14 = bảng → thẻ (B3), 15 = cửa sổ nộp tiền toàn màn hình (B4), 16 = máy tính không đổi (v2.7.0);
 17–20 = PM điện thoại (C1, C2, cửa sổ biên lai), tab 3 (C3, nhãn), nút Docs, bản dịch EN (v2.8.0);
 21–24 = địa chỉ nhận hàng, Config (public_config), hạn mức theo chương trình, EN (v2.9.0);
-25 = hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền (v2.10.0).
+25 = hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền (v2.10.0);
+26 = địa chỉ lưu trên Sheet, tỉnh/thành + cảnh báo khác miền, tự đổi địa chỉ đơn (v2.11.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -583,6 +584,125 @@ def main():
             page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(800)
             r = page.evaluate("(() => { const e = document.getElementById('quick-addr-note'), b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.right), innerWidth, e.scrollWidth <= e.clientWidth + 1]; })()")
             check(r[0] >= 0 and r[1] <= r[2] and r[3], f'iPhone 13: cửa sổ nộp tiền — câu nhắc địa chỉ không tràn ({r})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('26. v2.11 địa chỉ lưu trên Sheet: máy A lưu → máy B tự điền; mở lại trang lấy bản mới; tỉnh/thành + cảnh báo khác miền; tự đổi địa chỉ đơn')
+            class AddrV12(Mock):   # giả lập Apps Script Version 12 (Code.gs v2.11)
+                def __init__(self, **kw):
+                    super().__init__(**kw); self.addr = {}; self.order_addr = ''; self.order_paid = False
+                def do_auth(self, d):
+                    r = super().do_auth(d)
+                    if r.get('ok'): r['user']['address'] = self.addr.get(d['id'], '')
+                    return r
+                def do_my_address(self, d): return {'ok': True, 'address': self.addr.get(T.ME, '')}
+                def do_update_my_address(self, d):
+                    a = ' '.join(str(d.get('address', '')).split())
+                    if len(a) < 10: return {'ok': False, 'message': 'Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).'}
+                    self.addr[T.ME] = a; return {'ok': True, 'address': a, 'message': 'Đã lưu địa chỉ nhận hàng.'}
+                def do_user_update_order_address(self, d):
+                    if self.order_paid: return {'ok': False, 'message': f"Đơn {d.get('slotId')} đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được. Vui lòng liên hệ trực tiếp PM phụ trách."}
+                    self.order_addr = d['address']; return {'ok': True, 'address': d['address'], 'message': f"Đã đổi địa chỉ nhận hàng của đơn {d.get('slotId')}."}
+                def do_lookup(self, d):
+                    r = super().do_lookup(d)
+                    for o in r['orders']: o['address'] = self.order_addr; o['paid'] = self.order_paid
+                    return r
+            calls = lambda s_, a: [c[1] for c in s_.calls if c[0] == a]
+            OPEN = "setTimeout(() => openAddressModal(null), 0)"
+            ROW = "document.getElementById('delivery-addr-row').innerText"
+            # a) máy A: chưa có địa chỉ → chọn tỉnh + nhập chi tiết → lưu lên Sheet
+            s = AddrV12(my_status=None)
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            check('Chưa có địa chỉ' in page.evaluate(ROW), 'máy A: chưa có địa chỉ → nút Thêm địa chỉ')
+            page.evaluate(OPEN); page.wait_for_timeout(400)
+            page.click('#addr-save-btn'); page.wait_for_timeout(200)
+            check(not page.evaluate("document.getElementById('addr-error').hidden"), 'chưa chọn tỉnh → báo lỗi, không lưu')
+            page.select_option('#addr-province', 'Hải Phòng'); page.fill('#addr-input', 'Số 1 Lê Lợi, phường Ngô Quyền'); page.click('#addr-save-btn'); page.wait_for_timeout(1500)
+            check(s.addr.get(T.ME) == 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng', f"lưu lên Sheet (update_my_address): {s.addr.get(T.ME)!r}")
+            check('Đã lưu trên hệ thống' in page.evaluate(ROW) and 'Hải Phòng' in page.evaluate(ROW), 'tab 2: hiện địa chỉ + "Đã lưu trên hệ thống…"')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # b) máy B: không có gì trên máy → đăng nhập là có địa chỉ; sửa ở máy khác rồi mở lại trang → lấy bản mới
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            check('Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng' in page.evaluate(ROW), 'máy B: tự điền địa chỉ từ Sheet ngay khi đăng nhập')
+            s.addr[T.ME] = 'Số 9 Trần Phú, Ba Đình, Hà Nội'
+            page.reload(); page.wait_for_timeout(5000)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            check('Số 9 Trần Phú' in page.evaluate(ROW) and calls(s, 'my_address'), 'mở lại trang (phiên còn hạn): hỏi my_address → địa chỉ mới nhất')
+            ctx.close()
+            # c) địa chỉ cũ chỉ có trên máy (v2.9–v2.10), Sheet trống → tự đưa lên Sheet
+            s = AddrV12(my_status=None)
+            ctx, page = open_page(browser, port, s); T.login(page, T.ME); page.wait_for_timeout(1500)
+            check(s.addr.get(T.ME) == 'So 1 Duong Thu, Hai Phong', f"địa chỉ cũ trên máy → tự đưa lên Sheet ({s.addr.get(T.ME)!r})")
+            ctx.close()
+            # d) Apps Script cũ (V11, chưa có lệnh): giữ cách cũ, chữ cũ, không lỗi
+            s = Mock(my_status=None)
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            page.evaluate(OPEN); page.wait_for_timeout(300); page.select_option('#addr-province', 'Đà Nẵng'); page.fill('#addr-input', 'Số 5 Bạch Đằng, Hải Châu'); page.click('#addr-save-btn'); page.wait_for_timeout(800)
+            r = page.evaluate(ROW)
+            check('Số 5 Bạch Đằng, Hải Châu, Đà Nẵng' in r and 'liên hệ trực tiếp PM phụ trách' in r and not calls(s, 'update_my_address'), 'máy chủ cũ: lưu trên máy như cũ, chữ cũ, không gọi lệnh mới')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # e) nhận miền + cảnh báo khác miền (chỉ cảnh báo, vẫn giữ chỗ được)
+            s = AddrV12(my_status=None); s.addr[T.ME] = 'Số 12 Nguyễn Huệ, Quận 1, TP Hồ Chí Minh'
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            u = page.evaluate("""() => [addrRegion('Số 12 Điện Biên Phủ, Ngô Quyền, Hải Phòng'), addrRegion('Q1, TP HCM'), addrRegion('Thủ Dầu Một, Bình Dương'), addrRegion('Hải Châu, Đà Nẵng'), addrRegion('abc xyz'),
+              JSON.stringify(splitAddress('Số 1 Lê Lợi, TP Hồ Chí Minh')), JSON.stringify(splitAddress('12 Nguyễn Huệ Q1 HCM')), joinAddress('Số 1 Lê Lợi, Hải Phòng', 'Hải Phòng')]""")
+            check(u[:5] == ['Bắc', 'Nam', 'Nam', 'Trung', None], f'nhận miền: {u[:5]}')
+            check(u[5] == '{"province":"TP Hồ Chí Minh","detail":"Số 1 Lê Lợi"}' and '"province":"TP Hồ Chí Minh"' in u[6] and u[7] == 'Số 1 Lê Lợi, Hải Phòng', f'tách / ghép tỉnh: {u[5:]}')
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1200)
+            aya = page.evaluate("currentProducts.find(p => p.kho === 'AYA' && p.status === 'Available').uniqueCode")
+            page.evaluate(f"setTimeout(() => handleRegisterProduct('{aya}'), 0)"); page.wait_for_timeout(2500)
+            dlg = [x for x in page.dialogs if 'Xác nhận đăng ký' in x]
+            check(dlg and 'Lưu ý: địa chỉ ở Miền Nam, sản phẩm ở kho AYA (Miền Bắc)' in dlg[-1] and calls(s, 'register_product'), 'giữ chỗ kho AYA, địa chỉ HCM: hộp xác nhận có cảnh báo, vẫn giữ chỗ được')
+            reg_addr = calls(s, 'register_product')[-1].get('address') if calls(s, 'register_product') else None
+            check(reg_addr == 'Số 12 Nguyễn Huệ, Quận 1, TP Hồ Chí Minh', f'lệnh giữ chỗ gửi đúng địa chỉ ({reg_addr!r})')
+            ctx.close()
+            # f) đơn đang Chờ nộp tiền: ô 03 "Giao đến" + Đổi địa chỉ; gợi ý "Dùng lại"; đổi → máy chủ ghi; đã khai nộp → không đổi được
+            s = AddrV12(my_status=T.NEW); s.addr[T.ME] = 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'; s.order_addr = 'Số 7 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội'
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME); page.wait_for_timeout(1500)
+            c3 = page.inner_text('#grap-card3-body')
+            check('Giao đến: Số 7 Lý Thường Kiệt' in c3 and 'Đổi địa chỉ' in c3, f'ô 03: dòng Giao đến + nút Đổi địa chỉ ({c3[-90:]!r})')
+            page.click('#grap-card3-body .addr-link-btn'); page.wait_for_timeout(500)
+            st = page.evaluate("[document.getElementById('addr-province').value, document.getElementById('addr-input').value, document.getElementById('addr-modal-product').textContent, [...document.querySelectorAll('#addr-suggest .addr-chip')].map(b=>b.textContent)]")
+            check(st[0] == 'Hà Nội' and st[1] == 'Số 7 Lý Thường Kiệt, Hoàn Kiếm' and 'Đổi địa chỉ cho đơn' in st[2], f'cửa sổ đổi địa chỉ đơn: điền sẵn địa chỉ của đơn ({st[:3]})')
+            check(st[3] == ['Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'], f'gợi ý "Dùng lại" = địa chỉ mặc định ({st[3]})')
+            page.click('#addr-suggest .addr-chip'); page.wait_for_timeout(200)
+            check(page.evaluate("document.getElementById('addr-province').value") == 'Hải Phòng', 'bấm gợi ý → điền tỉnh + chi tiết')
+            check(page.evaluate("document.getElementById('addr-region-warn').hidden"), 'địa chỉ Hải Phòng + đơn kho AYA (cùng miền Bắc) → không cảnh báo')
+            page.click('#addr-save-btn'); page.wait_for_timeout(2500)
+            check(s.order_addr == 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng' and 'Số 1 Lê Lợi' in page.inner_text('#grap-card3-body'), 'đổi địa chỉ đơn → máy chủ ghi, ô 03 cập nhật')
+            check(s.addr[T.ME] == 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng', 'đổi địa chỉ đơn không đổi địa chỉ mặc định')
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(600)
+            check('trước khi khai nộp tiền' in page.inner_text('#quick-addr-note') and page.query_selector('#quick-addr-note .addr-link-btn'), 'cửa sổ nộp tiền: nút Đổi địa chỉ (chưa khai nộp)')
+            ctx.close()
+            s.order_paid = True
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME); page.wait_for_timeout(1500)
+            check('Đổi địa chỉ' not in page.inner_text('#grap-card3-body'), 'đã khai nộp: ô 03 không có nút Đổi địa chỉ')
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(600)
+            check('liên hệ trực tiếp PM phụ trách' in page.inner_text('#quick-addr-note'), 'đã khai nộp: bước nộp tiền ghi liên hệ PM')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # g) PM: nhãn Khác miền kho / Đã đổi địa chỉ
+            s = Mock(); r1 = reg(4, 'Chờ nộp tiền', 1000000); r1['address'] = 'Số 5 Lê Lợi, Quận 1, TP Hồ Chí Minh'; r1['note'] = 'Nhân viên đổi địa chỉ lúc 12/10/2026 09:00:00 (cũ: x)'
+            r2 = reg(5, 'Chờ nộp tiền', 1000000); r2['address'] = 'Số 2 Lạch Tray, Ngô Quyền, Hải Phòng'; s.pm_regs = [r1, r2]
+            ctx, page = open_page(browser, port, s); T.login(page, T.PM); page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+            fl = page.evaluate("[...document.querySelectorAll('#pm-reg-tbody tr')].map(tr => [...tr.querySelectorAll('.pm-addr-flag')].map(x => x.textContent))")
+            check(fl == [['Khác miền kho', 'Đã đổi địa chỉ'], []] or sorted(map(tuple, fl)) == sorted([('Khác miền kho', 'Đã đổi địa chỉ'), ()]), f'PM: nhãn đúng đơn ({fl})')
+            ctx.close()
+            # h) EN + điện thoại
+            s = AddrV12(my_status=None)
+            ctx, page = open_page(browser, port, s, device=ip13, no_addr=True, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            page.evaluate("setTimeout(() => openAddressModal({model: 'M1', kho: 'AYA'}), 0)"); page.wait_for_timeout(400)
+            page.select_option('#addr-province', 'Cần Thơ'); page.fill('#addr-input', 'Số 3 Hòa Bình, Ninh Kiều'); page.wait_for_timeout(200)
+            en = page.evaluate("[document.querySelector('label[for=addr-province]').textContent, document.getElementById('addr-province').options[0].text, document.querySelector('#addr-province optgroup').label, document.getElementById('addr-region-warn').textContent, document.getElementById('addr-input').placeholder]")
+            check(en[0] == 'Province / City *' and en[1] == '— Choose province / city —' and en[2] == 'North' and en[3].startswith('Note: the address is in the South region, but the item is in warehouse AYA (North region)') and en[4].startswith('e.g.'), f'EN: {en}')
+            r = page.evaluate("(() => { const c = document.querySelector('#addr-modal .modal-card').getBoundingClientRect(); return [Math.round(c.left), Math.round(c.right), innerWidth, document.documentElement.scrollWidth <= innerWidth + 1]; })()")
+            check(r[0] >= 0 and r[1] <= r[2] and r[3], f'iPhone 13: cửa sổ địa chỉ vừa màn hình ({r})')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

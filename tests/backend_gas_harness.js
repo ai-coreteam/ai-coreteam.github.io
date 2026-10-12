@@ -564,6 +564,49 @@ console.log('--- v2.10: hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS (w
   check(lkB.ok && lkB.orders[0].address === '', 'tra cứu bằng 4 số cuối (chưa đăng nhập) KHÔNG trả địa chỉ');
 }
 
+console.log('--- v2.11: địa chỉ nhận hàng lưu trên tab Users (cột "Address") + tự đổi địa chỉ đơn trước khi khai nộp ---');
+{
+  const book = freshBook(); const { post } = load(book);
+  const users = book.getSheetByName('Users');
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  check(u1.ok && u1.user.address === '', 'chưa có cột Address: đăng nhập vẫn chạy, address = "" (không lỗi)');
+  check(post({ action: 'update_my_address', address: 'Số 1 Lê Lợi, Hải Phòng' }).ok === false, 'update_my_address không token bị từ chối');
+  check(post({ action: 'update_my_address', token: u1.token, address: 'ngắn' }).ok === false, 'địa chỉ < 10 ký tự bị từ chối');
+  const up = post({ action: 'update_my_address', token: u1.token, address: '  Số 1   Lê Lợi,  Ngô Quyền, Hải Phòng ' });
+  check(up.ok && up.address === 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng', `lưu địa chỉ (gộp khoảng trắng): ${up.address}`);
+  const head = users.rows[0];
+  check(head[8] === 'Address', `tự thêm cột "Address" ở cột I khi chưa có (${JSON.stringify(head.slice(7))})`);
+  const row1 = users.rows.find(r => r[0] === 'VH70001'), row2 = users.rows.find(r => r[0] === 'VH70002');
+  check(row1[8] === 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng' && !row2[8], 'chỉ ghi đúng dòng của chính người đăng nhập');
+  const again = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  check(post({ action: 'my_address', token: u1.token }).address === 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng' && post({ action: 'my_address' }).ok === false, 'my_address (chỉ đọc) trả địa chỉ của chính mình; không token bị từ chối');
+  check(again.user.address === 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng', 'đăng nhập lại (máy khác) nhận địa chỉ từ máy chủ');
+  check(post({ action: 'update_my_address', token: u1.token, address: '=HYPERLINK("x") Lê Lợi dài' }).ok && String(users.rows.find(r => r[0] === 'VH70001')[8]).startsWith("'="), 'chống chèn công thức (thêm dấu \')');
+  post({ action: 'update_my_address', token: u1.token, address: 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng' });
+  // cột Address do ADMIN đặt ở vị trí khác (ví dụ cột K): máy chủ tìm theo tên
+  const b2 = freshBook(); const L2 = load(b2); const us2 = b2.getSheetByName('Users');
+  us2.rows[0][10] = 'Address'; us2.rows.find(r => r[0] === 'VH70002')[10] = 'Kho AYC, Bình Dương, TP Hồ Chí Minh';
+  check(L2.post({ action: 'auth', id: 'VH70002', password: 'pw2' }).user.address === 'Kho AYC, Bình Dương, TP Hồ Chí Minh', 'cột Address ở vị trí khác (K): vẫn đọc đúng theo tên tiêu đề');
+  // giữ chỗ thiếu địa chỉ → lấy địa chỉ mặc định; có địa chỉ → dùng địa chỉ gửi lên
+  post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'Nhan Vien 1' });
+  const reg = book.getSheetByName('Registrations');
+  check(reg.rows[1][9] === 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng', `giữ chỗ không kèm địa chỉ → máy chủ điền địa chỉ mặc định (${reg.rows[1][9]})`);
+  // tự đổi địa chỉ đơn
+  check(post({ action: 'user_update_order_address', slotId: PID + '-AYA-001', address: 'Số 9 Trần Phú, Ba Đình, Hà Nội' }).ok === false, 'đổi địa chỉ đơn không token bị từ chối');
+  const u2 = post({ action: 'auth', id: 'VH70002', password: 'pw2' });
+  check(post({ action: 'user_update_order_address', token: u2.token, slotId: PID + '-AYA-001', address: 'Số 9 Trần Phú, Ba Đình, Hà Nội' }).ok === false, 'không đổi được địa chỉ đơn của người khác');
+  const ch = post({ action: 'user_update_order_address', token: u1.token, slotId: PID + '-AYA-001', address: 'Số 9 Trần Phú, Ba Đình, Hà Nội' });
+  check(ch.ok && reg.rows[1][9] === 'Số 9 Trần Phú, Ba Đình, Hà Nội' && /đổi địa chỉ lúc .*cũ: Số 1 Lê Lợi/.test(reg.rows[1][20]), `đơn "Chờ mở thanh toán": tự đổi được, ghi vết cột Ghi chú (${reg.rows[1][20]})`);
+  check(users.rows.find(r => r[0] === 'VH70001')[8] === 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng', 'đổi địa chỉ đơn KHÔNG đổi địa chỉ mặc định');
+  reg.rows[1][11] = 'Chờ nộp tiền';
+  check(post({ action: 'user_update_order_address', token: u1.token, slotId: PID + '-AYA-001', address: 'Số 10 Trần Phú, Ba Đình, Hà Nội' }).ok, 'đơn "Chờ nộp tiền" chưa khai nộp: vẫn tự đổi được');
+  reg.rows[1][15] = 'FT123'; reg.rows[1][11] = 'Đã khai nộp - chờ đối soát';
+  const no = post({ action: 'user_update_order_address', token: u1.token, slotId: PID + '-AYA-001', address: 'Số 11 Trần Phú, Ba Đình, Hà Nội' });
+  check(no.ok === false && /liên hệ trực tiếp PM/.test(no.message) && reg.rows[1][9] === 'Số 10 Trần Phú, Ba Đình, Hà Nội', 'đã khai nộp tiền: không tự đổi được, báo liên hệ PM');
+  const lg = book.getSheetByName('ActivityLog').rows.map(r => r[1]);
+  check(lg.includes('ADDRESS_UPDATE') && lg.includes('ORDER_ADDRESS_UPDATE'), 'nhật ký ADDRESS_UPDATE + ORDER_ADDRESS_UPDATE');
+}
+
 console.log('--- V1-10: Mọi lệnh ghi Registrations / Products của luồng nghiệp vụ nằm trong khóa ---');
 {
   const allowed = /program_delete|product_upload|setup/; // ngoài phạm vi đợt này (thêm dòng mới / xóa chương trình 0 đơn)

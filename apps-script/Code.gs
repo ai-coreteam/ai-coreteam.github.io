@@ -110,6 +110,9 @@ function doPost(e) {
     if (data.action === 'lookup') return json_(lookup_(data));
     if (data.action === 'user_cancel_registration') return json_(user_cancel_registration_(data));
     if (data.action === 'email_setting') return json_(email_setting_(data));
+    if (data.action === 'my_address') return json_(my_address_(data));                               // v2.11 (chỉ đọc)
+    if (data.action === 'update_my_address') return json_(update_my_address_(data));                 // v2.11
+    if (data.action === 'user_update_order_address') return json_(user_update_order_address_(data)); // v2.11
     return json_({ ok: false, message: 'Yêu cầu không hợp lệ.' });
   } catch (err) {
     try { log_('ERROR', '', '', '', String(err)); } catch (e2) {}
@@ -865,6 +868,8 @@ function register_product_(d) {
   // v1-hardening (V1-07): chỉ chính người đã đăng nhập mới giữ chỗ được cho mình
   var regAuth = requireSelf_(d.token, empCode);
   if (!regAuth.ok) return regAuth;
+  // v2.11: web cũ / lỗi mạng gửi thiếu địa chỉ → lấy địa chỉ mặc định trong tab Users (đọc TRƯỚC khi khóa, không làm chậm lượt giữ chỗ)
+  var regAddress = normAddr_(d.address) || myAddress_(empCode);
 
   // Pre-check program status and quota from Programs sheet before acquiring lock
   var progSheet = book_().getSheetByName(SHEET_PROGRAMS);
@@ -957,7 +962,7 @@ function register_product_(d) {
       regRow[6] = String(prodDataTarget[4]).trim();   // Model
       regRow[7] = uniqueCode;                  // Slot/UniqueCode
       regRow[8] = str_(d.phone);               // Phone
-      regRow[9] = str_(d.address);             // Address
+      regRow[9] = safe_(regAddress);           // Address (v2.11: safe_ chống chèn công thức + lấy mặc định khi thiếu)
       regRow[10] = 'Đồng ý';                    // Agree
       regRow[11] = STATUS_WAIT_GATE;           // Status: 'Đã đăng ký - Chờ mở thanh toán'
       regRow[C.AMOUNT - 1] = Number(prodDataTarget[PROD_COL.PRICE - 1]) || 0; // Amount
@@ -1582,6 +1587,8 @@ function auth_(d) {
       role: String(data[r][6]).trim() || 'USER'
     };
 
+    var addrCol = userAddrCol_(sheet, false);                       // v2.11: địa chỉ nhận hàng mặc định (cột "Address" của tab Users)
+    user.address = addrCol ? str_(sheet.getRange(r + 2, addrCol).getValue()) : '';
     var token = generateSessionToken_(user);
     try { log_('AUTH_LOGIN', id, user.name, '', 'role=' + user.role); } catch (e2) {}
     return { ok: true, user: user, token: token };
@@ -1823,6 +1830,91 @@ function paidAlready_(d, empCode, slotId, rowNo) {
 }
 
 // Đơn gần nhất khớp Slot + Mã NV (đọc cột D..L)
+/* ---------- v2.11 (12/10/2026, chủ dự án duyệt): địa chỉ nhận hàng lưu trên Sheet ----------
+ * 1 địa chỉ mặc định / nhân viên ở tab Users, cột tiêu đề "Address" (tìm theo TÊN, không phụ thuộc vị trí cột;
+ * chưa có thì tự thêm ở cột trống đầu tiên bên phải). Mỗi đơn vẫn lưu bản riêng ở Registrations cột J.
+ */
+var ADDR_MIN = 10, ADDR_MAX = 300;
+function normAddr_(v) { return str_(v).replace(/\s+/g, ' ').trim().slice(0, ADDR_MAX); }
+function userAddrCol_(sheet, create) {
+  var lc = sheet.getLastColumn();
+  var head = lc > 0 ? sheet.getRange(1, 1, 1, lc).getValues()[0] : [];
+  for (var i = 0; i < head.length; i++) if (String(head[i]).trim().toLowerCase() === 'address') return i + 1;
+  if (!create) return 0;
+  var col = Math.max(lc, 8) + 1;
+  sheet.getRange(1, col).setValue('Address');
+  return col;
+}
+function userRow_(sheet, empCode) {
+  var n = sheet.getLastRow() - 1;
+  if (n <= 0) return 0;
+  var ids = sheet.getRange(2, 1, n, 1).getValues();
+  for (var r = 0; r < n; r++) if (String(ids[r][0]).trim().toUpperCase() === empCode) return r + 2;
+  return 0;
+}
+function myAddress_(empCode) {
+  try {
+    var sh = book_().getSheetByName(SHEET_USERS); if (!sh) return '';
+    var col = userAddrCol_(sh, false), row = col ? userRow_(sh, empCode) : 0;
+    return row ? normAddr_(sh.getRange(row, col).getValue()) : '';
+  } catch (e) { return ''; }
+}
+/* Chỉ đọc: web mở lại trang (phiên còn hạn) lấy địa chỉ mới nhất — có thể vừa sửa trên máy khác */
+function my_address_(d) {
+  var auth = verifySessionToken_(d.token);
+  if (!auth.valid) return { ok: false, authError: true, message: auth.message };
+  return { ok: true, address: myAddress_(String(auth.payload.uid || '').toUpperCase()) };
+}
+function update_my_address_(d) {
+  var auth = verifySessionToken_(d.token);
+  if (!auth.valid) return { ok: false, authError: true, message: auth.message };
+  var empCode = String(auth.payload.uid || '').toUpperCase();
+  var address = normAddr_(d.address);
+  if (address.length < ADDR_MIN) return { ok: false, message: 'Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).' };
+  var sh = book_().getSheetByName(SHEET_USERS);
+  if (!sh) return { ok: false, message: 'Hệ thống chưa cấu hình danh sách nhân viên.' };
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var row = userRow_(sh, empCode);
+    if (!row) return { ok: false, message: 'Mã nhân viên không tồn tại.' };
+    sh.getRange(row, userAddrCol_(sh, true)).setValue(safe_(address));
+    SpreadsheetApp.flush();
+  } finally { lock.releaseLock(); }
+  try { log_('ADDRESS_UPDATE', empCode, '', d.userAgent, 'Địa chỉ mặc định'); } catch (e) {}
+  return { ok: true, address: address, message: 'Đã lưu địa chỉ nhận hàng.' };
+}
+/* Đổi địa chỉ của đơn đã giữ: cùng quy tắc "Hủy giữ chỗ" (Chờ mở thanh toán / Chờ nộp tiền, chưa khai nộp). Ghi vết ở cột Ghi chú. */
+function user_update_order_address_(d) {
+  var auth = verifySessionToken_(d.token);
+  if (!auth.valid) return { ok: false, authError: true, message: auth.message };
+  var empCode = String(auth.payload.uid || '').toUpperCase();
+  var slotId = str_(d.slotId);
+  var address = normAddr_(d.address);
+  if (!slotId) return { ok: false, message: 'Thiếu mã slot.' };
+  if (address.length < ADDR_MIN) return { ok: false, message: 'Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).' };
+  var reg = book_().getSheetByName(SHEET_REG);
+  if (!reg) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
+  var oldAddr = '';
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  try {
+    var found = findOrder_(reg, slotId, empCode);
+    if (!found) return { ok: false, message: 'Không tìm thấy đơn giữ chỗ ' + slotId + ' của bạn.' };
+    if (!((found.status === STATUS_WAIT_GATE || found.status === STATUS_NEW) && !found.paid)) {
+      return { ok: false, message: 'Đơn ' + slotId + ' đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được. Vui lòng liên hệ trực tiếp PM phụ trách.' };
+    }
+    oldAddr = str_(reg.getRange(found.rowNo, C.ADDRESS).getValue());
+    if (oldAddr === address) return { ok: true, address: address, unchanged: true, message: 'Địa chỉ không thay đổi.' };
+    var oldNote = str_(reg.getRange(found.rowNo, C.NOTE).getValue());
+    reg.getRange(found.rowNo, C.ADDRESS).setValue(safe_(address));
+    reg.getRange(found.rowNo, C.NOTE).setValue(safe_((oldNote ? oldNote + ' | ' : '') + 'Nhân viên đổi địa chỉ lúc ' + fmt_(new Date()) + ' (cũ: ' + oldAddr + ')'));
+    SpreadsheetApp.flush();
+  } finally { lock.releaseLock(); }
+  try { log_('ORDER_ADDRESS_UPDATE', empCode, slotId, d.userAgent, 'cũ: ' + oldAddr); } catch (e) {}
+  return { ok: true, address: address, message: 'Đã đổi địa chỉ nhận hàng của đơn ' + slotId + '.' };
+}
+
 function findOrder_(reg, slotId, empCode) {
   var n = reg.getLastRow() - 1;
   if (n < 1) return null;
@@ -2362,7 +2454,7 @@ function setupNewDatabase() {
   
   // 5. Sheet: Users
   var usersSheet = ss.getSheetByName(SHEET_USERS) || ss.insertSheet(SHEET_USERS);
-  formatHeader(usersSheet, ['ID', 'Password', 'Name', 'Department', 'Phone', 'Email', 'Role', 'Status']);
+  formatHeader(usersSheet, ['ID', 'Password', 'Name', 'Department', 'Phone', 'Email', 'Role', 'Status', 'Address']);   // v2.11: Address = địa chỉ nhận hàng mặc định
   if (usersSheet.getLastRow() <= 1) {
     usersSheet.appendRow(['VH12345', 'test123', 'Quản Trị Viên PM (Demo)', 'HS PM Support', '0912345678', 'pm.internalsales@lge.com', 'PM', 'Active']);
     usersSheet.appendRow(['VH88921', 'test123', 'Trần Văn Nam (Demo)', 'Audit & Jeong-Do', '0987654321', 'vannam@lge.com', 'USER', 'Active']);

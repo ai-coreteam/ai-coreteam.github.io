@@ -3465,6 +3465,14 @@
     .pay-addr-note { margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--lg-border); border-left: 4px solid #A50034; border-radius: 8px; background: var(--lg-card-bg); font-size: 12.5px; line-height: 1.5; color: var(--lg-text-2); }
     .pay-addr-note[hidden] { display: none; }
     .pay-addr-note .addr-val { font-weight: 600; color: var(--lg-ink); overflow-wrap: anywhere; }
+    /* v2.11: địa chỉ lưu trên Sheet — chọn Tỉnh/Thành, cảnh báo khác miền, gợi ý địa chỉ đã dùng, đổi địa chỉ đơn */
+    #addr-province { font-size: 16px; margin-top: 6px; margin-bottom: 12px; }
+    .addr-region-warn { margin: 8px 0 0; padding: 8px 12px; border-left: 4px solid #A50034; border-radius: 6px; background: var(--lg-card-bg); font-size: 13px; line-height: 1.45; color: var(--lg-ink); }
+    .addr-region-warn[hidden], .addr-suggest[hidden] { display: none; }
+    .addr-suggest { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-size: 13px; color: var(--lg-text-2); align-items: center; }
+    .addr-chip { max-width: 100%; padding: 6px 12px; border: 1px solid var(--lg-border); border-radius: 999px; background: var(--lg-card-bg); color: var(--lg-ink); font: inherit; font-size: 13px; cursor: pointer; text-align: left; overflow-wrap: anywhere; }
+    .addr-link-btn { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+    .pm-addr-flag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #A50034; background: #F6F3EB; border: 1px solid #CBC8C2; white-space: nowrap; }
     #addr-input { font-size: 16px; }   /* iPhone không tự phóng to */
     .docs-link { display: flex; align-items: center; justify-content: center; height: 48px; text-decoration: none; font-size: 16px; }   /* v2.8: 2 link trong cửa sổ Docs */   /* v2.8 C1: nút "Thêm thao tác" chỉ có trên điện thoại */
     .lg-desc-row { display: contents; }   /* v2.7: khung bọc link LG.com + nút "Xem đủ" — máy tính: không tạo hộp, bố cục như cũ */
@@ -5719,9 +5727,13 @@
       <h3 style="margin:0 0 6px;">Địa chỉ nhận hàng</h3>
       <p id="addr-modal-product" style="margin:0 0 6px; font-size:14px; color:var(--lg-ink);" hidden></p>
       <p style="margin:0 0 12px; font-size:14px; color:var(--lg-text-2);">PM dùng địa chỉ này để kiểm tra bạn chọn đúng kho khu vực: AYA miền Bắc, AYB miền Trung, AYC miền Nam.</p>
-      <label class="form-label" for="addr-input">Địa chỉ nhận hàng (số nhà, đường, phường/xã, tỉnh/thành) *</label>
-      <textarea id="addr-input" class="form-control" rows="3" maxlength="300" style="height:auto; padding:10px 14px; margin-top:6px;" placeholder="Ví dụ: Số 12 Điện Biên Phủ, Ngô Quyền, Hải Phòng"></textarea>
-      <p id="addr-error" style="margin:6px 0 0; font-size:14px; color:var(--lg-heritage);" hidden>Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).</p>
+      <label class="form-label" for="addr-province">Tỉnh / Thành phố *</label>
+      <select id="addr-province" class="form-control" onchange="updateAddrRegionWarn()"></select>
+      <label class="form-label" for="addr-input">Số nhà, đường, phường / xã *</label>
+      <textarea id="addr-input" class="form-control" rows="3" maxlength="250" style="height:auto; padding:10px 14px; margin-top:6px;" placeholder="Ví dụ: Số 12 Điện Biên Phủ, phường Ngô Quyền" oninput="updateAddrRegionWarn()"></textarea>
+      <div id="addr-suggest" class="addr-suggest" hidden></div>
+      <p id="addr-region-warn" class="addr-region-warn" hidden></p>
+      <p id="addr-error" style="margin:6px 0 0; font-size:14px; color:var(--lg-heritage);" hidden>Vui lòng chọn Tỉnh / Thành phố và nhập số nhà, đường, phường / xã.</p>
       <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px; flex-wrap:wrap;">
         <button type="button" class="btn-action btn-secondary" onclick="closeAddressModal(null)">Hủy</button>
         <button type="button" class="btn-action" id="addr-save-btn" onclick="saveAddressFromModal()" style="background:#EA1917; border-color:#EA1917; color:#FFF;">Lưu địa chỉ</button>
@@ -7305,7 +7317,10 @@
               authenticated = true;
               authUser = data.user;
               if (data.token) authUser.token = data.token;
-              saveSession(authUser);
+              const srvAddr = Object.prototype.hasOwnProperty.call(authUser, 'address') ? authUser.address : undefined;   // v2.11: địa chỉ lưu trên Sheet
+              delete authUser.address;
+              saveSession(authUser);   // không lưu địa chỉ vào phiên: mở lại trang sẽ hỏi máy chủ bản mới nhất
+              if (srvAddr !== undefined) authUser.serverAddress = srvAddr;
               applyLogin(authUser);
               btn.disabled = false; btn.textContent = 'Đăng nhập';
               return;
@@ -8898,6 +8913,7 @@
       const pid = programId || activeProgram;
       if (typeof applyProgramTexts === 'function') applyProgramTexts(pid);   // v2.9: hạn mức + tiêu đề Tab 1 theo chương trình
       if (typeof renderDeliveryAddrRow === 'function') renderDeliveryAddrRow();
+      if (typeof syncDeliveryAddress === 'function') syncDeliveryAddress();   // v2.11: lấy / đẩy địa chỉ với máy chủ (1 lần mỗi lần đăng nhập / mở trang)
       if (typeof applySiteConfig === 'function') applySiteConfig();   // v2.9: dòng thông báo chỉ hiện sau đăng nhập → áp lại Config
       const titleEl = document.getElementById('grap-program-title');
       const pillEl = document.getElementById('grap-status-pill');
@@ -9050,6 +9066,7 @@
                 <div style="background:rgba(255,255,255,0.06); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); margin-bottom:6px;">
                   <div style="color:#CBC8C2; font-size:11px;">Giá ưu đãi nội bộ: <strong style="color:#FD312E; font-size:13px;">${formatVND(myReg.internalPrice || 0)}</strong></div>
                   <div style="color:#CBC8C2; font-size:11px;">Kho bàn giao: <strong style="color:#FFFFFF;">${esc(myReg.kho || 'Hải Phòng')}</strong></div>
+                  ${card3AddrLine(myReg)}
                 </div>
                 <div style="font-size:11px; color:#CBC8C2;">Đăng ký: ${esc(fmtVNTime(myReg.timestamp || ''))}</div>
               </div>`;
@@ -9146,7 +9163,7 @@
       document.getElementById('quick-kho-name').textContent = 'Kho ' + (reg.kho || 'Hải Phòng');
       document.getElementById('quick-model-name').innerHTML = esc(reg.model || '') + snHtml(reg);
       document.getElementById('quick-amount-text').textContent = formatVND(reg.internalPrice || 0);
-      renderPayAddrNote('quick-addr-note', reg.address);   // v2.10
+      renderPayAddrNote('quick-addr-note', reg.address, reg);   // v2.10 (v2.11: kèm đơn → nút Đổi địa chỉ)
 
       // Pre-fill user data (Zero-typing)
       document.getElementById('quick-payer-name').value = currentUser.name || '';
@@ -9663,56 +9680,246 @@
     }
 
     // ===== v2.9 (chủ dự án duyệt): địa chỉ nhận hàng — gửi kèm lệnh giữ chỗ (máy chủ đã lưu sẵn vào Registrations cột J) =====
-    // Lưu trên máy theo mã NV để lần sau không phải gõ lại. Đổi địa chỉ chỉ áp dụng cho lần giữ chỗ sau; đơn đã giữ: liên hệ PM.
+    // v2.11 (12/10/2026, chủ dự án duyệt): 1 địa chỉ mặc định / nhân viên LƯU TRÊN SHEET (tab Users, cột "Address") → tự điền
+    // trên mọi máy; trình duyệt chỉ giữ bản đệm. Máy chủ cũ (chưa có lệnh) → tự quay về cách cũ (chỉ lưu trên máy).
+    // Ô chọn Tỉnh/Thành (34 đơn vị từ 01/7/2025) + CẢNH BÁO khi miền địa chỉ ≠ miền kho (chỉ cảnh báo, vẫn cho giữ chỗ).
+    // Đơn đã giữ: tự đổi địa chỉ khi "Chờ mở thanh toán" / "Chờ nộp tiền" và chưa khai nộp (cùng quy tắc Hủy giữ chỗ).
+    var ADDR_SERVER = false;                 // máy chủ có lệnh lưu địa chỉ (Apps Script Version 12)
+    var addrSyncedFor = '';                  // chỉ đồng bộ 1 lần mỗi phiên đăng nhập
+    // Miền theo kho: AYA Bắc (Hải Phòng / Hà Nội), AYB Trung (Đà Nẵng), AYC Nam (Bình Dương / HCM). Chủ dự án duyệt bảng tỉnh → miền.
+    const KHO_REGION = { AYA: 'Bắc', AYB: 'Trung', AYC: 'Nam' };
+    const VN_PROVINCES = {
+      'Bắc': ['Hà Nội', 'Hải Phòng', 'Quảng Ninh', 'Bắc Ninh', 'Hưng Yên', 'Ninh Bình', 'Phú Thọ', 'Thái Nguyên', 'Tuyên Quang', 'Lào Cai',
+              'Cao Bằng', 'Lạng Sơn', 'Điện Biên', 'Lai Châu', 'Sơn La'],
+      'Trung': ['Thanh Hóa', 'Nghệ An', 'Hà Tĩnh', 'Quảng Trị', 'Huế', 'Đà Nẵng', 'Quảng Ngãi', 'Gia Lai', 'Khánh Hòa', 'Đắk Lắk', 'Lâm Đồng'],
+      'Nam': ['TP Hồ Chí Minh', 'Đồng Nai', 'Tây Ninh', 'Cần Thơ', 'Vĩnh Long', 'Đồng Tháp', 'An Giang', 'Cà Mau']
+    };
+    // Tên tỉnh cũ (trước 01/7/2025) và tên gọi thường gặp → nhận ra miền cả với địa chỉ gõ tự do / lưu từ trước
+    const VN_PROVINCE_ALIASES = {
+      'Bắc': ['Hà Giang', 'Yên Bái', 'Bắc Kạn', 'Bắc Giang', 'Vĩnh Phúc', 'Hòa Bình', 'Hải Dương', 'Thái Bình', 'Hà Nam', 'Nam Định'],
+      'Trung': ['Quảng Bình', 'Thừa Thiên Huế', 'Quảng Nam', 'Kon Tum', 'Bình Định', 'Phú Yên', 'Ninh Thuận', 'Đắk Nông', 'Bình Thuận'],
+      'Nam': ['Hồ Chí Minh', 'HCM', 'Sài Gòn', 'Bình Dương', 'Bà Rịa', 'Vũng Tàu', 'Bình Phước', 'Long An', 'Bến Tre', 'Trà Vinh', 'Tiền Giang',
+              'Sóc Trăng', 'Hậu Giang', 'Bạc Liêu', 'Kiên Giang']
+    };
+    function addrFold(t) { return asciiFold(t).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+    const ADDR_REGION_NAMES = [];
+    [VN_PROVINCES, VN_PROVINCE_ALIASES].forEach(src => Object.keys(src).forEach(rg => src[rg].forEach(n => ADDR_REGION_NAMES.push([addrFold(n), rg]))));
+    // Miền của 1 địa chỉ: tên tỉnh xuất hiện SAU CÙNG (tỉnh thường ở cuối; tránh nhầm tên đường như "Điện Biên Phủ")
+    function addrRegion(text) {
+      const f = ' ' + addrFold(text) + ' ';
+      let best = null, pos = -1;
+      ADDR_REGION_NAMES.forEach(([n, rg]) => { const k = f.lastIndexOf(' ' + n + ' '); if (k > pos) { pos = k; best = rg; } });
+      return best;
+    }
+    function addrRegionWarn(addr, kho) {
+      const ar = addrRegion(addr), kr = KHO_REGION[String(kho || '').toUpperCase()];
+      if (!ar || !kr || ar === kr) return '';
+      return T(`Lưu ý: địa chỉ ở Miền ${ar}, sản phẩm ở kho ${String(kho).toUpperCase()} (Miền ${kr}). Bạn vẫn giữ chỗ được; PM sẽ kiểm tra.`);
+    }
+    // Tách "chi tiết, Tỉnh" khi địa chỉ kết thúc bằng 1 trong 34 tỉnh / thành (hoặc cách gõ thường gặp của TP Hồ Chí Minh)
+    const PROVINCE_TAIL = { 'ho chi minh': 'TP Hồ Chí Minh', 'tp hcm': 'TP Hồ Chí Minh', 'tphcm': 'TP Hồ Chí Minh', 'hcm': 'TP Hồ Chí Minh', 'sai gon': 'TP Hồ Chí Minh', 'thua thien hue': 'Huế' };
+    function splitAddress(a) {
+      a = String(a || '').trim();
+      const fa = addrFold(a), tails = [];
+      [].concat(VN_PROVINCES['Bắc'], VN_PROVINCES['Trung'], VN_PROVINCES['Nam']).forEach(p => tails.push([addrFold(p), p]));
+      Object.keys(PROVINCE_TAIL).forEach(k => tails.push([k, PROVINCE_TAIL[k]]));
+      tails.sort((x, y) => y[0].length - x[0].length);   // khớp tên dài trước ("tp ho chi minh" trước "ho chi minh")
+      for (const [ft, p] of tails) {
+        if (fa !== ft && !fa.endsWith(' ' + ft)) continue;
+        const idx = a.lastIndexOf(',');
+        if (idx >= 0 && addrFold(a.slice(idx + 1)) === ft) return { province: p, detail: a.slice(0, idx).trim() };
+        return { province: p, detail: fa === ft ? '' : a };
+      }
+      return { province: '', detail: a };
+    }
+    function joinAddress(detail, province) {
+      const d = String(detail || '').replace(/\s+/g, ' ').trim().replace(/,\s*$/, '');
+      if (!province) return d;
+      return splitAddress(d).province === province ? d : (d ? d + ', ' : '') + province;   // đã gõ sẵn tên tỉnh ở cuối → không lặp
+    }
+    function fillProvinceSelect(sel) {
+      if (sel.options.length) return;
+      sel.innerHTML = `<option value="">${T('— Chọn Tỉnh / Thành phố —')}</option>` +
+        Object.keys(VN_PROVINCES).map(rg => `<optgroup label="${T('Miền ' + rg)}">` +
+          VN_PROVINCES[rg].map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('') + '</optgroup>').join('');
+    }
+
     function addrKey() { return 'lg_delivery_addr_' + (currentUser ? currentUser.id : ''); }
+    function addrPendingKey() { return 'lg_delivery_addr_pending_' + (currentUser ? currentUser.id : ''); }
     function getDeliveryAddress() { try { return (localStorage.getItem(addrKey()) || '').trim(); } catch (e) { return (currentUser && currentUser.address) || ''; } }
     function setDeliveryAddress(a) { try { localStorage.setItem(addrKey(), a); } catch (e) {} if (currentUser) currentUser.address = a; renderDeliveryAddrRow(); }
+    // Gửi địa chỉ mặc định lên máy chủ (chạy nền). Lỗi mạng → đánh dấu "chờ đồng bộ", lần đăng nhập / mở trang sau tự gửi lại.
+    async function pushDeliveryAddress(a) {
+      try { localStorage.setItem(addrPendingKey(), a); } catch (e) {}
+      const r = await postToSheet({ action: 'update_my_address', address: a });
+      if (r && r.ok) { try { localStorage.removeItem(addrPendingKey()); } catch (e) {} return true; }
+      if (r && !r.offline && /không hợp lệ/i.test(r.message || '')) ADDR_SERVER = false;   // máy chủ cũ chưa có lệnh
+      return false;
+    }
+    // Sau đăng nhập / mở lại trang: Sheet là nguồn chuẩn. Địa chỉ đang "chờ đồng bộ" (sửa lúc mất mạng) được ưu tiên gửi lên.
+    async function syncDeliveryAddress() {
+      if (!isServerUser() || currentUser.role === 'PM') return;
+      const key = currentUser.id + '|' + (currentUser.token || '');
+      if (addrSyncedFor === key) return;
+      addrSyncedFor = key;
+      let srv = currentUser.serverAddress;
+      delete currentUser.serverAddress;   // chỉ dùng 1 lần (ngay sau đăng nhập); mở lại trang → hỏi máy chủ
+      if (srv === undefined) {   // mở lại trang (phiên còn hạn): hỏi địa chỉ mới nhất — có thể vừa sửa ở máy khác
+        const r = await postToSheet({ action: 'my_address' });
+        if (!r || !r.ok) return;   // máy chủ cũ / mạng lỗi: giữ cách cũ (lưu trên máy)
+        srv = r.address || '';
+      }
+      ADDR_SERVER = true;
+      let pending = ''; try { pending = (localStorage.getItem(addrPendingKey()) || '').trim(); } catch (e) {}
+      const local = getDeliveryAddress();
+      if (pending) { setDeliveryAddress(pending); pushDeliveryAddress(pending); }
+      else if (srv) { if (srv !== local) setDeliveryAddress(srv); else renderDeliveryAddrRow(); }
+      else if (local) { renderDeliveryAddrRow(); pushDeliveryAddress(local); }   // địa chỉ nhập từ bản v2.9–v2.10 (chỉ có trên máy này) → đưa lên Sheet
+      else renderDeliveryAddrRow();
+    }
     function renderDeliveryAddrRow() {
       const row = document.getElementById('delivery-addr-row'); if (!row) return;
       if (!currentUser || currentUser.role === 'PM') { row.hidden = true; return; }
       const a = getDeliveryAddress();
       if (currentUser) currentUser.address = a;
       row.hidden = false;
+      const note = ADDR_SERVER
+        ? 'Đã lưu trên hệ thống: tự điền khi bạn đăng nhập ở máy khác. Đơn đã giữ: bấm "Đổi địa chỉ" ở ô 03 (trước khi khai nộp tiền).'
+        : 'Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.';
       row.innerHTML = a
         ? `<span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span><button type="button" class="btn-action btn-secondary" onclick="openAddressModal(null)">${T('Sửa')}</button>` +
-          `<span class="addr-note">${T('Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.')}</span>`
+          `<span class="addr-note">${T(note)}</span>`
         : `<span class="addr-missing">${T('Chưa có địa chỉ nhận hàng — cần khi giữ chỗ.')}</span><button type="button" class="btn-action" onclick="openAddressModal(null)" style="background:#EA1917; border-color:#EA1917; color:#FFF;">${T('Thêm địa chỉ')}</button>` +
           `<span class="addr-note">${T('Thêm trước giờ mở bán để giữ chỗ nhanh hơn.')}</span>`;
     }
-    // v2.10: bước nộp tiền hiện địa chỉ đã ghi trên đơn (máy chủ trả khi đã đăng nhập) + nhắc đổi địa chỉ qua PM.
-    // Không lấy địa chỉ lưu trên máy: có thể đã sửa sau khi giữ chỗ → khác địa chỉ của đơn.
-    function renderPayAddrNote(id, address) {
+    // Đơn tự đổi địa chỉ được: Chờ mở thanh toán / Chờ nộp tiền, chưa khai nộp, máy chủ có lệnh (V12)
+    function canChangeOrderAddress(o) {
+      return !!(o && ADDR_SERVER && isServerUser() && USER_CANCELLABLE.indexOf(o.status) >= 0 && !o.paid && !o.bankTxn);
+    }
+    function addrChangeBtn(o) {
+      return `<button type="button" class="addr-link-btn" onclick="changeOrderAddress('${esc(o.slotId || o.slot || '')}')">${T('Đổi địa chỉ')}</button>`;
+    }
+    // Ô 03: dòng "Giao đến" + nút Đổi địa chỉ
+    function card3AddrLine(reg) {
+      if (!reg || !reg.address) return '';
+      return `<div style="color:#CBC8C2; font-size:11px;">${T('Giao đến:')} <strong style="color:#FFFFFF;" data-no-i18n>${esc(reg.address)}</strong>` +
+        (canChangeOrderAddress(reg) ? ` · <span style="color:#FAD45C;">${addrChangeBtn(reg)}</span>` : '') + `</div>`;
+    }
+    // v2.10: bước nộp tiền hiện địa chỉ đã ghi trên đơn (máy chủ trả khi đã đăng nhập).
+    // v2.11: đơn chưa khai nộp → nút "Đổi địa chỉ"; đã khai nộp / máy chủ cũ → liên hệ trực tiếp PM phụ trách.
+    function renderPayAddrNote(id, address, order) {
       const el = document.getElementById(id); if (!el) return;
       const a = String(address || '').trim();
+      const o = order ? Object.assign({}, order, { slotId: order.slotId || order.slot }) : null;
+      const can = canChangeOrderAddress(o);
       el.innerHTML = (a ? `<div><span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span></div>` : '') +
-        `<div>${T('Muốn đổi địa chỉ nhận hàng: liên hệ trực tiếp PM phụ trách.')}</div>`;
+        (a && o && addrRegionWarn(a, o.kho) ? `<div>${addrRegionWarn(a, o.kho)}</div>` : '') +
+        (can ? `<div>${T('Muốn đổi địa chỉ nhận hàng (trước khi khai nộp tiền):')} ${addrChangeBtn(o)}</div>`
+             : `<div>${T('Muốn đổi địa chỉ nhận hàng: liên hệ trực tiếp PM phụ trách.')}</div>`);
       el.hidden = false;
     }
-    var addrModalResolve = null;
-    function openAddressModal(prod) {
+    var addrModalResolve = null, addrModalCtx = null;
+    // prod: đang giữ chỗ sản phẩm này (cảnh báo khác miền) · opts.order: đang đổi địa chỉ của đơn đã giữ
+    function openAddressModal(prod, opts) {
+      opts = opts || {};
       const modal = document.getElementById('addr-modal'), input = document.getElementById('addr-input'), info = document.getElementById('addr-modal-product');
-      input.value = getDeliveryAddress();
+      const sel = document.getElementById('addr-province');
+      fillProvinceSelect(sel);
+      const cur = opts.order ? (opts.order.address || '') : getDeliveryAddress();
+      const parts = splitAddress(cur);
+      sel.value = parts.province; input.value = parts.province ? parts.detail : cur;
+      addrModalCtx = { prod: prod || (opts.order ? { kho: opts.order.kho, model: opts.order.model } : null), order: opts.order || null };
       document.getElementById('addr-error').hidden = true;
-      if (prod) {
-        const region = { AYA: 'Kho AYA · Miền Bắc (Hải Phòng / Hà Nội)', AYB: 'Kho AYB · Miền Trung (Đà Nẵng)', AYC: 'Kho AYC · Miền Nam (Bình Dương / HCM)' }[String(prod.kho || '').toUpperCase()] || ('Kho ' + (prod.kho || ''));
+      const kho = addrModalCtx.prod && addrModalCtx.prod.kho;
+      const region = { AYA: 'Kho AYA · Miền Bắc (Hải Phòng / Hà Nội)', AYB: 'Kho AYB · Miền Trung (Đà Nẵng)', AYC: 'Kho AYC · Miền Nam (Bình Dương / HCM)' }[String(kho || '').toUpperCase()] || ('Kho ' + (kho || ''));
+      if (opts.order) {
+        info.textContent = `${T('Đổi địa chỉ cho đơn:')} ${opts.order.model || ''} · ${opts.order.slotId} · ${T(region)}`; info.hidden = false;
+        document.getElementById('addr-save-btn').textContent = T('Lưu địa chỉ cho đơn này');
+      } else if (prod) {
         info.textContent = `${T('Bạn đang giữ chỗ:')} ${prod.model} · ${T(region)}`; info.hidden = false;
         document.getElementById('addr-save-btn').textContent = T('Lưu & tiếp tục giữ chỗ');
       } else {
         info.hidden = true; document.getElementById('addr-save-btn').textContent = T('Lưu địa chỉ');
       }
+      renderAddrSuggest(cur);
+      updateAddrRegionWarn();
       modal.classList.add('active');
-      setTimeout(() => input.focus(), 50);
+      setTimeout(() => (sel.value ? input : sel).focus(), 50);
       return new Promise(resolve => { addrModalResolve = resolve; });
+    }
+    // Gợi ý "Dùng lại": địa chỉ mặc định + địa chỉ ở các đơn trước (tối đa 3, không trùng địa chỉ đang có)
+    function renderAddrSuggest(cur) {
+      const box = document.getElementById('addr-suggest'); if (!box) return;
+      const seen = new Set([addrFold(cur)]), list = [];
+      const add = a => { a = String(a || '').trim(); const k = addrFold(a); if (a.length >= 10 && !seen.has(k) && list.length < 3) { seen.add(k); list.push(a); } };
+      add(getDeliveryAddress());
+      (isServerUser() ? myServerOrders : []).slice().reverse().forEach(o => add(o.address));
+      box.hidden = !list.length;
+      box.innerHTML = list.length ? `<span>${T('Dùng lại:')}</span>` + list.map((a, i) => `<button type="button" class="addr-chip" data-i="${i}" data-no-i18n>${esc(a)}</button>`).join('') : '';
+      box.querySelectorAll('.addr-chip').forEach(b => b.onclick = () => {
+        const p = splitAddress(list[+b.dataset.i]);
+        document.getElementById('addr-province').value = p.province;
+        document.getElementById('addr-input').value = p.province ? p.detail : list[+b.dataset.i];
+        updateAddrRegionWarn();
+      });
+    }
+    function updateAddrRegionWarn() {
+      const el = document.getElementById('addr-region-warn'); if (!el) return;
+      const kho = addrModalCtx && addrModalCtx.prod && addrModalCtx.prod.kho;
+      const a = joinAddress(document.getElementById('addr-input').value, document.getElementById('addr-province').value);
+      const w = kho ? addrRegionWarn(a, kho) : '';
+      el.textContent = w; el.hidden = !w;
     }
     function closeAddressModal(value) {
       document.getElementById('addr-modal').classList.remove('active');
-      const r = addrModalResolve; addrModalResolve = null; if (r) r(value);
+      const r = addrModalResolve; addrModalResolve = null; addrModalCtx = null; if (r) r(value);
     }
-    function saveAddressFromModal() {
-      const a = document.getElementById('addr-input').value.replace(/\s+/g, ' ').trim();
-      if (a.length < 10) { document.getElementById('addr-error').hidden = false; return; }
+    async function saveAddressFromModal() {
+      let prov = document.getElementById('addr-province').value;
+      let detail = document.getElementById('addr-input').value.replace(/\s+/g, ' ').trim();
+      if (!prov) { const p = splitAddress(detail); if (p.province) { prov = p.province; detail = p.detail || detail; document.getElementById('addr-province').value = prov; } }   // đã gõ sẵn tên tỉnh ở cuối → tự nhận
+      const a = joinAddress(detail, prov);
+      if (!prov || detail.length < 5 || a.length < 10) { document.getElementById('addr-error').hidden = false; return; }
+      const ctx = addrModalCtx || {};
+      if (ctx.order) {   // đổi địa chỉ của đơn đã giữ: chờ máy chủ xác nhận
+        const btn = document.getElementById('addr-save-btn'); btn.disabled = true;
+        const r = await postToSheet({ action: 'user_update_order_address', slotId: ctx.order.slotId, address: a });
+        btn.disabled = false;
+        if (!r || !r.ok) { showToast((r && r.message) || 'Chưa đổi được địa chỉ. Vui lòng thử lại.', 'error', 6000); return; }
+        closeAddressModal(a);
+        showToast(r.message || 'Đã đổi địa chỉ nhận hàng.', 'success');
+        onOrderAddressChanged(ctx.order.slotId, r.address || a);
+        return;
+      }
       setDeliveryAddress(a);
-      closeAddressModal(a);
+      closeAddressModal(a);   // giữ chỗ không phải chờ: địa chỉ còn được gửi kèm lệnh giữ chỗ
+      if (ADDR_SERVER) {
+        pushDeliveryAddress(a).then(ok => { if (!ok) showToast('Đã lưu địa chỉ trên máy này. Chưa lưu được lên hệ thống (mạng chậm) — sẽ tự thử lại lần sau.', 'warning', 6000); });
+      }
+    }
+    // Nút "Đổi địa chỉ" (ô 03, bước nộp tiền)
+    function changeOrderAddress(slotId) {
+      const o = (isServerUser() ? myServerOrders : []).find(r => r.slotId === slotId);
+      if (!o) return;
+      if (!canChangeOrderAddress(o)) { showToast('Đơn đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được. Vui lòng liên hệ trực tiếp PM phụ trách.', 'error', 6000); return; }
+      openAddressModal(null, { order: o });
+    }
+    function onOrderAddressChanged(slotId, address) {
+      myServerOrders.forEach(r => { if (r.slotId === slotId) r.address = address; });
+      if (lastLookup && Array.isArray(lastLookup.orders)) lastLookup.orders.forEach(o => { if (o.slot === slotId) o.address = address; });
+      const o = myServerOrders.find(r => r.slotId === slotId);
+      if (document.getElementById('quick-payment-modal').classList.contains('active') && document.getElementById('quick-slot-code').textContent === slotId) renderPayAddrNote('quick-addr-note', address, o);
+      if (payCtx && payCtx.slot === slotId) renderPayAddrNote('pay-addr-note', address, Object.assign({}, o, { slotId }));
+      if (activeProgram) renderBriefTopDashboard(activeProgram);
+      refreshMyServerOrders();
+    }
+    // PM: nhãn "Khác miền kho" (địa chỉ ≠ miền kho) và "Đã đổi địa chỉ" (nhân viên tự đổi, ghi ở cột Ghi chú)
+    function pmAddrFlags(r) {
+      let h = '';
+      const ar = addrRegion(r.address), kr = KHO_REGION[String(r.kho || '').toUpperCase()];
+      if (r.address && ar && kr && ar !== kr) h += `<span class="pm-addr-flag" title="${esc(T(`Địa chỉ ở Miền ${ar}, kho ${String(r.kho).toUpperCase()} ở Miền ${kr}`))}">${T('Khác miền kho')}</span>`;
+      if (/đổi địa chỉ/i.test(r.note || '')) h += `<span class="pm-addr-flag">${T('Đã đổi địa chỉ')}</span>`;
+      return h;
     }
 
     // v2.8 (11/10/2026): Docs — bộ hướng dẫn theo vai trò (chỉ để tiện xem; link là trang công khai, ảnh chỉ có dữ liệu mẫu)
@@ -10222,7 +10429,8 @@
         `Sản phẩm: ${prod.model}${snTxt(prod)} — ${prod.description}\n` +
         `Giá nội bộ: ${formatVND(prod.internalPrice)}\n` +
         `Kho: ${prod.kho}\n` +
-        `Giao đến: ${deliveryAddr || '—'}\n\n` +
+        `Giao đến: ${deliveryAddr || '—'}\n` +
+        (addrRegionWarn(deliveryAddr, prod.kho) ? `${addrRegionWarn(deliveryAddr, prod.kho)}\n` : '') + `\n` +   // v2.11: chỉ cảnh báo, vẫn cho giữ chỗ
         `Bạn có chắc muốn đăng ký sản phẩm này?`;
       if (!confirm(msg)) return;
 
@@ -10708,7 +10916,7 @@
               <div class="pm-emp-badge">
                 <span class="pm-emp-name">${esc(r.empName)}</span>
                 <span class="pm-emp-meta">${esc(r.empCode)} · ${esc(r.division || '')}</span>
-                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}
+                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}${pmAddrFlags(r)}
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
@@ -11069,7 +11277,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
               <div class="pm-emp-badge">
                 <span class="pm-emp-name">${esc(r.empName)}</span>
                 <span class="pm-emp-meta">${esc(r.empCode)} · ${esc(r.division || '')}</span>
-                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}
+                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}${pmAddrFlags(r)}
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
@@ -12232,7 +12440,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         `<div data-no-i18n>${esc(cfg('BANK_HOLDER_SHORT'))}</div>` +
         `<div>Nội dung CK: <code class="pay-qr-syntax">${esc(qrSyntax)}</code></div></div>`;
       document.getElementById('pay-qr-box').hidden = false;
-      renderPayAddrNote('pay-addr-note', order.address);   // v2.10
+      renderPayAddrNote('pay-addr-note', order.address, { slotId: order.slot, kho: order.kho, model: order.model, status: order.status, paid: order.paid });   // v2.10 (v2.11: kèm đơn)
       document.getElementById('pay-lock').hidden = true;
       form.hidden = false;
       document.getElementById('payment-upload-card').scrollIntoView({ behavior: 'smooth' });

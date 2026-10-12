@@ -119,7 +119,9 @@
   }
   function walk(node) {
     if (node.nodeType === 3) { doText(node); return; }
-    if (node.nodeType !== 1 || SKIP[node.nodeName] || noI18n(node)) return;
+    if (node.nodeType !== 1 || noI18n(node)) return;
+    if (node.nodeName === 'TEXTAREA') { doAttrs(node); return; }   // 12/10/2026: chữ người dùng gõ không dịch, nhưng chữ gợi ý (placeholder) vẫn dịch
+    if (SKIP[node.nodeName]) return;
     doAttrs(node);
     for (var c = node.firstChild; c; c = c.nextSibling) walk(c);
   }
