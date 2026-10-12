@@ -9,7 +9,8 @@ Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1�
 17–20 = PM điện thoại (C1, C2, cửa sổ biên lai), tab 3 (C3, nhãn), nút Docs, bản dịch EN (v2.8.0);
 21–24 = địa chỉ nhận hàng, Config (public_config), hạn mức theo chương trình, EN (v2.9.0);
 25 = hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền (v2.10.0);
-26 = địa chỉ lưu trên Sheet, tỉnh/thành + cảnh báo khác miền, tự đổi địa chỉ đơn (v2.11.0).
+26 = địa chỉ lưu trên Sheet, tỉnh/thành + cảnh báo khác miền, tự đổi địa chỉ đơn (v2.11.0);
+27 = người nhận hàng + nhân viên tự sửa SĐT (v2.12.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -703,6 +704,92 @@ def main():
             check(en[0] == 'Province / City *' and en[1] == '— Choose province / city —' and en[2] == 'North' and en[3].startswith('Note: the address is in the South region, but the item is in warehouse AYA (North region)') and en[4].startswith('e.g.'), f'EN: {en}')
             r = page.evaluate("(() => { const c = document.querySelector('#addr-modal .modal-card').getBoundingClientRect(); return [Math.round(c.left), Math.round(c.right), innerWidth, document.documentElement.scrollWidth <= innerWidth + 1]; })()")
             check(r[0] >= 0 and r[1] <= r[2] and r[3], f'iPhone 13: cửa sổ địa chỉ vừa màn hình ({r})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('27. v2.12 người nhận hàng + nhân viên tự sửa SĐT (mặc định "Tôi là người nhận")')
+            class RecvV12(Mock):   # giả lập Apps Script Version 12 (Code.gs v2.12)
+                def __init__(self, **kw):
+                    super().__init__(**kw); self.prof = {'address': '', 'receiverName': '', 'receiverPhone': '', 'phone': '0900001234'}; self.order = {'address': 'Số 7 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội', 'receiverName': '', 'receiverPhone': ''}
+                def do_auth(self, d):
+                    r = super().do_auth(d)
+                    if r.get('ok'): r['user'].update(address=self.prof['address'], receiverName=self.prof['receiverName'], receiverPhone=self.prof['receiverPhone'], phone=self.prof['phone'])
+                    return r
+                def do_my_address(self, d): return dict(ok=True, **self.prof)
+                def do_update_my_address(self, d):
+                    self.prof.update(address=d['address'], receiverName=d.get('receiverName', ''), receiverPhone=d.get('receiverPhone', ''))
+                    if d.get('phone'): self.prof['phone'] = d['phone']
+                    return {'ok': True, 'address': d['address'], 'message': 'Đã lưu địa chỉ nhận hàng.'}
+                def do_user_update_order_address(self, d):
+                    self.order.update(address=d['address'], receiverName=d.get('receiverName', ''), receiverPhone=d.get('receiverPhone', ''))
+                    return {'ok': True, 'address': d['address'], 'message': f"Đã đổi địa chỉ nhận hàng của đơn {d.get('slotId')}."}
+                def do_lookup(self, d):
+                    r = super().do_lookup(d)
+                    for o in r['orders']: o.update(self.order)
+                    return r
+            calls = lambda s_, a: [c[1] for c in s_.calls if c[0] == a]
+            ROW = "document.getElementById('delivery-addr-row').innerText"
+            s = RecvV12(my_status=None); s.prof['address'] = 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1200)
+            check('Người nhận: Nhan Vien That · 0900001234 (bạn)' in page.evaluate(ROW), f"tab 2: mặc định người nhận = chính bạn ({page.evaluate(ROW)[:160]!r})")
+            page.evaluate("setTimeout(() => openAddressModal(null), 0)"); page.wait_for_timeout(400)
+            st = page.evaluate("[document.getElementById('addr-contact').hidden, document.getElementById('addr-self').checked, document.getElementById('addr-receiver').hidden, document.getElementById('addr-my-phone').value]")
+            check(st == [False, True, True, '0900001234'], f'cửa sổ: có mục người nhận, mặc định "Tôi là người nhận", SĐT của bạn điền sẵn ({st})')
+            page.uncheck('#addr-self'); page.wait_for_timeout(100)
+            check(not page.evaluate("document.getElementById('addr-receiver').hidden"), 'bỏ tick → hiện Tên + SĐT người nhận')
+            page.fill('#addr-recv-name', 'Trần Thị Bình'); page.fill('#addr-recv-phone', '12345'); page.click('#addr-save-btn'); page.wait_for_timeout(300)
+            check('người nhận không hợp lệ' in page.inner_text('#addr-error') and not calls(s, 'update_my_address'), 'SĐT người nhận sai → báo lỗi, không lưu')
+            page.fill('#addr-recv-phone', '+84 912 345 678'); page.fill('#addr-my-phone', '0988 777 666'); page.click('#addr-save-btn'); page.wait_for_timeout(1500)
+            u = calls(s, 'update_my_address')[-1] if calls(s, 'update_my_address') else {}
+            check(u.get('receiverName') == 'Trần Thị Bình' and u.get('receiverPhone') == '0912345678' and u.get('phone') == '0988777666', f'lưu lên Sheet: người nhận + SĐT mới chuẩn hóa ({u.get("receiverPhone")}, {u.get("phone")})')
+            check('Người nhận: Trần Thị Bình · 0912345678' in page.evaluate(ROW), 'tab 2 hiện người nhận mới')
+            aya = page.evaluate("currentProducts.find(p => p.kho === 'AYA' && p.status === 'Available').uniqueCode")
+            page.evaluate(f"setTimeout(() => handleRegisterProduct('{aya}'), 0)"); page.wait_for_timeout(2500)
+            rp = calls(s, 'register_product')[-1] if calls(s, 'register_product') else {}
+            dlg = [x for x in page.dialogs if 'Xác nhận đăng ký' in x]
+            check(rp.get('receiverName') == 'Trần Thị Bình' and rp.get('receiverPhone') == '0912345678' and rp.get('phone') == '0988777666', f'giữ chỗ gửi người nhận + SĐT mới ({rp.get("phone")})')
+            check(dlg and 'Người nhận: Trần Thị Bình · 0912345678' in dlg[-1], 'hộp xác nhận giữ chỗ có dòng Người nhận')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # đổi người nhận của đơn; ô 03 + bước nộp tiền hiện người nhận; ô SĐT "Nộp tiền ngay" chỉ đọc
+            s = RecvV12(my_status=T.NEW); s.prof['address'] = 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'; s.order.update(receiverName='Lê Văn Cường', receiverPhone='0903333444')
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME); page.wait_for_timeout(1500)
+            check('Người nhận: Lê Văn Cường · 0903333444' in page.inner_text('#grap-card3-body'), 'ô 03 hiện người nhận của đơn')
+            page.click('#grap-card3-body .addr-link-btn'); page.wait_for_timeout(400)
+            st = page.evaluate("[document.getElementById('addr-myphone-wrap').hidden, document.getElementById('addr-self').checked, document.getElementById('addr-recv-name').value]")
+            check(st == [True, False, 'Lê Văn Cường'], f'đổi địa chỉ đơn: ẩn SĐT của bạn, điền sẵn người nhận của đơn ({st})')
+            page.check('#addr-self'); page.click('#addr-save-btn'); page.wait_for_timeout(2000)
+            check(s.order['receiverName'] == '' and 'Người nhận' not in page.inner_text('#grap-card3-body'), 'chuyển đơn sang tự nhận → máy chủ xóa người nhận, ô 03 cập nhật')
+            page.evaluate(f"openQuickPaymentModalForReg('{T.PID}-AYA-003')"); page.wait_for_timeout(600)
+            q = page.evaluate("[document.getElementById('quick-phone').readOnly, document.getElementById('quick-phone').value, document.getElementById('quick-phone-hint').hidden]")
+            check(q == [True, '0900001234', False], f'"Nộp tiền ngay": ô SĐT chỉ đọc + hướng dẫn sửa ở tab 2 ({q})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # máy chủ cũ (V11): không có mục người nhận; ô SĐT vẫn chỉ đọc, không hiện hướng dẫn
+            s = Mock(my_status=T.NEW); ctx, page = open_page(browser, port, s); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            page.evaluate("setTimeout(() => openAddressModal(null), 0)"); page.wait_for_timeout(300)
+            check(page.evaluate("document.getElementById('addr-contact').hidden") and 'Người nhận' not in page.evaluate(ROW), 'máy chủ cũ: ẩn mục người nhận (không nhập mà không lưu được)')
+            ctx.close()
+            # PM: bảng + cửa sổ biên lai + Excel
+            s = Mock(); r1 = reg(4, 'Đã khai nộp - chờ đối soát', 1000000); r1.update(address='Số 5 Lê Lợi, Hải Phòng', receiverName='Trần Thị Bình', receiverPhone='0912345678', receipt='https://drive.google.com/file/d/x/view'); s.pm_regs = [r1]
+            ctx, page = open_page(browser, port, s); T.login(page, T.PM); page.evaluate('loadPMDashboardData()'); page.wait_for_timeout(2500)
+            check('Người nhận: Trần Thị Bình · 0912345678' in page.inner_text('#pm-reg-tbody'), 'PM: bảng đơn hiện người nhận')
+            page.evaluate("openPMReceiptModal(pmRegistrations[0].id)"); page.wait_for_timeout(500)
+            check(page.evaluate("!document.getElementById('modal-receiver-row').hidden") and page.inner_text('#modal-receiver') == 'Trần Thị Bình · 0912345678', 'PM: cửa sổ biên lai hiện người nhận')
+            xl = page.evaluate("(() => { let got = null; const o = window.downloadTableFile; window.downloadTableFile = (rows, n, opt) => { got = [rows[0], rows[1], opt.moneyCols]; }; try { exportRegistrationsCSV(); } finally { window.downloadTableFile = o; } return got; })()")
+            check(xl and xl[0][13:15] == ['Người nhận hàng', 'SĐT người nhận'] and xl[1][13:15] == ['Trần Thị Bình', '0912345678'] and xl[0][xl[2][1]] == 'Số tiền đã nộp', f'Excel: 2 cột người nhận cạnh địa chỉ, cột tiền vẫn đúng ({xl and xl[0][12:16]}, {xl and xl[2]})')
+            ctx.close()
+            # EN + iPhone
+            s = RecvV12(my_status=None); s.prof['address'] = 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'
+            ctx, page = open_page(browser, port, s, device=ip13, no_addr=True, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(800)
+            page.evaluate("setTimeout(() => openAddressModal(null), 0)"); page.wait_for_timeout(300); page.uncheck('#addr-self'); page.wait_for_timeout(100)
+            en = page.evaluate("[document.querySelector('label[for=addr-my-phone]').textContent, document.querySelector('.addr-self span').textContent, document.querySelector('label[for=addr-recv-name]').textContent, document.getElementById('addr-recv-name').placeholder]")
+            check(en == ['Your phone number *', 'I will receive the item', "Recipient's name *", 'e.g. Tran Thi Binh'], f'EN: {en}')
+            r = page.evaluate("(() => { const c = document.querySelector('#addr-modal .modal-card'); const b = c.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.right), innerWidth, document.documentElement.scrollWidth <= innerWidth + 1, c.scrollHeight > c.clientHeight ? getComputedStyle(c).overflowY : 'fits']; })()")
+            check(r[0] >= 0 and r[1] <= r[2] and r[3] and r[4] in ('auto', 'scroll', 'fits'), f'iPhone 13: cửa sổ vừa màn hình, cuộn được khi dài ({r})')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

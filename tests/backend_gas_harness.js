@@ -607,6 +607,55 @@ console.log('--- v2.11: địa chỉ nhận hàng lưu trên tab Users (cột "A
   check(lg.includes('ADDRESS_UPDATE') && lg.includes('ORDER_ADDRESS_UPDATE'), 'nhật ký ADDRESS_UPDATE + ORDER_ADDRESS_UPDATE');
 }
 
+console.log('--- v2.12: người nhận hàng (Users ReceiverName/ReceiverPhone, Registrations X/Y) + nhân viên tự sửa SĐT ---');
+{
+  const book = freshBook(); const { post, cache } = load(book);
+  const users = book.getSheetByName('Users'), reg = book.getSheetByName('Registrations');
+  const u1 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  const A = 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng';
+  check(post({ action: 'update_my_address', token: u1.token, address: A, receiverName: 'Trần Thị B' }).ok === false, 'có tên người nhận nhưng thiếu SĐT → từ chối');
+  check(post({ action: 'update_my_address', token: u1.token, address: A, receiverName: 'Trần Thị B', receiverPhone: '12345' }).ok === false, 'SĐT người nhận sai định dạng → từ chối');
+  check(post({ action: 'update_my_address', token: u1.token, address: A, phone: '0912' }).ok === false, 'SĐT của mình sai định dạng → từ chối');
+  const up = post({ action: 'update_my_address', token: u1.token, address: A, receiverName: '  Trần   Thị B ', receiverPhone: '+84 912 345 678', phone: '0988 777 666' });
+  const h = users.rows[0], row = users.rows.find(r => r[0] === 'VH70001');
+  const col = n => h.indexOf(n);
+  check(up.ok && up.receiverName === 'Trần Thị B' && up.receiverPhone === '0912345678', `lưu người nhận (gộp khoảng trắng, +84 → 0): ${up.receiverName} ${up.receiverPhone}`);
+  check(col('ReceiverName') > 7 && col('ReceiverPhone') > 7 && row[col('ReceiverName')] === 'Trần Thị B' && String(row[col('ReceiverPhone')]) === "'0912345678", `tab Users tự thêm cột ReceiverName / ReceiverPhone, SĐT giữ số 0 (${JSON.stringify(h.slice(8))})`);
+  check(String(row[4]) === "'0988777666", `SĐT của nhân viên (cột E) được tự sửa, giữ số 0 (${row[4]})`);
+  check(book.getSheetByName('ActivityLog').rows.some(r => r[1] === 'PHONE_UPDATE'), 'nhật ký PHONE_UPDATE (có SĐT cũ)');
+  const a2 = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  check(a2.user.phone.replace(/\D/g, '') === '0988777666' && a2.user.receiverName === 'Trần Thị B' && a2.user.receiverPhone === '0912345678', 'đăng nhập lại trả SĐT mới + người nhận');
+  const me = post({ action: 'my_address', token: u1.token });
+  check(me.receiverName === 'Trần Thị B' && me.phone === '0988777666', 'my_address trả cả SĐT + người nhận');
+  // giữ chỗ kèm người nhận → cột X, Y; SĐT cột I giữ số 0
+  const r1 = post({ action: 'register_product', token: u1.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'Nhan Vien 1', phone: '0988777666', address: A, receiverName: 'Trần Thị B', receiverPhone: '0912345678' });
+  const row1 = reg.rows[1];
+  check(r1.ok && reg.rows[0][23] === 'Receiver Name' && reg.rows[0][24] === 'Receiver Phone', 'Registrations tự có tiêu đề cột X, Y');
+  check(row1[23] === 'Trần Thị B' && String(row1[24]) === "'0912345678" && String(row1[8]) === "'0988777666", `đơn ghi người nhận X, Y + SĐT cột I giữ số 0 (${row1[8]} / ${row1[24]})`);
+  const lk = post({ action: 'lookup', token: u1.token, empCode: 'VH70001' });
+  check(lk.orders[0].receiverName === 'Trần Thị B' && lk.orders[0].receiverPhone === '0912345678', 'lookup đã đăng nhập trả người nhận');
+  check(post({ action: 'lookup', empCode: 'VH70001', phoneLast4: '7666' }).orders[0].receiverName === '', 'tra cứu bằng 4 số cuối (SĐT mới) tìm được đơn, KHÔNG lộ người nhận');
+  const pm = post({ action: 'auth', id: 'VH12345', password: 'test123' });
+  const dash = post({ action: 'pm_dashboard', token: pm.token, programId: PID });
+  check(dash.registrations[0].receiverName === 'Trần Thị B' && dash.registrations[0].receiverPhone === '0912345678', 'PM dashboard thấy người nhận');
+  // giữ chỗ không kèm người nhận (tự nhận) → X, Y trống
+  const u2 = post({ action: 'auth', id: 'VH70002', password: 'pw2' });
+  post({ action: 'register_product', token: u2.token, uniqueCode: PID + '-AYA-002', programId: PID, empCode: 'VH70002', empName: 'Nhan Vien 2', phone: '0900002222', address: 'Số 2 Lạch Tray, Hải Phòng' });
+  const row2 = reg.rows.find(r => r[3] === 'VH70002');
+  check(!row2[23] && !row2[24], 'tự nhận hàng → cột X, Y trống');
+  // đổi người nhận của đơn
+  const ch = post({ action: 'user_update_order_address', token: u1.token, slotId: PID + '-AYA-001', address: A });
+  check(ch.ok && !reg.rows[1][23] && /người nhận cũ: Trần Thị B/.test(reg.rows[1][20]), 'đổi đơn sang tự nhận → xóa X, Y, ghi vết người nhận cũ');
+  check(post({ action: 'user_update_order_address', token: u1.token, slotId: PID + '-AYA-001', address: A, receiverName: 'Lê C', receiverPhone: 'abc' }).ok === false, 'đổi người nhận đơn: SĐT sai → từ chối');
+  check(post({ action: 'user_update_order_address', token: u1.token, slotId: PID + '-AYA-001', address: A, receiverName: 'Lê Văn C', receiverPhone: '0903333444' }).ok && reg.rows[1][23] === 'Lê Văn C', 'đổi người nhận đơn → X, Y mới');
+  // web cũ không gửi địa chỉ → lấy mặc định cả người nhận
+  const b3 = freshBook(); const L3 = load(b3); const t3 = L3.post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  L3.post({ action: 'update_my_address', token: t3.token, address: A, receiverName: 'Trần Thị B', receiverPhone: '0912345678' });
+  L3.post({ action: 'register_product', token: t3.token, uniqueCode: PID + '-AYA-003', programId: PID, empCode: 'VH70001', empName: 'Nhan Vien 1' });
+  const r3 = b3.getSheetByName('Registrations').rows[1];
+  check(r3[9] === A && r3[23] === 'Trần Thị B', 'web cũ không gửi địa chỉ → máy chủ điền địa chỉ + người nhận mặc định');
+}
+
 console.log('--- V1-10: Mọi lệnh ghi Registrations / Products của luồng nghiệp vụ nằm trong khóa ---');
 {
   const allowed = /program_delete|product_upload|setup/; // ngoài phạm vi đợt này (thêm dòng mới / xóa chương trình 0 đơn)

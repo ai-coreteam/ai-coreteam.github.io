@@ -29,6 +29,7 @@
 |---|---|---|
 | Mã nguồn (web + Code.gs) | Git tag **`checkpoint-pre-v1-hardening-20261005`** (commit `5404e1a`) và nhánh **`backup/pre-v1-hardening-20261005`** | `git checkout checkpoint-pre-v1-hardening-20261005 -- Mau_Dang_Ky_Internal_Sales_3009.html apps-script/Code.gs` rồi commit; hoặc quay hẳn: `git switch main` (main chưa bị sửa) |
 | Dữ liệu Google Sheet | Bản sao **"LG Internal Sales Database - BACKUP 2026-10-05 (pre-v1-hardening) - KHONG SUA"** (ID `1WIUrSzTYxqKKtt5RbJ2bF2xZiZRVpXC_pxFdpQQ9lL4`, riêng tư) | Sao chép dữ liệu từ bản backup sang Sheet chính (không xóa Sheet chính) |
+| **v2.12.0 — người nhận hàng (tên + SĐT, cột X/Y), nhân viên tự sửa SĐT, sửa ô SĐT "Nộp tiền ngay" không lưu** (12/10/2026) | Điểm quay lại web: tag **`v2.11.0`** (hoặc `v2.10.2` nếu bỏ cả phần địa chỉ). Apps Script: **Version 12** = `Code.gs` tag `v2.12.0` (§3d); quay lại **Version 11** | **Quay lại web:** `git checkout v2.11.0 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/ guides/` → commit → `git pull --ff-only gobita main` → `git push all main`. Cột X, Y và cột Users mới để nguyên được |
 | **v2.11.0 — địa chỉ nhận hàng lưu trên Sheet, Tỉnh/Thành + cảnh báo khác miền, tự đổi địa chỉ đơn; 2 lỗi EN** (12/10/2026) | Điểm quay lại web: tag **`v2.10.2`**. Apps Script: **Version 12** = `Code.gs` tag `v2.11.0` (§3d); quay lại **Version 11** | **Quay lại web:** `git checkout v2.10.2 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html assets/i18n/ guides/` → commit → `git pull --ff-only gobita main` → `git push all main`. Cột Address trên Sheet để nguyên được (web cũ không đọc) |
 | **v2.10.2 — chặn "tự làm tối trang web" (Cốc Cốc…), dịch thông báo đọc biên lai, sửa 2 ảnh hướng dẫn** (11/10/2026) | Điểm quay lại: tag **`v2.10.1`**. Apps Script **không đổi** (Version 11) | **Quay lại:** `git checkout v2.10.1 -- Mau_Dang_Ky_Internal_Sales_3009.html portal.html index.html assets/i18n/ guides/ scripts/build_guides_web.py` → commit → `git pull --ff-only gobita main` → `git push all main` |
 | **v2.10.1 — bộ hướng dẫn (Docs) hiển thị vừa điện thoại** (11/10/2026) | Điểm quay lại: tag **`v2.10.0`**. Apps Script **không đổi** (Version 11). Chỉ đổi `guides/` | **Quay lại:** `git checkout v2.10.0 -- guides/ scripts/build_guides_web.py` + `git rm guides/mobile.css scripts/guides_mobile.css` → commit → `git pull --ff-only gobita main` → `git push all main` |
@@ -141,19 +142,19 @@ Sheet staging đã tạo sẵn: **"LG Internal Sales Database - STAGING (test ta
 
 Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet tự đổi chuỗi `0991000012525` thành số khi `setupNewDatabase()` ghi). Code **không đọc** các ô `BANK_*`; nhân viên thấy số **đầy đủ `0991000012525`** ở ô 01, cửa sổ nộp tiền, mã VietQR (`970436-0991000012525`) và email — đã kiểm chứng trên `portal.html` 05/10. Muốn ô trong Sheet cũng đúng: gõ lại `'0991000012525` (có dấu nháy đơn ở đầu).
 
-### 3d. Deploy Apps Script **Version 12** (v2.11.0 — địa chỉ nhận hàng lưu trên Sheet) — chủ dự án làm ngay sau khi web v2.11.0 lên
+### 3d. Deploy Apps Script **Version 12** (v2.11.0 + v2.12.0 — địa chỉ, người nhận hàng, SĐT lưu trên Sheet) — chủ dự án làm ngay sau khi web v2.12.0 lên
 
-Web v2.11.0 **chạy được với Version 11** (máy chủ chưa có lệnh mới → web tự dùng cách cũ: địa chỉ lưu trên máy, đổi địa chỉ đơn qua PM).
-Version 12 = `Code.gs` tag **`v2.11.0`**, so với V11 chỉ **thêm**: `my_address` (đọc), `update_my_address`, `user_update_order_address`;
-`auth` trả thêm `address`; `register_product` thiếu địa chỉ → lấy địa chỉ mặc định, và ghi địa chỉ qua `safe_` (chống chèn công thức).
+Web v2.11.0 / v2.12.0 **chạy được với Version 11** (máy chủ chưa có lệnh mới → web tự dùng cách cũ: địa chỉ lưu trên máy, ẩn mục người nhận, đổi địa chỉ đơn qua PM).
+Version 12 = `Code.gs` tag **`v2.12.0`**, so với V11 chỉ **thêm**: `my_address` (đọc), `update_my_address` (địa chỉ + người nhận + SĐT của nhân viên), `user_update_order_address`;
+`auth` trả thêm `address`, `receiverName`, `receiverPhone`; `lookup` (đã đăng nhập) và `pm_dashboard` trả thêm người nhận; `register_product` ghi người nhận vào **cột X, Y** (tự thêm tiêu đề lần đầu), thiếu địa chỉ → lấy mặc định, địa chỉ qua `safe_`, **SĐT cột I giữ số 0 đầu**.
 
 | # | Việc | Chi tiết | Kiểm tra |
 |---|---|---|---|
 | 1 | Ghi lại Version đang chạy | Deploy → Manage deployments | Đang là **Version 11** |
-| 2 | Dán toàn bộ `apps-script/Code.gs` (tag **`v2.11.0`**) → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
+| 2 | Dán toàn bộ `apps-script/Code.gs` (tag **`v2.12.0`**) → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
 | 3 | **KHÔNG** chạy `rotateSessionSecret` / `setupWatchdogTrigger` / `setupNewDatabase` | Giữ phiên đăng nhập, trigger, dữ liệu | — |
 | 4 | Deploy phiên bản mới trên deployment cũ | ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
-| 5 | Kiểm tra trên web | Đăng nhập 1 tài khoản nhân viên → tab 2 → Thêm / Sửa địa chỉ → Lưu | Tab Users có cột **Address** (máy chủ tự thêm ở cột trống đầu tiên bên phải) và dòng của tài khoản đó có địa chỉ; dòng địa chỉ trên web ghi "Đã lưu trên hệ thống…" |
+| 5 | Kiểm tra trên web | Đăng nhập 1 tài khoản nhân viên → tab 2 → Thêm / Sửa địa chỉ → bỏ tick "Tôi là người nhận hàng", nhập tên + SĐT người nhận → Lưu | Tab Users có cột **Address**, **ReceiverName**, **ReceiverPhone** (máy chủ tự thêm bên phải) và dòng của tài khoản đó có dữ liệu; web ghi "Người nhận: …" |
 | 6 | Kiểm tra máy thứ 2 | Đăng nhập cùng tài khoản trên điện thoại | Địa chỉ tự điền |
 | **Quay lại** | ✏️ Edit → chọn **Version 11** → Deploy | Web tự quay về cách cũ; cột Address vẫn nằm trên Sheet, không ảnh hưởng | — |
 

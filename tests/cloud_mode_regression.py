@@ -661,7 +661,7 @@ def main():
             with page.expect_download() as dl:
                 page.click('#btn-pm-export-csv')
             rows = open(dl.value.path(), encoding='utf-8-sig').read().splitlines()
-            check(dl.value.suggested_filename.endswith('.csv') and rows and rows[0].count(',') == 22, 'thư viện Excel không tải được → vẫn tải CSV 23 cột (22 + Serial Number)')
+            check(dl.value.suggested_filename.endswith('.csv') and rows and rows[0].count(',') == 24, 'thư viện Excel không tải được → vẫn tải CSV 25 cột (22 + Serial Number + 2 cột người nhận v2.12)')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 
@@ -682,8 +682,9 @@ def main():
             page.evaluate("() => { window.XLSX.writeFile = (wb, name) => { window.__rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); }; }")
             page.evaluate("exportRegistrationsCSV()"); page.wait_for_timeout(300)
             rows = page.evaluate("window.__rows") or []
-            check(len(rows) == 2 and rows[1][13] == '06/10/2026 14:52:01' and rows[1][19] == '06/10/2026 15:00:00',
-                  f"file Excel: Thời gian ĐK giờ VN, Thời gian nộp giữ nguyên ({rows[1][13] if len(rows) > 1 else rows})")
+            ci = lambda name: rows[0].index(name) if rows and name in rows[0] else -1   # tìm cột theo tên tiêu đề (v2.12: thêm 2 cột người nhận)
+            check(len(rows) == 2 and rows[1][ci('Thời gian ĐK')] == '06/10/2026 14:52:01' and rows[1][ci('Thời gian nộp')] == '06/10/2026 15:00:00',
+                  f"file Excel: Thời gian ĐK giờ VN, Thời gian nộp giữ nguyên ({rows[1][ci('Thời gian ĐK')] if len(rows) > 1 else rows})")
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
             ctx.close()
 

@@ -1084,6 +1084,18 @@
   "ô 7 và 8": "fields 7 and 8",
   "Mục 6:": "Field 6:",
   "Mục 6": "Field 6",
+  "Số điện thoại của bạn *": "Your phone number *",
+  "Tôi là người nhận hàng": "I will receive the item",
+  "Tên người nhận hàng *": "Recipient's name *",
+  "Ví dụ: Trần Thị Bình": "e.g. Tran Thi Binh",
+  "Số điện thoại người nhận *": "Recipient's phone number *",
+  "Người nhận hàng:": "Recipient:",
+  "Người nhận:": "Recipient:",
+  "(bạn)": "(you)",
+  "Sửa số điện thoại ở mục Địa chỉ nhận hàng (tab 2).": "Edit your phone number under Delivery address (tab 2).",
+  "Vui lòng nhập tên người nhận hàng.": "Please enter the recipient's name.",
+  "Số điện thoại người nhận không hợp lệ (10 số, bắt đầu bằng 0).": "The recipient's phone number is invalid (10 digits starting with 0).",
+  "Số điện thoại của bạn không hợp lệ (10 số, bắt đầu bằng 0).": "Your phone number is invalid (10 digits starting with 0).",
   "Tỉnh / Thành phố *": "Province / City *",
   "Số nhà, đường, phường / xã *": "House number, street, ward / commune *",
   "Ví dụ: Số 12 Điện Biên Phủ, phường Ngô Quyền": "e.g. 12 Dien Bien Phu, Ngo Quyen ward",
@@ -2002,6 +2014,10 @@
   [
    "^Đơn (\\S+) đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được\\. Vui lòng liên hệ trực tiếp PM phụ trách\\.$",
    "Order $1 has a payment declared or has been processed, so you cannot change the address yourself. Please contact the PM in charge directly."
+  ],
+  [
+   "^Người nhận: (.+)$",
+   "Recipient: $1"
   ],
   [
    "^Chưa tải được (.+)\\. Máy chủ Google thường phản hồi chậm trong vài phút đầu mở bán; hệ thống sẽ tự thử lại sau 15 giây\\.$",

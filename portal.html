@@ -3472,6 +3472,10 @@
     .addr-suggest { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-size: 13px; color: var(--lg-text-2); align-items: center; }
     .addr-chip { max-width: 100%; padding: 6px 12px; border: 1px solid var(--lg-border); border-radius: 999px; background: var(--lg-card-bg); color: var(--lg-ink); font: inherit; font-size: 13px; cursor: pointer; text-align: left; overflow-wrap: anywhere; }
     .addr-link-btn { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+    .addr-contact[hidden], .addr-receiver[hidden], .addr-myphone[hidden] { display: none; }
+    .addr-self { display: flex; align-items: center; gap: 10px; margin: 14px 0 4px; font-size: 15px; color: var(--lg-ink); cursor: pointer; min-height: 44px; }
+    .addr-self input { width: 20px; height: 20px; accent-color: #A50034; flex-shrink: 0; }
+    #addr-my-phone, #addr-recv-name, #addr-recv-phone { font-size: 16px; margin-top: 6px; }
     .pm-addr-flag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #A50034; background: #F6F3EB; border: 1px solid #CBC8C2; white-space: nowrap; }
     #addr-input { font-size: 16px; }   /* iPhone không tự phóng to */
     .docs-link { display: flex; align-items: center; justify-content: center; height: 48px; text-decoration: none; font-size: 16px; }   /* v2.8: 2 link trong cửa sổ Docs */   /* v2.8 C1: nút "Thêm thao tác" chỉ có trên điện thoại */
@@ -5552,6 +5556,7 @@
           <div><strong>Người nộp:</strong> <span id="modal-payer-name" style="color:var(--lg-ink); font-weight:600;">-</span></div>
           <div><strong>Tài khoản nhận:</strong> <span data-cfg="BANK_ACC" data-no-i18n>0991000012525</span> (<span data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span>)</div>
           <div><strong>Địa chỉ nhận hàng:</strong> <span id="modal-address" data-no-i18n>-</span></div>
+          <div id="modal-receiver-row" hidden><strong>Người nhận hàng:</strong> <span id="modal-receiver" data-no-i18n>-</span></div>
         </div>
       </div>
 
@@ -5680,7 +5685,8 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
           <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">Số điện thoại liên hệ</label>
-            <input type="text" class="form-control" id="quick-phone" required placeholder="0901234567">
+            <input type="text" class="form-control" id="quick-phone" required placeholder="0901234567" readonly>   <!-- v2.12: chỉ đọc — máy chủ không lưu ô này; sửa SĐT ở cửa sổ Địa chỉ nhận hàng -->
+            <div id="quick-phone-hint" style="font-size:11px; color:#716F6A; margin-top:3px;" hidden>Sửa số điện thoại ở mục Địa chỉ nhận hàng (tab 2).</div>
           </div>
         </div>
 
@@ -5712,6 +5718,20 @@
       <textarea id="addr-input" class="form-control" rows="3" maxlength="250" style="height:auto; padding:10px 14px; margin-top:6px;" placeholder="Ví dụ: Số 12 Điện Biên Phủ, phường Ngô Quyền" oninput="updateAddrRegionWarn()"></textarea>
       <div id="addr-suggest" class="addr-suggest" hidden></div>
       <p id="addr-region-warn" class="addr-region-warn" hidden></p>
+      <!-- v2.12: người nhận hàng + SĐT của nhân viên (chỉ hiện khi máy chủ có lệnh lưu — Apps Script V12) -->
+      <div id="addr-contact" class="addr-contact" hidden>
+        <div id="addr-myphone-wrap" class="addr-myphone" style="margin-top:12px;">
+          <label class="form-label" for="addr-my-phone">Số điện thoại của bạn *</label>
+          <input id="addr-my-phone" type="tel" inputmode="tel" class="form-control" maxlength="15" placeholder="0912345678">
+        </div>
+        <label class="addr-self"><input type="checkbox" id="addr-self" checked onchange="toggleReceiverFields()"> <span>Tôi là người nhận hàng</span></label>
+        <div id="addr-receiver" class="addr-receiver" hidden>
+          <label class="form-label" for="addr-recv-name">Tên người nhận hàng *</label>
+          <input id="addr-recv-name" type="text" class="form-control" maxlength="100" placeholder="Ví dụ: Trần Thị Bình">
+          <label class="form-label" for="addr-recv-phone" style="margin-top:10px;">Số điện thoại người nhận *</label>
+          <input id="addr-recv-phone" type="tel" inputmode="tel" class="form-control" maxlength="15" placeholder="0912345678">
+        </div>
+      </div>
       <p id="addr-error" style="margin:6px 0 0; font-size:14px; color:var(--lg-heritage);" hidden>Vui lòng chọn Tỉnh / Thành phố và nhập số nhà, đường, phường / xã.</p>
       <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px; flex-wrap:wrap;">
         <button type="button" class="btn-action btn-secondary" onclick="closeAddressModal(null)">Hủy</button>
@@ -6466,7 +6486,8 @@
         id: o.slot, slotId: o.slot, programId: o.programId || '', kho: o.kho || '', model: o.model || '', serial: o.serial || '',
         internalPrice: Number(o.price || o.amount) || 0, empCode: String(o.empCode || '').toUpperCase(),
         empName: o.empName || o.name || '', status: o.status || '', timestamp: o.time || '', paid: !!o.paid,
-        address: o.address || ''   // v2.10: máy chủ trả khi đã đăng nhập
+        address: o.address || '',   // v2.10: máy chủ trả khi đã đăng nhập
+        receiverName: o.receiverName || '', receiverPhone: o.receiverPhone || ''   // v2.12
       };
     }
     async function refreshMyServerOrders() {
@@ -8794,6 +8815,8 @@
 
       // T4.2: Mobile banking app-switching draft auto-restore
       const draftRestored = restoreQuickPaymentDraft(reg.id || reg.slotId);
+      document.getElementById('quick-phone').value = currentUser.phone || '';   // v2.12: luôn là SĐT hiện tại (bản nháp cũ không ghi đè)
+      document.getElementById('quick-phone-hint').hidden = !ADDR_SERVER;
       if (draftRestored && typeof showToast === 'function') {
         showToast('Đã tự động khôi phục bản nháp thông tin nộp tiền từ phiên trước.', 'info', 2500);
       }
@@ -9365,9 +9388,18 @@
     function getDeliveryAddress() { try { return (localStorage.getItem(addrKey()) || '').trim(); } catch (e) { return (currentUser && currentUser.address) || ''; } }
     function setDeliveryAddress(a) { try { localStorage.setItem(addrKey(), a); } catch (e) {} if (currentUser) currentUser.address = a; renderDeliveryAddrRow(); }
     // Gửi địa chỉ mặc định lên máy chủ (chạy nền). Lỗi mạng → đánh dấu "chờ đồng bộ", lần đăng nhập / mở trang sau tự gửi lại.
+    // v2.12: người nhận hàng (trống = chính nhân viên) + SĐT của nhân viên — chỉ khi máy chủ có lệnh (V12)
+    function normPhoneW(v) { let p = String(v || '').replace(/[\s.\-()']/g, ''); if (p.indexOf('+84') === 0) p = '0' + p.slice(3); return p; }
+    function validPhoneW(p) { return /^0\d{9}$/.test(p); }
+    function getReceiver() { return { name: (currentUser && currentUser.receiverName) || '', phone: (currentUser && currentUser.receiverPhone) || '' }; }
+    function setReceiver(name, phone) { if (!currentUser) return; currentUser.receiverName = name || ''; currentUser.receiverPhone = phone || ''; }
+    function toggleReceiverFields() {
+      document.getElementById('addr-receiver').hidden = document.getElementById('addr-self').checked;
+    }
     async function pushDeliveryAddress(a) {
-      try { localStorage.setItem(addrPendingKey(), a); } catch (e) {}
-      const r = await postToSheet({ action: 'update_my_address', address: a });
+      const payload = typeof a === 'string' ? { address: a } : a;
+      try { localStorage.setItem(addrPendingKey(), JSON.stringify(payload)); } catch (e) {}
+      const r = await postToSheet(Object.assign({ action: 'update_my_address' }, payload));
       if (r && r.ok) { try { localStorage.removeItem(addrPendingKey()); } catch (e) {} return true; }
       if (r && !r.offline && /không hợp lệ/i.test(r.message || '')) ADDR_SERVER = false;   // máy chủ cũ chưa có lệnh
       return false;
@@ -9384,11 +9416,18 @@
         const r = await postToSheet({ action: 'my_address' });
         if (!r || !r.ok) return;   // máy chủ cũ / mạng lỗi: giữ cách cũ (lưu trên máy)
         srv = r.address || '';
+        if (r.phone) currentUser.phone = r.phone;   // v2.12: SĐT + người nhận mới nhất
+        setReceiver(r.receiverName, r.receiverPhone);
       }
       ADDR_SERVER = true;
-      let pending = ''; try { pending = (localStorage.getItem(addrPendingKey()) || '').trim(); } catch (e) {}
+      let pending = null; try { const raw = (localStorage.getItem(addrPendingKey()) || '').trim(); pending = raw ? (raw[0] === '{' ? JSON.parse(raw) : { address: raw }) : null; } catch (e) {}
       const local = getDeliveryAddress();
-      if (pending) { setDeliveryAddress(pending); pushDeliveryAddress(pending); }
+      if (pending && pending.address) {
+        setDeliveryAddress(pending.address);
+        if ('receiverName' in pending) setReceiver(pending.receiverName, pending.receiverPhone);
+        if (pending.phone) currentUser.phone = pending.phone;
+        renderDeliveryAddrRow(); pushDeliveryAddress(pending);
+      }
       else if (srv) { if (srv !== local) setDeliveryAddress(srv); else renderDeliveryAddrRow(); }
       else if (local) { renderDeliveryAddrRow(); pushDeliveryAddress(local); }   // địa chỉ nhập từ bản v2.9–v2.10 (chỉ có trên máy này) → đưa lên Sheet
       else renderDeliveryAddrRow();
@@ -9402,9 +9441,13 @@
       const note = ADDR_SERVER
         ? 'Đã lưu trên hệ thống: tự điền khi bạn đăng nhập ở máy khác. Đơn đã giữ: bấm "Đổi địa chỉ" ở ô 03 (trước khi khai nộp tiền).'
         : 'Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.';
+      const rv = getReceiver();
+      const recvLine = ADDR_SERVER   // v2.12: ai nhận hàng (mặc định chính bạn)
+        ? `<span class="addr-note"><span>${T('Người nhận:')}</span> <span class="addr-val" data-no-i18n>${esc(rv.name || currentUser.name || '')} · ${esc(rv.name ? rv.phone : (currentUser.phone || ''))}</span>${rv.name ? '' : ` <span>${T('(bạn)')}</span>`}</span>`
+        : '';
       row.innerHTML = a
         ? `<span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span><button type="button" class="btn-action btn-secondary" onclick="openAddressModal(null)">${T('Sửa')}</button>` +
-          `<span class="addr-note">${T(note)}</span>`
+          recvLine + `<span class="addr-note">${T(note)}</span>`
         : `<span class="addr-missing">${T('Chưa có địa chỉ nhận hàng — cần khi giữ chỗ.')}</span><button type="button" class="btn-action" onclick="openAddressModal(null)" style="background:#EA1917; border-color:#EA1917; color:#FFF;">${T('Thêm địa chỉ')}</button>` +
           `<span class="addr-note">${T('Thêm trước giờ mở bán để giữ chỗ nhanh hơn.')}</span>`;
     }
@@ -9419,6 +9462,7 @@
     function card3AddrLine(reg) {
       if (!reg || !reg.address) return '';
       return `<div style="color:#CBC8C2; font-size:11px;">${T('Giao đến:')} <strong style="color:#FFFFFF;" data-no-i18n>${esc(reg.address)}</strong>` +
+        (reg.receiverName ? ` · ${T('Người nhận:')} <strong style="color:#FFFFFF;" data-no-i18n>${esc(reg.receiverName)} · ${esc(reg.receiverPhone || '')}</strong>` : '') +   // v2.12
         (canChangeOrderAddress(reg) ? ` · <span style="color:#FAD45C;">${addrChangeBtn(reg)}</span>` : '') + `</div>`;
     }
     // v2.10: bước nộp tiền hiện địa chỉ đã ghi trên đơn (máy chủ trả khi đã đăng nhập).
@@ -9429,6 +9473,7 @@
       const o = order ? Object.assign({}, order, { slotId: order.slotId || order.slot }) : null;
       const can = canChangeOrderAddress(o);
       el.innerHTML = (a ? `<div><span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span></div>` : '') +
+        (o && o.receiverName ? `<div><span>${T('Người nhận:')}</span> <span class="addr-val" data-no-i18n>${esc(o.receiverName)} · ${esc(o.receiverPhone || '')}</span></div>` : '') +   // v2.12
         (a && o && addrRegionWarn(a, o.kho) ? `<div>${addrRegionWarn(a, o.kho)}</div>` : '') +
         (can ? `<div>${T('Muốn đổi địa chỉ nhận hàng (trước khi khai nộp tiền):')} ${addrChangeBtn(o)}</div>`
              : `<div>${T('Muốn đổi địa chỉ nhận hàng: liên hệ trực tiếp PM phụ trách.')}</div>`);
@@ -9457,6 +9502,14 @@
       } else {
         info.hidden = true; document.getElementById('addr-save-btn').textContent = T('Lưu địa chỉ');
       }
+      // v2.12: SĐT của bạn (chỉ khi sửa địa chỉ mặc định) + người nhận
+      document.getElementById('addr-contact').hidden = !ADDR_SERVER;
+      document.getElementById('addr-myphone-wrap').hidden = !!opts.order;
+      document.getElementById('addr-my-phone').value = (currentUser && currentUser.phone) || '';
+      const rv = opts.order ? { name: opts.order.receiverName || '', phone: opts.order.receiverPhone || '' } : getReceiver();
+      document.getElementById('addr-self').checked = !rv.name;
+      document.getElementById('addr-recv-name').value = rv.name; document.getElementById('addr-recv-phone').value = rv.phone;
+      toggleReceiverFields();
       renderAddrSuggest(cur);
       updateAddrRegionWarn();
       modal.classList.add('active');
@@ -9495,22 +9548,39 @@
       let detail = document.getElementById('addr-input').value.replace(/\s+/g, ' ').trim();
       if (!prov) { const p = splitAddress(detail); if (p.province) { prov = p.province; detail = p.detail || detail; document.getElementById('addr-province').value = prov; } }   // đã gõ sẵn tên tỉnh ở cuối → tự nhận
       const a = joinAddress(detail, prov);
-      if (!prov || detail.length < 5 || a.length < 10) { document.getElementById('addr-error').hidden = false; return; }
+      const errEl = document.getElementById('addr-error');
+      const fail = m => { errEl.textContent = T(m); errEl.hidden = false; };
+      if (!prov || detail.length < 5 || a.length < 10) return fail('Vui lòng chọn Tỉnh / Thành phố và nhập số nhà, đường, phường / xã.');
       const ctx = addrModalCtx || {};
+      // v2.12: người nhận + SĐT (máy chủ V12 kiểm tra lại cùng quy tắc)
+      let recvName = '', recvPhone = '', myPhone = null;
+      if (ADDR_SERVER) {
+        if (!document.getElementById('addr-self').checked) {
+          recvName = document.getElementById('addr-recv-name').value.replace(/\s+/g, ' ').trim();
+          recvPhone = normPhoneW(document.getElementById('addr-recv-phone').value);
+          if (recvName.length < 2) return fail('Vui lòng nhập tên người nhận hàng.');
+          if (!validPhoneW(recvPhone)) return fail('Số điện thoại người nhận không hợp lệ (10 số, bắt đầu bằng 0).');
+        }
+        if (!ctx.order) {
+          myPhone = normPhoneW(document.getElementById('addr-my-phone').value);
+          if (!validPhoneW(myPhone)) return fail('Số điện thoại của bạn không hợp lệ (10 số, bắt đầu bằng 0).');
+        }
+      }
       if (ctx.order) {   // đổi địa chỉ của đơn đã giữ: chờ máy chủ xác nhận
         const btn = document.getElementById('addr-save-btn'); btn.disabled = true;
-        const r = await postToSheet({ action: 'user_update_order_address', slotId: ctx.order.slotId, address: a });
+        const r = await postToSheet({ action: 'user_update_order_address', slotId: ctx.order.slotId, address: a, receiverName: recvName, receiverPhone: recvPhone });
         btn.disabled = false;
         if (!r || !r.ok) { showToast((r && r.message) || 'Chưa đổi được địa chỉ. Vui lòng thử lại.', 'error', 6000); return; }
         closeAddressModal(a);
         showToast(r.message || 'Đã đổi địa chỉ nhận hàng.', 'success');
-        onOrderAddressChanged(ctx.order.slotId, r.address || a);
+        onOrderAddressChanged(ctx.order.slotId, r.address || a, recvName, recvPhone);
         return;
       }
+      if (ADDR_SERVER) { setReceiver(recvName, recvPhone); currentUser.phone = myPhone; }
       setDeliveryAddress(a);
-      closeAddressModal(a);   // giữ chỗ không phải chờ: địa chỉ còn được gửi kèm lệnh giữ chỗ
+      closeAddressModal(a);   // giữ chỗ không phải chờ: địa chỉ + người nhận còn được gửi kèm lệnh giữ chỗ
       if (ADDR_SERVER) {
-        pushDeliveryAddress(a).then(ok => { if (!ok) showToast('Đã lưu địa chỉ trên máy này. Chưa lưu được lên hệ thống (mạng chậm) — sẽ tự thử lại lần sau.', 'warning', 6000); });
+        pushDeliveryAddress({ address: a, receiverName: recvName, receiverPhone: recvPhone, phone: myPhone }).then(ok => { if (!ok) showToast('Đã lưu địa chỉ trên máy này. Chưa lưu được lên hệ thống (mạng chậm) — sẽ tự thử lại lần sau.', 'warning', 6000); });
       }
     }
     // Nút "Đổi địa chỉ" (ô 03, bước nộp tiền)
@@ -9520,9 +9590,9 @@
       if (!canChangeOrderAddress(o)) { showToast('Đơn đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được. Vui lòng liên hệ trực tiếp PM phụ trách.', 'error', 6000); return; }
       openAddressModal(null, { order: o });
     }
-    function onOrderAddressChanged(slotId, address) {
-      myServerOrders.forEach(r => { if (r.slotId === slotId) r.address = address; });
-      if (lastLookup && Array.isArray(lastLookup.orders)) lastLookup.orders.forEach(o => { if (o.slot === slotId) o.address = address; });
+    function onOrderAddressChanged(slotId, address, rn, rp) {
+      myServerOrders.forEach(r => { if (r.slotId === slotId) Object.assign(r, { address, receiverName: rn || '', receiverPhone: rp || '' }); });
+      if (lastLookup && Array.isArray(lastLookup.orders)) lastLookup.orders.forEach(o => { if (o.slot === slotId) Object.assign(o, { address, receiverName: rn || '', receiverPhone: rp || '' }); });
       const o = myServerOrders.find(r => r.slotId === slotId);
       if (document.getElementById('quick-payment-modal').classList.contains('active') && document.getElementById('quick-slot-code').textContent === slotId) renderPayAddrNote('quick-addr-note', address, o);
       if (payCtx && payCtx.slot === slotId) renderPayAddrNote('pay-addr-note', address, Object.assign({}, o, { slotId }));
@@ -10046,6 +10116,7 @@
         `Giá nội bộ: ${formatVND(prod.internalPrice)}\n` +
         `Kho: ${prod.kho}\n` +
         `Giao đến: ${deliveryAddr || '—'}\n` +
+        (getReceiver().name ? `Người nhận: ${getReceiver().name} · ${getReceiver().phone}\n` : '') +   // v2.12
         (addrRegionWarn(deliveryAddr, prod.kho) ? `${addrRegionWarn(deliveryAddr, prod.kho)}\n` : '') + `\n` +   // v2.11: chỉ cảnh báo, vẫn cho giữ chỗ
         `Bạn có chắc muốn đăng ký sản phẩm này?`;
       if (!confirm(msg)) return;
@@ -10069,6 +10140,7 @@
               division: currentUser.division || currentUser.dept || '',
               phone: currentUser.phone || '',
               address: deliveryAddr || currentUser.address || '',   // v2.9: địa chỉ nhận hàng → Registrations cột J
+              receiverName: getReceiver().name, receiverPhone: getReceiver().phone,   // v2.12: người nhận (trống = chính mình) → cột X, Y
               email: currentUser.email || ''
             })
           }, 2, 1000, 8000);
@@ -10121,6 +10193,7 @@
         division: currentUser.division || currentUser.dept || '',
         phone: currentUser.phone || '',
         address: currentUser.address || 'Hải Phòng',
+        receiverName: getReceiver().name, receiverPhone: getReceiver().phone,
         timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
         status: 'Đã đăng ký - Chờ mở thanh toán',
         payerName: '',
@@ -10532,7 +10605,7 @@
               <div class="pm-emp-badge">
                 <span class="pm-emp-name">${esc(r.empName)}</span>
                 <span class="pm-emp-meta">${esc(r.empCode)} · ${esc(r.division || '')}</span>
-                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}${pmAddrFlags(r)}
+                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}${pmAddrFlags(r)}${r.receiverName ? `<span class="pm-emp-meta pm-emp-addr"><span>${T('Người nhận:')}</span> <span data-no-i18n>${esc(r.receiverName)} · ${esc(r.receiverPhone || '')}</span></span>` : ''}
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
@@ -10893,7 +10966,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
               <div class="pm-emp-badge">
                 <span class="pm-emp-name">${esc(r.empName)}</span>
                 <span class="pm-emp-meta">${esc(r.empCode)} · ${esc(r.division || '')}</span>
-                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}${pmAddrFlags(r)}
+                ${r.address ? `<span class="pm-emp-meta pm-emp-addr" data-no-i18n><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(r.address)}</span>` : ''}${pmAddrFlags(r)}${r.receiverName ? `<span class="pm-emp-meta pm-emp-addr"><span>${T('Người nhận:')}</span> <span data-no-i18n>${esc(r.receiverName)} · ${esc(r.receiverPhone || '')}</span></span>` : ''}
                 <span class="pm-emp-meta"><svg class="lg-icon lg-icon-sm" viewBox="0 0 24 24" style="stroke:#716F6A;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(r.phone || '—')}</span>
               </div>
             </td>
@@ -11311,6 +11384,8 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (modalAmount) modalAmount.textContent = fmtVND(reg.amount || reg.internalPrice);
       if (modalPayer) modalPayer.textContent = `${reg.payerName || reg.empName} (${reg.payerCode || reg.empCode})`;
       const modalAddr = document.getElementById('modal-address'); if (modalAddr) modalAddr.textContent = reg.address || '—';   // v2.9
+      const mrRow = document.getElementById('modal-receiver-row');   // v2.12: người nhận khác người đăng ký
+      if (mrRow) { mrRow.hidden = !reg.receiverName; document.getElementById('modal-receiver').textContent = reg.receiverName ? `${reg.receiverName} · ${reg.receiverPhone || ''}` : ''; }
       if (modalTxn) modalTxn.textContent = reg.bankTxn || 'Chưa có mã GD';
 
       // Toggle Approve/Reject actions in modal
@@ -11355,7 +11430,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const headers = [
         'STT', 'Mã Slot', 'Kho', 'Ngành hàng', 'Model', 'Serial Number', 'Mô tả sản phẩm',
         'Giá nội bộ (VND)', 'Mã NV đăng ký', 'Họ tên NV', 'Bộ phận', 'Số điện thoại',
-        'Địa chỉ giao hàng', 'Thời gian ĐK', 'Trạng thái đơn', 'Người nộp tiền',
+        'Địa chỉ giao hàng', 'Người nhận hàng', 'SĐT người nhận', 'Thời gian ĐK', 'Trạng thái đơn', 'Người nộp tiền',
         'Mã NV nộp', 'Số tiền đã nộp', 'Mã GD ngân hàng', 'Thời gian nộp',
         'PM duyệt bởi', 'Ngày PM duyệt', 'Ghi chú'
       ];
@@ -11377,6 +11452,8 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
           r.division || '',
           r.phone || '',
           r.address || '',
+          r.receiverName || '',   // v2.12: trống = người nhận là người đăng ký
+          r.receiverPhone || '',
           fmtVNTime(r.timestamp || ''),
           r.status || '',
           r.payerName || '',
@@ -11391,7 +11468,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       });
 
       const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      downloadTableFile(rows, `${activeProgram}_Danh_Sach_Dang_Ky_${dateStr}`, { moneyCols: [7, 17], sheetName: 'Danh sach dang ky' });
+      downloadTableFile(rows, `${activeProgram}_Danh_Sach_Dang_Ky_${dateStr}`, { moneyCols: [7, 19], sheetName: 'Danh sach dang ky' });   // v2.12: +2 cột người nhận → cột tiền đã nộp 17 → 19
     }
 
     // Tải bảng (mảng 2 chiều, dòng 0 = tiêu đề) thành file Excel .xlsx.

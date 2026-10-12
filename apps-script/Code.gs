@@ -45,7 +45,8 @@ var C = {
   TS: 1, CAMPAIGN: 2, DIVISION: 3, EMP_CODE: 4, EMP_NAME: 5, KHO: 6, MODEL: 7, SLOT: 8,
   PHONE: 9, ADDRESS: 10, AGREE: 11, STATUS: 12, PAYER_NAME: 13, PAYER_CODE: 14,
   AMOUNT: 15, BANK_TXN: 16, PAY_TIME: 17, RECEIPT: 18, PM_BY: 19, PM_DATE: 20, NOTE: 21, UA: 22,
-  SERIAL: 23 // 06/10/2026: Serial Number của máy đã đăng ký (bản chụp lúc đăng ký) — cột W, thêm vào CUỐI để 22 cột cũ không đổi
+  SERIAL: 23, // 06/10/2026: Serial Number của máy đã đăng ký (bản chụp lúc đăng ký) — cột W, thêm vào CUỐI để 22 cột cũ không đổi
+  RECV_NAME: 24, RECV_PHONE: 25 // v2.12 (12/10/2026): người nhận hàng (cột X, Y) — trống = người nhận là người đăng ký
 };
 
 // Số cột ghi được vào Registrations: 23 nếu sheet đủ cột (mặc định 26), nếu không thì 22 như cũ — không bao giờ làm hỏng lượt đăng ký
@@ -869,7 +870,12 @@ function register_product_(d) {
   var regAuth = requireSelf_(d.token, empCode);
   if (!regAuth.ok) return regAuth;
   // v2.11: web cũ / lỗi mạng gửi thiếu địa chỉ → lấy địa chỉ mặc định trong tab Users (đọc TRƯỚC khi khóa, không làm chậm lượt giữ chỗ)
-  var regAddress = normAddr_(d.address) || myAddress_(empCode);
+  var regAddress = normAddr_(d.address);
+  var regRecvName = normName_(d.receiverName), regRecvPhone = normPhone_(d.receiverPhone);
+  if (!regAddress) {   // web cũ / thiếu → địa chỉ + người nhận mặc định trong tab Users
+    var dp = myProfile_(null, 0, empCode);
+    regAddress = dp.address; regRecvName = dp.receiverName; regRecvPhone = dp.receiverPhone;
+  }
 
   // Pre-check program status and quota from Programs sheet before acquiring lock
   var progSheet = book_().getSheetByName(SHEET_PROGRAMS);
@@ -903,6 +909,7 @@ function register_product_(d) {
   var ts = new Date().toISOString();
 
   try {
+    if (regRecvName || regRecvPhone) ensureRegRecvCols_(book_().getSheetByName(SHEET_REG));   // v2.12: cột X, Y (chỉ lần đầu, sau đó nhớ 6 giờ)
     var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
     if (!prodSheet) return { ok: false, message: 'Sheet Products không tồn tại.' };
     var n = prodSheet.getLastRow() - 1;
@@ -951,7 +958,7 @@ function register_product_(d) {
     var regSheet = book_().getSheetByName(SHEET_REG);
     if (regSheet) {
       prodDataTarget = data[targetRow];
-      var rw = regWidth_(regSheet);
+      var rw = (regRecvName || regRecvPhone) && regSheet.getMaxColumns() >= C.RECV_PHONE ? C.RECV_PHONE : regWidth_(regSheet);
       var regRow = new Array(rw).fill('');
       regRow[0] = ts;                          // Timestamp
       regRow[1] = programId;                   // Campaign/Program
@@ -961,12 +968,13 @@ function register_product_(d) {
       regRow[5] = String(prodDataTarget[2]).trim();   // Kho
       regRow[6] = String(prodDataTarget[4]).trim();   // Model
       regRow[7] = uniqueCode;                  // Slot/UniqueCode
-      regRow[8] = str_(d.phone);               // Phone
+      regRow[8] = asText_(d.phone);            // Phone (v2.12: giữ số 0 đầu như lệnh register cũ; trước đây Sheet đổi thành số)
       regRow[9] = safe_(regAddress);           // Address (v2.11: safe_ chống chèn công thức + lấy mặc định khi thiếu)
       regRow[10] = 'Đồng ý';                    // Agree
       regRow[11] = STATUS_WAIT_GATE;           // Status: 'Đã đăng ký - Chờ mở thanh toán'
       regRow[C.AMOUNT - 1] = Number(prodDataTarget[PROD_COL.PRICE - 1]) || 0; // Amount
       if (rw >= C.SERIAL) regRow[C.SERIAL - 1] = asText_(prodDataTarget[PROD_COL.SERIAL - 1]); // Serial (rỗng nếu SP chưa có)
+      if (rw >= C.RECV_PHONE) { regRow[C.RECV_NAME - 1] = safe_(regRecvName); regRow[C.RECV_PHONE - 1] = regRecvPhone ? asText_(regRecvPhone) : ''; }   // v2.12
       regSheet.getRange(regSheet.getLastRow() + 1, 1, 1, rw).setValues([regRow]);
     }
 
@@ -1055,7 +1063,7 @@ function pm_dashboard_(d) {
   if (regSheet) {
     var n = regSheet.getLastRow() - 1;
     if (n > 0) {
-      var vw = regSheet.getLastColumn() >= C.SERIAL ? C.SERIAL : 22;
+      var vw = regSheet.getLastColumn() >= C.RECV_PHONE ? C.RECV_PHONE : (regSheet.getLastColumn() >= C.SERIAL ? C.SERIAL : 22);   // v2.12: + người nhận
       var v = regSheet.getRange(2, 1, n, vw).getValues();
       for (var r = 0; r < n; r++) {
         var pId = String(v[r][C.CAMPAIGN - 1]).trim();
@@ -1076,6 +1084,8 @@ function pm_dashboard_(d) {
           slotId: curSlot,
           phone: str_(v[r][C.PHONE - 1]),
           address: str_(v[r][C.ADDRESS - 1]),
+          receiverName: vw >= C.RECV_PHONE ? str_(v[r][C.RECV_NAME - 1]) : '',      // v2.12
+          receiverPhone: vw >= C.RECV_PHONE ? normPhone_(v[r][C.RECV_PHONE - 1]) : '',
           status: str_(v[r][C.STATUS - 1]) || 'Chờ nộp tiền',
           payerName: str_(v[r][C.PAYER_NAME - 1]),
           payerCode: str_(v[r][C.PAYER_CODE - 1]),
@@ -1587,8 +1597,8 @@ function auth_(d) {
       role: String(data[r][6]).trim() || 'USER'
     };
 
-    var addrCol = userAddrCol_(sheet, false);                       // v2.11: địa chỉ nhận hàng mặc định (cột "Address" của tab Users)
-    user.address = addrCol ? str_(sheet.getRange(r + 2, addrCol).getValue()) : '';
+    var prof = myProfile_(sheet, r + 2);                            // v2.11–v2.12: địa chỉ + người nhận mặc định (cột theo tên tiêu đề)
+    user.address = prof.address; user.receiverName = prof.receiverName; user.receiverPhone = prof.receiverPhone;
     var token = generateSessionToken_(user);
     try { log_('AUTH_LOGIN', id, user.name, '', 'role=' + user.role); } catch (e2) {}
     return { ok: true, user: user, token: token };
@@ -1836,14 +1846,54 @@ function paidAlready_(d, empCode, slotId, rowNo) {
  */
 var ADDR_MIN = 10, ADDR_MAX = 300;
 function normAddr_(v) { return str_(v).replace(/\s+/g, ' ').trim().slice(0, ADDR_MAX); }
-function userAddrCol_(sheet, create) {
+function userCol_(sheet, name, create) {   // cột theo TÊN tiêu đề (Address, ReceiverName, ReceiverPhone); thiếu + create → thêm bên phải
   var lc = sheet.getLastColumn();
   var head = lc > 0 ? sheet.getRange(1, 1, 1, lc).getValues()[0] : [];
-  for (var i = 0; i < head.length; i++) if (String(head[i]).trim().toLowerCase() === 'address') return i + 1;
+  for (var i = 0; i < head.length; i++) if (String(head[i]).trim().toLowerCase() === name.toLowerCase()) return i + 1;
   if (!create) return 0;
   var col = Math.max(lc, 8) + 1;
-  sheet.getRange(1, col).setValue('Address');
+  sheet.getRange(1, col).setValue(name);
   return col;
+}
+function userAddrCol_(sheet, create) { return userCol_(sheet, 'Address', create); }
+/* v2.12: SĐT Việt Nam 10 số bắt đầu bằng 0 (+84… đổi thành 0…); tên người nhận tối đa 100 ký tự */
+function normPhone_(v) { var p = str_(v).replace(/[\s.\-()']/g, ''); if (p.indexOf('+84') === 0) p = '0' + p.slice(3); return p; }
+function validPhone_(p) { return /^0\d{9}$/.test(p); }
+function normName_(v) { return str_(v).replace(/\s+/g, ' ').trim().slice(0, 100); }
+// Hồ sơ giao hàng mặc định của 1 nhân viên: theo số dòng (đăng nhập) hoặc theo mã NV
+function myProfile_(sheet, row, empCode) {
+  var out = { address: '', receiverName: '', receiverPhone: '', phone: '' };
+  try {
+    sheet = sheet || book_().getSheetByName(SHEET_USERS); if (!sheet) return out;
+    row = row || userRow_(sheet, empCode); if (!row) return out;
+    var lc = sheet.getLastColumn(), vals = sheet.getRange(row, 1, 1, lc).getValues()[0], head = sheet.getRange(1, 1, 1, lc).getValues()[0];
+    for (var i = 0; i < head.length; i++) {
+      var h = String(head[i]).trim().toLowerCase();
+      if (h === 'address') out.address = normAddr_(vals[i]);
+      else if (h === 'receivername') out.receiverName = normName_(vals[i]);
+      else if (h === 'receiverphone') out.receiverPhone = normPhone_(vals[i]);
+    }
+    out.phone = normPhone_(vals[4]);
+  } catch (e) {}
+  return out;
+}
+// Registrations cột X, Y (người nhận): mở rộng lưới + tiêu đề nếu thiếu — 1 lần (nhớ 6 giờ); gọi TRONG khóa
+function ensureRegRecvCols_(reg) {
+  if (!reg) return;
+  var cache = CacheService.getScriptCache();
+  if (cache.get('regrecv')) return;
+  if (reg.getMaxColumns() < C.RECV_PHONE) reg.insertColumnsAfter(reg.getMaxColumns(), C.RECV_PHONE - reg.getMaxColumns());
+  if (!str_(reg.getRange(1, C.RECV_NAME).getValue())) reg.getRange(1, C.RECV_NAME).setValue('Receiver Name');
+  if (!str_(reg.getRange(1, C.RECV_PHONE).getValue())) reg.getRange(1, C.RECV_PHONE).setValue('Receiver Phone');
+  try { cache.put('regrecv', '1', 21600); } catch (e) {}
+}
+// Người nhận gửi lên: cả 2 trống = chính người đăng ký; có tên thì phải có SĐT hợp lệ (và ngược lại)
+function receiverInput_(d) {
+  var name = normName_(d.receiverName), phone = normPhone_(d.receiverPhone);
+  if (!name && !phone) return { ok: true, name: '', phone: '' };
+  if (name.length < 2) return { ok: false, message: 'Vui lòng nhập tên người nhận hàng.' };
+  if (!validPhone_(phone)) return { ok: false, message: 'Số điện thoại người nhận không hợp lệ (10 số, bắt đầu bằng 0).' };
+  return { ok: true, name: name, phone: phone };
 }
 function userRow_(sheet, empCode) {
   var n = sheet.getLastRow() - 1;
@@ -1852,18 +1902,13 @@ function userRow_(sheet, empCode) {
   for (var r = 0; r < n; r++) if (String(ids[r][0]).trim().toUpperCase() === empCode) return r + 2;
   return 0;
 }
-function myAddress_(empCode) {
-  try {
-    var sh = book_().getSheetByName(SHEET_USERS); if (!sh) return '';
-    var col = userAddrCol_(sh, false), row = col ? userRow_(sh, empCode) : 0;
-    return row ? normAddr_(sh.getRange(row, col).getValue()) : '';
-  } catch (e) { return ''; }
-}
+function myAddress_(empCode) { return myProfile_(null, 0, empCode).address; }
 /* Chỉ đọc: web mở lại trang (phiên còn hạn) lấy địa chỉ mới nhất — có thể vừa sửa trên máy khác */
 function my_address_(d) {
   var auth = verifySessionToken_(d.token);
   if (!auth.valid) return { ok: false, authError: true, message: auth.message };
-  return { ok: true, address: myAddress_(String(auth.payload.uid || '').toUpperCase()) };
+  var pf = myProfile_(null, 0, String(auth.payload.uid || '').toUpperCase());
+  return { ok: true, address: pf.address, phone: pf.phone, receiverName: pf.receiverName, receiverPhone: pf.receiverPhone };
 }
 function update_my_address_(d) {
   var auth = verifySessionToken_(d.token);
@@ -1871,18 +1916,30 @@ function update_my_address_(d) {
   var empCode = String(auth.payload.uid || '').toUpperCase();
   var address = normAddr_(d.address);
   if (address.length < ADDR_MIN) return { ok: false, message: 'Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).' };
+  var rcv = receiverInput_(d); if (!rcv.ok) return rcv;                     // v2.12: người nhận hàng
+  var phone = d.phone === undefined || d.phone === null ? null : normPhone_(d.phone);   // v2.12: nhân viên tự sửa SĐT (Users cột E)
+  if (phone !== null && !validPhone_(phone)) return { ok: false, message: 'Số điện thoại của bạn không hợp lệ (10 số, bắt đầu bằng 0).' };
   var sh = book_().getSheetByName(SHEET_USERS);
   if (!sh) return { ok: false, message: 'Hệ thống chưa cấu hình danh sách nhân viên.' };
+  var oldPhone = '';
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
   try {
     var row = userRow_(sh, empCode);
     if (!row) return { ok: false, message: 'Mã nhân viên không tồn tại.' };
     sh.getRange(row, userAddrCol_(sh, true)).setValue(safe_(address));
+    var cn = userCol_(sh, 'ReceiverName', !!rcv.name), cp = userCol_(sh, 'ReceiverPhone', !!rcv.name);
+    if (cn) sh.getRange(row, cn).setValue(safe_(rcv.name));
+    if (cp) sh.getRange(row, cp).setValue(rcv.phone ? asText_(rcv.phone) : '');
+    if (phone !== null) {
+      oldPhone = normPhone_(sh.getRange(row, 5).getValue());
+      if (oldPhone !== phone) sh.getRange(row, 5).setValue(asText_(phone)); else oldPhone = '';
+    }
     SpreadsheetApp.flush();
   } finally { lock.releaseLock(); }
-  try { log_('ADDRESS_UPDATE', empCode, '', d.userAgent, 'Địa chỉ mặc định'); } catch (e) {}
-  return { ok: true, address: address, message: 'Đã lưu địa chỉ nhận hàng.' };
+  try { log_('ADDRESS_UPDATE', empCode, '', d.userAgent, 'Địa chỉ mặc định' + (rcv.name ? ' · người nhận khác' : '')); } catch (e) {}
+  if (oldPhone) { try { log_('PHONE_UPDATE', empCode, '', d.userAgent, 'SĐT cũ: ' + oldPhone); } catch (e) {} }
+  return { ok: true, address: address, receiverName: rcv.name, receiverPhone: rcv.phone, phone: phone !== null ? phone : undefined, message: 'Đã lưu địa chỉ nhận hàng.' };
 }
 /* Đổi địa chỉ của đơn đã giữ: cùng quy tắc "Hủy giữ chỗ" (Chờ mở thanh toán / Chờ nộp tiền, chưa khai nộp). Ghi vết ở cột Ghi chú. */
 function user_update_order_address_(d) {
@@ -1893,26 +1950,33 @@ function user_update_order_address_(d) {
   var address = normAddr_(d.address);
   if (!slotId) return { ok: false, message: 'Thiếu mã slot.' };
   if (address.length < ADDR_MIN) return { ok: false, message: 'Vui lòng nhập địa chỉ đầy đủ (ít nhất 10 ký tự).' };
+  var rcv = receiverInput_(d); if (!rcv.ok) return rcv;                     // v2.12: đổi cả người nhận của đơn
   var reg = book_().getSheetByName(SHEET_REG);
   if (!reg) return { ok: false, message: 'Sheet Registrations không tồn tại.' };
-  var oldAddr = '';
+  var oldAddr = '', oldRecv = '';
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(LOCK_WAIT_MS)) return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
   try {
     var found = findOrder_(reg, slotId, empCode);
     if (!found) return { ok: false, message: 'Không tìm thấy đơn giữ chỗ ' + slotId + ' của bạn.' };
+    if (rcv.name) ensureRegRecvCols_(reg);
     if (!((found.status === STATUS_WAIT_GATE || found.status === STATUS_NEW) && !found.paid)) {
       return { ok: false, message: 'Đơn ' + slotId + ' đã khai nộp tiền hoặc đã xử lý nên không tự đổi địa chỉ được. Vui lòng liên hệ trực tiếp PM phụ trách.' };
     }
     oldAddr = str_(reg.getRange(found.rowNo, C.ADDRESS).getValue());
-    if (oldAddr === address) return { ok: true, address: address, unchanged: true, message: 'Địa chỉ không thay đổi.' };
+    var hasRecvCols = reg.getMaxColumns() >= C.RECV_PHONE;
+    var oldName = hasRecvCols ? str_(reg.getRange(found.rowNo, C.RECV_NAME).getValue()) : '';
+    var oldRPhone = hasRecvCols ? normPhone_(reg.getRange(found.rowNo, C.RECV_PHONE).getValue()) : '';
+    if (oldAddr === address && oldName === rcv.name && oldRPhone === rcv.phone) return { ok: true, address: address, unchanged: true, message: 'Địa chỉ không thay đổi.' };
     var oldNote = str_(reg.getRange(found.rowNo, C.NOTE).getValue());
     reg.getRange(found.rowNo, C.ADDRESS).setValue(safe_(address));
-    reg.getRange(found.rowNo, C.NOTE).setValue(safe_((oldNote ? oldNote + ' | ' : '') + 'Nhân viên đổi địa chỉ lúc ' + fmt_(new Date()) + ' (cũ: ' + oldAddr + ')'));
+    if (hasRecvCols) reg.getRange(found.rowNo, C.RECV_NAME, 1, 2).setValues([[safe_(rcv.name), rcv.phone ? asText_(rcv.phone) : '']]);
+    oldRecv = oldName ? ' · người nhận cũ: ' + oldName + ' ' + oldRPhone : '';
+    reg.getRange(found.rowNo, C.NOTE).setValue(safe_((oldNote ? oldNote + ' | ' : '') + 'Nhân viên đổi địa chỉ lúc ' + fmt_(new Date()) + ' (cũ: ' + oldAddr + oldRecv + ')'));
     SpreadsheetApp.flush();
   } finally { lock.releaseLock(); }
   try { log_('ORDER_ADDRESS_UPDATE', empCode, slotId, d.userAgent, 'cũ: ' + oldAddr); } catch (e) {}
-  return { ok: true, address: address, message: 'Đã đổi địa chỉ nhận hàng của đơn ' + slotId + '.' };
+  return { ok: true, address: address, receiverName: rcv.name, receiverPhone: rcv.phone, message: 'Đã đổi địa chỉ nhận hàng của đơn ' + slotId + '.' };
 }
 
 function findOrder_(reg, slotId, empCode) {
@@ -1943,7 +2007,7 @@ function lookup_(d) {
 
   var reg = book_().getSheetByName(SHEET_REG);
   var n = reg.getLastRow() - 1;
-  var lw = reg.getLastColumn() >= C.SERIAL ? C.SERIAL : C.RECEIPT;
+  var lw = reg.getLastColumn() >= C.RECV_PHONE ? C.RECV_PHONE : (reg.getLastColumn() >= C.SERIAL ? C.SERIAL : C.RECEIPT);   // v2.12: + cột người nhận X, Y
   var v = n > 0 ? reg.getRange(2, 1, n, lw).getValues() : [];
   var out = [];
 
@@ -1980,7 +2044,9 @@ function lookup_(d) {
       amount: curAmt, price: curAmt,
       status: str_(v[r][C.STATUS - 1]) || 'Chưa có trạng thái',
       paid: !!str_(v[r][C.BANK_TXN - 1]), receipt: !!str_(v[r][C.RECEIPT - 1]),
-      address: isAuthenticated ? str_(v[r][C.ADDRESS - 1]) : ''   // v2.10: chỉ trả khi đã đăng nhập (tra cứu bằng 4 số cuối không lộ địa chỉ)
+      address: isAuthenticated ? str_(v[r][C.ADDRESS - 1]) : '',   // v2.10: chỉ trả khi đã đăng nhập (tra cứu bằng 4 số cuối không lộ địa chỉ)
+      receiverName: isAuthenticated && lw >= C.RECV_PHONE ? str_(v[r][C.RECV_NAME - 1]) : '',     // v2.12: người nhận (cùng quy tắc với địa chỉ)
+      receiverPhone: isAuthenticated && lw >= C.RECV_PHONE ? normPhone_(v[r][C.RECV_PHONE - 1]) : ''
     });
   }
   if (!out.length) {
