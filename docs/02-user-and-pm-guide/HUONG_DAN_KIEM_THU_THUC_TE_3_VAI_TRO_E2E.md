@@ -33,7 +33,7 @@ sequenceDiagram
 
     Note over User: BƯỚC 3: XEM SẢN PHẨM & GIỮ CHỖ FCFS
     User->>User: 1. Đăng nhập tài khoản Nhân viên & Đổi mật khẩu
-    User->>User: 2. Xem danh mục (Tab 2), lọc Kho, chọn Model
+    User->>User: 2. Xem danh mục (Tab 1), lọc Kho, chọn Model
     User->>User: 3. Bấm "Đăng Ký Giữ Chỗ Ngay" + xác nhận (1 chạm)
     User->>User: 4. Đơn hiện ở ô 03, trạng thái "Chờ mở thanh toán"
 
@@ -184,7 +184,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 2. Nhập Mã NV (ví dụ: `NV01`) và mật khẩu tạm Admin cấp riêng cho bạn.
 3. Đổi mật khẩu cá nhân qua nút **`🔑 Đổi MK`** để bảo mật quyền lợi mua hàng.
 
-### Bước 3.2: Khám phá Danh mục Sản phẩm (Tab 2)
+### Bước 3.2: Khám phá Danh mục Sản phẩm (Tab 1)
 1. Chọn đợt bán trên **thanh chương trình** phía trên, rồi nhấp sang tab **`2. Danh Mục & Đăng Ký Mua Hàng`**.
 2. Sử dụng thanh công cụ trực quan:
    - **Bộ lọc kho:** Nhấp `Kho AYA`, `Kho AYB`, hoặc `Kho AYC` *(vị trí địa lý của từng kho đang chờ PM xác nhận — các tài liệu cũ ghi khác nhau)*.
@@ -200,10 +200,10 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 2. Kết quả:
    - **Thành công:** thông báo *"Đăng ký thành công sản phẩm …"*, trạng thái **`Đã đăng ký - Chờ mở thanh toán`**, đơn hiện ngay ở ô **"03 Đơn Hàng Của Bạn"**. Hệ thống **không** sinh mã đơn dạng `ORD-…` (bản cũ ghi có — không đúng); mã định danh là **Mã Slot**.
    - **Có người nhanh hơn:** thông báo *"đã có người đăng ký trước"*, slot đó chuyển "Đã có người giữ" ngay trên màn hình $\rightarrow$ chọn sản phẩm khác.
-3. Cam kết Jeong-Do: luồng 1 chạm hiện **không** có ô tích riêng; máy chủ ghi "Đồng ý" vào cột Cam kết. Nội dung cam kết nằm ở Tab 1 (Thư thông báo & Quy định) — đang chờ chủ dự án quyết định có thêm ô tích hay không (`CURRENT_STATE.md` mục 9).
+3. Cam kết Jeong-Do: luồng 1 chạm hiện **không** có ô tích riêng; máy chủ ghi "Đồng ý" vào cột Cam kết. Nội dung cam kết nằm ở Tab 4 (Thư thông báo & Quy định) — đang chờ chủ dự án quyết định có thêm ô tích hay không (`CURRENT_STATE.md` mục 9).
 4. Đổi ý trước khi khai nộp tiền: bấm **`Hủy giữ chỗ`** ở ô 03 — slot trả về kho ngay.
 
-### Bước 3.4: Chuyển Khoản VietQR 1-Chạm & Tải Biên Lai (Tab 3)
+### Bước 3.4: Chuyển Khoản VietQR 1-Chạm & Tải Biên Lai (Tab 2)
 1. Khi PM mở cổng thanh toán, ô **"03 Đơn Hàng Của Bạn"** chuyển sang **`CỔNG TT ĐÃ MỞ`** (tự kiểm tra lại mỗi 60 giây) và trạng thái đơn là **`Chờ nộp tiền`** — có **24 giờ** tính từ lúc cổng mở.
 2. Nộp tiền bằng một trong hai cách:
    - Ô 03: bấm **`Nộp tiền ngay (1-Chạm) →`**; hoặc
@@ -218,7 +218,7 @@ Mục tiêu của Admin là **tạo ra một hệ thống Google Sheet hoàn to�
 5. Đơn hàng chuyển sang trạng thái: **`Đã khai nộp - chờ đối soát`**.
 
 ### Bước 3.5: Theo dõi Tiến Độ Giao Hàng
-1. Nhân viên có thể vào lại Tab 3 bất kỳ lúc nào để tra cứu.
+1. Nhân viên có thể vào lại Tab 2 bất kỳ lúc nào để tra cứu.
 2. Khi PM đối soát xong, trạng thái cập nhật thành: **`Đã duyệt thanh toán`**.
 3. Nhận hàng: email duyệt thanh toán hiện hướng dẫn *"mang thẻ nhân viên LG đến kho … để làm thủ tục nhận sản phẩm theo lịch thông báo của PM"*. Hình thức giao / nhận chính thức do PM thông báo *(cập nhật 05/10: bản cũ ghi "giao tận nơi theo địa chỉ đã đăng ký" — mâu thuẫn với email; chờ chủ dự án chốt)*.
 

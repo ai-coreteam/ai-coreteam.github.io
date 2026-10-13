@@ -10,7 +10,8 @@ Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1�
 21–24 = địa chỉ nhận hàng, Config (public_config), hạn mức theo chương trình, EN (v2.9.0);
 25 = hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền (v2.10.0);
 26 = địa chỉ lưu trên Sheet, tỉnh/thành + cảnh báo khác miền, tự đổi địa chỉ đơn (v2.11.0);
-27 = người nhận hàng + nhân viên tự sửa SĐT (v2.12.0).
+27 = người nhận hàng + nhân viên tự sửa SĐT (v2.12.0);
+28 = thứ tự tab mới của nhân viên: Danh mục → Nộp tiền → Chi tiết → Thông báo (v2.13.0).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -816,6 +817,47 @@ def main():
             r = page.evaluate("(() => { const c = document.querySelector('#addr-modal .modal-card'); const b = c.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.right), innerWidth, document.documentElement.scrollWidth <= innerWidth + 1, c.scrollHeight > c.clientHeight ? getComputedStyle(c).overflowY : 'fits']; })()")
             check(r[0] >= 0 and r[1] <= r[2] and r[3] and r[4] in ('auto', 'scroll', 'fits'), f'iPhone 13: cửa sổ vừa màn hình, cuộn được khi dài ({r})')
             check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+
+            print('28. v2.13 thứ tự tab của nhân viên: Danh mục → Nộp tiền → Chi tiết → Thông báo (vào thẳng Danh mục)')
+            VIS = """() => [...document.querySelectorAll('#main-nav-tabs .tab-btn')].filter(b => b.offsetParent)
+                .map(b => { const r = b.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.left), b.id, b.innerText.replace(/\\s+/g, ' ').trim()]; })
+                .sort((a, b) => a[0] - b[0] || a[1] - b[1])"""
+            for dev_name, dev, lang in (('máy tính', None, ''), ('iPhone 13', ip13, ''), ('máy tính EN', None, 'en')):
+                s = Mock(my_status=T.NEW)
+                ctx, page = open_page(browser, port, s, device=dev, extra_init=("localStorage.setItem('lg_lang','en');" if lang else ''))
+                T.login(page, T.ME)
+                v = page.evaluate(VIS); ids = [x[2] for x in v]
+                check(ids == ['tab2-btn', 'tab3-btn', 'tab4-btn', 'tab1-btn'], f'{dev_name}: thứ tự hiển thị {ids}')
+                labels = [x[3].split(' ')[0] for x in v]
+                check(labels == ['1.', '2.', '3.', '4.'], f'{dev_name}: đánh số 1–4 theo thứ tự ({[x[3][:28] for x in v]})')
+                check(page.evaluate("document.querySelector('.tab-content.active').id") == 'tab2' and page.evaluate("document.getElementById('tab2-btn').classList.contains('active')"), f'{dev_name}: đăng nhập xong mở thẳng Danh mục')
+                if lang:
+                    check([x[3][:21] for x in v] == ['1. Catalog & Register', '2. Confirm & Pay 1 or', '3. Product Details Ex', '4. Notice & Rules Rul'] or all(l.startswith(n) for l, n in zip([x[3] for x in v], ['1. Catalog', '2. Confirm', '3. Product', '4. Notice'])), f'EN: nhãn {[x[3][:22] for x in v]}')
+                if dev:
+                    rows = sorted(set(x[0] for x in v))
+                    check(len(rows) == 2 and [x[2] for x in v if x[0] == rows[0]] == ['tab2-btn', 'tab3-btn'], f'iPhone: lưới 2×2, hàng đầu = Danh mục + Nộp tiền ({v})')
+                check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+                ctx.close()
+            # điều hướng giữa các tab vẫn đúng (trước có code chọn nút theo vị trí [1], [2])
+            s = Mock(my_status=T.NEW); ctx, page = open_page(browser, port, s); T.login(page, T.ME)
+            page.evaluate("switchTab('tab1', document.getElementById('tab1-btn'))"); page.wait_for_timeout(300)
+            page.evaluate("goToPortal()"); page.wait_for_timeout(500)
+            check(page.evaluate("[document.querySelector('.tab-content.active').id, document.querySelector('.tab-btn.active').id]") == ['tab2', 'tab2-btn'], 'goToPortal → Danh mục, đúng nút sáng')
+            page.evaluate("switchTab('tab1', document.getElementById('tab1-btn'))"); page.wait_for_timeout(300)
+            hero = page.evaluate("[...document.querySelectorAll('#tab1 button')].find(b => /Tab 1/.test(b.textContent))")
+            check(page.evaluate("!![...document.querySelectorAll('#tab1 button')].find(b => /Khám Phá Danh Mục & Mua Hàng Ngay \\(Tab 1\\)/.test(b.textContent))"), 'tab Thông báo: nút "Khám Phá Danh Mục… (Tab 1)"')
+            check(page.evaluate("TOURS.employee[0].tabId === 'tab2' && TOURS.employee[3].tabId === 'tab2'"), 'hướng dẫn nhanh: bước 1 và 4 ở lại Danh mục')
+            order = page.evaluate("(() => { const out = []; document.getElementById('tab2-btn').focus(); for (let i = 0; i < 3; i++) { const b = [...document.querySelectorAll('#main-nav-tabs .tab-btn')].filter(x => x.offsetParent); const k = b.indexOf(document.activeElement); b[k + 1].focus(); out.push(document.activeElement.id); } return out; })()")
+            dom = page.evaluate("[...document.querySelectorAll('#main-nav-tabs .tab-btn')].filter(x => x.offsetParent).map(x => x.id)")
+            check(dom == ['tab2-btn', 'tab3-btn', 'tab4-btn', 'tab1-btn'], f'thứ tự trong HTML (phím Tab / trình đọc màn hình) khớp thứ tự hiển thị ({dom})')
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
+            # PM: không đổi (1. Bảng điều khiển PM, 2. Bảng chi tiết)
+            s = Mock(); ctx, page = open_page(browser, port, s); T.login(page, T.PM)
+            v = page.evaluate(VIS)
+            check([x[2] for x in v] == ['tab-pm-btn', 'tab4-btn'] and v[0][3].startswith('1. Bảng Điều Khiển PM') and v[1][3].startswith('2. Bảng Chi Tiết'), f'PM: giữ nguyên ({[x[3][:24] for x in v]})')
+            check(page.evaluate("document.querySelector('.tab-content.active').id") == 'tab-pm', 'PM: vẫn mở Bảng điều khiển PM')
             ctx.close()
 
             print('16. Máy tính 1440 px: mô tả hiện đủ, không có nút "Xem đủ"; bảng vẫn là bảng; cửa sổ nộp tiền như cũ')

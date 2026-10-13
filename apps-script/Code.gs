@@ -1767,7 +1767,7 @@ function payment_(d) {
   var pre = findOrder_(reg, slotId, empCode);
   if (!pre) {
     log_('PAYMENT_NOT_FOUND', empCode, slotId, d.userAgent, 'Không tìm thấy đơn đăng ký');
-    return { ok: false, message: 'Không tìm thấy đơn đăng ký với Slot ' + slotId + ' và Mã NV ' + empCode + '. Vui lòng đăng ký ở Tab 2 trước.' };
+    return { ok: false, message: 'Không tìm thấy đơn đăng ký với Slot ' + slotId + ' và Mã NV ' + empCode + '. Vui lòng đăng ký ở Tab 1 trước.' };
   }
   if (pre.status === STATUS_WAIT_GATE || pre.status === 'Đã đăng ký - Chờ mở thanh toán') {
     return {

@@ -3963,14 +3963,13 @@
 
     <!-- Tabs Navigation -->
     <nav class="nav-tabs" id="main-nav-tabs">
-      <button class="tab-btn role-employee-tab active" id="tab1-btn" onclick="switchTab('tab1', this)">
-        1. Thư Thông Báo & Quy Định <span class="tab-badge">Rules</span>
-      </button>
-      <button class="tab-btn role-employee-tab" id="tab2-btn" onclick="switchTab('tab2', this)">
-        2. Danh Mục & Đăng Ký Mua Hàng <span class="tab-badge" style="background:var(--lg-panel-2); color:var(--lg-red);">Catalog Live</span>
+      <!-- v2.13 (13/10/2026, chủ dự án duyệt): nhân viên vào thẳng Danh mục → Nộp tiền; Thông báo & Quy định chuyển xuống cuối.
+           Chỉ đổi THỨ TỰ nút + số thứ tự; id tab1–tab4 giữ nguyên (code, hướng dẫn nhanh, test dùng id). -->
+      <button class="tab-btn role-employee-tab active" id="tab2-btn" onclick="switchTab('tab2', this)">
+        1. Danh Mục & Đăng Ký Mua Hàng <span class="tab-badge" style="background:var(--lg-panel-2); color:var(--lg-red);">Catalog Live</span>
       </button>
       <button class="tab-btn role-employee-tab" id="tab3-btn" onclick="switchTab('tab3', this)">
-        3. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">0 Đơn</span>
+        2. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">0 Đơn</span>
       </button>
       <!-- PM Main Tab (Positioned FIRST for PM) -->
       <button class="tab-btn pm-tab-button role-pm-tab" id="tab-pm-btn" onclick="switchTab('tab-pm', this)" style="display:none;">
@@ -3979,12 +3978,15 @@
       </button>
       <!-- Product Details Tab (Positioned behind PM Tab for PM; 4th for Employee) -->
       <button class="tab-btn" id="tab4-btn" onclick="switchTab('tab4', this)">
-        <span id="tab4-btn-title">4. Bảng Chi Tiết Sản Phẩm</span> <span class="tab-badge" id="tab4-badge">Excel View</span>
+        <span id="tab4-btn-title">3. Bảng Chi Tiết Sản Phẩm</span> <span class="tab-badge" id="tab4-badge">Excel View</span>
+      </button>
+      <button class="tab-btn role-employee-tab" id="tab1-btn" onclick="switchTab('tab1', this)">
+        4. Thư Thông Báo & Quy Định <span class="tab-badge">Rules</span>
       </button>
     </nav>
 
     <!-- TAB 1: THƯ THÔNG BÁO MỞ BÁN NỘI BỘ -->
-    <div id="tab1" class="tab-content active">
+    <div id="tab1" class="tab-content">
       <!-- LG BRAND SHOWCASE HERO BANNER (LIGHT THEME + LIFESTYLE IMAGERY + LG MOTION) -->
       <div class="lg-hero-showcase">
         <div class="hero-content">
@@ -4018,7 +4020,7 @@
           <div class="hero-actions">
             <button type="button" onclick="switchTab('tab2')" class="btn-hero-cta">
               <svg class="lg-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-              Khám Phá Danh Mục & Mua Hàng Ngay (Tab 2) →
+              Khám Phá Danh Mục & Mua Hàng Ngay (Tab 1) →
             </button>
             <button type="button" onclick="openFullLetterModal()" class="btn-hero-secondary">
               <svg class="lg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -4066,7 +4068,7 @@
           </div>
           <div class="meta-row">
             <span class="meta-label">Đính Kèm:</span>
-            <span class="meta-val">Danh sách Slot ID chi tiết (xem Tab 4)</span>
+            <span class="meta-val">Danh sách Slot ID chi tiết (xem Tab 3)</span>
           </div>
         </div>
 
@@ -4078,7 +4080,7 @@
 
           <p>Kính gửi Toàn thể Cán bộ Nhân viên LG Electronics Việt Nam (Dear All LG Team Members),</p>
           <br>
-          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG. Đợt này mở bán <strong id="tab1-letter-count">90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC</strong>. Danh sách Slot ID đầy đủ xem ở Tab 4.</p>
+          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG. Đợt này mở bán <strong id="tab1-letter-count">90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC</strong>. Danh sách Slot ID đầy đủ xem ở Tab 3.</p>
           <p style="margin-top:8px;"><em>Thông tin Nhân Viên Nộp Tiền (Họ tên & Mã NV, tách 2 trường riêng) được khai ở bước Xác nhận nộp tiền.</em></p>
 
           <div class="sec-card">
@@ -4099,19 +4101,19 @@
               <li><strong>Trường 1-3:</strong> Bộ Phận (Division) | Mã Nhân Viên Đăng Ký | Họ Tên NV Đăng Ký</li>
               <li><strong>Trường 4:</strong> Kho (AYA / AYB / AYC)</li>
               <li><strong>Trường 5-8:</strong> Mã Model | Mã Slot ID (#001, #002...) | SĐT Liên Hệ | Địa Chỉ Giao Hàng</li>
-              <li><strong style="color:var(--lg-heritage);">Họ tên & Mã NV người nộp tiền:</strong> khai ở Tab 3 khi xác nhận nộp tiền.</li>
+              <li><strong style="color:var(--lg-heritage);">Họ tên & Mã NV người nộp tiền:</strong> khai ở Tab 2 khi xác nhận nộp tiền.</li>
             </ul>
           </div>
 
           <div class="sec-card">
             <div class="sec-title">3. PHƯƠNG THỨC THANH TOÁN & NỘP CHỨNG TỪ TIỀN GỬI NGÂN HÀNG</div>
-            <p>Sau khi hệ thống xác nhận đăng ký slot thành công, nhân viên thực hiện chuyển khoản 100% giá trị đơn hàng và <strong>Upload File Ảnh Biên Lai Nộp Tiền</strong> tại Tab 3:</p>
+            <p>Sau khi hệ thống xác nhận đăng ký slot thành công, nhân viên thực hiện chuyển khoản 100% giá trị đơn hàng và <strong>Upload File Ảnh Biên Lai Nộp Tiền</strong> tại Tab 2:</p>
             <ul style="padding-left:20px; margin-top:8px; line-height:1.7;">
               <li><strong>Tên Tài Khoản:</strong> <span data-cfg="BANK_HOLDER" data-no-i18n>CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</span></li>
               <li><strong>Số Tài Khoản:</strong> <code data-cfg="BANK_ACC" data-no-i18n>0991000012525</code></li>
               <li><strong>Ngân Hàng:</strong> <span data-cfg="BANK_NAME" data-no-i18n>VIETCOMBANK</span> - <span data-cfg="BANK_BRANCH" data-no-i18n>Chi nhánh Tây Hồ</span></li>
               <li><strong>Cú pháp chuyển khoản (Bắt buộc):</strong> <code data-cfg-syntax data-no-i18n>[Mã NV] [Mã Slot]</code></li>
-              <li><strong>Upload File Biên Lai:</strong> Vào Tab 3 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.</li>
+              <li><strong>Upload File Biên Lai:</strong> Vào Tab 2 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.</li>
             </ul>
           </div>
 
@@ -4134,7 +4136,7 @@
     </div>
 
     <!-- TAB 2: ĐĂNG KÝ TRỰC TUYẾN TRÊN HỆ THỐNG -->
-    <div id="tab2" class="tab-content">
+    <div id="tab2" class="tab-content active">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div>
           <h2 style="font-size:17px; color:var(--lg-red); font-family:var(--font-heading); margin-bottom:4px;">Đăng Ký Mua Hàng Trực Tuyến Trên Hệ Thống (Direct Registration Form)</h2>
@@ -4960,7 +4962,7 @@
       <div class="sec-card sec-card-teal" style="margin-top:20px;">
         <div class="sec-title">GHI CHÚ VỀ TRƯỜNG THÔNG TIN "NHÂN VIÊN NỘP TIỀN" ĐẢM BẢO ĐỘC LẬP</div>
         <ul style="padding-left:20px; line-height:1.7; font-size:12.5px;">
-          <li><strong>Tách riêng 2 trường độc lập:</strong> Trong mẫu biểu nộp tiền (Tab 3), "Họ và Tên Nhân Viên Nộp Tiền" và "Mã NV Người Nộp Tiền" là 2 ô riêng biệt, không gộp chung.</li>
+          <li><strong>Tách riêng 2 trường độc lập:</strong> Trong mẫu biểu nộp tiền (Tab 2), "Họ và Tên Nhân Viên Nộp Tiền" và "Mã NV Người Nộp Tiền" là 2 ô riêng biệt, không gộp chung.</li>
           <li><strong>Minh bạch trong bảng báo cáo:</strong> Bảng tổng hợp chốt đơn tách riêng 2 cột: <code>Họ Tên NV Nộp Tiền</code> và <code>Mã NV Nộp Tiền</code> để PM & Kế toán dễ đối soát sao kê ngân hàng.</li>
         </ul>
       </div>
@@ -5686,7 +5688,7 @@
           <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">Số điện thoại liên hệ</label>
             <input type="text" class="form-control" id="quick-phone" required placeholder="0901234567" readonly>   <!-- v2.12: chỉ đọc — máy chủ không lưu ô này; sửa SĐT ở cửa sổ Địa chỉ nhận hàng -->
-            <div id="quick-phone-hint" style="font-size:11px; color:#716F6A; margin-top:3px;" hidden>Sửa số điện thoại ở mục Địa chỉ nhận hàng (tab 2).</div>
+            <div id="quick-phone-hint" style="font-size:11px; color:#716F6A; margin-top:3px;" hidden>Sửa số điện thoại ở mục Địa chỉ nhận hàng (tab 1).</div>
           </div>
         </div>
 
@@ -6798,12 +6800,12 @@
         }
       } else {
         if (tabPmBtn) tabPmBtn.style.display = 'none';
-        if (tab4Title) tab4Title.textContent = '4. Bảng Chi Tiết Sản Phẩm';
+        if (tab4Title) tab4Title.textContent = '3. Bảng Chi Tiết Sản Phẩm';   // v2.13: thứ tự mới cho nhân viên
         if (tab4Badge) tab4Badge.textContent = 'Excel View';
 
         const activeTab = document.querySelector('.tab-content.active');
-        if (activeTab && activeTab.id === 'tab-pm') {
-          switchTab('tab1');
+        if (!activeTab || activeTab.id === 'tab-pm') {
+          switchTab('tab2');   // v2.13: trang chính của nhân viên = Danh mục (trước: Thông báo)
         }
       }
     }
@@ -9160,7 +9162,7 @@
       RULE_JEONGDO: { vi: 'Tuyệt đối nghiêm cấm mua hộ, bán lại cho bên thứ ba hoặc trục lợi thương mại. Vi phạm sẽ bị xử lý kỷ luật theo quy định công ty.',
                       en: 'Buying on behalf of others, reselling to third parties or any commercial gain is strictly prohibited. Violations lead to disciplinary action under company rules.' },
       ASSISTANT_GREETING: { vi: "Life's Good! Bạn cần hỗ trợ gì về ưu đãi hôm nay?", en: "Life's Good! How can we help with today's deals?" },
-      ASSISTANT_MESSAGE: { vi: "Life's Good! Chọn đợt bán ở thanh phía trên, rồi xem danh mục và giữ chỗ ở tab 2.", en: "Life's Good! Pick a sale in the bar above, then browse and reserve in tab 2." },
+      ASSISTANT_MESSAGE: { vi: "Life's Good! Chọn đợt bán ở thanh phía trên, rồi xem danh mục và giữ chỗ ở tab 1.", en: "Life's Good! Pick a sale in the bar above, then browse and reserve in tab 1." },
       ANNOUNCEMENT: { vi: '' },
       PAYMENT_DEADLINE_HOURS: { vi: '24' }   // v2.10: hạn nộp tiền (giờ) kể từ lúc PM mở cổng — máy chủ dùng cùng ô này
     };
@@ -10273,7 +10275,7 @@
           if (!last.busy) return last;
         } catch (err) {
           last = { ok: false, message: err.name === 'AbortError'
-            ? 'Máy chủ phản hồi quá lâu. Vui lòng bấm Tra cứu đơn (Tab 3) để xem đơn đã được ghi chưa trước khi gửi lại.'
+            ? 'Máy chủ phản hồi quá lâu. Vui lòng bấm Tra cứu đơn (Tab 2) để xem đơn đã được ghi chưa trước khi gửi lại.'
             : 'Không kết nối được máy chủ: ' + err.message };
         } finally { clearTimeout(timer); }
       }
@@ -11895,15 +11897,15 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         }
       } else {
         if (tabId === 'tab-pm') {
-          tabId = 'tab1';
-          element = document.getElementById('tab1-btn');
+          tabId = 'tab2';   // v2.13: trang chính của nhân viên = Danh mục
+          element = document.getElementById('tab2-btn');
         }
       }
 
       if (tabId === 'tab-pm') {
         if (!currentUser || currentUser.role !== 'PM') {
           alert('Chức năng này chỉ dành riêng cho Quản trị viên (PM).');
-          switchTab('tab1');
+          switchTab('tab2');
           return;
         }
         renderPMDashboard();
@@ -11966,8 +11968,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         switchTab('tab-pm');
         return;
       }
-      const portalBtn = document.querySelectorAll('.tab-btn')[1];
-      switchTab('tab2', portalBtn);
+      switchTab('tab2', document.getElementById('tab2-btn'));   // v2.13: theo id (trước theo vị trí [1] → sai khi đổi thứ tự)
     }
 
     // Nộp tiền phải đi qua Tra cứu đơn (để kiểm tra đủ thời gian chờ)
@@ -12984,7 +12985,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     // Auto fill payment form from slot selection
     function autoFillPaymentOrderInfo() {
-      // Không tự điền dữ liệu mẫu. Thông tin được điền sẵn sau khi đăng ký ở Tab 2.
+      // Không tự điền dữ liệu mẫu. Thông tin được điền sẵn sau khi đăng ký ở Tab 1.
     }
 
 
@@ -13068,7 +13069,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       const head = res.offline
         ? 'BẢN MẪU: CHƯA KẾT NỐI GOOGLE SHEET, ĐĂNG KÝ NÀY KHÔNG ĐƯỢC LƯU.'
         : 'ĐĂNG KÝ ĐÃ ĐƯỢC GHI NHẬN VÀO HỆ THỐNG.';
-      alert(`${head}${warn}\n\n• Mã Slot: ${slotId}\n• Kho: ${kho}\n• Model: ${model}\n• Nhân viên đăng ký: ${empName} (${empCode})\n• Thời gian Timestamp: ${timestampStr}\n• Trạng thái: Chờ nộp tiền\n\nNỘP TIỀN: mở sau ${PAY_OPEN_DELAY_HOURS} giờ${openAtStr ? ', từ ' + openAtStr : ''}. Vui lòng CHƯA chuyển khoản trước giờ này.\nĐến giờ, vào Tab 3 → Tra cứu đơn của tôi (Mã NV + 4 số cuối SĐT) → bấm Nộp tiền.`);
+      alert(`${head}${warn}\n\n• Mã Slot: ${slotId}\n• Kho: ${kho}\n• Model: ${model}\n• Nhân viên đăng ký: ${empName} (${empCode})\n• Thời gian Timestamp: ${timestampStr}\n• Trạng thái: Chờ nộp tiền\n\nNỘP TIỀN: mở sau ${PAY_OPEN_DELAY_HOURS} giờ${openAtStr ? ', từ ' + openAtStr : ''}. Vui lòng CHƯA chuyển khoản trước giờ này.\nĐến giờ, vào Tab 2 → Tra cứu đơn của tôi (Mã NV + 4 số cuối SĐT) → bấm Nộp tiền.`);
 
       if (!res.offline) { takenSet.add(slotId); applyTaken(true); }
 
@@ -13077,8 +13078,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       if (phone) document.getElementById('lookup-phone').value = phone.replace(/[^0-9]/g, '').slice(-4);
       try { sessionStorage.setItem('regName_' + slotId, empName); } catch (e) {}
 
-      const tab3Btn = document.querySelectorAll('.tab-btn')[2];
-      switchTab('tab3', tab3Btn);
+      switchTab('tab3', document.getElementById('tab3-btn'));   // v2.13: theo id (trước theo vị trí [2])
     }
 
     document.getElementById('payment-form').addEventListener('reset', () => setTimeout(() => {
@@ -13854,7 +13854,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
       employee: [
         {
           targetSelector: '#program-tab-bar, .program-tab-bar',
-          tabId: 'tab1',
+          tabId: 'tab2',   // v2.13: thanh chương trình nằm ngoài tab → ở lại Danh mục (trang chính mới)
           badge: 'BƯỚC 1/4 · NHÂN VIÊN',
           kicker: 'CỬA NGÕ MUA SẮM',
           motionIcon: 'assets/images/quick-links-ani/ico_promotions_ani.gif',
@@ -13887,7 +13887,7 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
         },
         {
           targetSelector: '#grap-card-context, .grap-card-dark',
-          tabId: 'tab1',
+          tabId: 'tab2',   // v2.13: ô 03 nằm ngoài tab → kết thúc hướng dẫn ở Danh mục
           badge: 'BƯỚC 4/4 · HOÀN TẤT',
           kicker: 'THEO DÕI ĐƠN 1-CHẠM',
           motionIcon: 'assets/images/quick-links-ani/ico_membership_44.svg',

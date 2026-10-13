@@ -1084,6 +1084,22 @@
   "ô 7 và 8": "fields 7 and 8",
   "Mục 6:": "Field 6:",
   "Mục 6": "Field 6",
+  "4. Thư Thông Báo & Quy Định": "4. Notice & Rules",
+  "1. Danh Mục & Đăng Ký Mua Hàng": "1. Catalog & Register",
+  "2. Xác Nhận Mua & Nộp Tiền": "2. Confirm & Pay",
+  "3. Bảng Chi Tiết Sản Phẩm": "3. Product Details",
+  "Danh sách Slot ID chi tiết (xem Tab 3)": "Full slot ID list (see Tab 3)",
+  "Khám Phá Danh Mục & Mua Hàng Ngay (Tab 1) →": "Browse the catalog & buy (Tab 1) →",
+  "Upload File Ảnh Biên Lai Nộp Tiền tại Tab 2:": "the receipt image in Tab 2:",
+  "tại Tab 2:": "in Tab 2:",
+  "khai ở Tab 2 khi xác nhận nộp tiền.": "entered in Tab 2 when you confirm payment.",
+  "Vào Tab 2 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.": "Go to Tab 2 -> Fill in the payment form -> Upload the receipt image/PDF.",
+  "Máy chủ phản hồi quá lâu. Vui lòng bấm Tra cứu đơn (Tab 2) để xem đơn đã được ghi chưa trước khi gửi lại.": "The server took too long. Please use Order lookup (Tab 2) to check whether your order was saved before sending again.",
+  "Sửa số điện thoại ở mục Địa chỉ nhận hàng (tab 1).": "Edit your phone number under Delivery address (tab 1).",
+  "Đến giờ, vào Tab 2 → Tra cứu đơn của tôi (Mã NV + 4 số cuối SĐT) → bấm Nộp tiền.": "When it opens, go to Tab 2 → My order lookup (ID + last 4 phone digits) → click Pay.",
+  "Life's Good! Chọn đợt bán ở thanh phía trên, rồi xem danh mục và giữ chỗ ở tab 1.": "Life's Good! Pick a sale in the bar above, then browse and reserve in tab 1.",
+  ". Danh sách Slot ID đầy đủ xem ở Tab 3.": ". See the full slot ID list in Tab 3.",
+  "Trong mẫu biểu nộp tiền (Tab 2), \"Họ và Tên Nhân Viên Nộp Tiền\" và \"Mã NV Người Nộp Tiền\" là 2 ô riêng biệt, không gộp chung.": "In the payment form (Tab 2), \"Payer full name\" and \"Payer employee ID\" are 2 separate fields.",
   "Chưa có số điện thoại — bấm Sửa để thêm (cần khi giữ chỗ).": "No phone number yet — click Edit to add it (needed to reserve).",
   "Vui lòng nhập số điện thoại của bạn (10 số, bắt đầu bằng 0) để PM liên hệ giao hàng.": "Please enter your phone number (10 digits starting with 0) so the PM can contact you about delivery.",
   "Số điện thoại của bạn *": "Your phone number *",
@@ -1656,6 +1672,10 @@
   [
    "^Không tìm thấy đơn đăng ký với Slot (\\S+) và Mã NV (\\S+)\\. Vui lòng đăng ký ở Tab 2 trước\\.$",
    "No registration found for slot $1 and employee ID $2. Please register in Tab 2 first."
+  ],
+  [
+   "^Không tìm thấy đơn đăng ký với Slot (\\S+) và Mã NV (\\S+)\\. Vui lòng đăng ký ở Tab 1 trước\\.$",
+   "No registration found for slot $1 and employee ID $2. Please register in Tab 1 first."
   ],
   [
    "^Cổng thanh toán chưa được mở cho đơn hàng (\\S+)\\. PM đang kiểm duyệt danh sách đăng ký để chống trùng lặp\\. Vui lòng chờ thông báo mở cổng thanh toán từ PM\\.$",
