@@ -9826,7 +9826,10 @@
         ? 'Đã lưu trên hệ thống: tự điền khi bạn đăng nhập ở máy khác. Đơn đã giữ: bấm "Đổi địa chỉ" ở ô 03 (trước khi khai nộp tiền).'
         : 'Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.';
       const rv = getReceiver();
-      const recvLine = ADDR_SERVER   // v2.12: ai nhận hàng (mặc định chính bạn)
+      const noPhone = ADDR_SERVER && !rv.name && !validPhoneW(normPhoneW(currentUser.phone));   // v2.12.2: chưa có SĐT (HR không cung cấp)
+      const recvLine = noPhone
+        ? `<span class="addr-note"><span class="addr-missing">${T('Chưa có số điện thoại — bấm Sửa để thêm (cần khi giữ chỗ).')}</span></span>`
+        : ADDR_SERVER   // v2.12: ai nhận hàng (mặc định chính bạn)
         ? `<span class="addr-note"><span>${T('Người nhận:')}</span> <span class="addr-val" data-no-i18n>${esc(rv.name || currentUser.name || '')} · ${esc(rv.name ? rv.phone : normPhoneW(currentUser.phone || ''))}</span>${rv.name ? '' : ` <span>${T('(bạn)')}</span>`}</span>`
         : '';
       row.innerHTML = a
@@ -9896,8 +9899,10 @@
       toggleReceiverFields();
       renderAddrSuggest(cur);
       updateAddrRegionWarn();
+      const phoneMissing = ADDR_SERVER && !opts.order && !validPhoneW(normPhoneW(currentUser && currentUser.phone));   // v2.12.2
+      if (phoneMissing) { const er = document.getElementById('addr-error'); er.textContent = T('Vui lòng nhập số điện thoại của bạn (10 số, bắt đầu bằng 0) để PM liên hệ giao hàng.'); er.hidden = false; }
       modal.classList.add('active');
-      setTimeout(() => (sel.value ? input : sel).focus(), 50);
+      setTimeout(() => (phoneMissing && sel.value ? document.getElementById('addr-my-phone') : (sel.value ? input : sel)).focus(), 50);
       return new Promise(resolve => { addrModalResolve = resolve; });
     }
     // Gợi ý "Dùng lại": địa chỉ mặc định + địa chỉ ở các đơn trước (tối đa 3, không trùng địa chỉ đang có)
@@ -10491,7 +10496,8 @@
 
       // v2.9: cần địa chỉ nhận hàng (PM đối chiếu kho khu vực). Chưa có → hỏi 1 lần, lưu cho lần sau
       let deliveryAddr = getDeliveryAddress();
-      if (!deliveryAddr && currentUser.role !== 'PM') {
+      const needPhone = ADDR_SERVER && !validPhoneW(normPhoneW(currentUser.phone));   // v2.12.2: HR không có SĐT → nhân viên bổ sung trước khi giữ chỗ
+      if ((!deliveryAddr || needPhone) && currentUser.role !== 'PM') {
         deliveryAddr = await openAddressModal(prod);
         if (!deliveryAddr) return;
       }

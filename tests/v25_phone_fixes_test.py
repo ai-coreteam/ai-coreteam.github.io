@@ -792,6 +792,20 @@ def main():
             u = calls(s, 'update_my_address')[-1] if calls(s, 'update_my_address') else {}
             check(u.get('phone') == '0912345678' and page.evaluate("document.getElementById('addr-error').hidden"), f"lưu được, gửi SĐT đủ 0 ({u.get('phone')})")
             ctx.close()
+            # v2.12.2: HR không có SĐT — đã có địa chỉ nhưng chưa có SĐT → giữ chỗ phải hỏi SĐT trước
+            s = RecvV12(my_status=None); s.prof.update(address='Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng', phone='')
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1200)
+            check('Chưa có số điện thoại' in page.evaluate(ROW), 'tab 2: nhắc "Chưa có số điện thoại — bấm Sửa để thêm"')
+            aya = page.evaluate("currentProducts.find(p => p.kho === 'AYA' && p.status === 'Available').uniqueCode")
+            page.evaluate(f"setTimeout(() => handleRegisterProduct('{aya}'), 0)"); page.wait_for_timeout(800)
+            st = page.evaluate("[document.getElementById('addr-modal').classList.contains('active'), document.getElementById('addr-error').hidden, document.getElementById('addr-error').textContent, document.activeElement && document.activeElement.id]")
+            check(st[0] and not st[1] and 'để PM liên hệ giao hàng' in st[2] and st[3] == 'addr-my-phone' and not calls(s, 'register_product'), f'giữ chỗ khi chưa có SĐT → mở cửa sổ, nhắc nhập SĐT, con trỏ ở ô SĐT, chưa gửi giữ chỗ ({st})')
+            page.fill('#addr-my-phone', '0977 111 222'); page.click('#addr-save-btn'); page.wait_for_timeout(2500)
+            rp = calls(s, 'register_product')[-1] if calls(s, 'register_product') else {}
+            check(rp.get('phone') == '0977111222' and s.prof['phone'] == '0977111222', f"nhập SĐT → lưu lên Sheet + giữ chỗ kèm SĐT ({rp.get('phone')})")
+            check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+            ctx.close()
             # EN + iPhone
             s = RecvV12(my_status=None); s.prof['address'] = 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'
             ctx, page = open_page(browser, port, s, device=ip13, no_addr=True, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)

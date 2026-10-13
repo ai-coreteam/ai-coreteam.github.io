@@ -92,6 +92,8 @@
 | 9:50 | Đăng nhập lại lần nữa → phản hồi trong vài giây | ADMIN | ☐ |
 | 9:55 | PM đăng nhập, chọn đúng chương trình, sẵn sàng nút **"Mở bán ngay"** | PM | ☐ |
 
+> **SĐT nhân viên (từ v2.12.2):** HR không cung cấp SĐT → tab Users cột E trống → nhân viên tự nhập ở cửa sổ địa chỉ. Chưa có SĐT thì tab 2 nhắc và **lúc giữ chỗ web bắt nhập SĐT trước** (lưu vào cột E). Nhắc nhân viên **thêm địa chỉ + SĐT ở tab 2 trước 10:00** để giữ chỗ không bị chậm.
+>
 > **Người nhận hàng & SĐT (từ v2.12.0, cần Version 12):** cửa sổ địa chỉ có ô **SĐT của bạn** (nhân viên tự sửa → tab Users cột E, ghi nhật ký `PHONE_UPDATE`) và **"Tôi là người nhận hàng"** (mặc định tick). Người khác nhận → nhập tên + SĐT người nhận → Registrations **cột X, Y**; PM thấy "Người nhận: …" ở bảng đơn, cửa sổ biên lai và file Excel (2 cột "Người nhận hàng", "SĐT người nhận"; trống = chính người đăng ký). Tra cứu đơn bằng 4 số cuối dùng **SĐT lúc giữ chỗ** (cột I): đơn cũ tra bằng số cũ.
 >
 > **Địa chỉ nhận hàng (từ v2.11.0, cần Apps Script Version 12):** lưu trên tab Users (cột **Address**) → nhân viên nhập **1 lần trước 10:00**, đăng nhập máy nào cũng tự điền. Cửa sổ địa chỉ có ô **Tỉnh / Thành phố**; giữ chỗ khác miền với kho → web **chỉ cảnh báo**, vẫn cho giữ; PM thấy nhãn **"Khác miền kho"** ở bảng đơn. Nhân viên **tự đổi địa chỉ của đơn** (ô 03 / bước nộp tiền, nút "Đổi địa chỉ") khi đơn còn *Chờ mở thanh toán* / *Chờ nộp tiền* và chưa khai nộp; mỗi lần đổi ghi vào cột Ghi chú và PM thấy nhãn **"Đã đổi địa chỉ"** → PM kiểm tra lại miền trước khi mở cổng / duyệt. Đã khai nộp: vẫn liên hệ PM.

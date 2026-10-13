@@ -158,7 +158,7 @@ Version 12 = `Code.gs` tag **`v2.12.1`** (= v2.12.0 + SĐT mất số 0 đầu t
 | 6 | Kiểm tra máy thứ 2 | Đăng nhập cùng tài khoản trên điện thoại | Địa chỉ tự điền |
 | **Quay lại** | ✏️ Edit → chọn **Version 11** → Deploy | Web tự quay về cách cũ; cột Address vẫn nằm trên Sheet, không ảnh hưởng | — |
 
-> **Cập nhật 13/10/2026 (đã kiểm trên máy chủ thật, chỉ đọc):** chủ dự án **đã deploy Version 12** với code có lệnh địa chỉ (`my_address` / `update_my_address` / `user_update_order_address` trả "Thiếu Token" = đã có). Bản `v2.12.1` deploy thêm 1 lần nữa → Apps Script tự đánh số **Version 13** (Manage deployments → ✏️ → Version: New version → Deploy; URL `/exec` không đổi; quay lại: chọn Version 12). Sheet thật 13/10: Users 8 cột A–H, chưa có cột Address (chưa ai lưu); Users cột E chỉ 1 dòng có SĐT; Registrations lưới 26 cột, X/Y trống; Registrations dòng 2 cột I = số `912345678` (đúng lỗi mất số 0 mà v2.12.1 sửa).
+> **Cập nhật 13/10/2026 (đã kiểm trên máy chủ thật, chỉ đọc):** chủ dự án **đã deploy Version 12** với code có lệnh địa chỉ (`my_address` / `update_my_address` / `user_update_order_address` trả "Thiếu Token" = đã có). Bản `v2.12.1` deploy thêm 1 lần nữa → Apps Script tự đánh số **Version 13** (**chủ dự án đã deploy 13/10 09:51**; web v2.12.2 chỉ đổi web, không cần deploy thêm) (Manage deployments → ✏️ → Version: New version → Deploy; URL `/exec` không đổi; quay lại: chọn Version 12). Sheet thật 13/10: Users 8 cột A–H, chưa có cột Address (chưa ai lưu); Users cột E chỉ 1 dòng có SĐT; Registrations lưới 26 cột, X/Y trống; Registrations dòng 2 cột I = số `912345678` (đúng lỗi mất số 0 mà v2.12.1 sửa).
 
 **Google Sheet có cần sửa tay trước khi deploy V12 không? KHÔNG bắt buộc.**
 
