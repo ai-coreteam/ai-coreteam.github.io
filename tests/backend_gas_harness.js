@@ -656,6 +656,18 @@ console.log('--- v2.12: người nhận hàng (Users ReceiverName/ReceiverPhone,
   check(r3[9] === A && r3[23] === 'Trần Thị B', 'web cũ không gửi địa chỉ → máy chủ điền địa chỉ + người nhận mặc định');
 }
 
+console.log('--- v2.12.1: SĐT trong tab Users bị Google Sheet đổi thành số (mất 0 đầu) ---');
+{
+  const book = freshBook(); const { post } = load(book);
+  book.getSheetByName('Users').rows.find(r => r[0] === 'VH70001')[4] = 900001111;   // ô số: 0900001111 → 900001111
+  const u = post({ action: 'auth', id: 'VH70001', password: 'pw1' });
+  check(u.user.phone === '0900001111', `đăng nhập trả SĐT có lại số 0 đầu (${u.user.phone})`);
+  check(post({ action: 'update_my_address', token: u.token, address: 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng', phone: u.user.phone }).ok, 'lưu địa chỉ với SĐT đó không bị chặn');
+  post({ action: 'register_product', token: u.token, uniqueCode: PID + '-AYA-001', programId: PID, empCode: 'VH70001', empName: 'Nhan Vien 1', phone: '900001111', address: 'Số 1 Lê Lợi, Ngô Quyền, Hải Phòng' });
+  check(String(book.getSheetByName('Registrations').rows[1][8]) === "'0900001111", 'giữ chỗ với SĐT thiếu 0 → cột I ghi đủ "0900001111"');
+  check(post({ action: 'lookup', empCode: 'VH70001', phoneLast4: '1111' }).ok, 'tra cứu bằng 4 số cuối vẫn tìm được');
+}
+
 console.log('--- V1-10: Mọi lệnh ghi Registrations / Products của luồng nghiệp vụ nằm trong khóa ---');
 {
   const allowed = /program_delete|product_upload|setup/; // ngoài phạm vi đợt này (thêm dòng mới / xóa chương trình 0 đơn)

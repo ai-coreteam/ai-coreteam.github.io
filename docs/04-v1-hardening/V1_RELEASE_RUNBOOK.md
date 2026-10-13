@@ -145,18 +145,29 @@ Ghi chú: ô `BANK_ACC` trong tab `Config` hiện `991000012525` (Google Sheet t
 ### 3d. Deploy Apps Script **Version 12** (v2.11.0 + v2.12.0 — địa chỉ, người nhận hàng, SĐT lưu trên Sheet) — chủ dự án làm ngay sau khi web v2.12.0 lên
 
 Web v2.11.0 / v2.12.0 **chạy được với Version 11** (máy chủ chưa có lệnh mới → web tự dùng cách cũ: địa chỉ lưu trên máy, ẩn mục người nhận, đổi địa chỉ đơn qua PM).
-Version 12 = `Code.gs` tag **`v2.12.0`**, so với V11 chỉ **thêm**: `my_address` (đọc), `update_my_address` (địa chỉ + người nhận + SĐT của nhân viên), `user_update_order_address`;
+Version 12 = `Code.gs` tag **`v2.12.1`** (= v2.12.0 + SĐT mất số 0 đầu tự thêm lại), so với V11 chỉ **thêm**: `my_address` (đọc), `update_my_address` (địa chỉ + người nhận + SĐT của nhân viên), `user_update_order_address`;
 `auth` trả thêm `address`, `receiverName`, `receiverPhone`; `lookup` (đã đăng nhập) và `pm_dashboard` trả thêm người nhận; `register_product` ghi người nhận vào **cột X, Y** (tự thêm tiêu đề lần đầu), thiếu địa chỉ → lấy mặc định, địa chỉ qua `safe_`, **SĐT cột I giữ số 0 đầu**.
 
 | # | Việc | Chi tiết | Kiểm tra |
 |---|---|---|---|
 | 1 | Ghi lại Version đang chạy | Deploy → Manage deployments | Đang là **Version 11** |
-| 2 | Dán toàn bộ `apps-script/Code.gs` (tag **`v2.12.0`**) → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
+| 2 | Dán toàn bộ `apps-script/Code.gs` (tag **`v2.12.1`**) → Lưu | Thay toàn bộ nội dung | Không báo lỗi cú pháp |
 | 3 | **KHÔNG** chạy `rotateSessionSecret` / `setupWatchdogTrigger` / `setupNewDatabase` | Giữ phiên đăng nhập, trigger, dữ liệu | — |
 | 4 | Deploy phiên bản mới trên deployment cũ | ✏️ Edit → Version: **New version** → Deploy | **URL `/exec` không đổi** |
 | 5 | Kiểm tra trên web | Đăng nhập 1 tài khoản nhân viên → tab 2 → Thêm / Sửa địa chỉ → bỏ tick "Tôi là người nhận hàng", nhập tên + SĐT người nhận → Lưu | Tab Users có cột **Address**, **ReceiverName**, **ReceiverPhone** (máy chủ tự thêm bên phải) và dòng của tài khoản đó có dữ liệu; web ghi "Người nhận: …" |
 | 6 | Kiểm tra máy thứ 2 | Đăng nhập cùng tài khoản trên điện thoại | Địa chỉ tự điền |
 | **Quay lại** | ✏️ Edit → chọn **Version 11** → Deploy | Web tự quay về cách cũ; cột Address vẫn nằm trên Sheet, không ảnh hưởng | — |
+
+**Google Sheet có cần sửa tay trước khi deploy V12 không? KHÔNG bắt buộc.**
+
+| Tab | V12 cần gì | Ai làm |
+|---|---|---|
+| Users | Cột `Address`, `ReceiverName`, `ReceiverPhone` | Máy chủ **tự thêm** ở cột trống đầu tiên bên phải (tìm theo **tên tiêu đề**, hàng 1) khi nhân viên lưu lần đầu |
+| Users cột E (Phone) | SĐT 10 số | Ô bị Sheet đổi thành số (mất 0 đầu, vd. `912345678`) → v2.12.1 **tự thêm 0**. Tùy chọn: định dạng cột E = *Văn bản thuần* để ô nhập tay sau này giữ số 0 |
+| Registrations | Cột X `Receiver Name`, Y `Receiver Phone` | Máy chủ **tự thêm** (mở rộng lưới nếu thiếu) ở lần giữ chỗ đầu tiên có người nhận khác |
+| Config | Không có key mới | — |
+
+Điều kiện: hàng 1 của tab Users và Registrations là hàng tiêu đề (như hiện nay); không đặt tên cột khác trùng "Address" / "ReceiverName" / "ReceiverPhone".
 
 ⚠️ **Nạp danh sách nhân viên thật (dọn tab Users đợt 2):** nếu ghi đè cả tab Users thì **giữ nguyên cột Address** (hoặc nạp trước rồi mới để nhân viên nhập địa chỉ). Máy chủ tìm cột theo **tên tiêu đề** "Address", nên thứ tự cột không quan trọng.
 

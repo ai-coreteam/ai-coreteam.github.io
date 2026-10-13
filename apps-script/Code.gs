@@ -968,7 +968,7 @@ function register_product_(d) {
       regRow[5] = String(prodDataTarget[2]).trim();   // Kho
       regRow[6] = String(prodDataTarget[4]).trim();   // Model
       regRow[7] = uniqueCode;                  // Slot/UniqueCode
-      regRow[8] = asText_(d.phone);            // Phone (v2.12: giữ số 0 đầu như lệnh register cũ; trước đây Sheet đổi thành số)
+      regRow[8] = asText_(normPhone_(d.phone)); // Phone (v2.12: giữ số 0 đầu như lệnh register cũ; trước đây Sheet đổi thành số)
       regRow[9] = safe_(regAddress);           // Address (v2.11: safe_ chống chèn công thức + lấy mặc định khi thiếu)
       regRow[10] = 'Đồng ý';                    // Agree
       regRow[11] = STATUS_WAIT_GATE;           // Status: 'Đã đăng ký - Chờ mở thanh toán'
@@ -1592,7 +1592,7 @@ function auth_(d) {
       id: rowId,
       name: String(data[r][2]).trim(),
       dept: String(data[r][3]).trim(),
-      phone: String(data[r][4]).trim(),
+      phone: normPhone_(data[r][4]),   // v2.12.1: ô số mất 0 đầu → thêm lại (nếu không, web chặn lưu địa chỉ vì SĐT sai định dạng)
       email: String(data[r][5]).trim(),
       role: String(data[r][6]).trim() || 'USER'
     };
@@ -1857,7 +1857,11 @@ function userCol_(sheet, name, create) {   // cột theo TÊN tiêu đề (Addre
 }
 function userAddrCol_(sheet, create) { return userCol_(sheet, 'Address', create); }
 /* v2.12: SĐT Việt Nam 10 số bắt đầu bằng 0 (+84… đổi thành 0…); tên người nhận tối đa 100 ký tự */
-function normPhone_(v) { var p = str_(v).replace(/[\s.\-()']/g, ''); if (p.indexOf('+84') === 0) p = '0' + p.slice(3); return p; }
+function normPhone_(v) {
+  var p = str_(v).replace(/[\s.\-()']/g, ''); if (p.indexOf('+84') === 0) p = '0' + p.slice(3);
+  if (/^[1-9]\d{8}$/.test(p)) p = '0' + p;   // v2.12.1: Google Sheet đổi "0912345678" thành số 912345678 (mất số 0 đầu) → thêm lại
+  return p;
+}
 function validPhone_(p) { return /^0\d{9}$/.test(p); }
 function normName_(v) { return str_(v).replace(/\s+/g, ' ').trim().slice(0, 100); }
 // Hồ sơ giao hàng mặc định của 1 nhân viên: theo số dòng (đăng nhập) hoặc theo mã NV

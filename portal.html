@@ -8815,7 +8815,7 @@
 
       // T4.2: Mobile banking app-switching draft auto-restore
       const draftRestored = restoreQuickPaymentDraft(reg.id || reg.slotId);
-      document.getElementById('quick-phone').value = currentUser.phone || '';   // v2.12: luôn là SĐT hiện tại (bản nháp cũ không ghi đè)
+      document.getElementById('quick-phone').value = normPhoneW(currentUser.phone || '');   // v2.12: luôn là SĐT hiện tại (bản nháp cũ không ghi đè)
       document.getElementById('quick-phone-hint').hidden = !ADDR_SERVER;
       if (draftRestored && typeof showToast === 'function') {
         showToast('Đã tự động khôi phục bản nháp thông tin nộp tiền từ phiên trước.', 'info', 2500);
@@ -9389,7 +9389,7 @@
     function setDeliveryAddress(a) { try { localStorage.setItem(addrKey(), a); } catch (e) {} if (currentUser) currentUser.address = a; renderDeliveryAddrRow(); }
     // Gửi địa chỉ mặc định lên máy chủ (chạy nền). Lỗi mạng → đánh dấu "chờ đồng bộ", lần đăng nhập / mở trang sau tự gửi lại.
     // v2.12: người nhận hàng (trống = chính nhân viên) + SĐT của nhân viên — chỉ khi máy chủ có lệnh (V12)
-    function normPhoneW(v) { let p = String(v || '').replace(/[\s.\-()']/g, ''); if (p.indexOf('+84') === 0) p = '0' + p.slice(3); return p; }
+    function normPhoneW(v) { let p = String(v || '').replace(/[\s.\-()']/g, ''); if (p.indexOf('+84') === 0) p = '0' + p.slice(3); if (/^[1-9]\d{8}$/.test(p)) p = '0' + p; return p; }   // v2.12.1: số mất 0 đầu (Sheet đổi thành số) → thêm lại
     function validPhoneW(p) { return /^0\d{9}$/.test(p); }
     function getReceiver() { return { name: (currentUser && currentUser.receiverName) || '', phone: (currentUser && currentUser.receiverPhone) || '' }; }
     function setReceiver(name, phone) { if (!currentUser) return; currentUser.receiverName = name || ''; currentUser.receiverPhone = phone || ''; }
@@ -9443,7 +9443,7 @@
         : 'Dùng cho lần giữ chỗ tiếp theo. Đơn đã giữ muốn đổi địa chỉ: liên hệ trực tiếp PM phụ trách.';
       const rv = getReceiver();
       const recvLine = ADDR_SERVER   // v2.12: ai nhận hàng (mặc định chính bạn)
-        ? `<span class="addr-note"><span>${T('Người nhận:')}</span> <span class="addr-val" data-no-i18n>${esc(rv.name || currentUser.name || '')} · ${esc(rv.name ? rv.phone : (currentUser.phone || ''))}</span>${rv.name ? '' : ` <span>${T('(bạn)')}</span>`}</span>`
+        ? `<span class="addr-note"><span>${T('Người nhận:')}</span> <span class="addr-val" data-no-i18n>${esc(rv.name || currentUser.name || '')} · ${esc(rv.name ? rv.phone : normPhoneW(currentUser.phone || ''))}</span>${rv.name ? '' : ` <span>${T('(bạn)')}</span>`}</span>`
         : '';
       row.innerHTML = a
         ? `<span>${T('Địa chỉ nhận hàng:')}</span> <span class="addr-val" data-no-i18n>${esc(a)}</span><button type="button" class="btn-action btn-secondary" onclick="openAddressModal(null)">${T('Sửa')}</button>` +
@@ -9505,7 +9505,7 @@
       // v2.12: SĐT của bạn (chỉ khi sửa địa chỉ mặc định) + người nhận
       document.getElementById('addr-contact').hidden = !ADDR_SERVER;
       document.getElementById('addr-myphone-wrap').hidden = !!opts.order;
-      document.getElementById('addr-my-phone').value = (currentUser && currentUser.phone) || '';
+      document.getElementById('addr-my-phone').value = normPhoneW((currentUser && currentUser.phone) || '');
       const rv = opts.order ? { name: opts.order.receiverName || '', phone: opts.order.receiverPhone || '' } : getReceiver();
       document.getElementById('addr-self').checked = !rv.name;
       document.getElementById('addr-recv-name').value = rv.name; document.getElementById('addr-recv-phone').value = rv.phone;

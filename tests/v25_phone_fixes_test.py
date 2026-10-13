@@ -781,6 +781,17 @@ def main():
             xl = page.evaluate("(() => { let got = null; const o = window.downloadTableFile; window.downloadTableFile = (rows, n, opt) => { got = [rows[0], rows[1], opt.moneyCols]; }; try { exportRegistrationsCSV(); } finally { window.downloadTableFile = o; } return got; })()")
             check(xl and xl[0][13:15] == ['Người nhận hàng', 'SĐT người nhận'] and xl[1][13:15] == ['Trần Thị Bình', '0912345678'] and xl[0][xl[2][1]] == 'Số tiền đã nộp', f'Excel: 2 cột người nhận cạnh địa chỉ, cột tiền vẫn đúng ({xl and xl[0][12:16]}, {xl and xl[2]})')
             ctx.close()
+            # v2.12.1: SĐT trong Sheet mất số 0 đầu (ô số) → web tự thêm lại, lưu không bị chặn
+            s = RecvV12(my_status=None); s.prof.update(address='Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng', phone='912345678')
+            ctx, page = open_page(browser, port, s, no_addr=True); T.login(page, T.ME)
+            page.evaluate("switchTab('tab2', document.getElementById('tab2-btn'))"); page.wait_for_timeout(1000)
+            check('0912345678 (bạn)' in page.evaluate(ROW), 'tab 2: SĐT thiếu 0 hiện đủ "0912345678"')
+            page.evaluate("setTimeout(() => openAddressModal(null), 0)"); page.wait_for_timeout(300)
+            check(page.input_value('#addr-my-phone') == '0912345678', 'cửa sổ: ô SĐT của bạn điền sẵn "0912345678"')
+            page.click('#addr-save-btn'); page.wait_for_timeout(1200)
+            u = calls(s, 'update_my_address')[-1] if calls(s, 'update_my_address') else {}
+            check(u.get('phone') == '0912345678' and page.evaluate("document.getElementById('addr-error').hidden"), f"lưu được, gửi SĐT đủ 0 ({u.get('phone')})")
+            ctx.close()
             # EN + iPhone
             s = RecvV12(my_status=None); s.prof['address'] = 'Số 1 Lê Lợi, phường Ngô Quyền, Hải Phòng'
             ctx, page = open_page(browser, port, s, device=ip13, no_addr=True, extra_init="localStorage.setItem('lg_lang','en');"); T.login(page, T.ME)
