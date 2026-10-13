@@ -3519,6 +3519,12 @@
       html.ui-v2 .program-tab-bar { flex-wrap: wrap !important; overflow-x: visible !important; border-radius: 28px !important; }
       html.ui-v2 .program-tab { max-width: 100%; height: auto; min-height: 44px; white-space: normal !important; text-align: left; line-height: 20px; padding-top: 8px !important; padding-bottom: 8px !important; }   /* tên đợt dài xuống dòng trong nút, không tràn khỏi màn hình */
 
+      /* v2.13.1: bộ lọc "Kho" ở tab Danh Mục — trước: 4 nút xếp 4 dòng trong khung bo 999 px → thành hình bầu dục lớn.
+         Nay lưới 2 cột như thanh tab chính trên điện thoại (bo 24 px / nút 18 px); chữ "Kho:" một dòng riêng. Chỉ CSS, nút và chức năng giữ nguyên. */
+      html.ui-v2 .kho-filter-pills { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; padding: 6px; border-radius: 24px; }
+      html.ui-v2 .kho-filter-pills > span { grid-column: 1 / -1; padding: 6px 12px 2px !important; }
+      html.ui-v2 .kho-filter-pills button { height: auto; min-height: 44px; padding: 8px 12px !important; border-radius: 18px !important; line-height: 20px; white-space: normal; text-wrap: balance; }
+
       /* B1 (v2.6, 11/10/2026, chủ dự án duyệt): thẻ sản phẩm gọn — biểu tượng 64 px bên trái, tình trạng / kho / model bên phải;
          mô tả tình trạng, link LG.com, giá và nút giữ chỗ chạy hết chiều ngang. Chỉ CSS: HTML, nút và chức năng giữ nguyên.
          Mô tả tình trạng KHÔNG cắt bớt (là thông tin lỗi máy — người mua phải thấy đủ). */

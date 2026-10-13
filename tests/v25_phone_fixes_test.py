@@ -11,7 +11,8 @@ Mỗi kịch bản = 1 mục đã duyệt: token program_update, R1, R2, R3, B1�
 25 = hạn nộp tiền theo Config PAYMENT_DEADLINE_HOURS + nhắc đổi địa chỉ ở bước nộp tiền (v2.10.0);
 26 = địa chỉ lưu trên Sheet, tỉnh/thành + cảnh báo khác miền, tự đổi địa chỉ đơn (v2.11.0);
 27 = người nhận hàng + nhân viên tự sửa SĐT (v2.12.0);
-28 = thứ tự tab mới của nhân viên: Danh mục → Nộp tiền → Chi tiết → Thông báo (v2.13.0).
+28 = thứ tự tab mới của nhân viên: Danh mục → Nộp tiền → Chi tiết → Thông báo (v2.13.0);
+29 = bộ lọc "Kho" trên điện thoại thành lưới 2 cột, máy tính giữ nguyên (v2.13.1).
 """
 import os, sys, re, copy, json, subprocess, functools, http.server, socketserver, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -859,6 +860,28 @@ def main():
             check([x[2] for x in v] == ['tab-pm-btn', 'tab4-btn'] and v[0][3].startswith('1. Bảng Điều Khiển PM') and v[1][3].startswith('2. Bảng Chi Tiết'), f'PM: giữ nguyên ({[x[3][:24] for x in v]})')
             check(page.evaluate("document.querySelector('.tab-content.active').id") == 'tab-pm', 'PM: vẫn mở Bảng điều khiển PM')
             ctx.close()
+
+            print('29. v2.13.1 bộ lọc "Kho" trên điện thoại: lưới 2 cột (trước: 4 dòng trong khung bo 999 px = hình bầu dục); máy tính giữ nguyên')
+            KHO = """() => { const k = document.querySelector('#tab2 .kho-filter-pills'), r = k.getBoundingClientRect(), cs = getComputedStyle(k);
+                const bs = [...k.querySelectorAll('button')].map(b => { const x = b.getBoundingClientRect(); return [Math.round(x.top), Math.round(x.height), b.scrollWidth <= b.clientWidth + 1]; });
+                return { disp: cs.display, radius: parseFloat(cs.borderRadius), w: Math.round(r.width), rows: new Set(bs.map(b => b[0])).size, minH: Math.min(...bs.map(b => b[1])),
+                         fit: bs.every(b => b[2]), n: bs.length, noScroll: document.documentElement.scrollWidth <= innerWidth + 1 }; }"""
+            for dev_name, dev, lang in (('iPhone SE 320', dict(p.devices['iPhone SE']), 'en'), ('iPhone 13', ip13, ''), ('máy tính 1440', None, '')):
+                s = Mock(my_status=T.NEW)
+                for i, p_ in enumerate(s.products): p_['kho'] = ['AYA', 'AYB', 'AYC'][i % 3]
+                ctx, page = open_page(browser, port, s, device=dev, extra_init=("localStorage.setItem('lg_lang','en');" if lang else ''))
+                T.login(page, T.ME); page.wait_for_timeout(600)
+                k = page.evaluate(KHO)
+                if dev:
+                    check(k['n'] == 4 and k['disp'] == 'grid' and k['radius'] <= 24 and k['rows'] == 2 and k['minH'] >= 44 and k['fit'] and k['noScroll'],
+                          f'{dev_name}: lưới 2 cột, 2 hàng nút, bo ≤ 24 px, nút ≥ 44 px, chữ không bị cắt, không tràn ngang ({k})')
+                else:
+                    check(k['disp'] == 'flex' and k['radius'] >= 999 and k['rows'] == 1, f'{dev_name}: giữ nguyên thanh 1 hàng bo tròn ({k})')
+                page.evaluate("[...document.querySelectorAll('#tab2 .kho-filter-pills button')][2].click()"); page.wait_for_timeout(600)
+                f = page.evaluate("[unifiedCatalogKho, [...document.querySelectorAll('#tab2 .lg-product-card')].length]")
+                check(f[0] == 'AYB' and f[1] == sum(1 for p_ in s.products if p_['kho'] == 'AYB'), f'{dev_name}: bấm Kho AYB → chỉ hiện sản phẩm kho AYB ({f})')
+                check(not page.errors, f'không có lỗi JS ({page.errors[:2]})')
+                ctx.close()
 
             print('16. Máy tính 1440 px: mô tả hiện đủ, không có nút "Xem đủ"; bảng vẫn là bảng; cửa sổ nộp tiền như cũ')
             s = Mock(my_status=T.NEW)
